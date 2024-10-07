@@ -217,7 +217,11 @@ void MX_USART3_UART_Init(void)
   huart3.Instance = USART3;
   huart3.Init.BaudRate = baud_rate;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+	huart3.Init.StopBits = UART_STOPBITS_1;
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+	huart3.Init.StopBits = UART_STOPBITS_2;
+#endif
   huart3.Init.Parity = UART_PARITY_NONE;
   huart3.Init.Mode = UART_MODE_TX_RX;
   huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;

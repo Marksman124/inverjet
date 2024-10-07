@@ -50,8 +50,8 @@
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
           <OutputName>inverjet_app</OutputName>
-          <CreateExecutable>0</CreateExecutable>
-          <CreateLib>1</CreateLib>
+          <CreateExecutable>1</CreateExecutable>
+          <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
@@ -82,7 +82,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
-            <UserProg1Name>fromelf --bin --output=.\inverjet_app\inverjet_app.bin .\inverjet_app\inverjet_app.axf</UserProg1Name>
+            <UserProg1Name>fromelf --bin --output=.\output\inverjet_app.bin .\output\inverjet_app.axf</UserProg1Name>
             <UserProg2Name>.\after_build_script.bat "$J\..\bin" "#L" "$L@L.bin"</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1122,6 +1122,11 @@
               <FilePath>..\Core\app\tm1621.c</FilePath>
             </File>
             <File>
+              <FileName>wifi_thread.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Thread\wifi_thread.c</FilePath>
+            </File>
+            <File>
               <FileName>bluetooth.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\app\bluetooth.c</FilePath>
@@ -1175,11 +1180,6 @@
               <FileName>macro_definition.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Core\Thread\macro_definition.h</FilePath>
-            </File>
-            <File>
-              <FileName>wifi_thread.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Thread\wifi_thread.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -51,6 +51,7 @@ typedef enum
 	// 异常状态
   OPERATION_MENU_STATUS,		//			操作菜单
 	ERROR_DISPLAY_STATUS,			//			故障界面
+	OTA_UPGRADE_STATUS,				//			OTA 升级
 	SYSTEM_STATE_END,					//	结束
 } SYSTEM_STATE_MODE_E;
 
@@ -102,6 +103,8 @@ extern uint8_t System_is_Operation(void);
 extern uint8_t System_is_Error(void);
 // 关机
 extern uint8_t System_is_Power_Off(void);
+// OTA
+extern uint8_t System_is_OTA(void);
 // 自由 模式
 extern uint8_t System_Mode_Free(void);
 // 定时 模式

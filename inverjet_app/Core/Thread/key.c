@@ -31,8 +31,8 @@
 
 #define KEY_IO_NUMBER_MAX			4
 
-#define KEY_MULTIPLE_CLICKS_MAX			8
-#define KEY_MULTIPLE_CLICKS_TIME			3000
+#define KEY_MULTIPLE_CLICKS_MAX				8						// 8次
+#define KEY_MULTIPLE_CLICKS_TIME			3000				// 3秒内
 //------------------- 按键 & 引脚 ----------------------------
 #define KEY_SPEED_IO_PORT			GPIOC
 #define KEY_SPEED_IO_PIN			GPIO_PIN_7
@@ -157,7 +157,6 @@ void on_pushButton_clicked(void)
 			Arbitrarily_To_Initial();
 		
 		Update_OP_Speed();
-		
 		Lcd_Show();
 	}
 	else
@@ -187,7 +186,8 @@ void on_pushButton_2_clicked(void)
 {
 	if(*p_System_State_Machine == POWER_OFF_STATUS)
 		return;
-	Clean_Timing_Timer_Cnt();
+	Clean_Swimming_Distance();//清除计算距离
+	Clean_Timing_Timer_Cnt();//清除 timing线程计时器
 	
 	if(*p_System_State_Machine == TIMING_MODE_INITIAL)
 	{
@@ -207,7 +207,6 @@ void on_pushButton_2_clicked(void)
 	else
 	{
 			To_Timing_Mode();
-			Fun_Change_Mode();
 	}
 	Arbitrarily_To_Initial();
 	
@@ -222,13 +221,12 @@ void on_pushButton_3_clicked(void)
 {
 	if(*p_System_State_Machine == POWER_OFF_STATUS)
 		return;
-	
-	Clean_Timing_Timer_Cnt();
-	
+	Clean_Swimming_Distance();//清除计算距离
+	Clean_Timing_Timer_Cnt();//清除 timing线程计时器
+		
 	if(System_Mode_Free())
 	{
 			To_Train_Mode(1);
-			Fun_Change_Mode();
 	}
 	else if(System_Mode_Train())
 	{
@@ -244,11 +242,9 @@ void on_pushButton_3_clicked(void)
 	else
 	{
 			To_Free_Mode(0);
-			Fun_Change_Mode();
 	}
 
 	Period_Now = 0;
-	Arbitrarily_To_Initial();
 }
 
 //================================== ④ 开机键  短按
@@ -274,8 +270,8 @@ void on_pushButton_4_Short_Press(void)
 	else	// 其它 --> 暂停
 	{
 		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+		*p_OP_ShowNow_Speed = 0;
 		Arbitrarily_To_Pause();
-		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
 	}
 	
 	//*p_OP_ShowNow_Time = 20;
@@ -333,6 +329,8 @@ void on_pushButton_1_Long_Press(void)
 //		if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR) == 0)
 //			Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 //	}
+	Clean_Timing_Timer_Cnt();
+	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
@@ -453,8 +451,11 @@ void Led_Button_On(uint8_t para)
 		HAL_GPIO_WritePin(LED_POWER_IO_PORT, LED_POWER_IO_PIN, GPIO_PIN_RESET);	// 0		
 	
 }
-
-//特殊按键规则
+/**********************************************************************************************
+*
+*						特殊按键规则
+*
+**********************************************************************************************/
 void Special_Button_Rules(uint8_t key_value)
 {
 	if(Get_Upgradation_Static() == UPDATE_START_CMD)
@@ -748,10 +749,10 @@ void System_Power_On(void)
 	Check_Data_Init();
 
 	//	状态
-	To_Free_Mode(0);				// ui
+	To_Free_Mode(0);			// ui
 	
 	Led_Button_On(0x0F);	// 按键
-	
+	all_data_update();		// wifi 上传
 	//
 	
 	// 后台定时器
@@ -761,7 +762,9 @@ void System_Power_On(void)
 //	关机
 void System_Power_Off(void)
 {
+	char show_mapping[9] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 	
+	Clean_Swimming_Distance();//清除计算距离
 	//清除故障状态
 	CallOut_Fault_State();
 	//清除计数器
@@ -775,6 +778,8 @@ void System_Power_Off(void)
 	
 	// 后台定时器
 	//BlackGround_Task_Off();
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
+	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
 	
 	//退出100档位模式
 	Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
@@ -791,7 +796,7 @@ void System_Boot_Screens(void)
 //	return;
 //#endif
 ////*******************************************************
-
+	osDelay(200);
 	//全亮 2s
 	Breath_light_Max();
 	TM1621_Show_All();
@@ -821,3 +826,12 @@ void Restore_Factory_Settings(void)
 	
 }
 
+//	OTA
+void System_To_OTA(void)
+{
+	Set_System_State_Machine(OTA_UPGRADE_STATUS);
+	Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
+}
+
+
+	

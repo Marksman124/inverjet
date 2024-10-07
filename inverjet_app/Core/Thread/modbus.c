@@ -106,7 +106,7 @@ HoldingCallOut( USHORT usAddress )
 		}
 		else
 		{
-			Motor_Speed_Target_Set(0);
+			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		//Ctrl_Set_System_Mode(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE]);
 		Set_Ctrl_Mode_Type(CTRL_FROM_RS485);//标记控制来源
@@ -120,7 +120,7 @@ HoldingCallOut( USHORT usAddress )
 		}
 		else
 		{
-			Motor_Speed_Target_Set(0);
+			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		Set_Ctrl_Mode_Type(CTRL_FROM_RS485);//标记控制来源
 	}
@@ -205,7 +205,7 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
 							while( usNRegs > 0 )
 							{
 								//状态机
-								if((iRegIndex == MB_SYSTEM_WORKING_STATUS) && ( *(++pucRegBuffer) > TRAINING_MODE_STOP ))
+								if((iRegIndex == MB_SYSTEM_WORKING_STATUS) && ( *(pucRegBuffer+1) > TRAINING_MODE_STOP ))
 								{
 									pucRegBuffer++;
 									pucRegBuffer++;
@@ -483,6 +483,19 @@ void Set_DataValue_U32(UCHAR ucFunctionCode, USHORT addr, uint32_t value)
 	//taskEXIT_CRITICAL();
 }
 
+void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8_t len)
+{
+	//taskENTER_CRITICAL();
+	if(ucFunctionCode == MB_FUNC_READ_HOLDING_REGISTER)
+	{
+		memcpy(&usRegHoldingBuf[addr], p_data, len);
+	}
+	else if(ucFunctionCode == MB_FUNC_READ_INPUT_REGISTER)
+	{
+		memcpy(&usRegInputBuf[addr], p_data, len);
+	}
+	//taskEXIT_CRITICAL();
+}
 
 void Get_Mapping_Register(void)
 {
@@ -517,8 +530,14 @@ void Get_Mapping_Register(void)
 	//电机 下发 实际 转速
 	p_Send_Reality_Speed = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SEND_REALITY_SPEED);
 	
+	//电机 实际 功率
+	p_Motor_Reality_Power = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_REALITY_POWER);
+	
+	
 	//母线 电压
 	p_Motor_Bus_Voltage = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_VOLTAGE);
+	
+	p_Simulated_Swim_Distance = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SIMULATED_SWIM_DISTANCE);
 
 
 	//--------------------------- 系统属性
@@ -530,8 +549,7 @@ void Get_Mapping_Register(void)
 	p_OP_ShowNow_Speed = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_CURRENT_SPEED);
 	// 当前时间
 	p_OP_ShowNow_Time = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_CURRENT_TIME);
-	
-	
+		
 	//--------------------------- 调试 使用
 	// 系统时间
 	p_System_Runing_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_RUNNING_TIME);		// 系统时间

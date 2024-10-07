@@ -93,6 +93,8 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_MOTOR_REALITY_SPEED, DP_TYPE_VALUE},
     {DPID_MOTOR_BUS_VOLTAGE, DP_TYPE_VALUE},
     {DPID_SEND_REALITY_SPEED, DP_TYPE_VALUE},
+    {DPID_MOTOR_POWER, DP_TYPE_VALUE},
+    {DPID_MOTOR_BUS_CURRENTE, DP_TYPE_VALUE},
     {DPID_SYSTEM_RUNNING_TIME, DP_TYPE_VALUE},
     {DPID_NO_OPERATION_TIME, DP_TYPE_VALUE},
     {DPID_SYSTEM_SLEEPING_TIME, DP_TYPE_VALUE},
@@ -100,6 +102,7 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_SYSTEM_WORKING_STATUS, DP_TYPE_ENUM},
     {DPID_MOTOR_CURRENT_SPEED, DP_TYPE_VALUE},
     {DPID_MOTOR_CURRENT_TIME, DP_TYPE_VALUE},
+    {DPID_SWIMMING_DISTANCE, DP_TYPE_VALUE},
     {DPID_FREE_MODE_SPEEN, DP_TYPE_VALUE},
     {DPID_TIMING_MODE_SPEEN, DP_TYPE_VALUE},
     {DPID_TIMING_MODE_TIME, DP_TYPE_VALUE},
@@ -165,10 +168,12 @@ void all_data_update(void)
     mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,当前读系统故障); //故障型数据上报;
     mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,当前MOS温度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,当前电箱温度); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,当前电机电流); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,当前电机电流(输出)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,当前电机实际转速); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,当前母线电压); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,当前母线电压(输入)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_SEND_REALITY_SPEED,当前下发实际转速); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_POWER,当前电机功率); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,当前母线电流); //VALUE型数据上报;
     mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,当前系统运行时间); //VALUE型数据上报;
     mcu_dp_value_update(DPID_NO_OPERATION_TIME,当前无操作时间); //VALUE型数据上报;
     mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,当前休眠时间); //VALUE型数据上报;
@@ -176,7 +181,7 @@ void all_data_update(void)
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,当前系统状态机); //枚举型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,当前当前转速); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,当前当前时间); //VALUE型数据上报;
-	
+    mcu_dp_value_update(DPID_SWIMMING_DISTANCE,当前游泳距离); //VALUE型数据上报;
     mcu_dp_value_update(DPID_FREE_MODE_SPEEN,当前自由模式默认速度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,当前定时模式默认速度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_TIMING_MODE_TIME,当前定时模式默认时间); //VALUE型数据上报;
@@ -190,33 +195,36 @@ void all_data_update(void)
     */
 
 	//故障上传
-	mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,*p_Motor_Fault_Static); //VALUE型数据上报;
-	mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,*p_System_Fault_Static); //故障型数据上报;
+	mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,*p_Motor_Fault_Static); 					// 驱动板故障;
+	mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,*p_System_Fault_Static); 	// 系统 故障型数据上报;
 	
 	//暂定不传
-	mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,*p_Mos_Temperature); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,*p_Box_Temperature); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,*p_Motor_Current); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Motor_Reality_Speed); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,*p_Motor_Bus_Voltage); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Send_Reality_Speed); //VALUE型数据上报;
-	
+	mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,*p_Mos_Temperature); 					// MOS温度;
+	mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,*p_Box_Temperature); 					// 机箱温度;
+	mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,*p_Motor_Current);								// 输出电流（电机）;
+	mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,*p_Motor_Bus_Voltage);						// 输入电压（母线）;
+	mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,*p_Motor_Bus_Current); 					// 输入电流（母线）;
+	mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Motor_Reality_Speed); 			// 实际转速;
+	mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Send_Reality_Speed);				// 下发转速;
+	mcu_dp_value_update(DPID_MOTOR_POWER,*p_Motor_Reality_Power);								// 当前功率;
+	mcu_dp_value_update(DPID_SWIMMING_DISTANCE,*p_Simulated_Swim_Distance); 		// 模拟游泳距离;
 	
 	// 系统状态 (重要)
-	mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); //VALUE型数据上报;
-	mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,*p_System_State_Machine); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed); //VALUE型数据上报;
-	mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time); //VALUE型数据上报;
+	mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); 									// 工作模式;
+	mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,*p_System_State_Machine); 		// 状态机;
+	mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed);					// 当前速度;
+	mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time);						// 当前时间;
 	
 	// 默认参数
-	mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed); //VALUE型数据上报;
-  mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed); //VALUE型数据上报;
-  mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time); //VALUE型数据上报;
+	mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed);						// 自由模式 速度;
+  mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed);				// 定时模式 速度;
+  mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time);					// 定时模式 时间;
 
 	// debug 用
-	mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,		*p_System_Runing_Second_Cnt); //VALUE型数据上报;
-  mcu_dp_value_update(DPID_NO_OPERATION_TIME,			*p_No_Operation_Second_Cnt); //VALUE型数据上报;
-  mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,	*p_System_Sleeping_Second_Cnt); //VALUE型数据上报;
+	mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,		*p_System_Runing_Second_Cnt); 	// 运行时间;
+  mcu_dp_value_update(DPID_NO_OPERATION_TIME,			*p_No_Operation_Second_Cnt); 		// 无操作时间;
+  mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,	*p_System_Sleeping_Second_Cnt); // 休眠时间;
+	mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_Simulated_Swim_Distance);				// 游泳距离;
 }
 
 
@@ -236,28 +244,15 @@ void all_data_update(void)
 *****************************************************************************/
 static unsigned char dp_download_system_working_mode_handle(const unsigned char value[], unsigned short length)
 {
-    //示例:当前DP类型为VALUE
+    //示例:当前DP类型为ENUM
     unsigned char ret;
     unsigned char system_working_mode;
 
     system_working_mode = mcu_get_dp_download_enum(value,length);
 
-    switch(system_working_mode) {
-        
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-					*p_PMode_Now = system_working_mode;
-					Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-					Set_Pmode_Period_Now(0);
-        break;
-        
-        default:
-        break;
-    }
+		*p_PMode_Now = system_working_mode;
+		Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+		Set_Pmode_Period_Now(0);
 
     //There should be a report after processing the DP
     ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE, system_working_mode);
@@ -276,7 +271,7 @@ static unsigned char dp_download_system_working_mode_handle(const unsigned char 
 *****************************************************************************/
 static unsigned char dp_download_system_working_status_handle(const unsigned char value[], unsigned short length)
 {
-    //示例:当前DP类型为VALUE
+    //示例:当前DP类型为ENUM
     unsigned char ret;
     unsigned char system_working_status;
 
@@ -720,7 +715,7 @@ void upgrade_package_choose(unsigned long package_sz)
 		pack_sum ++;
 	
 	Out_Of_Upgradation();
-	System_Power_Off();
+	System_To_OTA();
 	Lcd_Show_Upgradation(pack_sum,0);
 	Freertos_TaskSuspend_Wifi();
 	
@@ -759,7 +754,7 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
 			Wifi_OTA_Pack_Len += (length);
 			taskEXIT_CRITICAL();
     }
-		Lcd_Show_Upgradation(pack_sum,++pack_cnt);
+		Lcd_Show_Upgradation(pack_sum,(++pack_cnt*100)/pack_sum);//(num*100)/sum;
 		osDelay(300);
     return SUCCESS;
 }

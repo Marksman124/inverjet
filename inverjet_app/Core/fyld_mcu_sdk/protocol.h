@@ -283,6 +283,12 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //下发实际转速(只上报)
 //备注:
 #define DPID_SEND_REALITY_SPEED 11
+//电机功率(只上报)
+//备注:
+#define DPID_MOTOR_POWER 12
+//母线电流(只上报)
+//备注:
+#define DPID_MOTOR_BUS_CURRENTE 13
 //系统运行时间(只上报)
 //备注:
 #define DPID_SYSTEM_RUNNING_TIME 16
@@ -304,6 +310,9 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //当前时间(可下发可上报)
 //备注:
 #define DPID_MOTOR_CURRENT_TIME 24
+//游泳距离(只上报)
+//备注:
+#define DPID_SWIMMING_DISTANCE 25
 //自由模式默认速度(可下发可上报)
 //备注:
 #define DPID_FREE_MODE_SPEEN 28
@@ -314,7 +323,7 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //备注:
 #define DPID_TIMING_MODE_TIME 30
 //训练计划01(可下发可上报)
-//备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
+//备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】*50 = 200 字节
 #define DPID_SET_TRAIN_PLAN_01 31
 //训练计划02(可下发可上报)
 //备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节

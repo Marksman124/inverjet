@@ -14,7 +14,7 @@ unsigned char BT_OTA_Mode=0;
 
 unsigned long BT_OTA_Pack_Len=0;					// 总长度
 
-unsigned long BT_Pack_Sum=0;
+unsigned long BT_Pack_Len=0;
 
 unsigned char BT_OTA_Buffer[MODBUS_SLAVE_TX_RX_MAX_LEN]={0};
 
@@ -359,7 +359,7 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 		}
 		else
 		{
-			Motor_Speed_Target_Set(0);
+			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		//Ctrl_Set_System_Mode(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE]);
 		Set_Ctrl_Mode_Type(CTRL_FROM_BT);//标记控制来源
@@ -648,6 +648,8 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 	unsigned long write_addr=0;						// flash 写入地址
 	unsigned long sign=0;
 	unsigned long len=0;
+	
+	static uint8_t BT_Pack_Sum=0;
 	static unsigned char first_error=0;
 	
     if(!pObj->rxWriteLock)
@@ -679,9 +681,9 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 					len = pObj->rxWriteIdx;
 					memcpy(BT_OTA_Buffer,pObj->rxBuff,len);
 					
-//					if((BT_OTA_Pack_Len + len) > BT_Pack_Sum)
+//					if((BT_OTA_Pack_Len + len) > BT_Pack_Len)
 //					{
-//						len =  BT_Pack_Sum - BT_OTA_Pack_Len;
+//						len =  BT_Pack_Len - BT_OTA_Pack_Len;
 //					}
 					_MsRxQueueUnLock(pObj);
 					taskENTER_CRITICAL();
@@ -690,7 +692,7 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 					BT_OTA_Pack_Len += (len);
 					taskEXIT_CRITICAL();
 					
-					Lcd_Show_Upgradation(100,BT_OTA_Pack_Len*100/BT_Pack_Sum);
+					Lcd_Show_Upgradation(BT_Pack_Sum,BT_OTA_Pack_Len*100/BT_Pack_Len);
 				}
 			}
 		}
@@ -731,8 +733,12 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 			BT_OTA_Mode = 0xAA;
 			BT_OTA_Pack_Len = 0;
 			first_error = 0;
-			BT_Pack_Sum = pObj->rxBuff[2]<<24 | pObj->rxBuff[3]<<16| pObj->rxBuff[4]<<8| pObj->rxBuff[5];
-			Lcd_Show_Upgradation(100,0);
+			BT_Pack_Len = pObj->rxBuff[2]<<24 | pObj->rxBuff[3]<<16| pObj->rxBuff[4]<<8| pObj->rxBuff[5];
+			BT_Pack_Sum = BT_Pack_Len/1024;
+			if(BT_Pack_Len % 1024)
+				BT_Pack_Sum ++;
+			System_To_OTA();
+			Lcd_Show_Upgradation(BT_Pack_Sum,0);
 			Freertos_TaskSuspend_RS485();
 				break;
 			case 0x02:

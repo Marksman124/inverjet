@@ -231,8 +231,8 @@ void BT_Distribution_Halder(void)
 		SerialWrite((uint8_t*)"+++",3);
 	else if(BT_Halder_cnt == 2)
 		BT_Set_Name();
-	else if(BT_Halder_cnt == 4)
-		BT_Set_MAC();
+	//else if(BT_Halder_cnt == 4)
+		//BT_Set_MAC();
 	else if(BT_Halder_cnt == 6)
 		BT_Set_Mode(0);
 	else if(BT_Halder_cnt == 16)

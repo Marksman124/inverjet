@@ -61,6 +61,12 @@ uint16_t Check_Motor_Speed_Cnt=0;
 //  刷新屏幕
 static uint8_t LCD_Refresh_State= 0;
 
+#ifdef SYSTEM_LONG_RUNNING_MODE
+//********* 老化工装 ***********************************************
+// 老化工装 计时器
+static uint32_t Old_Chemical_Equipment_Cnt =0;
+//******************************************************************
+#endif
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -83,16 +89,23 @@ void Clean_Timing_Timer_Cnt(void)
 	Timing_Timer_Cnt = 0;
 }
 
-// 停止刷新
+// 设置刷新标志
 void LCD_Refresh_Set(uint8_t value)
 {
 	LCD_Refresh_State = value;
 }
 
-// 停止刷新
+// 获取刷新标志
 uint8_t LCD_Refresh_Get(void)
 {
 	return LCD_Refresh_State;
+}
+
+// 恢复刷新
+void LCD_Refresh_Restore(void)
+{
+	if(LCD_Refresh_Get()== 1)
+		LCD_Refresh_Set(0);
 }
 
 void Speed_Save_Flash(Operating_Parameters op_node,uint8_t system_state)
@@ -311,6 +324,7 @@ void Fault_State_Handler(void)
 // 软启动 状态基  1秒进一次
 void Starting_State_Handler(void)
 {
+	all_data_update();		// wifi 上传
 	Arbitrarily_To_Running();
 	return;
 	
@@ -393,7 +407,8 @@ void Running_State_Handler(void)
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 	}
-	
+	// 计算 模拟 距离
+	Calculate_Swimming_Distance();
 	// 转速达到目标值
 	if(Motor_Speed_Is_Reach())
 	{
@@ -427,7 +442,7 @@ void Running_State_Handler(void)
 		}
 #endif
 	}
-	//高温降速
+	//降频
 	if(Get_Temp_Slow_Down_State())
 	{
 		Temp_Slow_Down_Timing_Cnt ++;
@@ -441,7 +456,6 @@ void Running_State_Handler(void)
 			if( Motor_Speed_Target_Get()  >= (slow_down_speed + TIME_SLOW_DOWN_SPEED_MIX))
 			{
 				Temp_Slow_Down_Speed += slow_down_speed;
-				//高温 降速
 				Data_Set_Current_Speed(Motor_Speed_Target_Get() - slow_down_speed);
 			}
 		}
@@ -510,11 +524,14 @@ void Running_State_Handler(void)
 // 暂停 状态基  1秒进一次
 void Pause_State_Handler(void)
 {
+	if(*p_OP_ShowNow_Speed != 0)
+		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
+	
 	if(((Timing_Half_Second_Cnt - Automatic_Shutdown_Timing_Cnt) > AUTOMATIC_SHUTDOWN_TIME)&&(Timing_Half_Second_Cnt > Automatic_Shutdown_Timing_Cnt))
 	{
 		System_Power_Off();
 	}
-	Lcd_Show();
+	
 	if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 		Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 }
@@ -540,7 +557,11 @@ void Stop_State_Handler(void)
 	if(Timing_Timer_Cnt < 4)
 	{
 		if( (Timing_Timer_Cnt % 2) == 1)
-			Lcd_Off();
+		{
+			LCD_Refresh_Set(1);
+			//Lcd_Off();
+			Lcd_Speed_Off();
+		}
 		else
 			Lcd_Show();
 	}
@@ -577,7 +598,7 @@ void Initial_State_Handler(void)
 		}
 		else
 		{
-			LCD_Refresh_Set(0);
+			//LCD_Refresh_Set(0);
 			Lcd_Show();
 		}
 	}
@@ -621,12 +642,31 @@ void Initial_State_Handler(void)
 	Timing_Timer_Cnt++;
 }
 
-
 // 定时任务主线程
 void App_Timing_Task(void)
 {
 	if(System_is_Power_Off())
+	{
+#ifdef SYSTEM_LONG_RUNNING_MODE
+		//********* 老化工装 ***********************************************
+		// 老化工装 2h关  7200
+		Timing_Thread_Task_Cnt++;
+		*p_System_Runing_Second_Cnt = 0;
+		
+		if(Timing_Thread_Task_Cnt >= (TIMING_THREAD_HALF_SECOND*2)) //半秒
+		{
+			Old_Chemical_Equipment_Cnt++;
+			if(Old_Chemical_Equipment_Cnt > 7200)
+			{
+				Buzzer_Click_Long_On(1);
+				Old_Chemical_Equipment_Cnt = 0;
+				System_Power_On();
+			}
+		}
+		//******************************************************************
+#endif
 		return;
+	}
 	
 	Timing_Thread_Task_Cnt++;
 	
@@ -650,7 +690,18 @@ void App_Timing_Task(void)
 			half_second_state = 0;
 			*p_System_Runing_Second_Cnt += 1;
 			*p_No_Operation_Second_Cnt += 1;
-			
+#ifdef SYSTEM_LONG_RUNNING_MODE
+			//********* 老化工装 ***********************************************
+			// 老化工装 4h开  14400
+			Old_Chemical_Equipment_Cnt ++;
+			if(Old_Chemical_Equipment_Cnt > 14400)
+			{
+				Buzzer_Click_Long_On(1);
+				Old_Chemical_Equipment_Cnt = 0;
+				System_Power_Off();
+			}
+			//******************************************************************
+#endif
 			if(System_is_Pause() || System_is_Stop())
 				*p_System_Sleeping_Second_Cnt += 1;
 			else
@@ -667,7 +718,6 @@ void App_Timing_Task(void)
 		else
 		{
 			half_second_state = 1;
-
 			if(Motor_is_Start()==0)
 			{
 				// 时间 : 闪烁  半秒
@@ -715,6 +765,7 @@ void App_Timing_Task(void)
 					Operation_State_Handler();
 				}
 			}
+			
 		}
 	}
 	
@@ -722,51 +773,6 @@ void App_Timing_Task(void)
 		Lcd_Speed_Off();
 	else
 		Lcd_Show();
-//	{
-//		if(Motor_is_Start()==0)
-//		{
-//			// 时间 : 闪烁  半秒
-//			LCD_Show_Bit &= ~STATUS_BIT_COLON;
-//			TM1621_Show_Symbol(TM1621_COORDINATE_TIME_COLON, 		0);
-//			TM1621_LCD_Redraw();
-//		}
-//		//故障检测
-//		if(If_System_Is_Error())
-//		{
-//			Fault_State_Handler();
-//		}
-//		else
-//		{
-//			System_Fault_Timing_Cnt = 0;
-//			
-//			if(ERROR_DISPLAY_STATUS == Get_System_State_Machine())// && (If_Fault_Recovery_Max() == 0))
-//			{
-//				Clean_Fault_State();
-//				Lcd_Show();
-//			}
-//			
-//			if(System_is_Initial())
-//			{
-//				Initial_State_Handler();
-//			}
-//			else if(System_is_Starting())
-//			{
-//				Starting_State_Handler();
-//			}
-//			else if(System_is_Running())
-//			{
-//				Running_State_Handler();
-//			}
-//			else if(System_is_Pause())//暂停
-//			{
-//				Pause_State_Handler();
-//			}
-//			else if(System_is_Stop())//结束
-//			{
-//				Stop_State_Handler();
-//			}
-//		}
-//	}
 }
 
 // 定时任务主线程

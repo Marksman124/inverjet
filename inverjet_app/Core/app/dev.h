@@ -29,7 +29,7 @@ typedef __IO uint16_t vu16;
 
 
 #define MODBUS_LOCAL_ADDRESS			(21)
-#define MODBUS_BAUDRATE_DEFAULT			2
+#define MODBUS_BAUDRATE_DEFAULT			3
 
 extern uint16_t* p_Local_Address;			//	本地地址
 extern uint16_t* p_Baud_Rate;					//	波特率

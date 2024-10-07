@@ -205,6 +205,8 @@ void Breath_Light_Handler(void const * argument)
 void Rs485_Modbus_Handler(void const * argument)
 {
   /* USER CODE BEGIN Rs485_Modbus_Handler */
+	uint16_t time_cnt=0;
+	
 	Modbus_Init();
 	App_Data_Init();
 	BT_Modbus_Config_Init();
@@ -220,6 +222,15 @@ void Rs485_Modbus_Handler(void const * argument)
 		Modbus_Handle_Task();
 		
 		BT_Read_Handler();
+		
+		if(System_is_OTA())
+		{
+			if(time_cnt++ > MODBUS_THREAD_ONE_SECOND)
+			{
+				time_cnt = 0;
+				OTA_Time_Out();
+			}
+		}
 		
 		osDelay(THREAD_PERIOD_RS485_MODBUS_TASK);
   }
@@ -309,12 +320,23 @@ void Motor_Handler(void const * argument)
 void wifi_module_Handler(void const * argument)
 {
   /* USER CODE BEGIN wifi_module_Handler */
+	uint16_t time_cnt=0;
+	
 	wifi_Module_Init();
   /* Infinite loop */
   for(;;)
   {
 		Wifi_Module_Handler();
 		HAL_IWDG_Refresh(&hiwdg);
+		
+		if(System_is_OTA())
+		{
+			if(time_cnt++ > WIFI_THREAD_ONE_SECOND)
+			{
+				time_cnt = 0;
+				OTA_Time_Out();
+			}
+		}
     osDelay(THREAD_PERIOD_WIFI_TASK);
   }
   /* USER CODE END wifi_module_Handler */

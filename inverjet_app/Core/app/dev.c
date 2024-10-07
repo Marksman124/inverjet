@@ -25,7 +25,7 @@ uint16_t* p_Software_Version_low;		//	软件版本 低
 
 //与上位机modbus
 uint16_t* p_Baud_Rate;							//	波特率
-uint32_t Modbus_BaudRate_Table[] = 	{2400,4800,9600,19200,115200};
+uint32_t Modbus_BaudRate_Table[] = 	{1200,2400,4800,9600,19200,115200};
 #define MODBUS_BAUDRATE_TABLE_LEN		(sizeof(Modbus_BaudRate_Table)/sizeof(Modbus_BaudRate_Table[0]))
 
 
@@ -53,7 +53,11 @@ uint32_t Dev_BaudRate_Get(uint8_t usart_num)
 	}
 	else if(usart_num == DRIVER_USART)	// 驱动板
 	{
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 		return 115200;//115200
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+		return 2400;
+#endif
 	}
 	else if(usart_num == BLUETOOTH_USART)	// 蓝牙
 	{

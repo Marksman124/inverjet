@@ -52,7 +52,7 @@ uint8_t Set_System_State_Machine(uint8_t val)
 {
 	if(val >= SYSTEM_STATE_END) //溢出
 		return 0;
-	
+		
 	*p_System_State_Machine = val;
 	
 	return 1;
@@ -160,6 +160,15 @@ uint8_t System_is_Power_Off(void)
 		return 0;
 }
 
+// OTA
+uint8_t System_is_OTA(void)
+{
+	if(*p_System_State_Machine == OTA_UPGRADE_STATUS)
+		return 1;
+	else
+		return 0;
+}
+
 
 // 自由 模式
 uint8_t System_Mode_Free(void)
@@ -187,6 +196,7 @@ uint8_t System_Mode_Train(void)
 	else
 		return 0;
 }
+
 
 
 //------------------- 更改状态 不改变模式  ----------------------------
@@ -259,6 +269,7 @@ void Arbitrarily_To_Pause(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 1;
 	
+	Motor_Speed_Target_Set(0);
 	Clean_Automatic_Shutdown_Timer();
 	return;
 }
@@ -282,7 +293,6 @@ void Arbitrarily_To_Stop(void)
 	Clean_Automatic_Shutdown_Timer();
 	return;
 }
-
 
 //------------------- 特别状态 机  ----------------------------
 

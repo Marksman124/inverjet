@@ -56,7 +56,6 @@ uint16_t* p_PMode_Now;								// 当前模式
 uint16_t* p_OP_ShowNow_Speed;					// 当前速度
 uint16_t* p_OP_ShowNow_Time;					// 当前时间
 
-
 System_Ctrl_Mode_Type_enum Ctrl_Mode_Type = CTRL_FROM_KEY;				// 控制方式
 
 // 各模式 属性
@@ -66,18 +65,29 @@ Operating_Parameters* p_OP_Timing_Mode;
 
 Operating_Parameters (*p_OP_PMode)[TRAINING_MODE_PERIOD_MAX] = OP_Init_PMode;
 
-uint16_t* p_Driver_Software_Version;			//驱动板软件版本
+//==========================================================
+//--------------------------- 驱动板读取信息
+//==========================================================
+uint16_t* p_Driver_Software_Version;			// 驱动板软件版本
+uint16_t* p_Motor_Fault_Static;						// 故障状态		驱动板
 
-uint16_t* p_System_Fault_Static;			//故障状态
-uint16_t* p_Motor_Fault_Static;				//故障状态
-uint16_t* p_Mos_Temperature;					//mos 温度
-uint16_t* p_Box_Temperature;					//电箱 温度
-uint32_t* p_Motor_Current;						//电机 电流
-uint32_t* p_Motor_Reality_Speed;			//电机 实际 转速
-uint32_t* p_Send_Reality_Speed;				//下发 实际 转速
+uint32_t* p_Motor_Reality_Speed;					// 电机 实际 转速
+uint32_t* p_Motor_Reality_Power;					// 电机 实际 功率
 
-uint16_t* p_Motor_Bus_Voltage;				//母线 电压
-	
+uint16_t* p_Mos_Temperature;							// mos 温度
+uint32_t* p_Motor_Current;								// 电机 电流		输出
+uint16_t* p_Motor_Bus_Voltage;						// 母线 电压		输入
+uint16_t* p_Motor_Bus_Current;						// 母线 电流  	输入
+
+//==========================================================
+//--------------------------- 整机信息
+//==========================================================
+uint16_t* p_System_Fault_Static;					// 故障状态		整机
+uint16_t* p_Box_Temperature;							// 电箱 温度
+uint32_t* p_Send_Reality_Speed;						// 下发 实际 转速
+uint32_t* p_Simulated_Swim_Distance;			// 模拟游泳距离
+
+
 uint16_t* p_Modbus_Node_Addr;					//地址
 uint16_t* p_Modbus_Baud_Rate;					//波特率
 uint16_t* p_Support_Control_Methods;	//屏蔽控制方式
@@ -113,6 +123,11 @@ uint32_t* p_System_Sleeping_Second_Cnt;		// 休眠时间
 void Check_Data_Init(void)
 {
 	static uint8_t x=0,y=0;
+	
+	*p_System_Runing_Second_Cnt = 0; //运行时间
+	*p_No_Operation_Second_Cnt = 0;	//无人操作时间
+	*p_System_Sleeping_Second_Cnt = 0;// 休眠时间
+	*p_Analog_key_Value = 0;	//虚拟按键
 	
 	if(Is_Speed_Legal(p_OP_Free_Mode->speed) == 0)
 	{
@@ -151,11 +166,6 @@ void Check_Data_Init(void)
 			}
 		}
 	}
-	
-	*p_System_Runing_Second_Cnt = 0; //运行时间
-	*p_No_Operation_Second_Cnt = 0;	//无人操作时间
-	*p_System_Sleeping_Second_Cnt = 0;// 休眠时间
-	*p_Analog_key_Value = 0;	//虚拟按键
 }
 
 
@@ -241,6 +251,7 @@ void Update_OP_Speed(void)
 		Memset_OPMode();//存flash
 	}
 }
+
 //存储 新 时间
 void Update_OP_Time(void)
 {
@@ -352,10 +363,12 @@ void System_Wifi_State_Clean(void)
 	WIFI_Rssi = 0xFF;
 }
 	
-	
+extern void LCD_Refresh_Restore(void);
+
 //------------------- 设置控制方式 ----------------------------
 void Set_Ctrl_Mode_Type(System_Ctrl_Mode_Type_enum type)
 {
+	LCD_Refresh_Restore();//恢复刷新
 	Ctrl_Mode_Type = type;
 }
 	
@@ -365,4 +378,24 @@ System_Ctrl_Mode_Type_enum Get_Ctrl_Mode_Type(void)
 	return Ctrl_Mode_Type;
 }
 
+//------------------- OTA 自动退出 1秒进一次 ----------------------------
+void OTA_Time_Out(void)
+{
+	static uint32_t time_out_cnt=0;
+	
+	time_out_cnt ++;
+	if(time_out_cnt > OTA_SHUTDOWN_TIME_OUT)
+	{
+		SysSoftReset();// 软件复位
+	}
+}
 
+//------------------- 显示内容映射 ----------------------------
+void LCD_TO_Mapping(void)
+{
+	
+}
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------

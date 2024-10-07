@@ -89,7 +89,8 @@ typedef enum
 extern void App_Timing_Init(void);
 
 extern void Clean_Timing_Timer_Cnt(void);
-	
+// 获取刷新标志
+extern void LCD_Refresh_Restore(void);
 // 定时任务主线程
 extern void App_Timing_Handler(void);
 

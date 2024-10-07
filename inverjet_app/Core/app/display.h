@@ -47,6 +47,7 @@ extern "C" {
 //#define STATUS_BIT_P2							64
 //#define STATUS_BIT_P3							128
 
+#define LCD_SYMBOL_FOT_FAULT								(STATUS_BIT_BLUETOOTH + STATUS_BIT_WIFI)
 
 /* Exported functions prototypes ---------------------------------------------*/
 
@@ -112,9 +113,7 @@ extern void Lcd_System_Information(void);
 extern void Lcd_Speed_Off(void);
 // 降速 界面 2秒1刷
 void Lcd_Show_Slow_Down(uint8_t value);
-//------------------- 切换模式  ----------------------------
-// 切换模式
-extern void Fun_Change_Mode(void);
+
 // 关机
 extern void To_Power_Off(void);
 // 自由模式

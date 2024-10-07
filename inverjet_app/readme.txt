@@ -3,7 +3,7 @@ config：
 
 Run #1：
 
-fromelf --bin --output=.\inverjet_app\inverjet_app.bin .\inverjet_app\inverjet_app.axf
+fromelf --bin --output=.\output\inverjet_app.bin .\output\inverjet_app.axf
 
 
 Run #2：

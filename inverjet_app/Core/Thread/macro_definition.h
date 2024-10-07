@@ -31,19 +31,38 @@ extern "C" {
 #define PRODUCT_MODEL_CODE_SJ160					(160)
 //*******************************************************
 
+
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 // 产品机型码
 #define	MACRO_SYSTEM_PRODUCT_MODEL_CODE								PRODUCT_MODEL_CODE_SJ230		//
 
 // 软件版本
 #define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.1"
 
-
-//******************  调试模式 **************************
-#define SYSTEM_DEBUG_MODE					1
-//#define UART_PRINTF_LOG						1
-//#define UART_DEBUG_SEND_CTRL			1
+/**
+******************************************************************************
+* 系统宏定义
+******************************************************************************
+*/
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
+//#define UART_PRINTF_LOG									1	// 打印日志
+//#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
+//#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
 //*******************************************************
 
+//******************  驱动板 型号选择 **************************
+#define MOTOR_DEVICE_HARDWARE_AQPED002					(1)			//	郭工 版
+#define MOTOR_DEVICE_HARDWARE_TEMP001						(2)			//	蓝工 版
+
+//*******************************************************
+
+#define MOTOR_DEVICE_PROTOCOL_VERSION						(MOTOR_DEVICE_HARDWARE_AQPED002)				// 驱动协议版本
+
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
 /*==============================================================================================================*/
 // 串口1 --> 中控Modbus 	(485)
 // 串口2 --> wifi 			(ttl)
@@ -58,7 +77,7 @@ extern "C" {
 #define	MACRO_BLUETOOTH_USART							5
 
 //串口总数
-#define	MACRO_SYSTEM_USER_USART_MAX				(5)
+#define	MACRO_SYSTEM_USER_USART_MAX										(5)
 
 
 #define MACRO_POWER_ON_WAITE_TIME_TASK								(4000)			//上电等待时间 （等显示开机界面 机型码）
@@ -79,10 +98,10 @@ extern "C" {
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
-#define LIGHT_BRIGHTNESS_MAX					(200)			// 最大亮度  0~500
+#define LIGHT_BRIGHTNESS_MAX					(50)		// 最大亮度  0~500
 #else
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
-#define LIGHT_BRIGHTNESS_MAX					(500)//(*p_Breath_Light_Max)			// 最大亮度  0~500
+#define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// 最大亮度  0~500
 #endif
 //*******************************************************
 //档位
@@ -156,8 +175,8 @@ extern "C" {
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 //配网时长
-#define WIFI_DISTRIBUTION_TIME_CALLOUT				(6*TIMING_THREAD_ONE_SECOND)				// 6 s
-#define BT_DISTRIBUTION_TIME_CALLOUT					(6*TIMING_THREAD_ONE_SECOND)				// 6 s
+#define WIFI_DISTRIBUTION_TIME_CALLOUT				(60*TIMING_THREAD_ONE_SECOND)				// 6 s
+#define BT_DISTRIBUTION_TIME_CALLOUT					(60*TIMING_THREAD_ONE_SECOND)				// 6 s
 //故障自恢复
 #define SYSTEM_FAULT_TIME_CALLOUT							(20*TIMING_THREAD_ONE_SECOND)				// 20 s
 #define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
@@ -177,7 +196,21 @@ extern "C" {
 #define AUTOMATIC_SHUTDOWN_TIME								(1800*TIMING_THREAD_ONE_SECOND)				// 0.5 小时内  1800 s
 
 #endif
-//自动关机 时间
+
+// 每 %1 每秒 增加游泳距离 放大1000倍
+#if(MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ230)
+// 1.5米处 流速 1.8m/s   出水口流速 4m/s
+#define	EVERY_1PERCENT_DISTANCE_PER_SECOND								(180)
+
+#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ200)
+// 1.5米处 流速 1.6m/s   出水口流速 3.45m/s
+#define	EVERY_1PERCENT_DISTANCE_PER_SECOND								(160)
+
+#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ160)
+// 1.5米处 流速 1.38m/s   出水口流速 2.94m/s
+#define	EVERY_1PERCENT_DISTANCE_PER_SECOND								(138)
+
+#endif
 
 
 //-------------------------------------------------------------------------------------------------
@@ -215,6 +248,9 @@ extern "C" {
 #if(MODBUS_THREAD_TURN_ON)
 #define MODBUS_THREAD_LIFECYCLE							(40)				// ms 暂时不用
 
+//1秒周期数
+#define MODBUS_THREAD_ONE_SECOND						(1000/MODBUS_THREAD_LIFECYCLE)				// 1 s
+
 #endif
 /*==============================================================================================================*/
 /*==============================================================================================================*/
@@ -226,6 +262,7 @@ extern "C" {
 #define MOTOR_THREAD_TURN_ON					1
 
 #if(MOTOR_THREAD_TURN_ON)
+
 #define MOTOR_THREAD_LIFECYCLE						(20)				// 任务生命周期 50ms
 
 // 命令 周期 200ms 
@@ -238,8 +275,15 @@ extern "C" {
 // 读状态 周期 200ms 
 #define MOTOR_READ_STATIC_CYCLE						(0)
 
+
+//*****************************************************************************
 //电机极数
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 #define	MOTOR_POLE_NUMBER									(5)
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+#define	MOTOR_POLE_NUMBER									(1)
+#endif
+//*****************************************************************************
 
 #if(MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ230)
 //最大转速 100%
@@ -289,6 +333,38 @@ extern "C" {
 //-------------------------------------------------------------------------------------------------
 
 
+//-------------------------------------------------------------------------------------------------
+//*********************************************************************************************
+
+// 功率 降频
+#if(MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ230)
+//*********************************************************************************************
+//-------------- 电机功率 报警值  -------------------
+#define MOTOR_POWER_ALARM_VALUE								(1450)
+//-------------- 电机功率 降速  -------------------
+#define MOTOR_POWER_REDUCE_SPEED							(1350)		// 降档
+#define MOTOR_POWER_RESTORE_SPEED							(1250)		// 恢复
+//*********************************************************************************************
+#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ200)
+//*********************************************************************************************
+//-------------- 电机功率报警值 -------------------
+#define MOTOR_POWER_ALARM_VALUE								(1050)
+//-------------- 电机功率 降速 -------------------
+#define MOTOR_POWER_REDUCE_SPEED							(950)		// 降档
+#define MOTOR_POWER_RESTORE_SPEED							(850)		// 恢复
+//*********************************************************************************************
+#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ160)
+//*********************************************************************************************
+//-------------- 电机功率报警值 -------------------
+#define MOTOR_POWER_ALARM_VALUE								(750)
+//-------------- 电机功率 降速  -------------------
+#define MOTOR_POWER_REDUCE_SPEED							(650)		// 降档
+#define MOTOR_POWER_RESTORE_SPEED							(550)		// 恢复
+//*********************************************************************************************
+#endif
+
+//-------------------------------------------------------------------------------------------------
+
 //通讯故障 报警时间
 #define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒
 //通讯故障 尝试重启 时间
@@ -316,9 +392,16 @@ extern "C" {
 #define WIFI_THREAD_TURN_ON					1
 
 #if(WIFI_THREAD_TURN_ON)
-#define WIFI_THREAD_LIFECYCLE							(40)				// ms 暂时不用
+#define WIFI_THREAD_LIFECYCLE											(40)				// ms 暂时不用
 
-#define WIFI_DATE_UPLOAD_TIME							(10000/WIFI_THREAD_LIFECYCLE)				// 自动上传 时间 10s
+//1秒周期数
+#define WIFI_THREAD_ONE_SECOND									(1000/WIFI_THREAD_LIFECYCLE)				// 1 s
+
+#define OTA_SHUTDOWN_TIME_OUT										(1800)				//  s
+
+#define WIFI_DATE_UPLOAD_TIME_NORMAL							(1 * WIFI_THREAD_ONE_SECOND)				// 普通数据 时间 1s
+
+#define WIFI_DATE_UPLOAD_TIME											(10 * WIFI_THREAD_ONE_SECOND)				// 不常用数据 时间 10s
 
 //wifi 故障 判断值
 #define WIFI_RSSI_ERROR_VAULE										(50)

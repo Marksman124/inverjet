@@ -14,6 +14,7 @@
 #include "tm1621.h"
 #include "key.h"
 #include "wifi.h"
+#include "debug_protocol.h"
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -127,7 +128,10 @@ Display_Show_Speed
 void Display_Hide_Speed(uint8_t para)
 {
 	if(para & (1<<2))
+	{
 		TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, 0);
+		
+	}
 	if(para & (1<<1))
 		TM1621_display_number(TM1621_COORDINATE_SPEED_HIGH, 0xFF);
 	if(para & (1<<0))
@@ -201,6 +205,8 @@ void Lcd_Test(uint8_t num)
 
 void Lcd_Display(uint16_t speed, uint16_t time, uint8_t status_para, uint8_t mode)
 {
+	char show_mapping[9] = {0};
+	
 	//speed
 	Display_Show_Speed(speed);
 	// time
@@ -216,6 +222,23 @@ void Lcd_Display(uint16_t speed, uint16_t time, uint8_t status_para, uint8_t mod
 	
 	
 	Lcd_Display_Symbol(status_para);
+	
+	sprintf(show_mapping,"P%01d%02d%02d%02d",mode,speed%100,GET_TIME_MINUTE_DIGIT(time),GET_TIME_SECOND_DIGIT(time));
+	if(System_Mode_Time())
+	{
+		show_mapping[0] = 0xFF;
+		show_mapping[1] = 0xFF;
+	}
+	if(speed < 10)
+		show_mapping[2] = 0xFF;
+	
+	if(speed >= 100)
+		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 7);
+	else
+		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 6);
+	
+	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
+
 	return;
 }
 
@@ -259,8 +282,14 @@ void Lcd_No_Speed(uint16_t time, uint8_t status_para, uint8_t mode)
 ***********************************************************************/
 void Lcd_Show(void)
 {
-
-	if(System_is_Operation() || System_is_Error() || System_is_Power_Off()||(System_Self_Testing_State == 0xAA))
+	if(System_is_Error())
+	{
+		Lcd_Display_Symbol( LCD_Show_Bit & LCD_SYMBOL_FOT_FAULT);
+		TM1621_LCD_Redraw();
+		return ;
+	}
+	
+	if(System_is_Operation() || System_is_Power_Off()|| (System_Self_Testing_State == 0xAA))
 	{
 			return ;
 	}
@@ -268,10 +297,7 @@ void Lcd_Show(void)
 	//背光
 	TM1621_BLACK_ON();
 	
-	if(System_is_Operation() || System_is_Error())
-	{
-			return ;
-	}
+	LCD_Refresh_Restore();//恢复刷新
 	taskENTER_CRITICAL();
 	//
 	Lcd_Display(*p_OP_ShowNow_Speed, *p_OP_ShowNow_Time, LCD_Show_Bit,*p_PMode_Now);
@@ -287,7 +313,7 @@ void Lcd_Show(void)
 ***********************************************************************/
 void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 {
-	uint8_t schedule=0;
+	//uint8_t schedule=0;
 	
 	//背光
 	TM1621_BLACK_ON();
@@ -295,14 +321,15 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 
 	taskENTER_CRITICAL();
 	//当前包
-	schedule = (num*100)/sum;
-	Display_Show_Speed(schedule);
+	//schedule = (num*100)/sum;
+	
+	Display_Show_Speed(num);
 	TM1621_Show_Symbol(TM1621_COORDINATE_PERCENTAGE, 		1);
-	TM1621_Show_Symbol(TM1621_COORDINATE_BLUETOOTH, 		1);
+	//TM1621_Show_Symbol(TM1621_COORDINATE_BLUETOOTH, 		1);
 	
 	TM1621_Show_Symbol(TM1621_COORDINATE_TIME_COLON, 		0);
 	TM1621_Show_Symbol(TM1621_COORDINATE_DECIMAL_POINT, 0);
-	TM1621_Show_Symbol(TM1621_COORDINATE_WIFI, 					0);
+	//TM1621_Show_Symbol(TM1621_COORDINATE_WIFI, 					0);
 	
 	
 	//总包数
@@ -376,34 +403,21 @@ void Lcd_Show_Slow_Down(uint8_t value)
 	TM1621_LCD_Redraw();
 	taskEXIT_CRITICAL();
 }
-//------------------- 切换模式  ----------------------------
-// 切换模式
-void Fun_Change_Mode(void)
-{
-//    if(Motor_is_Start())
-//    {
-//			*p_OP_ShowNow_Speed = 20;
-//			
-//			Lcd_Show();
-//    }
-//		else
-//		{
-//			
-//		}
-}
+
 
 // 关机
 void To_Power_Off(void)
 {
 	System_Self_Testing_State = 0;
 	
-	*p_PMode_Now = 0;
+	*p_System_State_Machine = POWER_OFF_STATUS;		// 状态机
+	*p_PMode_Now = 0;															// 当前模式
+	*p_OP_ShowNow_Speed = 0;											// 当前速度
+	*p_OP_ShowNow_Time = 0;												// 当前时间
+	
 	Period_Now = 0;
-	
 	Special_Status_Bit = 0;
-	
-	*p_System_State_Machine = POWER_OFF_STATUS;
-		
+
 	Lcd_Off();
 }
 
@@ -495,10 +509,11 @@ extern TaskHandle_t wifi_moduleHandle;
 void Freertos_TaskSuspend_Wifi(void)
 {
 	// 暂停任务
+	osThreadSuspend(Key_Button_TaskHandle);
 	osThreadSuspend(Breath_Light_TaHandle);
 	osThreadSuspend(Rs485_Modbus_TaHandle);
 	osThreadSuspend(Main_TaskHandle);
-	osThreadSuspend(Motor_TaskHandle);
+	//osThreadSuspend(Motor_TaskHandle);
 	//osThreadSuspend(wifi_moduleHandle);
 }
 
@@ -507,11 +522,13 @@ void Freertos_TaskSuspend_Wifi(void)
 void Freertos_TaskSuspend_RS485(void)
 {
 	// 暂停任务
+	osThreadSuspend(Key_Button_TaskHandle);
 	osThreadSuspend(Breath_Light_TaHandle);
 	//osThreadSuspend(Rs485_Modbus_TaHandle);
 	osThreadSuspend(Main_TaskHandle);
-	osThreadSuspend(Motor_TaskHandle);
+	//osThreadSuspend(Motor_TaskHandle);
 	osThreadSuspend(wifi_moduleHandle);
+	
 }
 
 
@@ -520,6 +537,7 @@ void Freertos_TaskSuspend_RS485(void)
 void Freertos_TaskResume_All(void)
 {
 	// 恢复任务
+	osThreadResume(Key_Button_TaskHandle);
 	osThreadResume(Breath_Light_TaHandle);
 	osThreadResume(Rs485_Modbus_TaHandle);
 	osThreadResume(Main_TaskHandle);

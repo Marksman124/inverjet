@@ -13,7 +13,7 @@
 #include "operation.h"
 #include "tm1621.h"
 #include "key.h"
-
+#include "stdio.h"
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -224,6 +224,8 @@ void Display_Mode_Hide(void)
 ***********************************************************************/
 void Lcd_Show_Operation(uint8_t type, uint16_t num)
 {
+	char show_mapping[9] = {0};
+	
 	if(System_is_Operation() == 0)
 	{
 			return ;
@@ -246,10 +248,20 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 	
 	//版本号显示小数点
 	if((type == OPERATION_DISPLAY_VERSION) || (type == OPERATION_DEIVES_VERSION))
+	{
 		Lcd_Display_Symbol(STATUS_BIT_POINT);
+		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 8);
+	}
 	else
+	{
 		Lcd_Display_Symbol(0);
-
+		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
+	}
+	
+	sprintf(show_mapping,"%02d%02d%04d",0,type,num);
+	show_mapping[0] = 0xFF;
+	show_mapping[1] = 0xFF;
+	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
 	
 	TM1621_LCD_Redraw();
 	taskEXIT_CRITICAL();

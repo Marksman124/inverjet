@@ -22,8 +22,8 @@ extern "C" {
 #include "macro_definition.h"				// 统一宏定义
 
 /* Exported macro ------------------------------------------------------------*/
-#define DEBUG_PROTOCOL_RX_MAX			64
-#define DEBUG_PROTOCOL_TX_MAX			256
+#define DEBUG_PROTOCOL_RX_MAX			16
+#define DEBUG_PROTOCOL_TX_MAX			512
 
 extern uint8_t debug_buffer[DEBUG_PROTOCOL_TX_MAX];
 

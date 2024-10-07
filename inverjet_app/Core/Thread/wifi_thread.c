@@ -94,11 +94,15 @@ void WIFI_Update_State_Upload(void)
 	static uint16_t Wifi_OP_ShowNow_Time = 0;
 	static int	 Wifi_Box_Temperature = 0;
 	static int	 Wifi_Mos_Temperature = 0;
-	static uint16_t Wifi_Motor_Current = 0;
-	static uint16_t Wifi_Motor_Reality_Speed = 0;
-	static uint16_t Wifi_Send_Reality_Speed = 0;
+	static uint32_t Wifi_Motor_Current = 0;
+	static uint32_t Wifi_Motor_Reality_Speed = 0;
+	static uint32_t Wifi_Send_Reality_Speed = 0;
+
+	static uint32_t Wifi_Simulated_Swim_Distance = 0;
 	
+	static uint16_t Wifi_Motor_Reality_Power = 0;
 	static uint16_t Wifi_Motor_Bus_Voltage = 0;
+	static uint16_t Wifi_Motor_Bus_Current = 0;
 	
 	static uint16_t Wifi_OP_Free_Mode_Speed = 0;
 	static uint16_t Wifi_OP_Time_Mode_Speed = 0;
@@ -109,109 +113,134 @@ void WIFI_Update_State_Upload(void)
 		
 	static uint16_t State_Upload_Cnt=0;
 	
-	//故障上传
+	//------------------- 故障上传 ----------------------------
 	if(Wifi_Motor_Fault_Static != *p_Motor_Fault_Static)
 	{
-		mcu_dp_fault_update(DPID_DEVICE_ERROR_CODE,*p_Motor_Fault_Static); //故障型数据上报;
+		mcu_dp_fault_update(DPID_DEVICE_ERROR_CODE,*p_Motor_Fault_Static);					// 驱动板故障
 		Wifi_Motor_Fault_Static = *p_Motor_Fault_Static;
 	}
-	
-	//故障上传
 	if(Wifi_System_Fault_Static != *p_System_Fault_Static)
 	{
-		mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,*p_System_Fault_Static); //故障型数据上报;
+		mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,*p_System_Fault_Static); 	// 系统 故障型数据上报
 		Wifi_System_Fault_Static = *p_System_Fault_Static;
 	}
-	// 系统状态 (重要)
+	//------------------- 系统状态 (重要)  ----------------------------
 	if(Wifi_PMode_Now != *p_PMode_Now)
 	{
-		mcu_dp_value_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); 							// 工作模式
 		Wifi_PMode_Now = *p_PMode_Now;
 	}
 	if(Wifi_System_State_Machine != *p_System_State_Machine)
 	{
-		mcu_dp_value_update(DPID_SYSTEM_WORKING_STATUS,*p_System_State_Machine); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_SYSTEM_WORKING_STATUS,*p_System_State_Machine); 	// 状态机
 		Wifi_System_State_Machine = *p_System_State_Machine;
 	}
-	
 	if(Wifi_OP_ShowNow_Speed != *p_OP_ShowNow_Speed)
 	{
-		mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed); 				// 当前速度
 		Wifi_OP_ShowNow_Speed = *p_OP_ShowNow_Speed;
 	}
-	
 	if(Wifi_OP_ShowNow_Time != *p_OP_ShowNow_Time)
 	{
-		mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time); 					// 当前时间
 		Wifi_OP_ShowNow_Time = *p_OP_ShowNow_Time;
 	}
-	// 温度  
-	memcpy(&box_temperature, p_Box_Temperature, 2);
-	if(Wifi_Box_Temperature != box_temperature)
+	//*********************************
+	//===== 一般数据 1s 上传   =========
+	//*********************************
+	if((State_Upload_Cnt % WIFI_DATE_UPLOAD_TIME_NORMAL)==0)
 	{
-		Wifi_Box_Temperature = box_temperature;
-		mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,Wifi_Box_Temperature); //VALUE型数据上报;
+		//------------------- Debug 数据  ----------------------------
+		if(Wifi_Simulated_Swim_Distance != *p_Simulated_Swim_Distance)
+		{
+			//mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_Simulated_Swim_Distance); //游泳距离
+			Wifi_Simulated_Swim_Distance = *p_Simulated_Swim_Distance;
+		}
+		memcpy(&box_temperature, p_Box_Temperature, 2);
+		if(Wifi_Box_Temperature != box_temperature)
+		{
+			Wifi_Box_Temperature = box_temperature;
+			mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,Wifi_Box_Temperature); 			// 机箱温度
+		}
+		memcpy(&mos_temperature, p_Mos_Temperature, 2);
+		if(Wifi_Mos_Temperature != mos_temperature)
+		{
+			Wifi_Mos_Temperature = mos_temperature;
+			mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,Wifi_Mos_Temperature); 			// MOS温度
+		}
+		if(Wifi_Motor_Current != *p_Motor_Current)
+		{
+			mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,*p_Motor_Current); 						// 输出电流 （电机）
+			Wifi_Motor_Current = *p_Motor_Current;
+		}
+		if(Wifi_Motor_Bus_Voltage != *p_Motor_Bus_Voltage)
+		{
+			mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,*p_Motor_Bus_Voltage); 				// 输入电压 （母线）
+			Wifi_Motor_Bus_Voltage = *p_Motor_Bus_Voltage;
+		}
+		if(Wifi_Motor_Bus_Current != *p_Motor_Bus_Current)
+		{
+			mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,*p_Motor_Bus_Current); 				// 输入电流（母线）
+			Wifi_Motor_Bus_Current = *p_Motor_Bus_Current;
+		}
+		
+		if(Wifi_Motor_Reality_Speed != *p_Motor_Reality_Speed)
+		{
+			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Motor_Reality_Speed); 		// 实际转速
+			Wifi_Motor_Reality_Speed = *p_Motor_Reality_Speed;
+		}
+		if(Wifi_Send_Reality_Speed != *p_Send_Reality_Speed)
+		{
+			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,*p_Send_Reality_Speed); 			// 下发转速
+			Wifi_Send_Reality_Speed = *p_Send_Reality_Speed;
+		}
+		if(Wifi_Motor_Reality_Power != *p_Motor_Reality_Power)
+		{
+			mcu_dp_value_update(DPID_MOTOR_POWER,*p_Motor_Reality_Power); 						// 当前功率
+			Wifi_Motor_Reality_Power = *p_Motor_Reality_Power;
+		}
+		if(Wifi_Simulated_Swim_Distance != *p_Simulated_Swim_Distance)
+		{
+			mcu_dp_value_update(DPID_SWIMMING_DISTANCE,*p_Simulated_Swim_Distance); 	// 模拟游泳距离
+			Wifi_Simulated_Swim_Distance = *p_Simulated_Swim_Distance;
+		}
+		
+		//------------------- 默认 系统参数  ----------------------------
+		if(Wifi_OP_Free_Mode_Speed != p_OP_Free_Mode->speed)
+		{
+			mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed); 					// 自由模式 速度
+			Wifi_OP_Free_Mode_Speed = p_OP_Free_Mode->speed;
+		}
+		if(Wifi_OP_Time_Mode_Speed != p_OP_Timing_Mode->speed)
+		{
+			mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed); 			// 定时模式 速度
+			Wifi_OP_Time_Mode_Speed = p_OP_Timing_Mode->speed;
+		}
+		if(Wifi_OP_Time_Mode_Time != p_OP_Timing_Mode->time)
+		{
+			mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time); 				// 定时模式 时间
+			Wifi_OP_Time_Mode_Time = p_OP_Timing_Mode->time;
+		}
 	}
-	
-	memcpy(&mos_temperature, p_Mos_Temperature, 2);
-	if(Wifi_Mos_Temperature != mos_temperature)
+	//*********************************
+	//===== 不重要数据 10s 上传   ======
+	//*********************************
+	if((State_Upload_Cnt % WIFI_DATE_UPLOAD_TIME)==0)
 	{
-		Wifi_Mos_Temperature = mos_temperature;
-		mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,Wifi_Mos_Temperature); //VALUE型数据上报;
-	}
-	// 电压电流
-	if(Wifi_Motor_Current != *p_Motor_Current)
-	{
-		mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,*p_Motor_Current); //VALUE型数据上报;
-		Wifi_Motor_Current = *p_Motor_Current;
-	}
-	if(Wifi_Motor_Bus_Voltage != *p_Motor_Bus_Voltage)
-	{
-		mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,*p_Motor_Bus_Voltage); //VALUE型数据上报;
-		Wifi_Motor_Bus_Voltage = *p_Motor_Bus_Voltage;
-	}
-	// 实际转速
-	if(Wifi_Motor_Reality_Speed != *p_Motor_Reality_Speed)
-	{
-		mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Motor_Reality_Speed); //VALUE型数据上报;
-		Wifi_Motor_Reality_Speed = *p_Motor_Reality_Speed;
-	}
-	
-	// 下发 实际转速
-	if(Wifi_Send_Reality_Speed != *p_Send_Reality_Speed)
-	{
-		mcu_dp_value_update(DPID_SEND_REALITY_SPEED,*p_Send_Reality_Speed); //VALUE型数据上报;
-		Wifi_Send_Reality_Speed = *p_Send_Reality_Speed;
-	}
-	
-	// 默认参数
-	if(Wifi_OP_Free_Mode_Speed != p_OP_Free_Mode->speed)
-	{
-		mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed); //VALUE型数据上报;
-		Wifi_OP_Free_Mode_Speed = p_OP_Free_Mode->speed;
-	}
-	if(Wifi_OP_Time_Mode_Speed != p_OP_Timing_Mode->speed)
-	{
-		mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed); //VALUE型数据上报;
-		Wifi_OP_Time_Mode_Speed = p_OP_Timing_Mode->speed;
-	}
-	if(Wifi_OP_Time_Mode_Time != p_OP_Timing_Mode->time)
-	{
-		mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time); //VALUE型数据上报;
-		Wifi_OP_Time_Mode_Time = p_OP_Timing_Mode->time;
-	}
-	
-	if(State_Upload_Cnt++ > WIFI_DATE_UPLOAD_TIME)
-	{
-		State_Upload_Cnt = 0;
 		// debug 用
-		mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,		*p_System_Runing_Second_Cnt); //VALUE型数据上报;
-		mcu_dp_value_update(DPID_NO_OPERATION_TIME,			*p_No_Operation_Second_Cnt); //VALUE型数据上报;
-		mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,	*p_System_Sleeping_Second_Cnt); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,		*p_System_Runing_Second_Cnt); 		// 运行时间;
+		mcu_dp_value_update(DPID_NO_OPERATION_TIME,			*p_No_Operation_Second_Cnt); 			// 无操作时间;
+		mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,	*p_System_Sleeping_Second_Cnt); 	// 休眠时间;
+		// 怕不同步 补发一次
+		//mcu_dp_value_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now);  				// 工作模式;
+		//mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed); 	// 当前速度;
 	}
+	
+	State_Upload_Cnt++;
+	//State_Upload_Cnt = 0;
 }
 
-//------------------- 上传状态更新 ----------------------------
+//------------------- wifi 状态  图标 ----------------------------
 void WIFI_Get_Work_State(void)
 {
 	switch(mcu_get_wifi_work_state())

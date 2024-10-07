@@ -134,10 +134,13 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_MOTOR_FAULT_STATUS					          	( 0x09 )	// 	电机 	故障状态
 #define MB_MOS_TEMPERATURE					          		( 0x0A )	//	mos 	温度
 #define MB_BOX_TEMPERATURE					          		( 0x0B )	//	电箱	温度
-#define MB_MOTOR_CURRENT					          			( 0x0C )	// 	电机 	电流
-#define MB_MOTOR_REALITY_SPEED					          ( 0x0E )	//	电机 	实际 转速
-#define MB_SEND_REALITY_SPEED					          	( 0x10 )	//	电机 	实际 转速  下发
-#define MB_MOTOR_BUS_VOLTAGE					          	( 0x12 )	//	母线 	电压
+#define MB_MOTOR_BUS_VOLTAGE					          	( 0x0C )	//	母线 	电压
+#define MB_MOTOR_BUS_CURRENT					          	( 0x0D )	//	母线 	电流
+#define MB_MOTOR_CURRENT					          			( 0x0E )	// 	（2字节） 电机 	电流
+#define MB_MOTOR_REALITY_SPEED					          ( 0x10 )	//	（2字节） 电机 	实际 转速
+#define MB_SEND_REALITY_SPEED					          	( 0x12 )	//	（2字节） 电机 	实际 转速  下发
+#define MB_MOTOR_REALITY_POWER					          ( 0x14 )	//	（2字节） 电机 	实际 功率
+#define MB_SIMULATED_SWIM_DISTANCE		      			( 0x16 )	//	（2字节） 模拟游泳距离
 
 // ----------------------------------------------------------------------------------------------
 
@@ -149,7 +152,11 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_SYSTEM_LAST_KEY_TIME        			( 0x26 )	//	最后一次 时间
 
 // ----------------------------------------------------------------------------------------------
-
+#define MB_LCD_MAPPING_MODE        					( 0x30 )	//	模式
+#define MB_LCD_MAPPING_SPEED        				( 0x31 )	//	速度
+#define MB_LCD_MAPPING_TIME_HIGH        		( 0x32 )	//	时间 高
+#define MB_LCD_MAPPING_TIME_LOW        			( 0x33 )	//	时间 低
+#define MB_LCD_MAPPING_SYMBOL        				( 0x34 )	//	符号
 // ----------------------------------------------------------------------------------------------
 #define MB_SYSTEM_RUNNING_TIME        			( 0x40 )	//	运行时间
 #define MB_NO_OPERATION_TIME        				( 0x42 )	//	无人操作时间
@@ -200,6 +207,7 @@ extern uint16_t* Get_DataAddr_Pointer(UCHAR ucFunctionCode, USHORT addr);
 extern uint16_t Get_DataAddr_Value(UCHAR ucFunctionCode, USHORT addr);
 extern void Set_DataAddr_Value(UCHAR ucFunctionCode, USHORT addr, uint16_t value);
 extern void Set_DataValue_U32(UCHAR ucFunctionCode, USHORT addr, uint32_t value);
+extern void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8_t len);
 
 extern void Get_Mapping_Register(void);
 #ifdef __cplusplus

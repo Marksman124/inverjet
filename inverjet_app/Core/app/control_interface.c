@@ -59,19 +59,16 @@ void Ctrl_Set_System_Mode(uint16_t para)
 	{
 		// 3s后自动运行
 		To_Free_Mode(0);	//	自由模式
-		Fun_Change_Mode();
 	}
 	else if(mode == 1)
 	{
 		To_Timing_Mode();	//	定时模式
-		Fun_Change_Mode();
 	}
 	else if(mode == 2)
 	{
 		if(plan < TRAINING_MODE_NUMBER_MAX)
 		{
 			To_Train_Mode(plan);	//	训练模式
-			Fun_Change_Mode();
 		}
 	}
 }

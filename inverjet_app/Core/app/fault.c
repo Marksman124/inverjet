@@ -62,8 +62,6 @@ static uint32_t Chassis_TEMP_Timer_cnt= 0;	//高温 计数器
 /* Private macro -------------------------------------------------------------*/
 #define CHASSIS_TEMP_TIMER_MAX			9
 
-#define LCD_SYMBOL_FOT_FAULT								(STATUS_BIT_BLUETOOTH & STATUS_BIT_WIFI)
-
 /* Private variables ---------------------------------------------------------*/
 
 uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,
@@ -160,8 +158,8 @@ uint8_t If_System_Is_Error(void)
 	if(WIFI_Rssi < WIFI_RSSI_ERROR_VAULE)
 	{
 		DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
-		system_fault |= FAULT_WIFI_TEST_ERROR;  //不报故障了
-		//WIFI_Set_Machine_State(WIFI_ERROR);
+		//system_fault |= FAULT_WIFI_TEST_ERROR;  // 报故障
+		WIFI_Set_Machine_State(WIFI_ERROR);
 	}
 	
 	// 机箱 温度
@@ -390,6 +388,8 @@ void Display_Show_Sum(uint8_t sum)
 ***********************************************************************/
 void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 {
+	char show_mapping[9] = {0};
+		
 	if(System_is_Error() == 0)
 	{
 			return ;
@@ -407,6 +407,11 @@ void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 	Lcd_Display_Symbol( LCD_Show_Bit & LCD_SYMBOL_FOT_FAULT);
 	
 	TM1621_LCD_Redraw();
+	
+	sprintf(show_mapping,"%02d%02dE%03x",sum,now,Fault_Label[type-1]);
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
+	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
+	
 	taskEXIT_CRITICAL();
 	return;
 }

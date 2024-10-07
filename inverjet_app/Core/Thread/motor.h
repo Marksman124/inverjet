@@ -84,7 +84,8 @@ extern "C" {
 #endif
 
 #endif
-
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 // 缓冲区大小
 #define MOTOR_RS485_TX_BUFF_SIZE			16
 #define MOTOR_RS485_RX_BUFF_SIZE			256
@@ -108,7 +109,47 @@ extern "C" {
 #define	MOTOR_ADDR_NTC2_TEMP_OFFSET							60
 #define	MOTOR_ADDR_NTC3_TEMP_OFFSET							62
 
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+// 缓冲区大小
+#define MOTOR_RS485_TX_BUFF_SIZE			16
+#define MOTOR_RS485_RX_BUFF_SIZE			32
 
+
+//驱动板故障 标志位
+#define MOTOR_FAULT_SIGN_BIT						FAULT_TEMPERATURE_AMBIENT
+#define CLEAN_MOTOR_FAULT(n)						(n &= ~MOTOR_FAULT_SIGN_BIT)
+
+#define	MOTOR_PROTOCOL_HEADER_OFFSET						1
+#define	MOTOR_PROTOCOL_ADDR_MAX									11
+
+#define	MOTOR_ADDR_MOTOR_SPEED_OFFSET							0
+#define	MOTOR_ADDR_MOTOR_VERSION_OFFSET						1
+#define	MOTOR_ADDR_BUS_VOLTAGE_OFFSET							2
+#define	MOTOR_ADDR_BUS_CURRENT_OFFSET							3
+#define	MOTOR_ADDR_MOTOR_CURRENT_OFFSET						4
+#define	MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET					5
+#define	MOTOR_ADDR_MOSFET_TEMP_OFFSET							6
+
+#define	MOTOR_ADDR_MOTOR_POWER_OFFSET							7
+#define	MOTOR_ADDR_MOTOR_FAULT_OFFSET							9
+
+
+
+#define MOTOR_FAULT_BUS_VOLTAGE_UNDER					0x1
+#define MOTOR_FAULT_BUS_CURRENT_OVER					0x2
+#define MOTOR_FAULT_SAMPLE_ERROR							0x4
+#define MOTOR_FAULT_HARDWARE_OVERCURRENT			0x8
+#define MOTOR_FAULT_OUT_STEP_FAULT						0x10
+#define MOTOR_FAULT_STARTUP_FAILED						0x20
+#define MOTOR_FAULT_TIME_OUT									0x40
+#define MOTOR_FAULT_CRC_ERROR									0x80
+#define MOTOR_FAULT_OUTPUT_OVERCURRENT				0x100
+#define MOTOR_FAULT_LACK_PHASE								0x200
+
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#endif
 /* Exported functions prototypes ---------------------------------------------*/
 void Metering_Receive_Init(void);
 // 重启
@@ -124,6 +165,12 @@ extern uint8_t Motor_Speed_Update(void);
 extern uint8_t Motor_Speed_Is_Reach(void);
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern void Motor_Speed_Target_Set(uint8_t speed);
+
+//------------------- 清除 计算游泳距离 ----------------------------
+extern void Clean_Swimming_Distance(void);
+//------------------- 计算游泳距离 每秒----------------------------
+extern void Calculate_Swimming_Distance(void);
+
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern uint8_t Motor_Speed_Target_Get(void);
 //------------------- 百分比转 转速 ----------------------------
@@ -131,6 +178,9 @@ extern uint32_t Motor_Speed_To_Rpm(uint8_t speed);
 
 
 //================================================== 内部调用接口
+//-------------------- 高温降速  mos ----------------------------
+void Check_Down_Conversion_MOS_Temperature(short int Temperature);
+	
 //-------------------- 获取电机故障状态 ----------------------------
 uint16_t Get_Motor_Fault_State(void);
 
@@ -139,8 +189,6 @@ uint16_t Get_Motor_Fault_State(void);
 extern void Motor_Speed_Send(uint32_t speed_rpm);
 //------------------- 心跳 ----------------------------
 extern void Motor_Heartbeat_Send(void);
-//------------------- 读故障状态 ----------------------------
-extern void Motor_ReadFault_Send(void);
 //-------------------- 读寄存器 ----------------------------
 extern void Motor_Read_Register(void);
 

@@ -129,7 +129,8 @@ extern void System_Power_Off(void);
 extern void System_Boot_Screens(void);
 //	ª÷∏¥≥ˆ≥ß…Ë÷√
 extern void Restore_Factory_Settings(void);
-
+//	OTA
+extern void System_To_OTA(void);
 /* Private defines -----------------------------------------------------------*/
 
 

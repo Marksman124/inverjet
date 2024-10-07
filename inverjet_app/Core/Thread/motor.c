@@ -61,6 +61,10 @@ static uint32_t Motor_Rx_Timer_cnt= 0;
 static uint32_t Motor_Fault_Timer_cnt= 0;	//故障计数器
 static uint32_t Motor_TEMP_Timer_cnt= 0;	//高温 计数器
 
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+static uint8_t Rx_State= 0;		//从机接收状态
+#endif
+
 /* Private user code ---------------------------------------------------------*/
 
 // 初始化
@@ -103,27 +107,34 @@ void Clean_Motor_OffLine_Timer(void)
 void App_Motor_Handler(void)
 {
 	//通信故障计数器
-//******************  调试模式 **************************
-#ifndef SYSTEM_DEBUG_MODE
 	Motor_Rx_Timer_cnt++;  //不报故障 记得删  wuqingguang 2024-09-09
-#endif
 	
 	if(Motor_Timer_Cnt < 10000)
 		Motor_Timer_Cnt ++;
 	else
 		Motor_Timer_Cnt = 0;
 	// ===================  通讯故障
+	//******************  调试模式 **************************
+#ifndef SYSTEM_DEBUG_MODE
 	if(Motor_Rx_Timer_cnt > FAULT_MOTOR_LOSS_TIME)
 	{
 		//驱动板 通讯故障
 		Motor_Fault_State |= FAULT_MOTOR_LOSS;
 	}
+#endif
 	// ===================  尝试重启串口
 	if( ((Motor_Rx_Timer_cnt % FAULT_MOTOR_TRY_RESTAR_TIME)==0) && (Motor_Rx_Timer_cnt >= FAULT_MOTOR_TRY_RESTAR_TIME))
 	{
 		DEBUG_PRINT("[ERROR]\t驱动板通讯故障 cnt:\t%d\t重启串口\n",Motor_Rx_Timer_cnt);
 		Motor_Usart_Restar();
 	}
+	
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	//*********************************************************************************************
+	//* ------ 郭工驱动板 ------ *******************************************************************
+	//*********************************************************************************************
+	
 	// ===================  设置转速
 	if((Motor_Timer_Cnt % MOTOR_POLLING_PERIOD)==MOTOR_COMMAND_CYCLE)
 	{
@@ -146,6 +157,24 @@ void App_Motor_Handler(void)
 			Motor_Heartbeat_Send();
 		}
 	}
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	//*********************************************************************************************
+	//* ------ 蓝工驱动板 ------ *******************************************************************
+	//*********************************************************************************************
+	if(Rx_State == 1)	// 接收
+	{
+		//Rx_State = 2;
+		Motor_State_Analysis();
+//	}
+//	else if(Rx_State == 2)	// 回复
+//	{
+		Rx_State = 0;
+		Motor_Speed_Update();
+	}
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#endif
 }
 
 
@@ -182,10 +211,11 @@ uint8_t Motor_Speed_Update(void)
 	{
 		result = 0;
 	}
-	
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	// 驱动板要求, 停机后不要再发控制指令
 	if((Motor_Speed_Now == 0)&&(result == 0))
 		return result;
+#endif
 	
 	*p_Send_Reality_Speed = Motor_Speed_To_Rpm(Motor_Speed_Now);
 	//发送 驱动板
@@ -194,7 +224,7 @@ uint8_t Motor_Speed_Update(void)
 	if(result == 1)
 	{
 		//测试发送串口
-		DEBUG_PRINT("电极转速:\t%d\t\t转速:\t%d\t档位:\t%d%%\n",*p_Send_Reality_Speed,*p_Send_Reality_Speed/5,Motor_Speed_Now);
+		DEBUG_PRINT("电气转速:\t%d\t\t转速:\t%d\t档位:\t%d%%\n",*p_Send_Reality_Speed,*p_Send_Reality_Speed/5,Motor_Speed_Now);
 	}
 	
 	return result;
@@ -219,6 +249,22 @@ void Motor_Speed_Target_Set(uint8_t speed)
 	Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 }
 
+//------------------- 清除 计算游泳距离 ----------------------------
+void Clean_Swimming_Distance(void)
+{
+	*p_Simulated_Swim_Distance = 0;
+}
+//------------------- 计算游泳距离 每秒----------------------------
+void Calculate_Swimming_Distance(void)
+{
+	uint32_t distance = 0;
+	
+	
+	distance = Motor_Speed_Now * EVERY_1PERCENT_DISTANCE_PER_SECOND;
+	
+	*p_Simulated_Swim_Distance += distance;
+	
+}
 //------------------- 电机转速 目标值 设置 ----------------------------
 uint8_t Motor_Speed_Target_Get(void)
 {
@@ -271,35 +317,67 @@ uint8_t Change_Faule_To_Upper(uint8_t type)
 {
 	uint8_t change_fault=0;
 	
-	if(type > 0)
-	{
-		//-----------母线电压 过压 | 欠压
-		if((type == 0x01)||(type == 0x02))
-			change_fault = FAULT_BUS_VOLTAGE_ABNORMAL;
-		//----------- 输出电压异常
-		else if(type == 0x03)
-			change_fault = FAULT_ABNORMAL_OUTPUT_VOLTAGE;
-		//-----------过流
-		else if(type == 0x04)
-			change_fault = FAULT_BUS_CURRENT_ABNORMAL;
-		//----------- MOS 过热
-		else if(type == 0x05)
-			change_fault = FAULT_TEMPERATURE_AMBIENT;
-		//-----------电流传感器1\2\3 偏置故障-硬件误差过大
-		else if(type == 0x12)
-			change_fault = FAULT_BUS_CURRENT_BIAS;
-//		//----------- mos管 过热
-//		else if(type == 0x06)
-//			change_fault = FAULT_TEMPERATURE_MOS;
-		//----------- 其它 故障
-		else
-			change_fault = FAULT_MOTOR_DRIVER;
-	}
+	if(type == 0)
+		return 0;
+	
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	//-----------母线电压 过压 | 欠压
+	if((type == 0x01)||(type == 0x02))
+		change_fault = FAULT_BUS_VOLTAGE_ABNORMAL;
+	//----------- 输出电压异常
+	else if(type == 0x03)
+		change_fault = FAULT_ABNORMAL_OUTPUT_VOLTAGE;
+	//-----------过流
+	else if(type == 0x04)
+		change_fault = FAULT_BUS_CURRENT_ABNORMAL;
+	//----------- MOS 过热
+	else if(type == 0x05)
+		change_fault = FAULT_TEMPERATURE_AMBIENT;
+	//-----------电流传感器1\2\3 偏置故障-硬件误差过大
+	else if(type == 0x12)
+		change_fault = FAULT_BUS_CURRENT_BIAS;
+	//----------- 其它 故障
+	else
+		change_fault = FAULT_MOTOR_DRIVER;
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	//母线电压异常
+	if((type & MOTOR_FAULT_BUS_VOLTAGE_UNDER)||(type & MOTOR_FAULT_BUS_CURRENT_OVER))
+		change_fault |= FAULT_BUS_VOLTAGE_ABNORMAL;
+	
+	//硬件故障
+	if((type & MOTOR_FAULT_OUT_STEP_FAULT)||(type & MOTOR_FAULT_STARTUP_FAILED))
+		change_fault |= FAULT_MOTOR_DRIVER;
+	
+	//通信故障
+	if((type & MOTOR_FAULT_TIME_OUT)||(type & MOTOR_FAULT_CRC_ERROR))
+		change_fault |= FAULT_MOTOR_LOSS;
+		
+	//偏置异常
+	if(type & MOTOR_FAULT_SAMPLE_ERROR)
+		change_fault |= FAULT_BUS_CURRENT_BIAS;
+	
+	//硬件过流  --短路
+	if(type & MOTOR_FAULT_HARDWARE_OVERCURRENT)
+		change_fault |= FAULT_ABNORMAL_OUTPUT_VOLTAGE;
+	
+	//输出过流
+	if(type & MOTOR_FAULT_OUTPUT_OVERCURRENT)
+		change_fault |= FAULT_BUS_CURRENT_ABNORMAL;
+	
+	//缺相
+	if(type & MOTOR_FAULT_LACK_PHASE)
+		change_fault |= FAULT_LACK_PHASE;
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#endif
 	
 	return change_fault;
 }
 
 /*-------------------- 收发处理 ----------------------------------------------*/
+// crc16-XMODEM
 uint16_t CRC16_XMODEM_T(uint8_t *ptr, uint16_t len)
 {
     const uint16_t crc_table[256] = {
@@ -347,7 +425,25 @@ uint16_t CRC16_XMODEM_T(uint8_t *ptr, uint16_t len)
     return(crc);
 }
 
+// 校验和 取反
+uint8_t CRC8_ADD(uint8_t *ptr, uint16_t len)
+{
+	uint8_t crc = 0x00;
+    
+    while(len--) 
+    {
+        crc = (crc + *ptr++);
+    }
+#ifdef SYSTEM_DEBUG_MODE
+    return(crc);
+#else
+		return(~crc);
+#endif
+}
+
 //-------------------- 电机状态解析 ----------------------------
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 void Motor_State_Analysis(void)
 {
 	//static uint32_t Rx_cnt= 0;
@@ -381,11 +477,24 @@ void Motor_State_Analysis(void)
 	ntc_tmp[1] = Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET+1];
 	ntc_tmp[2] = Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET+1];
 	
-	DEBUG_PRINT("\n\n\nmosfet温度:\t%d.%d\n电机温度:\t%d.%d\n电机电流:\t%d.%d\n转速:\t\t\t\t%d\n母线电压:\t%d.%d\n电机故障:\t\t%d\n10KNTC温度1 2 3:\t%d.%d\t%d.%d\t%d.%d\n\n",
+	//----- 串口打印   ------------------------------------------------------------------------------
+	DEBUG_PRINT("\n\n\
+	mosfet温度:\t%d.%d (°C)\n\
+	驱动版本:\t%d.%d \n\
+	电机电流:\t%d.%d (A)\n\
+	当前转速:\t\t\t\t%d (rpm)\n\
+	母线电压:\t%d.%d (V)\n\
+	电机故障:\t\t%X \n\
+	10KNTC温度1 2 3:\t%d.%d (°C)\t%d.%d (°C)\t%d.%d (°C)\n\n",
 			Temperature/10,Temperature%10,*p_Driver_Software_Version/10,*p_Driver_Software_Version%10,*p_Motor_Current/100,*p_Motor_Current%100,
 			*p_Motor_Reality_Speed,*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,*p_Motor_Fault_Static,
 			ntc_tmp[0]/10,ntc_tmp[0]%10,ntc_tmp[1]/10,ntc_tmp[1]%10,ntc_tmp[2]/10,ntc_tmp[2]%10);
-		
+	
+	if((ntc_tmp[0]>Temperature)||(ntc_tmp[1]>Temperature)||(ntc_tmp[2]>Temperature))
+		DEBUG_PRINT("\n mosfet温度错误 \t%d.%d (°C)\n",Temperature/10,Temperature%10);
+	
+	//===============================================================================================
+	
 	CLEAN_MOTOR_FAULT(Motor_Fault_State);
 	if(*p_Motor_Fault_Static > 0)
 	{
@@ -403,8 +512,97 @@ void Motor_State_Analysis(void)
 	}
 	
 	// 高温降速	mos
+	Check_Down_Conversion_MOS_Temperature(Temperature/10);
+	
+}
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+void Motor_State_Analysis(void)
+{
+	//static uint32_t Rx_cnt= 0;
+	uint16_t result_fault=0;
+	uint16_t Temperature=0;
+	Motor_Rx_Timer_cnt = 0;
+	static uint16_t ntc_tmp[3]={0};
 
-	if(Temperature >= (MOS_TEMP_ALARM_VALUE*10))				//-------------  停机
+	
+	//驱动板 通讯故障 恢复
+	Motor_Fault_State &= ~FAULT_MOTOR_LOSS;
+	
+	// 当前 转速
+	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]*10;
+	// 软件版本
+	*p_Driver_Software_Version = Motor_State_Storage[MOTOR_ADDR_MOTOR_VERSION_OFFSET];
+	// 母线电压
+	*p_Motor_Bus_Voltage = Motor_State_Storage[MOTOR_ADDR_BUS_VOLTAGE_OFFSET] *10;
+	// 母线电流
+	*p_Motor_Bus_Current = Motor_State_Storage[MOTOR_ADDR_BUS_CURRENT_OFFSET] *100;
+	// 电机电流
+	*p_Motor_Current = Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET] *100;
+	// mosfet温度
+	if((Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET] >= 1) && (Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET] <= 3))
+	{
+		ntc_tmp[Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET]-1] = Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_OFFSET] *10;
+	}
+	Temperature = (ntc_tmp[0]>ntc_tmp[1])?ntc_tmp[0]:ntc_tmp[1];
+	Temperature = (Temperature>ntc_tmp[2])?Temperature:ntc_tmp[2];
+	*p_Mos_Temperature = Temperature;
+	// 当前功率
+	*p_Motor_Reality_Power =  Motor_State_Storage[MOTOR_ADDR_MOTOR_POWER_OFFSET+1]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_POWER_OFFSET];
+	// 电机故障
+ 	*p_Motor_Fault_Static = Motor_State_Storage[MOTOR_ADDR_MOTOR_FAULT_OFFSET+1]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_FAULT_OFFSET];
+	
+	//----- 串口打印   ------------------------------------------------------------------------------
+	DEBUG_PRINT("\n\n\
+	当前转速:\t\t\t%d (rpm)\n\
+	驱动版本:\t%X\n\
+	母线电压:\t%d.%d (V)\n\
+	母线电流:\t%d.%d (A)\n\
+	电机电流:\t%d.%d (A)\n\
+	mosfet温度:\t\t%d.%d (°C)\n\
+	10KNTC温度1 2 3:\t%d.%d (°C)\t%d.%d (°C)\t%d.%d (°C)\n\
+	当前功率:\t%d (W)\n\
+	电机故障:\t\t0x%X\n",
+
+	*p_Motor_Reality_Speed,*p_Driver_Software_Version,
+	*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,
+	*p_Motor_Bus_Current/100,*p_Motor_Bus_Current%100,
+	*p_Motor_Current/100,*p_Motor_Current%100,
+	Temperature/10,Temperature%10,
+	ntc_tmp[0]/10,ntc_tmp[0]%10,ntc_tmp[1]/10,ntc_tmp[1]%10,ntc_tmp[2]/10,ntc_tmp[2]%10,
+	*p_Motor_Reality_Power,*p_Motor_Fault_Static);
+	//===============================================================================================
+
+	CLEAN_MOTOR_FAULT(Motor_Fault_State);
+	if(*p_Motor_Fault_Static > 0)
+	{
+		if(Motor_Fault_Timer_cnt < MOTOR_FAULT_TIMER_MAX)
+			Motor_Fault_Timer_cnt ++;
+		else
+		{
+			result_fault = Change_Faule_To_Upper(*p_Motor_Fault_Static);
+			Motor_Fault_State |= result_fault;
+		}
+	}
+	else
+	{
+		Motor_Fault_Timer_cnt = 0;
+	}
+	
+	// 高温降速	mos
+	Check_Down_Conversion_MOS_Temperature(*p_Mos_Temperature/10);
+}
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#endif
+
+//================================================== 内部调用接口
+
+//-------------------- 高温降频  mos ----------------------------
+// Temperature 可为负数
+void Check_Down_Conversion_MOS_Temperature(short int Temperature)
+{
+	if(Temperature >= (MOS_TEMP_ALARM_VALUE))				//-------------  停机
 	{
 		if(Motor_TEMP_Timer_cnt < (MOTOR_TEMP_TIMER_MAX*2))
 			Motor_TEMP_Timer_cnt ++;
@@ -413,7 +611,7 @@ void Motor_State_Analysis(void)
 			Motor_Fault_State |= FAULT_TEMPERATURE_AMBIENT;
 		}
 	}
-	else if(Temperature >= (MOS_TEMP_REDUCE_SPEED*10))				//-------------  降速
+	else if(Temperature >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速
 	{
 		if(Motor_TEMP_Timer_cnt < MOTOR_TEMP_TIMER_MAX)
 			Motor_TEMP_Timer_cnt ++;
@@ -424,7 +622,7 @@ void Motor_State_Analysis(void)
 				Set_Temp_Slow_Down_State(1);
 		}
 	}
-	else if(Temperature <= (MOS_TEMP_RESTORE_SPEED*10))				//-------------  恢复
+	else if(Temperature <= (MOS_TEMP_RESTORE_SPEED))				//-------------  恢复
 	{
 		if(Motor_TEMP_Timer_cnt > 0)
 			Motor_TEMP_Timer_cnt = 0;
@@ -434,11 +632,42 @@ void Motor_State_Analysis(void)
 				Set_Temp_Slow_Down_State(0);
 		}
 	}
-	
 }
 
-//================================================== 内部调用接口
-
+//-------------------- 功率降频   ----------------------------
+void Check_Down_Conversion_Motor_Power(uint16_t power)
+{
+	if(power >= (MOS_TEMP_ALARM_VALUE))				//-------------  停机
+	{
+		if(Motor_TEMP_Timer_cnt < (MOTOR_TEMP_TIMER_MAX*2))
+			Motor_TEMP_Timer_cnt ++;
+		else
+		{
+			Motor_Fault_State |= FAULT_TEMPERATURE_AMBIENT;
+		}
+	}
+	else if(power >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速
+	{
+		if(Motor_TEMP_Timer_cnt < MOTOR_TEMP_TIMER_MAX)
+			Motor_TEMP_Timer_cnt ++;
+		else
+		{
+			//预警 降速
+			if(Get_Temp_Slow_Down_State() == 0)
+				Set_Temp_Slow_Down_State(3);
+		}
+	}
+	else if(power <= (MOS_TEMP_RESTORE_SPEED))				//-------------  恢复
+	{
+		if(Motor_TEMP_Timer_cnt > 0)
+			Motor_TEMP_Timer_cnt = 0;
+		else
+		{
+			if(Get_Temp_Slow_Down_State() == 1)
+				Set_Temp_Slow_Down_State(0);
+		}
+	}
+}
 //-------------------- 获取电机故障状态 ----------------------------
 uint16_t Get_Motor_Fault_State(void)
 {
@@ -458,6 +687,8 @@ void Motor_UART_Send(uint8_t* p_buff, uint8_t len)
 //-------------------- 接收 ----------------------------
 void Motor_RxData(uint8_t len)
 {
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	uint16_t crc_value=0;
 	
 	// 检查 长度
@@ -478,7 +709,33 @@ void Motor_RxData(uint8_t len)
 	
 	memcpy(Motor_State_Storage, &Motor_DMABuff[MOTOR_PROTOCOL_HEADER_OFFSET], MOTOR_PROTOCOL_ADDR_MAX);
 	Motor_State_Analysis();
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	uint8_t crc_value=0;
+	
+	// 检查 长度
+	if(len != 13)
+	{
+		DEBUG_PRINT("[ERROR]\t接收长度错误:\t收到:\t%d  \n", len);
+		return;
+	}
+	
+	//检查crc
+	crc_value = CRC8_ADD(&Motor_DMABuff[0], 12);
+	//crc_read = ((Motor_DMABuff[len-2]<<8) & Motor_DMABuff[len-1]);
+	if(crc_value != Motor_DMABuff[12])
+	{
+		DEBUG_PRINT("[ERROR]\tcrc校验错误:\t计算得到:\t%X   收到的:\t%X\n",crc_value, (Motor_DMABuff[12]));
+		return;
+	}
+	
+	memcpy(Motor_State_Storage, &Motor_DMABuff[MOTOR_PROTOCOL_HEADER_OFFSET], MOTOR_PROTOCOL_ADDR_MAX);
+	//接收标志
+	Rx_State = 1;
 
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#endif
 }
 
 
@@ -487,6 +744,8 @@ void Motor_RxData(uint8_t len)
 //------------------- 设置电机转速 ----------------------------
 void Motor_Speed_Send(uint32_t speed_rpm)
 {
+#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	uint8_t buffer[10]={0x02,0x05,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x03};
 	uint16_t crc_value=0;
 	
@@ -503,6 +762,20 @@ void Motor_Speed_Send(uint32_t speed_rpm)
 	buffer[8] = crc_value & 0xFF;
 	
 	Motor_UART_Send(buffer, 10);
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	uint8_t buffer[13]={0x50,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xB1,0x00};
+	
+	//buffer[1] = Motor_Speed_To_Frequency(speed_rpm);
+	buffer[1] = speed_rpm & 0xFF;
+	buffer[2] = (speed_rpm>>8) & 0xFF;
+	buffer[12] =  CRC8_ADD(buffer, 12);
+	
+	Motor_UART_Send(buffer, 13);
+
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+#endif
 }
 
 
@@ -514,13 +787,6 @@ void Motor_Heartbeat_Send(void)
 	Motor_UART_Send(buffer, 6);
 }
 
-//------------------- 读故障状态 ----------------------------
-void Motor_ReadFault_Send(void)
-{
-	uint8_t buffer[10]={0x02,0x01,0x1E,0xF3,0xFF,0x03};
-
-	Motor_UART_Send(buffer, 6);
-}
 
 //-------------------- 读寄存器 ( 全读 )----------------------------
 void Motor_Read_Register(void)
@@ -530,21 +796,7 @@ void Motor_Read_Register(void)
 	Motor_UART_Send(buffer, 6);
 }
 
-//-------------------- 读 软硬件版本 ----------------------------
-void Motor_Read_Version(void)
-{
-	uint8_t buffer[10]={0x02,0x01,0x1E,0xF3,0xFF,0x03};
 
-	Motor_UART_Send(buffer, 6);
-}
-
-//-------------------- 读 故障 ----------------------------
-void Motor_Read_Fault(void)
-{
-	uint8_t buffer[10]={0x02,0x01,0x1E,0xF3,0xFF,0x03};
-
-	Motor_UART_Send(buffer, 6);
-}
 
 //-------------------- 检查电机电流 ----------------------------
 uint8_t Check_Motor_Current(void)
