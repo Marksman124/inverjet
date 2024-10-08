@@ -199,7 +199,7 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
             break;
 
         case MB_REG_WRITE:
-						if(If_Accept_External_Control())
+						if(If_Accept_External_Control(BLOCK_MODBUS_CONTROL))
 						{
 							taskENTER_CRITICAL();
 							while( usNRegs > 0 )
@@ -507,9 +507,7 @@ void Get_Mapping_Register(void)
 	p_Breath_Light_Max = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_BREATH_LIGHT_MAX);
 	if(*p_Breath_Light_Max > 500)
 		*p_Breath_Light_Max = 500;
-	p_Modbus_Node_Addr = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SLAVE_NODE_ADDRESS);
-	p_Modbus_Baud_Rate = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SLAVE_BAUD_RATE);
-	p_Support_Control_Methods = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SUPPORT_CONTROL_METHODS);
+
 	//p_Motor_Pole_Number = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_DISTRIBUTION_NETWORK_CONTROL);
 	p_Motor_Pole_Number = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_POLE_NUMBER);
 	

@@ -14,6 +14,8 @@
 #include "tm1621.h"
 #include "key.h"
 #include "stdio.h"
+#include "wifi.h"					// wifi 模组
+
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -597,8 +599,13 @@ static void on_Button_4_Short_Press(void)
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SUPPORT_CONTROL_METHODS, Operation_Shield_Value );
 	//保存 flash
 	Memset_OPMode();//存flash
+	
+	Dev_Check_Control_Methods();
+
+	mcu_reset_wifi();// 复位模组
+	SysSoftReset();// 软件复位
 	//退出
-	To_Free_Mode(1);
+	//To_Free_Mode(1);
 }
 
 // ① + ③  组合键  短按   切换档位 100级 or 5级

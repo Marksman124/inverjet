@@ -249,13 +249,15 @@ static unsigned char dp_download_system_working_mode_handle(const unsigned char 
     unsigned char system_working_mode;
 
     system_working_mode = mcu_get_dp_download_enum(value,length);
-
-		*p_PMode_Now = system_working_mode;
-		Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-		Set_Pmode_Period_Now(0);
-
+	
+		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
+		{
+			*p_PMode_Now = system_working_mode;
+			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+			Set_Pmode_Period_Now(0);
+		}
     //There should be a report after processing the DP
-    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE, system_working_mode);
+    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE, *p_PMode_Now);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -277,23 +279,26 @@ static unsigned char dp_download_system_working_status_handle(const unsigned cha
 
     system_working_status = mcu_get_dp_download_enum(value,length);
 	
-		if(system_working_status <= TRAINING_MODE_STOP)
+		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
-			*p_System_State_Machine = system_working_status;
-			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-			Set_Pmode_Period_Now(0);
-			if(System_is_Power_Off())//状态机
+			if(system_working_status <= TRAINING_MODE_STOP)
 			{
-				System_Power_Off();
-			}
-			else if(System_Mode_Train())
-			{
-				if(*p_PMode_Now == 0)
-					*p_PMode_Now = 1;
+				*p_System_State_Machine = system_working_status;
+				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+				Set_Pmode_Period_Now(0);
+				if(System_is_Power_Off())//状态机
+				{
+					System_Power_Off();
+				}
+				else if(System_Mode_Train())
+				{
+					if(*p_PMode_Now == 0)
+						*p_PMode_Now = 1;
+				}
 			}
 		}
     //There should be a report after processing the DP
-    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS, system_working_status);
+    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS, *p_System_State_Machine);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -317,7 +322,7 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
     /*
     //VALUE type data processing
     */
-		if(If_Accept_External_Control())
+		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
 			if(motor_current_speed < 20)
 				*p_OP_ShowNow_Speed = 20;
@@ -361,7 +366,7 @@ static unsigned char dp_download_motor_current_time_handle(const unsigned char v
     /*
     //VALUE type data processing
     */
-		if(If_Accept_External_Control())
+		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
 			*p_OP_ShowNow_Time = motor_current_time;
 			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源

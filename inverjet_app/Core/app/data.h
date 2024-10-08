@@ -68,6 +68,10 @@ typedef enum
 #define	MOTOR_RPM_MIX_OF_POLES									1		//电机级数 合法最小值
 #define	MOTOR_RPM_MAX_OF_POLES									8		//电机级数 合法最大值
 
+//------------------- 屏蔽控制 ----------------------------
+#define	BLOCK_BLUETOOTH_CONTROL									1		// 屏蔽 蓝牙 控制
+#define	BLOCK_MODBUS_CONTROL										2		// 屏蔽 MODBUS 控制
+#define	BLOCK_WIFI_CONTROL											4		// 屏蔽 WIFI 控制
 /* Exported functions prototypes ---------------------------------------------*/
 
 extern void Check_Data_Init(void);
@@ -101,7 +105,7 @@ extern void Data_Set_Current_Time(uint16_t time);
 //------------------- 设置 训练时段 ----------------------------
 extern void Set_Pmode_Period_Now(uint16_t value);
 //------------------- 是否接收外部控制 ----------------------------
-extern uint8_t If_Accept_External_Control(void);
+extern uint8_t If_Accept_External_Control(uint8_t mode);
 //------------------- 获取软件版本号  字符串转 uint32 ----------------------------
 extern uint32_t get_uint3_version(char * buffer);
 //------------------- 清除wifi标志 ----------------------------
@@ -171,8 +175,6 @@ extern uint32_t* p_Send_Reality_Speed;					// 下发 实际 转速
 extern uint32_t* p_Simulated_Swim_Distance;			// 模拟游泳距离
 
 
-extern uint16_t* p_Modbus_Node_Addr;						//地址
-extern uint16_t* p_Modbus_Baud_Rate;						//波特率
 extern uint16_t* p_Support_Control_Methods;			//屏蔽控制方式
 extern uint16_t* p_Motor_Pole_Number;						//电机极数
 extern uint16_t* p_Breath_Light_Max;						//光圈亮度  

@@ -44,8 +44,8 @@ extern uint32_t Read_Software_Version(void);
 extern void Set_Local_Address(uint16_t addr);
 extern void Set_Baud_Rate(uint16_t rate);
 extern void Set_Software_Version(void);
-
-
+extern void Disable_Usart_Receiver(uint8_t no);
+extern void Dev_Check_Control_Methods( void );
 
 #ifdef __cplusplus
 }

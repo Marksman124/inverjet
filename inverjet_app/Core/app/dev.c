@@ -81,7 +81,9 @@ void Dev_Information_Init(void)
 	
 	p_Software_Version_high = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION);//	软件版本
 	p_Software_Version_low = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION+1);
-
+	
+	// 屏蔽 控制方式
+	p_Support_Control_Methods = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SUPPORT_CONTROL_METHODS);
 }
 
 
@@ -134,4 +136,81 @@ void Set_Software_Version(void)
 	MB_Flash_Buffer_Write();
 }
  
+
+void Disable_Usart_Receiver(uint8_t no)
+{
+	if(no == MACRO_MODBUS_USART)
+	{
+    eMBDisable();
+	}
+	else if(no == 2)
+	{
+    __HAL_UART_DISABLE_IT(&huart2, UART_IT_RXNE);
+    __HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_RXNE);
+	}
+	else if(no == 3)
+	{
+    __HAL_UART_DISABLE_IT(&huart3, UART_IT_RXNE);
+    __HAL_UART_CLEAR_FLAG(&huart3, UART_FLAG_RXNE);
+	}
+	else if(no == 4)
+	{
+    __HAL_UART_DISABLE_IT(&huart4, UART_IT_RXNE);
+    __HAL_UART_CLEAR_FLAG(&huart4, UART_FLAG_RXNE);
+	}
+	else if(no == 5)
+	{
+    __HAL_UART_DISABLE_IT(&huart5, UART_IT_RXNE);
+    __HAL_UART_CLEAR_FLAG(&huart5, UART_FLAG_RXNE);
+	}
+}
+
+void Enable_Usart_Receiver(uint8_t no)
+{
+	if(no == MACRO_MODBUS_USART)
+	{
+    eMBEnable();//使能modbus
+	}
+	else if(no == 2)
+	{
+    HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer2, 1);
+    __HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_RXNE);
+	}
+	else if(no == 3)
+	{
+    HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer3, 1);
+    __HAL_UART_CLEAR_FLAG(&huart3, UART_FLAG_RXNE);
+	}
+	else if(no == 4)
+	{
+    HAL_UART_Receive_IT(&huart4, (uint8_t *)aRxBuffer4, 1);
+    __HAL_UART_CLEAR_FLAG(&huart4, UART_FLAG_RXNE);
+	}
+	else if(no == 5)
+	{
+    HAL_UART_Receive_IT(&huart5, (uint8_t *)aRxBuffer5, 1);
+    __HAL_UART_CLEAR_FLAG(&huart5, UART_FLAG_RXNE);
+	}
+}
+
+void Dev_Check_Control_Methods( void )
+{
+	if( *p_Support_Control_Methods & BLOCK_BLUETOOTH_CONTROL)
+		Disable_Usart_Receiver(MACRO_BLUETOOTH_USART);
+	else
+		Enable_Usart_Receiver(MACRO_BLUETOOTH_USART);
+	
+	if( *p_Support_Control_Methods & BLOCK_MODBUS_CONTROL)
+		Disable_Usart_Receiver(MACRO_MODBUS_USART);
+	else
+		Enable_Usart_Receiver(MACRO_MODBUS_USART);
+	
+	if( *p_Support_Control_Methods & BLOCK_WIFI_CONTROL)
+		Disable_Usart_Receiver(MACRO_WIFI_USART);
+	else
+		Enable_Usart_Receiver(MACRO_WIFI_USART);
+	
+}
+
+
 

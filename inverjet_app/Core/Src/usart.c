@@ -549,8 +549,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 	if (huart->Instance == USART2) //如果是串口2
 	{
-		uart_receive_input(aRxBuffer2[0]);
-		HAL_UART_Receive_IT(&huart2, (uint8_t *)&aRxBuffer2, 1);
 	}
 
 	if (huart->Instance == USART3) //如果是串口3
@@ -623,8 +621,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	if (huart->Instance == UART5) //如果是串口5
 	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart5);
-		Usart_IRQ_CallBack(aRxBuffer5[0]);
+//		__HAL_UART_CLEAR_IDLEFLAG(&huart5);
+//		Usart_IRQ_CallBack(aRxBuffer5[0]);
 	}
 }
 

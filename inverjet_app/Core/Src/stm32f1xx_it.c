@@ -258,9 +258,10 @@ void USART1_IRQHandler(void)
 	}
 #elif MODBUS_USART == 1
 	DEBUG_LED1_ON();
+	//HAL_UART_IRQHandler(&huart1);
 	if(__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE)!= RESET) 
 		{
-			prvvUARTRxISR();//接收中断
+				prvvUARTRxISR();//接收中断
 		}
 
 	if(__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_TXE)!= RESET) 
@@ -290,7 +291,7 @@ void USART2_IRQHandler(void)
 	if((USART2->SR&UART_FLAG_RXNE) != 0)
 	{
 		//Res=USART2->DR;
-		uart_receive_input(USART2->DR);
+			uart_receive_input(USART2->DR);
 	}
   /* USER CODE END USART2_IRQn 0 */
   //HAL_UART_IRQHandler(&huart2);
@@ -405,10 +406,10 @@ void UART5_IRQHandler(void)
 	if((UART5->SR&UART_FLAG_RXNE) != 0)
 	{
 		//Res=USART2->DR;
-		BT_Read_Data_Bit(UART5->DR);
+			BT_Read_Data_Bit(UART5->DR);
 	}
   /* USER CODE END UART5_IRQn 0 */
-  //HAL_UART_IRQHandler(&huart5);
+  HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN UART5_IRQn 1 */
   /* USER CODE END UART5_IRQn 1 */
 }
