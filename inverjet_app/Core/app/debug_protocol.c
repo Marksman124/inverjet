@@ -47,6 +47,9 @@ uint8_t Debug_Read_Buffer[DEBUG_PROTOCOL_RX_MAX];
 
 uint8_t debug_buffer[DEBUG_PROTOCOL_TX_MAX]={0};
 
+
+uint32_t Print_Flag_Position = 0;
+
 /* USER CODE END PV */
 
 extern DMA_HandleTypeDef hdma_uart4_rx;
@@ -151,14 +154,18 @@ void To_Debug_Protocol_Analysis(uint8_t len)
 	{
 		Chassis_Temperature_Debug = Debug_Read_Buffer[1];
 	}
-	else if(Debug_Read_Buffer[0] == 0xF2)//wifi
-	{
-		WIFI_Set_Machine_State(Debug_Read_Buffer[1]);
-	}
-	else if(Debug_Read_Buffer[0] == 0xF3)//蓝牙
-	{
-		BT_Set_Machine_State(Debug_Read_Buffer[1]);
-	}
+//	else if(Debug_Read_Buffer[0] == 0xF2)//wifi
+//	{
+//		WIFI_Set_Machine_State(Debug_Read_Buffer[1]);
+//	}
+//	else if(Debug_Read_Buffer[0] == 0xF3)//蓝牙
+//	{
+//		BT_Set_Machine_State(Debug_Read_Buffer[1]);
+//	}
+//	else if(Debug_Read_Buffer[0] == 0xFF)//打印标志位 u32
+//	{
+//		Print_Flag_Position = Debug_Read_Buffer[1]<<24 | Debug_Read_Buffer[2]<<16 | Debug_Read_Buffer[3]<<8 | Debug_Read_Buffer[4];
+//	}
 	
 	return;
 #endif

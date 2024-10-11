@@ -195,6 +195,9 @@ void Enable_Usart_Receiver(uint8_t no)
 
 void Dev_Check_Control_Methods( void )
 {
+#ifndef SYSTEM_LONG_RUNNING_MODE
+//********* 老化工装 ***********************************************
+// 老化不屏蔽 更多的暴露问题
 	if( *p_Support_Control_Methods & BLOCK_BLUETOOTH_CONTROL)
 		Disable_Usart_Receiver(MACRO_BLUETOOTH_USART);
 	else
@@ -209,7 +212,8 @@ void Dev_Check_Control_Methods( void )
 		Disable_Usart_Receiver(MACRO_WIFI_USART);
 	else
 		Enable_Usart_Receiver(MACRO_WIFI_USART);
-	
+//******************************************************************
+#endif
 }
 
 

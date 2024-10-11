@@ -65,6 +65,11 @@ static uint32_t Motor_TEMP_Timer_cnt= 0;	//高温 计数器
 static uint8_t Rx_State= 0;		//从机接收状态
 #endif
 
+//电机电流低
+uint16_t Check_Motor_Current_Cnt=0;
+//电机转速不符
+uint16_t Check_Motor_Speed_Cnt=0;
+
 /* Private user code ---------------------------------------------------------*/
 
 // 初始化
@@ -312,6 +317,29 @@ uint32_t Motor_Speed_To_Rpm(uint8_t speed)
 	return (uint32_t)speed_rpm;
 }
 
+uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm)
+{
+	uint32_t speed;
+	
+	if(speed_rpm > MOTOR_RPM_SPEED_MAX)
+		return 100;
+
+	if(speed_rpm < MOTOR_RPM_SPEED_MIX)
+	{
+		speed = speed_rpm/(MOTOR_RPM_SPEED_MIX/20);
+	}
+	else if(speed_rpm == MOTOR_RPM_SPEED_MIX)
+		speed = 20;
+	else if(speed_rpm == MOTOR_RPM_SPEED_MAX)
+		speed = 100;
+	else
+	{
+		speed = 20 + ((speed_rpm-MOTOR_RPM_SPEED_MIX)*80/(MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX));
+	}
+	
+	return (speed&0xFF);
+}
+
 //------------------- 故障类型转换 ----------------------------
 uint8_t Change_Faule_To_Upper(uint8_t type)
 {
@@ -446,7 +474,7 @@ uint8_t CRC8_ADD(uint8_t *ptr, uint16_t len)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 void Motor_State_Analysis(void)
 {
-	//static uint32_t Rx_cnt= 0;
+	static uint8_t Motor_State_Old[MOTOR_PROTOCOL_ADDR_MAX]={0};//电机状态
 	uint16_t result_fault=0;
 	short int Temperature=0;
 	Motor_Rx_Timer_cnt = 0;
@@ -478,21 +506,25 @@ void Motor_State_Analysis(void)
 	ntc_tmp[2] = Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET+1];
 	
 	//----- 串口打印   ------------------------------------------------------------------------------
-	DEBUG_PRINT("\n\n\
-	mosfet温度:\t%d.%d (°C)\n\
-	驱动版本:\t%d.%d \n\
-	电机电流:\t%d.%d (A)\n\
-	当前转速:\t\t\t\t%d (rpm)\n\
-	母线电压:\t%d.%d (V)\n\
-	电机故障:\t\t%X \n\
-	10KNTC温度1 2 3:\t%d.%d (°C)\t%d.%d (°C)\t%d.%d (°C)\n\n",
-			Temperature/10,Temperature%10,*p_Driver_Software_Version/10,*p_Driver_Software_Version%10,*p_Motor_Current/100,*p_Motor_Current%100,
-			*p_Motor_Reality_Speed,*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,*p_Motor_Fault_Static,
-			ntc_tmp[0]/10,ntc_tmp[0]%10,ntc_tmp[1]/10,ntc_tmp[1]%10,ntc_tmp[2]/10,ntc_tmp[2]%10);
-	
-	if((ntc_tmp[0]>Temperature)||(ntc_tmp[1]>Temperature)||(ntc_tmp[2]>Temperature))
-		DEBUG_PRINT("\n mosfet温度错误 \t%d.%d (°C)\n",Temperature/10,Temperature%10);
-	
+	if(memcmp(Motor_State_Old, Motor_State_Storage, MOTOR_PROTOCOL_ADDR_MAX) != 0)
+	{
+		DEBUG_PRINT("\n\n\
+		mosfet温度:\t%d.%d (°C)\n\
+		驱动版本:\t%d.%d \n\
+		电机电流:\t%d.%d (A)\n\
+		当前转速:\t\t\t\t%d (rpm)\n\
+		母线电压:\t%d.%d (V)\n\
+		电机故障:\t\t%X \n\
+		10KNTC温度1 2 3:\t%d.%d (°C)\t%d.%d (°C)\t%d.%d (°C)\n\n",
+				Temperature/10,Temperature%10,*p_Driver_Software_Version/10,*p_Driver_Software_Version%10,*p_Motor_Current/100,*p_Motor_Current%100,
+				*p_Motor_Reality_Speed,*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,*p_Motor_Fault_Static,
+				ntc_tmp[0]/10,ntc_tmp[0]%10,ntc_tmp[1]/10,ntc_tmp[1]%10,ntc_tmp[2]/10,ntc_tmp[2]%10);
+		
+		if((ntc_tmp[0]>Temperature)||(ntc_tmp[1]>Temperature)||(ntc_tmp[2]>Temperature))
+			DEBUG_PRINT("\n mosfet温度错误 \t%d.%d (°C)\n",Temperature/10,Temperature%10);
+		
+		memcpy(Motor_State_Old, Motor_State_Storage, MOTOR_PROTOCOL_ADDR_MAX);
+	}
 	//===============================================================================================
 	
 	CLEAN_MOTOR_FAULT(Motor_Fault_State);
@@ -513,6 +545,10 @@ void Motor_State_Analysis(void)
 	
 	// 高温降速	mos
 	Check_Down_Conversion_MOS_Temperature(Temperature/10);
+	// 驱动状态检验   电机转速
+	Drive_Status_Inspection_Motor_Speed();
+	// 驱动状态检验   电机电流
+	Drive_Status_Inspection_Motor_Current();
 	
 }
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -597,6 +633,70 @@ void Motor_State_Analysis(void)
 #endif
 
 //================================================== 内部调用接口
+
+//-------------------- 驱动状态检验   电机转速 ----------------------------
+void Drive_Status_Inspection_Motor_Speed(void)
+{
+//判断电机转速
+#ifdef MOTOR_SPEED_ERROR_TIME
+	if(Motor_Speed_Is_Reach())	//等转速设置稳定下来后再做判断
+	{
+		if(Check_Motor_Speed())
+		{
+			Check_Motor_Speed_Cnt = 0;
+		}
+		else
+		{
+			if(Check_Motor_Speed_Cnt <= MOTOR_SPEED_ERROR_TIME)
+			{
+				Check_Motor_Speed_Cnt ++;
+				DEBUG_PRINT("\n[判断电机转速]\t目标转速\t%d(rpm)\t实际转速\t%d(rpm)\t计数器\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
+			}
+			else
+			{
+				//电机转速不准 故障 202 驱动故障
+				//Motor_Fault_State |= FAULT_MOTOR_DRIVER;
+				
+				//把当前速度同步成驱动板速度
+				Motor_Speed_Now = Motor_Rpm_To_Speed(*p_Motor_Reality_Speed);
+				DEBUG_PRINT("\n[把当前速度同步成驱动板速度]\t转速\t%d(rpm)\t百分比\t%d()\n",*p_Motor_Reality_Speed,Motor_Speed_Now);
+			
+				//Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);	//光圈重新闪烁
+			}
+		}
+	}
+	else
+	{
+		Check_Motor_Speed_Cnt = 0;
+	}
+#endif
+}
+
+//-------------------- 驱动状态检验   电机电流 ----------------------------
+void Drive_Status_Inspection_Motor_Current(void)
+{
+//判断电机电流
+#ifdef MOTOR_CANNOT_START_TIME
+		if(Check_Motor_Current())
+		{
+			Check_Motor_Current_Cnt = 0;
+		}
+		else
+		{
+			if(Check_Motor_Current_Cnt <= MOTOR_CANNOT_START_TIME)
+			{
+				Check_Motor_Current_Cnt ++;
+				DEBUG_PRINT("\n[判断电机电流]\t目标转速\t%d(rpm)\t实际转速\t%d(rpm)\t计数器\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
+			}
+			else
+			{
+				//电机起不来 故障 202 驱动故障
+				Motor_Fault_State |= FAULT_MOTOR_DRIVER;
+			}
+		}
+#endif
+
+}
 
 //-------------------- 高温降频  mos ----------------------------
 // Temperature 可为负数
@@ -819,12 +919,12 @@ uint8_t Check_Motor_Speed(void)
 	
 	if(rpm  > *p_Motor_Reality_Speed)
 	{
-		if((rpm - *p_Motor_Current) > MOTOR_SPEED_VIBRATION_RANGE)
+		if((rpm - *p_Motor_Reality_Speed) > MOTOR_SPEED_VIBRATION_RANGE)
 			return 0;
 	}
 	else
 	{
-		if((*p_Motor_Current - rpm) > MOTOR_SPEED_VIBRATION_RANGE)
+		if((*p_Motor_Reality_Speed - rpm) > MOTOR_SPEED_VIBRATION_RANGE)
 			return 0;
 	}
 #endif

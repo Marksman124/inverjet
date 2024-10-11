@@ -297,7 +297,7 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 #define DPID_NO_OPERATION_TIME 17
 //休眠时间(只上报)
 //备注:
-#define DPID_SYSTEM_SLEEPING_TIME 18
+#define DPID_SYSTEM_STARTUP_TIME 18
 //工作模式(可下发可上报)
 //备注:
 #define DPID_SYSTEM_WORKING_MODE 21

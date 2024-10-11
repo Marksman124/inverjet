@@ -120,20 +120,7 @@ uint8_t If_System_Is_Error(void)
 	//电机故障  含驱动板通讯故障
 	system_fault = Get_Motor_Fault_State();
 	//添加本地故障  新增功能 
-#ifdef MOTOR_CANNOT_START_TIME
-	if(Check_Motor_Current_Cnt >= MOTOR_CANNOT_START_TIME)
-	{
-		//电机起不来 故障 202 驱动故障
-		system_fault |= FAULT_MOTOR_DRIVER;
-	}
-#endif
-#ifdef MOTOR_CANNOT_START_TIME
-	if(Check_Motor_Speed_Cnt >= MOTOR_SPEED_ERROR_TIME)
-	{
-		//电机转速不准 故障 202 驱动故障
-		system_fault |= FAULT_MOTOR_DRIVER;
-	}
-#endif
+
 	// 检查本地故障
 #ifdef UART_DEBUG_SEND_CTRL
 	if( Chassis_Temperature_Debug > 0)
@@ -206,14 +193,14 @@ uint8_t If_System_Is_Error(void)
 				CallOut_Fault_State();
 			}
 			//拨码自动恢复
-			else if(System_Dial_Switch == 1)
-			{
-				//超过3次锁住 不再更新
-				if((If_Fault_Recovery_Max())&&(*p_System_Fault_Static != FAULT_MOTOR_LOSS))
-					return 1;
-				Add_Fault_Recovery_Cnt();
-				CallOut_Fault_State();
-			}
+//			else if(System_Dial_Switch == 1)
+//			{
+//				//超过3次锁住 不再更新
+//				if((If_Fault_Recovery_Max())&&(*p_System_Fault_Static != FAULT_MOTOR_LOSS))
+//					return 1;
+//				Add_Fault_Recovery_Cnt();
+//				CallOut_Fault_State();
+//			}
 		}
 		else
 		{

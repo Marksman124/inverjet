@@ -230,7 +230,7 @@ void WIFI_Update_State_Upload(void)
 		// debug 用
 		mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,		*p_System_Runing_Second_Cnt); 		// 运行时间;
 		mcu_dp_value_update(DPID_NO_OPERATION_TIME,			*p_No_Operation_Second_Cnt); 			// 无操作时间;
-		mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,	*p_System_Sleeping_Second_Cnt); 	// 休眠时间;
+		mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,	*p_System_Startup_Second_Cnt); 			// 启动时间;
 		// 怕不同步 补发一次
 		//mcu_dp_value_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now);  				// 工作模式;
 		//mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed); 	// 当前速度;

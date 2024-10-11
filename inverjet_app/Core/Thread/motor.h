@@ -173,11 +173,16 @@ extern void Calculate_Swimming_Distance(void);
 
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern uint8_t Motor_Speed_Target_Get(void);
-//------------------- 百分比转 转速 ----------------------------
+//------------------- 百分比 转 转速 ----------------------------
 extern uint32_t Motor_Speed_To_Rpm(uint8_t speed);
-
+//------------------- 转速 转 百分比 ----------------------------
+extern uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm);
 
 //================================================== 内部调用接口
+//-------------------- 驱动状态检验   电机转速 ----------------------------
+void Drive_Status_Inspection_Motor_Speed(void);
+//-------------------- 驱动状态检验   电机电流 ----------------------------
+void Drive_Status_Inspection_Motor_Current(void);
 //-------------------- 高温降速  mos ----------------------------
 void Check_Down_Conversion_MOS_Temperature(short int Temperature);
 	
@@ -207,12 +212,21 @@ extern uint8_t Check_Motor_Speed(void);
 
 /* Private defines -----------------------------------------------------------*/
 
+extern uint8_t Motor_Speed_Now;			// 电机转速 
+
 //**************** 收发缓冲区
 extern uint8_t Motor_DMABuff[MOTOR_RS485_RX_BUFF_SIZE];//定义一个接收缓存区
 extern uint8_t Motor_TxBuff[MOTOR_RS485_TX_BUFF_SIZE];//定义一个发送缓存区
 
 
 extern DMA_HandleTypeDef hdma_usart3_rx;
+
+//电机电流低
+extern uint16_t Check_Motor_Current_Cnt;
+//电机转速不符
+extern uint16_t Check_Motor_Speed_Cnt;
+
+
 #ifdef __cplusplus
 }
 #endif

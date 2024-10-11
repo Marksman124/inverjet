@@ -53,11 +53,6 @@ static uint32_t Temp_Slow_Down_Timing_Cnt= 0;		//计时器
 static uint8_t Temp_Slow_Down_State=0;//			高温降速 标志  bit 1 :mos  bit 2 机箱温度
 static uint8_t Temp_Slow_Down_Speed=0;//			高温降速 速度  百分比
 
-//电机电流低
-uint16_t Check_Motor_Current_Cnt=0;
-//电机转速不符
-uint16_t Check_Motor_Speed_Cnt=0;
-
 //  刷新屏幕
 static uint8_t LCD_Refresh_State= 0;
 
@@ -418,30 +413,6 @@ void Running_State_Handler(void)
 		{
 			Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 		}
-//判断电机电流
-#ifdef MOTOR_CANNOT_START_TIME
-		if(Check_Motor_Current())
-		{
-			Check_Motor_Current_Cnt = 0;
-		}
-		else
-		{
-			if(Check_Motor_Current_Cnt <= MOTOR_CANNOT_START_TIME)
-				Check_Motor_Current_Cnt ++;
-		}
-#endif
-//判断电机转速
-#ifdef MOTOR_SPEED_ERROR_TIME
-		if(Check_Motor_Speed())
-		{
-			Check_Motor_Speed_Cnt = 0;
-		}
-		else
-		{
-			if(Check_Motor_Speed_Cnt <= MOTOR_SPEED_ERROR_TIME)
-				Check_Motor_Speed_Cnt ++;
-		}
-#endif
 	}
 	//降频
 	if(Get_Temp_Slow_Down_State())
@@ -648,14 +619,16 @@ void App_Timing_Task(void)
 {
 	if(System_is_Power_Off())
 	{
+		Timing_Thread_Task_Cnt++;		
+		if(Timing_Thread_Task_Cnt >= (TIMING_THREAD_HALF_SECOND*2)) //半秒
+		{
+			Timing_Thread_Task_Cnt = 0;
+			*p_System_Runing_Second_Cnt += 1;			// 运行时间
+			*p_No_Operation_Second_Cnt += 1;			// 无操作时间
+			*p_System_Startup_Second_Cnt = 0;			// 启动时间
 #ifdef SYSTEM_LONG_RUNNING_MODE
 		//********* 老化工装 ***********************************************
 		// 老化工装 2h关  7200
-		Timing_Thread_Task_Cnt++;
-		*p_System_Runing_Second_Cnt = 0;
-		
-		if(Timing_Thread_Task_Cnt >= (TIMING_THREAD_HALF_SECOND*2)) //半秒
-		{
 			Old_Chemical_Equipment_Cnt++;
 			if(Old_Chemical_Equipment_Cnt > 7200)
 			{
@@ -663,9 +636,9 @@ void App_Timing_Task(void)
 				Old_Chemical_Equipment_Cnt = 0;
 				System_Power_On();
 			}
-		}
 		//******************************************************************
 #endif
+		}
 		return;
 	}
 	
@@ -678,19 +651,15 @@ void App_Timing_Task(void)
 	{
 		Timing_Thread_Task_Cnt = 0;
 		Timing_Half_Second_Cnt ++;
-//		if(Timing_Half_Second_Cnt > 10000)
-//		Timing_Half_Second_Cnt = 0;
-		
-//		WIFI_State_Handler();
-//		BT_State_Handler();
-		
-		
+
 		static uint8_t half_second_state=0;
 		if(half_second_state == 1)
 		{
 			half_second_state = 0;
-			*p_System_Runing_Second_Cnt += 1;
-			*p_No_Operation_Second_Cnt += 1;
+			*p_System_Runing_Second_Cnt += 1;			// 运行时间
+			*p_No_Operation_Second_Cnt += 1;			// 无操作时间
+			*p_System_Startup_Second_Cnt += 1;		// 休眠时间
+			
 #ifdef SYSTEM_LONG_RUNNING_MODE
 			//********* 老化工装 ***********************************************
 			// 老化工装 4h开  14400
@@ -703,10 +672,6 @@ void App_Timing_Task(void)
 			}
 			//******************************************************************
 #endif
-			if(System_is_Pause() || System_is_Stop())
-				*p_System_Sleeping_Second_Cnt += 1;
-			else
-				*p_System_Sleeping_Second_Cnt = 0;
 			
 			// 时间 : 闪烁  半秒
 			if(System_is_Normal_Operation())

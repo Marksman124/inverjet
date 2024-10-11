@@ -120,6 +120,23 @@ extern System_Ctrl_Mode_Type_enum Get_Ctrl_Mode_Type(void);
 extern void OTA_Time_Out(void);
 
 
+//------------------- 获取机型码 ----------------------------
+extern uint32_t Get_Model_Code_Num(void);
+// 每 %1 每秒 增加游泳距离 放大100倍
+extern uint32_t Get_Every_1Percent_Distance_Per_Second(void);
+//最大转速 100%
+extern uint32_t Get_Motor_Rpm_Speed_Max(void);
+//最低转速 20%
+extern uint32_t Get_Motor_Rpm_Speed_Mix(void);
+// 功率 降频
+//*********************************************************************************************
+//-------------- 电机功率 报警值  -------------------
+extern uint32_t Get_Motor_Power_Alarm_Value(void);
+//-------------- 电机功率 降速  -------------------
+extern uint32_t Get_Motor_Power_Reduce_Speed(void);
+//-------------- 电机功率 恢复  -------------------
+extern uint32_t Get_Motor_Power_Restore_Speed(void);
+
 /* Private defines -----------------------------------------------------------*/
 
 extern Operating_Parameters OP_ShowNow;
@@ -197,8 +214,8 @@ extern uint8_t System_Self_Testing_State;
 //================= 调试使用  时间 ================================
 
 extern uint32_t* p_System_Runing_Second_Cnt;			// 系统时间
-extern uint32_t* p_No_Operation_Second_Cnt;			// 无人操作时间
-extern uint32_t* p_System_Sleeping_Second_Cnt;		// 休眠时间
+extern uint32_t* p_No_Operation_Second_Cnt;				// 无人操作时间
+extern uint32_t* p_System_Startup_Second_Cnt;			// 启动时间
 
 
 #ifdef __cplusplus

@@ -26,6 +26,7 @@ UART_HandleTypeDef* p_huart_display = &huart3;		 //调试串口 UART句柄
 
 /* Private macro -------------------------------------------------------------*/
 
+
 /* Private variables ---------------------------------------------------------*/
 
 // 显示图标
@@ -351,6 +352,12 @@ void Lcd_System_Information(void)
 {
 	//背光
 	TM1621_BLACK_ON();
+	
+	//	拨码开关
+	System_Dial_Switch = Gpio_Get_Dial_Switch();
+	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH,  GET_NUMBER_TEN_DIGIT(System_Dial_Switch));
+	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  GET_NUMBER_ONE_DIGIT(System_Dial_Switch));
+	
 	//speed
 	//Display_Hide_Speed(0xFF);
 	//TM1621_display_number(TM1621_COORDINATE_SPEED_HIGH, 5);
@@ -365,10 +372,6 @@ void Lcd_System_Information(void)
 	TM1621_display_number(TM1621_COORDINATE_MIN_LOW,  (SYSTEM_PRODUCT_MODEL_CODE/100)%10);
 	TM1621_display_number(TM1621_COORDINATE_SEC_HIGH,  (SYSTEM_PRODUCT_MODEL_CODE/10)%10);
 	TM1621_display_number(TM1621_COORDINATE_SEC_LOW,  (SYSTEM_PRODUCT_MODEL_CODE)%10);
-	//
-	System_Dial_Switch = Gpio_Get_Dial_Switch();
-	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH,  GET_NUMBER_TEN_DIGIT(System_Dial_Switch));
-	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  GET_NUMBER_ONE_DIGIT(System_Dial_Switch));
 	
 	Lcd_Display_Symbol(0);
 	TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, 		0);

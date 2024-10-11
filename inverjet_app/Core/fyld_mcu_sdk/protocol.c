@@ -35,6 +35,7 @@
 #include "iap.h"
 #include "modbus.h"
 #include "key.h"
+
 #ifdef WEATHER_ENABLE
 /**
  * @var    weather_choose
@@ -97,7 +98,7 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_MOTOR_BUS_CURRENTE, DP_TYPE_VALUE},
     {DPID_SYSTEM_RUNNING_TIME, DP_TYPE_VALUE},
     {DPID_NO_OPERATION_TIME, DP_TYPE_VALUE},
-    {DPID_SYSTEM_SLEEPING_TIME, DP_TYPE_VALUE},
+    {DPID_SYSTEM_STARTUP_TIME, DP_TYPE_VALUE},
     {DPID_SYSTEM_WORKING_MODE, DP_TYPE_ENUM},
     {DPID_SYSTEM_WORKING_STATUS, DP_TYPE_ENUM},
     {DPID_MOTOR_CURRENT_SPEED, DP_TYPE_VALUE},
@@ -176,7 +177,7 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,当前母线电流); //VALUE型数据上报;
     mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,当前系统运行时间); //VALUE型数据上报;
     mcu_dp_value_update(DPID_NO_OPERATION_TIME,当前无操作时间); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,当前休眠时间); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,当前休眠时间); //VALUE型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,当前工作模式); //枚举型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,当前系统状态机); //枚举型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,当前当前转速); //VALUE型数据上报;
@@ -223,8 +224,16 @@ void all_data_update(void)
 	// debug 用
 	mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,		*p_System_Runing_Second_Cnt); 	// 运行时间;
   mcu_dp_value_update(DPID_NO_OPERATION_TIME,			*p_No_Operation_Second_Cnt); 		// 无操作时间;
-  mcu_dp_value_update(DPID_SYSTEM_SLEEPING_TIME,	*p_System_Sleeping_Second_Cnt); // 休眠时间;
+  mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,	*p_System_Startup_Second_Cnt); 		// 启动 时间;
 	mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_Simulated_Swim_Distance);				// 游泳距离;
+	
+	// 透传型
+	//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_USER_TRAIN_MODE_SPEED_P1_1),TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+	mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,(unsigned char *)p_OP_PMode[0],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+	mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,(unsigned char *)p_OP_PMode[1],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+	mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,(unsigned char *)p_OP_PMode[2],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+	mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,(unsigned char *)p_OP_PMode[3],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+	//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,(unsigned char *)p_OP_PMode[4],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
 }
 
 

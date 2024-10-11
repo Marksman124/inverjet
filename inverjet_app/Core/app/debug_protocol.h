@@ -32,6 +32,8 @@ extern uint8_t Debug_Read_Buffer[DEBUG_PROTOCOL_RX_MAX];
 #ifdef UART_DEBUG_SEND_CTRL
 extern uint8_t Chassis_Temperature_Debug;
 #endif
+	
+extern uint32_t Print_Flag_Position;
 
 /* Exported functions prototypes ---------------------------------------------*/
 

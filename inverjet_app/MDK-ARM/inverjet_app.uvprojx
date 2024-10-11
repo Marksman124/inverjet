@@ -1112,6 +1112,11 @@
               <FilePath>..\Core\app\operation.c</FilePath>
             </File>
             <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Thread\motor.c</FilePath>
+            </File>
+            <File>
               <FileName>fault.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\app\fault.c</FilePath>
@@ -1172,14 +1177,14 @@
               <FilePath>..\Core\Thread\modbus.c</FilePath>
             </File>
             <File>
-              <FileName>motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Thread\motor.c</FilePath>
-            </File>
-            <File>
               <FileName>macro_definition.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Core\Thread\macro_definition.h</FilePath>
+            </File>
+            <File>
+              <FileName>model_parameter.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Thread\model_parameter.h</FilePath>
             </File>
           </Files>
         </Group>

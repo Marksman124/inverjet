@@ -118,10 +118,6 @@ void Clean_Change_Speed_Timer(void);
 
 
 /* Private defines -----------------------------------------------------------*/
-//电机电流低
-extern uint16_t Check_Motor_Current_Cnt;
-//电机转速不符
-extern uint16_t Check_Motor_Speed_Cnt;
 
 #ifdef __cplusplus
 }

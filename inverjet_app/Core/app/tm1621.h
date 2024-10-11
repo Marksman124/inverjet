@@ -36,7 +36,7 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 
 
-#if(LCD_BACK_LIGHT_PWM_CTRL)
+#ifdef LCD_BACK_LIGHT_PWM_CTRL
 //PWM ¿ØÖÆ
 #define TM1621_BLACK_ON()			TM1621_light_On();
 #define TM1621_BLACK_OFF()		TM1621_light_Off();

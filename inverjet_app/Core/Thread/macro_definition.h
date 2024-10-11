@@ -20,34 +20,27 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 
+#include "model_parameter.h"
+
 /* Exported macro ------------------------------------------------------------*/
 
 
 /*========================================== <main.h> macro ====================================================*/
 
-//******************  型号选择 **************************
-#define PRODUCT_MODEL_CODE_SJ230					(230)
-#define PRODUCT_MODEL_CODE_SJ200					(200)
-#define PRODUCT_MODEL_CODE_SJ160					(160)
-//*******************************************************
-
-
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
-// 产品机型码
-#define	MACRO_SYSTEM_PRODUCT_MODEL_CODE								PRODUCT_MODEL_CODE_SJ230		//
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.1"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.2"
 
 /**
 ******************************************************************************
 * 系统宏定义
 ******************************************************************************
 */
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
-//#define UART_PRINTF_LOG									1	// 打印日志
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
 //*******************************************************
@@ -140,14 +133,14 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					1
 #else
-#define BUZZER_FREQUENCY					5					//50
+#define BUZZER_FREQUENCY					50					//50
 #endif
 //*******************************************************
 
 #define KEY_VALUE_SHAKE_TIME					(2)		//去抖动 次数
 
 //屏幕背光 pwm 控制 
-#define LCD_BACK_LIGHT_PWM_CTRL		0
+//#define LCD_BACK_LIGHT_PWM_CTRL							1
 
 //屏幕背光 pwm 通道号
 #define LCD_BACK_LIGHT_PWM_CHANNEL						(TIM_CHANNEL_2)
@@ -197,21 +190,6 @@ extern "C" {
 
 #endif
 
-// 每 %1 每秒 增加游泳距离 放大1000倍
-#if(MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ230)
-// 1.5米处 流速 1.8m/s   出水口流速 4m/s
-#define	EVERY_1PERCENT_DISTANCE_PER_SECOND								(180)
-
-#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ200)
-// 1.5米处 流速 1.6m/s   出水口流速 3.45m/s
-#define	EVERY_1PERCENT_DISTANCE_PER_SECOND								(160)
-
-#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ160)
-// 1.5米处 流速 1.38m/s   出水口流速 2.94m/s
-#define	EVERY_1PERCENT_DISTANCE_PER_SECOND								(138)
-
-#endif
-
 
 //-------------------------------------------------------------------------------------------------
 //*********************************************************************************************
@@ -232,10 +210,6 @@ extern "C" {
 #define TIME_SLOW_DOWN_SPEED_MIX										(20)		//最低降到 20%
 #define TIME_SLOW_DOWN_SPEED_MAX										(100)		//恢复速度最高恢复到 100%
 
-//-------------- 电机不启动 报警时间 --------------
-//#define MOTOR_CANNOT_START_TIME											(5)				// 5 秒
-//-------------- 电机转速不准 报警时间 --------------
-//#define MOTOR_SPEED_ERROR_TIME											(5)				// 5 秒
 #endif
 /*==============================================================================================================*/
 /*==============================================================================================================*/
@@ -276,6 +250,12 @@ extern "C" {
 #define MOTOR_READ_STATIC_CYCLE						(0)
 
 
+// 驱动状态检验   电机电流 报警时间  ------------------
+//#define MOTOR_CANNOT_START_TIME						(5000 / MOTOR_POLLING_PERIOD / MOTOR_THREAD_LIFECYCLE)
+// 驱动状态检验   电机转速 报警时间  ------------------
+#define MOTOR_SPEED_ERROR_TIME						(5000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)
+
+
 //*****************************************************************************
 //电机极数
 #if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
@@ -285,39 +265,25 @@ extern "C" {
 #endif
 //*****************************************************************************
 
-#if(MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ230)
-//最大转速 100%
-#define	MOTOR_RPM_SPEED_MAX								(1950*MOTOR_POLE_NUMBER)
-//最低转速 100%
-#define	MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
-
-#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ200)
-//最大转速 100%
-#define	MOTOR_RPM_SPEED_MAX								(1700*MOTOR_POLE_NUMBER)
-//最低转速 100%
-#define	MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
-
-#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ160)
-//最大转速 100%
-#define	MOTOR_RPM_SPEED_MAX								(1470*MOTOR_POLE_NUMBER)
-//最低转速 100%
-#define	MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
-
-#endif
 // 700  1012   1324  1637   1950
 //每 1% 转速
-#define	MOTOR_RPM_CONVERSION_COEFFICIENT				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /80)			//15.6
+#define	MOTOR_RPM_CONVERSION_COEFFICIENT				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /80)			//15.6			78
 
 //每 20% 转速 
-#define	MOTOR_RPM_CONVERSION_COEFFICIENT_20				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /4)			//312.5     
+#define	MOTOR_RPM_CONVERSION_COEFFICIENT_20				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /4)			//312.5     1562
 
 //电机最低速度  百分比  20%
 #define	MOTOR_POWER_SPEED										(20)
-//电机最低电流
-//#define	MOTOR_CURRENT_MIX									(1000)				//10A
-//电机转速误差范围
-//#define	MOTOR_SPEED_VIBRATION_RANGE					(20*MOTOR_POLE_NUMBER)				//乘以电机极数
 
+#ifdef MOTOR_CANNOT_START_TIME
+//电机最低电流
+#define	MOTOR_CURRENT_MIX									(1000)				//10A
+#endif
+
+#ifdef MOTOR_SPEED_ERROR_TIME
+//电机转速误差范围
+#define	MOTOR_SPEED_VIBRATION_RANGE					(100*MOTOR_POLE_NUMBER)				//乘以电机极数
+#endif
 
 //电机加速度
 #define	MOTOR_ACCELERATION										(1)
@@ -335,33 +301,6 @@ extern "C" {
 
 //-------------------------------------------------------------------------------------------------
 //*********************************************************************************************
-
-// 功率 降频
-#if(MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ230)
-//*********************************************************************************************
-//-------------- 电机功率 报警值  -------------------
-#define MOTOR_POWER_ALARM_VALUE								(1450)
-//-------------- 电机功率 降速  -------------------
-#define MOTOR_POWER_REDUCE_SPEED							(1350)		// 降档
-#define MOTOR_POWER_RESTORE_SPEED							(1250)		// 恢复
-//*********************************************************************************************
-#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ200)
-//*********************************************************************************************
-//-------------- 电机功率报警值 -------------------
-#define MOTOR_POWER_ALARM_VALUE								(1050)
-//-------------- 电机功率 降速 -------------------
-#define MOTOR_POWER_REDUCE_SPEED							(950)		// 降档
-#define MOTOR_POWER_RESTORE_SPEED							(850)		// 恢复
-//*********************************************************************************************
-#elif (MACRO_SYSTEM_PRODUCT_MODEL_CODE == PRODUCT_MODEL_CODE_SJ160)
-//*********************************************************************************************
-//-------------- 电机功率报警值 -------------------
-#define MOTOR_POWER_ALARM_VALUE								(750)
-//-------------- 电机功率 降速  -------------------
-#define MOTOR_POWER_REDUCE_SPEED							(650)		// 降档
-#define MOTOR_POWER_RESTORE_SPEED							(550)		// 恢复
-//*********************************************************************************************
-#endif
 
 //-------------------------------------------------------------------------------------------------
 
@@ -401,7 +340,14 @@ extern "C" {
 
 #define WIFI_DATE_UPLOAD_TIME_NORMAL							(1 * WIFI_THREAD_ONE_SECOND)				// 普通数据 时间 1s
 
+#ifdef SYSTEM_LONG_RUNNING_MODE
+//********* 老化工装 ***********************************************
+// 老化工装 快速上报 方便查看运行状态
+#define WIFI_DATE_UPLOAD_TIME											(1 * WIFI_THREAD_ONE_SECOND)				// 不常用数据 时间 10s
+#else
 #define WIFI_DATE_UPLOAD_TIME											(10 * WIFI_THREAD_ONE_SECOND)				// 不常用数据 时间 10s
+//******************************************************************
+#endif
 
 //wifi 故障 判断值
 #define WIFI_RSSI_ERROR_VAULE										(50)
@@ -409,8 +355,6 @@ extern "C" {
 #endif
 /*==============================================================================================================*/
 /*==============================================================================================================*/
-
-
 
 
 #ifdef __cplusplus
