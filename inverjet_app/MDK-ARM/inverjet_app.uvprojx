@@ -1112,11 +1112,6 @@
               <FilePath>..\Core\app\operation.c</FilePath>
             </File>
             <File>
-              <FileName>motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Thread\motor.c</FilePath>
-            </File>
-            <File>
               <FileName>fault.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\app\fault.c</FilePath>
@@ -1125,11 +1120,6 @@
               <FileName>tm1621.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\app\tm1621.c</FilePath>
-            </File>
-            <File>
-              <FileName>wifi_thread.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Thread\wifi_thread.c</FilePath>
             </File>
             <File>
               <FileName>bluetooth.c</FileName>
@@ -1175,6 +1165,16 @@
               <FileName>modbus.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Thread\modbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Thread\motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>wifi_thread.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Thread\wifi_thread.c</FilePath>
             </File>
             <File>
               <FileName>macro_definition.h</FileName>

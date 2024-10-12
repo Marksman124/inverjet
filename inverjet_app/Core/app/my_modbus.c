@@ -348,7 +348,7 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 		{
 			Set_Pmode_Period_Now(0);
 		}
-		if(*p_System_State_Machine == 0)//×´Ì¬»ú
+		if(System_is_Power_Off())//×´Ì¬»ú
 		{
 			System_Power_Off();
 		}
@@ -549,7 +549,7 @@ MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 	}
 	else if(addr == MB_SYSTEM_WORKING_STATUS)
 	{
-		if(*p_System_State_Machine == 0)//×´Ì¬»ú
+		if(System_is_Power_Off())//×´Ì¬»ú
 		{
 			System_Power_Off();
 		}

@@ -39,8 +39,8 @@ extern "C" {
 * 系统宏定义
 ******************************************************************************
 */
-#define SYSTEM_DEBUG_MODE								1	// 调试模式
-#define UART_PRINTF_LOG									1	// 打印日志
+//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+//#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
 //*******************************************************
@@ -137,7 +137,7 @@ extern "C" {
 #endif
 //*******************************************************
 
-#define KEY_VALUE_SHAKE_TIME					(2)		//去抖动 次数
+#define KEY_VALUE_SHAKE_TIME					(1)		//去抖动 次数
 
 //屏幕背光 pwm 控制 
 //#define LCD_BACK_LIGHT_PWM_CTRL							1
@@ -148,6 +148,12 @@ extern "C" {
 #define BACK_LIGHT_BRIGHTNESS_MAX						(500)			// 最大亮度  0~500
 //休眠时间(目前无效)
 #define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//5 min  300000
+
+// 电机速度每档增加量 5档
+#define	KEY_SPEED_INCREASE_20_GEAR										(1)
+// 电机速度每档增加量	100档
+#define	KEY_SPEED_INCREASE_100_GEAR										(20)
+
 
 #endif
 /*==============================================================================================================*/
@@ -253,7 +259,7 @@ extern "C" {
 // 驱动状态检验   电机电流 报警时间  ------------------
 //#define MOTOR_CANNOT_START_TIME						(5000 / MOTOR_POLLING_PERIOD / MOTOR_THREAD_LIFECYCLE)
 // 驱动状态检验   电机转速 报警时间  ------------------
-#define MOTOR_SPEED_ERROR_TIME						(5000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)
+//#define MOTOR_SPEED_ERROR_TIME						(5000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)
 
 
 //*****************************************************************************
@@ -272,8 +278,10 @@ extern "C" {
 //每 20% 转速 
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT_20				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /4)			//312.5     1562
 
+//电机最高速度  百分比  100%
+#define	MOTOR_PERCENT_SPEED_MAX										(100)
 //电机最低速度  百分比  20%
-#define	MOTOR_POWER_SPEED										(20)
+#define	MOTOR_PERCENT_SPEED_MIX										(20)
 
 #ifdef MOTOR_CANNOT_START_TIME
 //电机最低电流
@@ -343,7 +351,7 @@ extern "C" {
 #ifdef SYSTEM_LONG_RUNNING_MODE
 //********* 老化工装 ***********************************************
 // 老化工装 快速上报 方便查看运行状态
-#define WIFI_DATE_UPLOAD_TIME											(1 * WIFI_THREAD_ONE_SECOND)				// 不常用数据 时间 10s
+#define WIFI_DATE_UPLOAD_TIME											(1 * WIFI_THREAD_ONE_SECOND)				// 1s
 #else
 #define WIFI_DATE_UPLOAD_TIME											(10 * WIFI_THREAD_ONE_SECOND)				// 不常用数据 时间 10s
 //******************************************************************
@@ -351,6 +359,10 @@ extern "C" {
 
 //wifi 故障 判断值
 #define WIFI_RSSI_ERROR_VAULE										(50)
+
+// 结束统计 上传 最低时间 -- 低于 3min 不计入统计  单位(秒)
+#define WIFI_STATISTICE_UPLOAD_MINIMUM_TIME										(180)
+
 
 #endif
 /*==============================================================================================================*/

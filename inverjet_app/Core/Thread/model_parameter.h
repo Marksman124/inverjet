@@ -126,7 +126,7 @@ extern "C" {
 /*==============================================================================================================*/
 #ifdef PRODUCT_MODEL_CODE_SJ160
 // 1.5米处 流速 1.38m/s   出水口流速 2.94m/s
-#define	SJ160_EVERY_1PERCENT_DISTANCE_PER_SECOND								(138)
+#define	SJ160_EVERY_1PERCENT_DISTANCE_PER_SECOND								(130)
 //最大转速 100%
 #define	SJ160_MOTOR_RPM_SPEED_MAX								(1470*MOTOR_POLE_NUMBER)
 //最低转速 100%

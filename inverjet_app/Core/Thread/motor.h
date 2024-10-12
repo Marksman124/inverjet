@@ -221,11 +221,6 @@ extern uint8_t Motor_TxBuff[MOTOR_RS485_TX_BUFF_SIZE];//定义一个发送缓存区
 
 extern DMA_HandleTypeDef hdma_usart3_rx;
 
-//电机电流低
-extern uint16_t Check_Motor_Current_Cnt;
-//电机转速不符
-extern uint16_t Check_Motor_Speed_Cnt;
-
 
 #ifdef __cplusplus
 }

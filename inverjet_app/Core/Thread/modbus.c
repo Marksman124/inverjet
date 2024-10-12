@@ -535,7 +535,7 @@ void Get_Mapping_Register(void)
 	//母线 电压
 	p_Motor_Bus_Voltage = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_VOLTAGE);
 	
-	p_Simulated_Swim_Distance = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SIMULATED_SWIM_DISTANCE);
+	p_Simulated_Swim_Distance = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SIMULATED_SWIM_DISTANCE);
 
 
 	//--------------------------- 系统属性
@@ -558,6 +558,12 @@ void Get_Mapping_Register(void)
 	
 	//--------------------------- 
 	p_Analog_key_Value = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_ANALOG_KEY_VALUE);
+	
+	//--------------------------- 完成统计 (APP要)
+	p_Finish_Statistics_Time 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_TIME);			//	完成统计 --> 时长
+	p_Finish_Statistics_Speed = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_SPEED);			//	完成统计 --> 强度
+	p_Finish_Statistics_Distance = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_DISTANCE);	//	完成统计 --> 游泳距离
+	p_Preparation_Time_BIT 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_PREPARATION_TIME_BIT);			//	准备时间 Bit: 定时模式 P1-P6
 	
 }
 

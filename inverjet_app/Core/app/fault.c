@@ -23,7 +23,6 @@
 
 //uint8_t Fault_Recovery_Attempt_cnt=0;				//
 /* Private function prototypes -----------------------------------------------*/
-extern void To_Free_Mode(uint8_t mode);
 
 //------------------- 按键回调 ----------------------------
 //--------------- 短按 -----------------------
@@ -112,7 +111,7 @@ uint8_t If_System_Is_Error(void)
 	float Temperature;
 	//uint8_t motor_fault=0;
 	uint16_t system_fault=0;
-	short int vaule;
+	uint16_t vaule;
 		
 	if(System_is_Operation())//菜单
 		return 0;
@@ -483,7 +482,7 @@ static void on_Fault_Button_3_Long_Press(void)
 
 static void on_Fault_Button_4_Long_Press(void)
 {
-	if(If_Fault_Recovery_Max()==0)
+	//if(If_Fault_Recovery_Max()==0)
 		System_Power_Off();
 }
 

@@ -58,7 +58,7 @@ void Ctrl_Set_System_Mode(uint16_t para)
 	if(mode == 0)
 	{
 		// 3s后自动运行
-		To_Free_Mode(0);	//	自由模式
+		To_Free_Mode(FREE_MODE_AUTO_START);	//	自由模式
 	}
 	else if(mode == 1)
 	{
@@ -95,7 +95,7 @@ void Ctrl_Set_System_Status(uint16_t para)
 	{
 		if(System_is_Pause())	// 暂停 --> 启动
 		{
-			Arbitrarily_To_Starting();
+			Arbitrarily_To_Running();
 			*p_OP_ShowNow_Speed = p_OP_ShowLater->speed;
 			*p_OP_ShowNow_Time = 20;
 		}
@@ -105,7 +105,7 @@ void Ctrl_Set_System_Status(uint16_t para)
 		// 自由模式
 		if(System_Mode_Free())
 		{
-			To_Free_Mode(0);	//	自由 模式
+			To_Free_Mode(FREE_MODE_AUTO_START);	//	自由 模式
 		}
 		else if(System_Mode_Time())
 		{
@@ -119,7 +119,7 @@ void Ctrl_Set_System_Status(uint16_t para)
 	else if(para == 3)
 	{
 		// 返回 自由模式 初始状态
-		To_Free_Mode(1);
+		To_Free_Mode(FREE_MODE_NOT_AUTO_START);
 		Lcd_Show();
 	}
 }

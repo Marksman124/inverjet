@@ -112,7 +112,7 @@ void App_Breath_light_Handler(void)
 			}
 		}
 	}
-	else if(*p_System_State_Machine == POWER_OFF_STATUS)	// 关机
+	else if(System_is_Power_Off())	// 关机
 	{
 		if(Light_Brightness > LIGHT_BRIGHTNESS_MIX)
 		{

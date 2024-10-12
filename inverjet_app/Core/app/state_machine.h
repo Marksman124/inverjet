@@ -48,7 +48,7 @@ typedef enum
 	TRAINING_MODE_SUSPEND,		//			暂停
 	TRAINING_MODE_STOP,				//	15	结束
 	
-	// 异常状态
+	// 其它状态
   OPERATION_MENU_STATUS,		//			操作菜单
 	ERROR_DISPLAY_STATUS,			//			故障界面
 	OTA_UPGRADE_STATUS,				//			OTA 升级
@@ -77,6 +77,8 @@ typedef enum
 //------------------- 硬件 & 驱动 ----------------------------
 // 初始化
 extern void App_State_Machine_Init(void);
+//------------- 模式发生切换 ------------------------------------
+extern void Check_Mode_Change(uint16_t machine);
 //------------------- 设置状态机  ----------------------------
 extern uint8_t Set_System_State_Machine(uint8_t val);
 //------------------- 获取状态机  ----------------------------
@@ -128,6 +130,11 @@ extern void Arbitrarily_To_Pause(void);
 
 // --> 结束状态 （不更改模式）
 extern void Arbitrarily_To_Stop(void);
+
+//------------------- 判断 状态 & 模式  ----------------------------
+// 	模式 是否发生变化 
+//	1:是  0:否
+extern uint8_t Is_Change_System_Mode(uint16_t machine);
 
 //------------------- 特别状态 机  ----------------------------
 

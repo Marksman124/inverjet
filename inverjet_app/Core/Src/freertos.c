@@ -139,10 +139,9 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
-
   /* Create the thread(s) */
   /* definition and creation of Breath_Light_Ta */
-  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 128);
+  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityIdle, 0, 128);
   Breath_Light_TaHandle = osThreadCreate(osThread(Breath_Light_Ta), NULL);
 
   /* definition and creation of Rs485_Modbus_Ta */
@@ -154,21 +153,20 @@ void MX_FREERTOS_Init(void) {
   Main_TaskHandle = osThreadCreate(osThread(Main_Task), NULL);
 
   /* definition and creation of Key_Button_Task */
-  osThreadDef(Key_Button_Task, Key_Button_Handler, osPriorityIdle, 0, 128);
+  osThreadDef(Key_Button_Task, Key_Button_Handler, osPriorityNormal, 0, 128);
   Key_Button_TaskHandle = osThreadCreate(osThread(Key_Button_Task), NULL);
 
   /* definition and creation of Motor_Task */
-  osThreadDef(Motor_Task, Motor_Handler, osPriorityIdle, 0, 256);
+  osThreadDef(Motor_Task, Motor_Handler, osPriorityHigh, 0, 256);
   Motor_TaskHandle = osThreadCreate(osThread(Motor_Task), NULL);
 
   /* definition and creation of wifi_module */
-  osThreadDef(wifi_module, wifi_module_Handler, osPriorityHigh, 0, 640);
+  osThreadDef(wifi_module, wifi_module_Handler, osPriorityAboveNormal, 0, 640);
   wifi_moduleHandle = osThreadCreate(osThread(wifi_module), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
-
 }
 	
 /* USER CODE BEGIN Header_Breath_Light_Handler */
@@ -216,7 +214,7 @@ void Rs485_Modbus_Handler(void const * argument)
   while(1)
   {
 		HAL_IWDG_Refresh(&hiwdg);
-		
+
 		BT_MsTimeout();
 		
 		Modbus_Handle_Task();
@@ -247,7 +245,7 @@ void Rs485_Modbus_Handler(void const * argument)
 void Main_Handler(void const * argument)
 {
   /* USER CODE BEGIN Main_Handler */
-	
+
 	Set_Software_Version();
 	App_Timing_Init();
 	//osDelay(POWER_ON_WAITE_TIME_TASK);
@@ -255,9 +253,9 @@ void Main_Handler(void const * argument)
   while(1)
   {
 		HAL_IWDG_Refresh(&hiwdg);
-		
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);		// 1
 		App_Timing_Handler();
-		
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);	// 0	
 		osDelay(THREAD_PERIOD_MAIN_TASK);
   }
 	
@@ -274,15 +272,17 @@ void Main_Handler(void const * argument)
 void Key_Button_Handler(void const * argument)
 {
   /* USER CODE BEGIN Key_Button_Handler */
+
+	
 	App_Key_Init();
 	
   /* Infinite loop */
   while(1)
   {
 		HAL_IWDG_Refresh(&hiwdg);
-		
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);		// 1
 		App_Key_Handler();
-		
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);	// 0	
 		osDelay(THREAD_PERIOD_KEY_BUTTON_TASK);
   }
   /* USER CODE END Key_Button_Handler */
@@ -298,13 +298,17 @@ void Key_Button_Handler(void const * argument)
 void Motor_Handler(void const * argument)
 {
   /* USER CODE BEGIN Motor_Handler */
+
+	
 	Metering_Receive_Init();
 	Debug_Protocol_Init();
 	//osDelay(POWER_ON_WAITE_TIME_TASK);
   /* Infinite loop */
   for(;;)
   {
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);		// 1
 		App_Motor_Handler();
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);	// 0	
     osDelay(THREAD_PERIOD_MOTOR_TASK);
   }
   /* USER CODE END Motor_Handler */
@@ -326,6 +330,7 @@ void wifi_module_Handler(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);		// 1
 		Wifi_Module_Handler();
 		HAL_IWDG_Refresh(&hiwdg);
 		
@@ -337,6 +342,7 @@ void wifi_module_Handler(void const * argument)
 				OTA_Time_Out();
 			}
 		}
+//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);	// 0	
     osDelay(THREAD_PERIOD_WIFI_TASK);
   }
   /* USER CODE END wifi_module_Handler */

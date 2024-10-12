@@ -134,7 +134,7 @@ uint8_t Key_Buzzer_Type = 0;	//蜂鸣器长短 类型
 //================================== ① 档位键
 void on_pushButton_clicked(void)
 {
-	if((*p_System_State_Machine == POWER_OFF_STATUS) || System_is_Pause() || System_is_Stop())
+	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop())
 			return;
 	if(PMode_Now == 5)//冲浪
 			return;
@@ -143,10 +143,10 @@ void on_pushButton_clicked(void)
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
-		if(*p_OP_ShowNow_Speed >= 100)
-			*p_OP_ShowNow_Speed = 20;
+		if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
 		else
-			*p_OP_ShowNow_Speed += 1;
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
 		
 		if(Motor_is_Start())
 		{
@@ -157,17 +157,17 @@ void on_pushButton_clicked(void)
 			Arbitrarily_To_Initial();
 		
 		Update_OP_Speed();
-		Lcd_Show();
+		//Lcd_Show();
 	}
 	else
 	{
-		if((*p_OP_ShowNow_Speed % 20) != 0)
-			*p_OP_ShowNow_Speed += (20-(*p_OP_ShowNow_Speed % 20));
+		if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
+			*p_OP_ShowNow_Speed += (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
 		else
-		*p_OP_ShowNow_Speed += 20;
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
 		
-		if(*p_OP_ShowNow_Speed > 100)
-			*p_OP_ShowNow_Speed = 20;
+		if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
 		if(Motor_is_Start())
 		{
 			Special_Status_Add(SPECIAL_BIT_SPEED_CHANGE);
@@ -177,14 +177,14 @@ void on_pushButton_clicked(void)
 			Arbitrarily_To_Initial();
 		
 		Update_OP_Speed();
-		Lcd_Show();
+		//Lcd_Show();
 	}
 }
 
 //================================== ② 时间键
 void on_pushButton_2_clicked(void)
 {
-	if(*p_System_State_Machine == POWER_OFF_STATUS)
+	if(System_is_Power_Off())
 		return;
 	Clean_Swimming_Distance();//清除计算距离
 	Clean_Timing_Timer_Cnt();//清除 timing线程计时器
@@ -202,7 +202,7 @@ void on_pushButton_2_clicked(void)
 			}
 			
 			Update_OP_Time();
-			Lcd_Show();
+			//Lcd_Show();
 	}
 	else
 	{
@@ -219,7 +219,7 @@ void on_pushButton_2_clicked(void)
 //================================== ③ 模式键
 void on_pushButton_3_clicked(void)
 {
-	if(*p_System_State_Machine == POWER_OFF_STATUS)
+	if(System_is_Power_Off())
 		return;
 	Clean_Swimming_Distance();//清除计算距离
 	Clean_Timing_Timer_Cnt();//清除 timing线程计时器
@@ -232,7 +232,7 @@ void on_pushButton_3_clicked(void)
 	{
 			if(*p_PMode_Now >= TRAINING_MODE_NUMBER_MAX)
 			{
-					To_Free_Mode(0);
+					To_Free_Mode(FREE_MODE_AUTO_START);
 			}
 			else
 			{
@@ -241,7 +241,7 @@ void on_pushButton_3_clicked(void)
 	}
 	else
 	{
-			To_Free_Mode(0);
+			To_Free_Mode(FREE_MODE_AUTO_START);
 	}
 
 	Period_Now = 0;
@@ -251,7 +251,7 @@ void on_pushButton_3_clicked(void)
 void on_pushButton_4_Short_Press(void)
 {
 	Clean_Timing_Timer_Cnt();
-	if(*p_System_State_Machine == POWER_OFF_STATUS)//关机中 执行开机
+	if(System_is_Power_Off())//关机中 执行开机
 	{
 			return;
 	}
@@ -259,23 +259,34 @@ void on_pushButton_4_Short_Press(void)
 	if(System_is_Initial() && (Special_Status_Get(SPECIAL_BIT_SKIP_INITIAL)))	// 初始 --> 立即启动
 	{
 			Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
-			Arbitrarily_To_Starting();
+			Arbitrarily_To_Running();
 			Data_Set_Current_Speed(p_OP_ShowLater->speed);//注意,需要在切完运行状态后再设置速度,如"启动"
 	}
 	else if(System_is_Pause())	// 暂停 --> 启动
 	{
-		Arbitrarily_To_Starting();
+		if(p_OP_ShowLater->speed == 0)
+			DEBUG_PRINT("\n\n\np_OP_ShowLater->speed 错误 *p_OP_ShowNow_Speed = %d\n",*p_OP_ShowNow_Speed);
+		
+		Arbitrarily_To_Running();
 		Data_Set_Current_Speed(p_OP_ShowLater->speed);//注意,需要在切完运行状态后再设置速度,如"启动"
 	}
 	else	// 其它 --> 暂停
 	{
-		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
-		*p_OP_ShowNow_Speed = 0;
+		if((*p_OP_ShowNow_Speed == 0)&&(p_OP_ShowLater->speed > 0))
+		{
+			DEBUG_PRINT("\n\n\np_OP_ShowNow_Speed 错误 p_OP_ShowLater->speed = %d\n",p_OP_ShowLater->speed);
+		}
+		else
+		{
+			p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+			//*p_OP_ShowNow_Speed = 0;
+			Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"启动"
+		}
 		Arbitrarily_To_Pause();
 	}
 	
 	//*p_OP_ShowNow_Time = 20;
-	Lcd_Show();
+	//Lcd_Show();
 }
 
 //================================== ① + ②  组合键  测试 设置故障
@@ -287,7 +298,7 @@ void on_pushButton_1_2_Short_Press(void)
 //================================== ① + ③  组合键  短按   切换档位 100级 or 5级
 void on_pushButton_1_3_Short_Press(void)
 {
-	if(*p_System_State_Machine == POWER_OFF_STATUS)
+	if(System_is_Power_Off())
 		return;
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
@@ -318,7 +329,7 @@ void on_pushButton_2_4_Short_Press(void)
 //================================== ① 档位键
 void on_pushButton_1_Long_Press(void)
 {
-	if((*p_System_State_Machine == POWER_OFF_STATUS) || System_is_Pause() || System_is_Stop())
+	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop())
 			return;
 	if(PMode_Now == 5)//冲浪
 			return;
@@ -334,14 +345,14 @@ void on_pushButton_1_Long_Press(void)
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
-		if(*p_OP_ShowNow_Speed >= 100)
-				*p_OP_ShowNow_Speed = 20;
+		if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
 		else
-			*p_OP_ShowNow_Speed += 1;
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
 
 		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);
 		Arbitrarily_To_Initial();
-		Lcd_Show();
+		//Lcd_Show();
 	}
 
 }
@@ -357,7 +368,7 @@ void on_pushButton_3_Long_Press(void)
 //================================== ④ 开机键  短按
 void on_pushButton_4_Long_Press(void)
 {
-	if(*p_System_State_Machine == POWER_OFF_STATUS)//关机中 执行开机
+	if(System_is_Power_Off())//关机中 执行开机
 	{
 			Buzzer_Click_Long_On(1);
 			System_Power_On();
@@ -378,6 +389,7 @@ void on_pushButton_1_2_Long_Press(void)
 {
 	//if(Motor_is_Start() ==0)
 	{
+		Buzzer_Click_On();
 		WIFI_Get_In_Distribution();
 	}
 }
@@ -398,6 +410,7 @@ void on_pushButton_2_3_Long_Press(void)
 //	}
 	//if(Motor_is_Start() ==0)
 	{
+		Buzzer_Click_On();
 		BT_Get_In_Distribution();
 	}
 }
@@ -430,6 +443,7 @@ void App_Key_Init(void)
 // 按键灯
 void Led_Button_On(uint8_t para)
 {
+	
 	if(para & 1<<0)
 		HAL_GPIO_WritePin(LED_SPEED_IO_PORT, LED_SPEED_IO_PIN, GPIO_PIN_SET);		// 1
 	else
@@ -448,7 +462,8 @@ void Led_Button_On(uint8_t para)
 	if(para & 1<<3)
 		HAL_GPIO_WritePin(LED_POWER_IO_PORT, LED_POWER_IO_PIN, GPIO_PIN_SET);		// 1
 	else
-		HAL_GPIO_WritePin(LED_POWER_IO_PORT, LED_POWER_IO_PIN, GPIO_PIN_RESET);	// 0		
+		HAL_GPIO_WritePin(LED_POWER_IO_PORT, LED_POWER_IO_PIN, GPIO_PIN_RESET);	// 0
+	
 	
 }
 /**********************************************************************************************
@@ -595,9 +610,9 @@ void App_Key_Task(void)
 					//测试发送串口
 					DEBUG_PRINT("[按键长按]: %d\n",Key_IO_Ordering_Value[i]);
 					
-					if(OPERATION_MENU_STATUS == *p_System_State_Machine)
+					if(System_is_Operation())
 						p_Operation_Long_Press[i]();
-					else if(ERROR_DISPLAY_STATUS == *p_System_State_Machine)
+					else if(System_is_Error())
 						p_Fault_Long_Press[i]();
 					else
 						p_Funtion_Long_Press[i]();
@@ -618,9 +633,9 @@ void App_Key_Task(void)
 						//测试发送串口
 						DEBUG_PRINT("[按键点击]: %d\n",i);
 						
-						if(OPERATION_MENU_STATUS == *p_System_State_Machine)
+						if(System_is_Operation())
 							p_Operation_Button[i]();
-						else if(ERROR_DISPLAY_STATUS == *p_System_State_Machine)
+						else if(System_is_Error())
 							p_Fault_Button[i]();
 						else
 						{
@@ -629,7 +644,7 @@ void App_Key_Task(void)
 						}
 						
 						//关机下 计数 8次
-						if(POWER_OFF_STATUS == *p_System_State_Machine)
+						if(System_is_Power_Off())
 						{
 							Special_Button_Rules(Key_IO_Ordering_Value[i]);
 						}
@@ -728,7 +743,7 @@ uint8_t Key_Get_IO_Input(void)
 			result |= (1<<i);
 	}
 	
-//	if(*p_System_State_Machine == POWER_OFF_STATUS)
+//	if(System_is_Power_Off())
 //	{
 //		result &= KEY_VALUE_BIT_BUTTON_4;
 //	}
@@ -749,7 +764,7 @@ void System_Power_On(void)
 	Check_Data_Init();
 
 	//	状态
-	To_Free_Mode(0);			// ui
+	To_Free_Mode(FREE_MODE_AUTO_START);			// ui
 	
 	Led_Button_On(0x0F);	// 按键
 	all_data_update();		// wifi 上传
@@ -822,7 +837,6 @@ void Restore_Factory_Settings(void)
 	osDelay(1500);
 	System_Power_Off();
 	// 返回 自由模式 初始状态
-	//To_Free_Mode(1);
 	
 }
 

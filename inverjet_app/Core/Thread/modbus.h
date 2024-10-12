@@ -69,7 +69,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_MOTOR_SPEED_MODE  								( 0x05 )	//	转速 方式
 #define MB_MOTOR_BREATH_LIGHT_MAX  					( 0x06 )	//	光圈亮度
 // ----------------------------------------------------------------------------------------------
-
+#define MB_PREPARATION_TIME_BIT     				( 0x20 )	//	预备时间（标志位）  准备时间 Bit: 定时模式 P1-P6
 // ----------------------------------------------------------------------------------------------
 #define MB_SYSTEM_WORKING_MODE     					( 0x21 )	//	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
 #define MB_SYSTEM_WORKING_STATUS      			( 0x22 )	//	系统工作状态  0:暂停,   1:暂停恢复,   2:重新开始,  3:结束
@@ -140,8 +140,11 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_MOTOR_REALITY_SPEED					          ( 0x10 )	//	（2字节） 电机 	实际 转速
 #define MB_SEND_REALITY_SPEED					          	( 0x12 )	//	（2字节） 电机 	实际 转速  下发
 #define MB_MOTOR_REALITY_POWER					          ( 0x14 )	//	（2字节） 电机 	实际 功率
-#define MB_SIMULATED_SWIM_DISTANCE		      			( 0x16 )	//	（2字节） 模拟游泳距离
+#define MB_SIMULATED_SWIM_DISTANCE		      			( 0x16 )	//	模拟游泳距离
 
+#define MB_FINISH_STATISTICS_TIME		      				( 0x17 )	//	完成统计 --> 时长
+#define MB_FINISH_STATISTICS_SPEED		      			( 0x18 )	//	完成统计 --> 游泳强度
+#define MB_FINISH_STATISTICS_DISTANCE		      		( 0x19 )	//	完成统计 --> 游泳距离
 // ----------------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------------

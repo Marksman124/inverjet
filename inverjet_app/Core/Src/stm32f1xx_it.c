@@ -257,7 +257,6 @@ void USART1_IRQHandler(void)
 		}
 	}
 #elif MODBUS_USART == 1
-	DEBUG_LED1_ON();
 	//HAL_UART_IRQHandler(&huart1);
 	if(__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE)!= RESET) 
 		{
@@ -270,7 +269,6 @@ void USART1_IRQHandler(void)
 		}
 	
   HAL_NVIC_ClearPendingIRQ(USART1_IRQn);
-	//DEBUG_LED1_OFF();
 #else
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
@@ -290,8 +288,10 @@ void USART2_IRQHandler(void)
 	
 	if((USART2->SR&UART_FLAG_RXNE) != 0)
 	{
+		DEBUG_LED1_ON();
 		//Res=USART2->DR;
 			uart_receive_input(USART2->DR);
+		DEBUG_LED1_OFF();
 	}
   /* USER CODE END USART2_IRQn 0 */
   //HAL_UART_IRQHandler(&huart2);

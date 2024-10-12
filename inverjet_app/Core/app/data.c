@@ -92,7 +92,7 @@ uint16_t* p_Motor_Bus_Current;						// 母线 电流  	输入
 uint16_t* p_System_Fault_Static;					// 故障状态		整机
 uint16_t* p_Box_Temperature;							// 电箱 温度
 uint32_t* p_Send_Reality_Speed;						// 下发 实际 转速
-uint32_t* p_Simulated_Swim_Distance;			// 模拟游泳距离
+uint16_t* p_Simulated_Swim_Distance;			// 模拟游泳距离
 
 
 uint16_t* p_Support_Control_Methods;	//屏蔽控制方式
@@ -116,6 +116,16 @@ uint8_t System_PowerUp_Finish = 0;
 uint32_t* p_System_Runing_Second_Cnt;			// 系统时间
 uint32_t* p_No_Operation_Second_Cnt;			// 无人操作时间
 uint32_t* p_System_Startup_Second_Cnt;		// 启动 时间
+
+
+//==========================================================
+//--------------------------- 完成统计 (APP要)
+//==========================================================
+uint16_t* p_Finish_Statistics_Time;					//	完成统计 --> 时长
+uint16_t* p_Finish_Statistics_Speed;				//	完成统计 --> 强度
+uint32_t* p_Finish_Statistics_Distance;			//	完成统计 --> 游泳距离
+uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
+
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -259,6 +269,23 @@ void Update_OP_Time(void)
 {
 	if(System_Mode_Time())	// 定时
 	{
+		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
+		Memset_OPMode();//存flash
+	}
+}
+
+//存储 新 速度 & 时间
+void Update_OP_All(void)
+{
+	if(System_Mode_Free())	// 自由
+	{
+		p_OP_Free_Mode->speed = *p_OP_ShowNow_Speed;
+		p_OP_Free_Mode->time = 0;
+		Memset_OPMode();//存flash
+	}
+	else if(System_Mode_Time())	// 定时
+	{
+		p_OP_Timing_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
 		Memset_OPMode();//存flash
 	}
@@ -544,5 +571,50 @@ uint32_t Get_Motor_Power_Restore_Speed(void)
 }
 
 
+// 完成数据统计
+//*********************************************************************************************
+//-------------- 计算 完成统计  -------------------
+//	count 秒
+void Finish_Statistics_Count(uint8_t count)
+{
+	* p_Finish_Statistics_Time += count;								//	完成统计 --> 时长
+	if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MIX)
+		* p_Finish_Statistics_Speed = *p_OP_ShowNow_Speed;	//	完成统计 --> 强度
+	* p_Finish_Statistics_Distance += (Motor_Speed_Now * EVERY_1PERCENT_DISTANCE_PER_SECOND / 100);			//	完成统计 --> 游泳距离
+}
+
+
+//-------------- 清除 完成统计  -------------------
+void Finish_Statistics_Clean( void )
+{
+	* p_Finish_Statistics_Time = 0;				//	完成统计 --> 时长
+	* p_Finish_Statistics_Speed = 0;			//	完成统计 --> 强度
+	* p_Finish_Statistics_Distance = 0;		//	完成统计 --> 游泳距离
+}
+
+
+//-------------- 上传 完成统计  -------------------
+void Finish_Statistics_Upload( void )
+{
+	WIFI_Finish_Statistics_Upload();
+	Finish_Statistics_Clean();
+}
+
+
+
+
+
+
+
+
+
+
+
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
 

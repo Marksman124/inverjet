@@ -408,12 +408,18 @@ void Lcd_Show_Slow_Down(uint8_t value)
 }
 
 
-// 关机
+/*
+******************************************************************************
+*	模式切换
+******************************************************************************
+*/
+
+//-------------  To-->关机 ------------------------------------
 void To_Power_Off(void)
 {
 	System_Self_Testing_State = 0;
 	
-	*p_System_State_Machine = POWER_OFF_STATUS;		// 状态机
+	Set_System_State_Machine(POWER_OFF_STATUS);		// 状态机
 	*p_PMode_Now = 0;															// 当前模式
 	*p_OP_ShowNow_Speed = 0;											// 当前速度
 	*p_OP_ShowNow_Time = 0;												// 当前时间
@@ -424,7 +430,7 @@ void To_Power_Off(void)
 	Lcd_Off();
 }
 
-// 自由模式
+//-------------  To-->自由模式 ------------------------------------
 void To_Free_Mode(uint8_t mode)
 {
 	if(mode == 0)
@@ -445,7 +451,7 @@ void To_Free_Mode(uint8_t mode)
 	Lcd_Show();
 }
 
-// 定时模式
+//-------------  To-->定时模式 ------------------------------------
 void To_Timing_Mode(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
@@ -461,11 +467,17 @@ void To_Timing_Mode(void)
 	Lcd_Show();
 }
 
-//	训练模式  num:1-4
+//-------------  To-->训练模式  num:1-4 ------------------------------------
 void To_Train_Mode(uint8_t num)
 {
 	if(Is_Mode_Legal(num) == 0)
 		return;
+	
+	//	切换模式时上传<统计数据> 如： 从 P1 切到 P2
+	if(*p_PMode_Now != num)
+	{
+		Finish_Statistics_Upload();
+	}
 	
 	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 	*p_PMode_Now = num;
@@ -485,7 +497,7 @@ void To_Train_Mode(uint8_t num)
 }
 
 
-//	自测
+//-------------  To-->自测 ------------------------------------
 void System_Self_Testing_Porgram(void)
 {
 	System_Self_Testing_State = 0xAA;

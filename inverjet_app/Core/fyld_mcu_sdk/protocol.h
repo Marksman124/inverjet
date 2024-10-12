@@ -259,6 +259,10 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
                         1:dp数据点序列号重新定义
           **此为自动生成代码,如在开发平台有相关修改请重新下载MCU_SDK**         
 ******************************************************************************/
+//预备时间（标志位）(可下发可上报)
+//备注:Bit 0: 定时模式
+
+#define DPID_PREPARATION_TIME 3
 //驱动板故障(只上报)
 //备注:
 #define DPID_DEVICE_ERROR_CODE 4
@@ -271,13 +275,13 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //电箱温度(只上报)
 //备注:
 #define DPID_GET_BOX_TEMPERATURE 7
-//电机电流(只上报)
+//电机电流(输出)(只上报)
 //备注:
 #define DPID_GET_MOTOR_CURRENT 8
 //电机实际转速(只上报)
 //备注:
 #define DPID_MOTOR_REALITY_SPEED 9
-//母线电压(只上报)
+//母线电压(输入)(只上报)
 //备注:
 #define DPID_MOTOR_BUS_VOLTAGE 10
 //下发实际转速(只上报)
@@ -289,13 +293,13 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //母线电流(只上报)
 //备注:
 #define DPID_MOTOR_BUS_CURRENTE 13
-//系统运行时间(只上报)
+//系统运行时间 (调试用)(只上报)
 //备注:
 #define DPID_SYSTEM_RUNNING_TIME 16
-//无操作时间(只上报)
+//无操作时间 (调试用)(只上报)
 //备注:
 #define DPID_NO_OPERATION_TIME 17
-//休眠时间(只上报)
+//启动时间 (调试用)(只上报)
 //备注:
 #define DPID_SYSTEM_STARTUP_TIME 18
 //工作模式(可下发可上报)
@@ -337,6 +341,15 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //训练计划05(可下发可上报)
 //备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
 #define DPID_SET_TRAIN_PLAN_05 35
+//完成统计_时长(只上报)
+//备注:
+#define DPID_FINISH_STATISTICS_TIME 40
+//完成统计_游泳强度(只上报)
+//备注:
+#define DPID_FINISH_STATISTICS_SEED 41
+//完成统计_距离(只上报)
+//备注:
+#define DPID_FINISH_STATISTICS_DISTANCE 42
 
 
 

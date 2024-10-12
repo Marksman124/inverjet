@@ -68,6 +68,12 @@ extern void WIFI_Get_In_Error(void);
 
 //------------------- 上传状态更新 ----------------------------
 extern void WIFI_Update_State_Upload(void);
+
+//-------------- 上传 完成统计  -------------------
+extern void WIFI_Finish_Statistics_Upload( void );
+	
+
+
 /* Private defines -----------------------------------------------------------*/
 // 初始化
 extern void wifi_Module_Init(void);

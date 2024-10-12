@@ -130,10 +130,10 @@ void WIFI_Update_State_Upload(void)
 		mcu_dp_value_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); 							// 工作模式
 		Wifi_PMode_Now = *p_PMode_Now;
 	}
-	if(Wifi_System_State_Machine != *p_System_State_Machine)
+	if(Wifi_System_State_Machine != Get_System_State_Machine())
 	{
-		mcu_dp_value_update(DPID_SYSTEM_WORKING_STATUS,*p_System_State_Machine); 	// 状态机
-		Wifi_System_State_Machine = *p_System_State_Machine;
+		mcu_dp_value_update(DPID_SYSTEM_WORKING_STATUS,Get_System_State_Machine()); 	// 状态机
+		Wifi_System_State_Machine = Get_System_State_Machine();
 	}
 	if(Wifi_OP_ShowNow_Speed != *p_OP_ShowNow_Speed)
 	{
@@ -151,11 +151,6 @@ void WIFI_Update_State_Upload(void)
 	if((State_Upload_Cnt % WIFI_DATE_UPLOAD_TIME_NORMAL)==0)
 	{
 		//------------------- Debug 数据  ----------------------------
-		if(Wifi_Simulated_Swim_Distance != *p_Simulated_Swim_Distance)
-		{
-			//mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_Simulated_Swim_Distance); //游泳距离
-			Wifi_Simulated_Swim_Distance = *p_Simulated_Swim_Distance;
-		}
 		memcpy(&box_temperature, p_Box_Temperature, 2);
 		if(Wifi_Box_Temperature != box_temperature)
 		{
@@ -239,6 +234,22 @@ void WIFI_Update_State_Upload(void)
 	State_Upload_Cnt++;
 	//State_Upload_Cnt = 0;
 }
+
+
+
+//-------------- 上传 完成统计  -------------------
+void WIFI_Finish_Statistics_Upload( void )
+{
+	if(*p_Finish_Statistics_Time > WIFI_STATISTICE_UPLOAD_MINIMUM_TIME)
+	{
+		DEBUG_PRINT("\n上传统计数据:\t时长:\t%d\t强度:\t%d\t距离:\t%d\t\n",*p_Finish_Statistics_Time,*p_Finish_Statistics_Speed,*p_Finish_Statistics_Distance);
+		
+		mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 		//	完成统计 --> 时长
+		mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 		//	完成统计 --> 强度
+		mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); //	完成统计 --> 游泳距离
+	}
+}
+
 
 //------------------- wifi 状态  图标 ----------------------------
 void WIFI_Get_Work_State(void)

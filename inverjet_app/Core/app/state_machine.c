@@ -46,6 +46,18 @@ void App_State_Machine_Init(void)
 	Special_Status_Bit = 0;
 }
 
+//------------- 模式发生切换 ------------------------------------
+// machine: 新状态机
+void Check_Mode_Change(uint16_t machine)
+{
+	//	切换模式时上传<统计数据>
+	if(Is_Change_System_Mode(machine))
+	{
+		Finish_Statistics_Upload();
+	}
+	
+}
+
 //------------------- 设置状态机  ----------------------------
 
 uint8_t Set_System_State_Machine(uint8_t val)
@@ -53,6 +65,8 @@ uint8_t Set_System_State_Machine(uint8_t val)
 	if(val >= SYSTEM_STATE_END) //溢出
 		return 0;
 		
+	Check_Mode_Change(val);
+	
 	*p_System_State_Machine = val;
 	
 	return 1;
@@ -269,7 +283,6 @@ void Arbitrarily_To_Pause(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 1;
 	
-	Motor_Speed_Target_Set(0);
 	Clean_Automatic_Shutdown_Timer();
 	return;
 }
@@ -293,6 +306,69 @@ void Arbitrarily_To_Stop(void)
 	Clean_Automatic_Shutdown_Timer();
 	return;
 }
+
+//------------------- 判断 状态 & 模式  ----------------------------
+// 	模式 是否发生变化 
+//	1:是  0:否
+uint8_t Is_Change_System_Mode(uint16_t machine)
+{
+	uint8_t result = 1;
+	
+	switch(machine)
+	{
+		case POWER_OFF_STATUS:			//	关机
+			if(System_is_Power_Off())
+				result = 0;
+		break;
+	//自由模式
+		case FREE_MODE_INITIAL:				//	1		初始状态	
+		case FREE_MODE_STARTING:			//			启动中
+		case FREE_MODE_RUNNING:				//			运行中
+		case FREE_MODE_SUSPEND:				//			暂停
+		case FREE_MODE_STOP:					//	5		结束
+			if(System_Mode_Free())
+				result = 0;
+		break;
+	//定时模式
+		case TIMING_MODE_INITIAL:			//	6		初始状态
+		case TIMING_MODE_STARTING:		//			启动中
+		case TIMING_MODE_RUNNING:			//			运行中
+		case TIMING_MODE_SUSPEND:			//			暂停
+		case TIMING_MODE_STOP:				//	10	结束
+			if(System_Mode_Time())
+				result = 0;
+		break;
+	//训练模式
+		case TRAINING_MODE_INITIAL:		//	11	初始状态
+		case TRAINING_MODE_STARTING:	//			启动中
+		case TRAINING_MODE_RUNNING:		//			运行中
+		case TRAINING_MODE_SUSPEND:		//			暂停
+		case TRAINING_MODE_STOP:			//	15	结束
+			if(System_Mode_Train())
+				result = 0;
+		break;
+	
+	// 其它状态
+		case OPERATION_MENU_STATUS:		//			操作菜单
+			if(System_is_Operation())
+				result = 0;
+		break;
+		case ERROR_DISPLAY_STATUS:		//			故障界面
+			if(System_is_Error())
+				result = 0;
+		break;
+		case OTA_UPGRADE_STATUS:			//			OTA 升级
+			if(System_is_OTA())
+				result = 0;
+		break;
+			
+		default:
+			break;
+	}
+	
+	return result;
+}
+
 
 //------------------- 特别状态 机  ----------------------------
 

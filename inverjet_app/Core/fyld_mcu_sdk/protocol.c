@@ -86,6 +86,7 @@ unsigned char pack_sum=0;
 ******************************************************************************/
 const DOWNLOAD_CMD_S download_cmd[] =
 {
+    {DPID_PREPARATION_TIME, DP_TYPE_VALUE},
     {DPID_DEVICE_ERROR_CODE, DP_TYPE_VALUE},
     {DPID_GET_SYSTEM_FAULT_STATUS, DP_TYPE_BITMAP},
     {DPID_GET_MOS_TEMPERATURE, DP_TYPE_VALUE},
@@ -112,6 +113,9 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_SET_TRAIN_PLAN_03, DP_TYPE_RAW},
     {DPID_SET_TRAIN_PLAN_04, DP_TYPE_RAW},
     {DPID_SET_TRAIN_PLAN_05, DP_TYPE_RAW},
+    {DPID_FINISH_STATISTICS_TIME, DP_TYPE_VALUE},
+    {DPID_FINISH_STATISTICS_SEED, DP_TYPE_VALUE},
+    {DPID_FINISH_STATISTICS_DISTANCE, DP_TYPE_VALUE},
     
 };
 
@@ -165,6 +169,7 @@ void all_data_update(void)
     //#error "请在此处理可下发可上报数据及只上报数据示例,处理完成后删除该行"
     /*
     //此代码为平台自动生成，请按照实际数据修改每个可下发可上报函数和只上报函数
+    mcu_dp_value_update(DPID_PREPARATION_TIME,当前预备时间（标志位）); //VALUE型数据上报;
     mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,当前驱动板故障); //VALUE型数据上报;
     mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,当前读系统故障); //故障型数据上报;
     mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,当前MOS温度); //VALUE型数据上报;
@@ -175,9 +180,9 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_SEND_REALITY_SPEED,当前下发实际转速); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_POWER,当前电机功率); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,当前母线电流); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,当前系统运行时间); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_NO_OPERATION_TIME,当前无操作时间); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,当前休眠时间); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,当前系统运行时间 (调试用)); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_NO_OPERATION_TIME,当前无操作时间 (调试用)); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,当前启动时间 (调试用)); //VALUE型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,当前工作模式); //枚举型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,当前系统状态机); //枚举型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,当前当前转速); //VALUE型数据上报;
@@ -191,10 +196,43 @@ void all_data_update(void)
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,当前训练计划03指针,当前训练计划03数据长度); //RAW型数据上报;
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,当前训练计划04指针,当前训练计划04数据长度); //RAW型数据上报;
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,当前训练计划05指针,当前训练计划05数据长度); //RAW型数据上报;
+    mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,当前完成统计_时长); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,当前完成统计_游泳强度); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,当前完成统计_距离); //VALUE型数据上报;
     
 
     */
-
+		mcu_dp_value_update(DPID_PREPARATION_TIME,*p_Preparation_Time_BIT); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,*p_Motor_Fault_Static); //VALUE型数据上报;
+    mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,*p_System_Fault_Static); //故障型数据上报;
+    mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,*p_Mos_Temperature); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,*p_Box_Temperature); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,*p_Motor_Current); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Motor_Reality_Speed); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,*p_Motor_Bus_Voltage); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,*p_Send_Reality_Speed); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_POWER,*p_Motor_Reality_Power); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,*p_Motor_Bus_Current); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,*p_System_Runing_Second_Cnt); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_NO_OPERATION_TIME,*p_No_Operation_Second_Cnt); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,*p_System_Startup_Second_Cnt); //VALUE型数据上报;
+    mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); //枚举型数据上报;
+    mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,Get_System_State_Machine()); //枚举型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SWIMMING_DISTANCE,*p_Simulated_Swim_Distance); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time); //VALUE型数据上报;
+    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,(unsigned char *)p_OP_PMode[0],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,(unsigned char *)p_OP_PMode[1],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,(unsigned char *)p_OP_PMode[2],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,(unsigned char *)p_OP_PMode[3],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,(unsigned char *)p_OP_PMode[4],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+//		mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,当前完成统计_时长); //VALUE型数据上报;
+//    mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,当前完成统计_游泳强度); //VALUE型数据上报;
+//    mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,当前完成统计_距离); //VALUE型数据上报;
+/*
 	//故障上传
 	mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,*p_Motor_Fault_Static); 					// 驱动板故障;
 	mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,*p_System_Fault_Static); 	// 系统 故障型数据上报;
@@ -206,13 +244,13 @@ void all_data_update(void)
 	mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,*p_Motor_Bus_Voltage);						// 输入电压（母线）;
 	mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,*p_Motor_Bus_Current); 					// 输入电流（母线）;
 	mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Motor_Reality_Speed); 			// 实际转速;
-	mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,*p_Send_Reality_Speed);				// 下发转速;
+	mcu_dp_value_update(DPID_SEND_REALITY_SPEED,*p_Send_Reality_Speed);					// 下发转速;
 	mcu_dp_value_update(DPID_MOTOR_POWER,*p_Motor_Reality_Power);								// 当前功率;
 	mcu_dp_value_update(DPID_SWIMMING_DISTANCE,*p_Simulated_Swim_Distance); 		// 模拟游泳距离;
 	
 	// 系统状态 (重要)
 	mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,*p_PMode_Now); 									// 工作模式;
-	mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,*p_System_State_Machine); 		// 状态机;
+	mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,Get_System_State_Machine()); 		// 状态机;
 	mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed);					// 当前速度;
 	mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time);						// 当前时间;
 	
@@ -234,6 +272,9 @@ void all_data_update(void)
 	mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,(unsigned char *)p_OP_PMode[2],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
 	mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,(unsigned char *)p_OP_PMode[3],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
 	//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,(unsigned char *)p_OP_PMode[4],TRAINING_MODE_PERIOD_MAX*4); //RAW型数据上报;
+
+*/
+
 }
 
 
@@ -243,6 +284,33 @@ void all_data_update(void)
 自动化代码模板函数,具体请用户自行实现数据处理
 ******************************************************************************/
 
+/*****************************************************************************
+函数名称 : dp_download_preparation_time_handle
+功能描述 : 针对DPID_PREPARATION_TIME的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_preparation_time_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为VALUE
+    unsigned char ret;
+    unsigned long preparation_time;
+
+    preparation_time = mcu_get_dp_download_value(value,length);
+    /*
+    //VALUE type data processing
+
+    */
+		*p_Preparation_Time_BIT = preparation_time;
+    //There should be a report after processing the DP
+    ret = mcu_dp_value_update(DPID_PREPARATION_TIME,*p_Preparation_Time_BIT);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
 /*****************************************************************************
 函数名称 : dp_download_system_working_mode_handle
 功能描述 : 针对DPID_SYSTEM_WORKING_MODE的处理函数
@@ -261,6 +329,11 @@ static unsigned char dp_download_system_working_mode_handle(const unsigned char 
 	
 		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
+			//	切换模式时上传<统计数据> 如： 从 P1 切到 P2
+			if((*p_PMode_Now != system_working_mode)&&(*p_PMode_Now > 0))
+			{
+				Finish_Statistics_Upload();
+			}
 			*p_PMode_Now = system_working_mode;
 			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
 			Set_Pmode_Period_Now(0);
@@ -292,22 +365,18 @@ static unsigned char dp_download_system_working_status_handle(const unsigned cha
 		{
 			if(system_working_status <= TRAINING_MODE_STOP)
 			{
-				*p_System_State_Machine = system_working_status;
+				Set_System_State_Machine(system_working_status);
 				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-				Set_Pmode_Period_Now(0);
-				if(System_is_Power_Off())//状态机
+				if(System_is_Power_Off())
 				{
 					System_Power_Off();
 				}
-				else if(System_Mode_Train())
-				{
-					if(*p_PMode_Now == 0)
-						*p_PMode_Now = 1;
-				}
+				//确保这个最后收到的前提下
+				Update_OP_All();
 			}
 		}
     //There should be a report after processing the DP
-    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS, *p_System_State_Machine);
+    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS, Get_System_State_Machine());
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -333,10 +402,10 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
     */
 		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
-			if(motor_current_speed < 20)
-				*p_OP_ShowNow_Speed = 20;
-			else if(motor_current_speed > 100)
-				*p_OP_ShowNow_Speed = 100;
+			if(motor_current_speed < MOTOR_PERCENT_SPEED_MIX)
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+			else if(motor_current_speed > MOTOR_PERCENT_SPEED_MAX)
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
 			else
 				*p_OP_ShowNow_Speed = motor_current_speed;
 			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
@@ -492,7 +561,6 @@ static unsigned char dp_download_set_train_plan_01_handle(const unsigned char va
     */
 		my_memcpy(p_OP_PMode[0], value, length);
 		//保存
-		Memset_OPMode();
 	
     //There should be a report after processing the DP
     ret = mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,value,length);
@@ -518,7 +586,6 @@ static unsigned char dp_download_set_train_plan_02_handle(const unsigned char va
     */
 		my_memcpy(p_OP_PMode[1], value, length);
 		//保存
-		Memset_OPMode();
 	
     //There should be a report after processing the DP
     ret = mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,value,length);
@@ -544,7 +611,6 @@ static unsigned char dp_download_set_train_plan_03_handle(const unsigned char va
     */
 		my_memcpy(p_OP_PMode[2], value, length);
 		//保存
-		Memset_OPMode();
 	
     //There should be a report after processing the DP
     ret = mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,value,length);
@@ -570,7 +636,6 @@ static unsigned char dp_download_set_train_plan_04_handle(const unsigned char va
     */
 		my_memcpy(p_OP_PMode[3], value, length);
 		//保存
-		Memset_OPMode();
 	
     //There should be a report after processing the DP
     ret = mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,value,length);
@@ -597,7 +662,6 @@ static unsigned char dp_download_set_train_plan_05_handle(const unsigned char va
     */
 		my_memcpy(p_OP_PMode[4], value, length);
 		//保存
-		Memset_OPMode();
 	
     //There should be a report after processing the DP
     ret = mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,value,length);
@@ -634,6 +698,10 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
     ***********************************/
     unsigned char ret;
     switch(dpid) {
+        case DPID_PREPARATION_TIME:
+            //预备时间（标志位）处理函数
+            ret = dp_download_preparation_time_handle(value,length);
+        break;
         case DPID_SYSTEM_WORKING_MODE:
             //工作模式处理函数
             ret = dp_download_system_working_mode_handle(value,length);

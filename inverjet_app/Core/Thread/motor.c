@@ -65,11 +65,6 @@ static uint32_t Motor_TEMP_Timer_cnt= 0;	//高温 计数器
 static uint8_t Rx_State= 0;		//从机接收状态
 #endif
 
-//电机电流低
-uint16_t Check_Motor_Current_Cnt=0;
-//电机转速不符
-uint16_t Check_Motor_Speed_Cnt=0;
-
 /* Private user code ---------------------------------------------------------*/
 
 // 初始化
@@ -262,7 +257,7 @@ void Clean_Swimming_Distance(void)
 //------------------- 计算游泳距离 每秒----------------------------
 void Calculate_Swimming_Distance(void)
 {
-	uint32_t distance = 0;
+	uint16_t distance = 0;
 	
 	
 	distance = Motor_Speed_Now * EVERY_1PERCENT_DISTANCE_PER_SECOND;
@@ -639,36 +634,67 @@ void Drive_Status_Inspection_Motor_Speed(void)
 {
 //判断电机转速
 #ifdef MOTOR_SPEED_ERROR_TIME
+	static uint16_t Check_Motor_Speed_Cnt=0;		// 计时器
+	static uint8_t Number_Of_Fault_Alarms = 0;	//	故障计数器
+	
 	if(Motor_Speed_Is_Reach())	//等转速设置稳定下来后再做判断
 	{
 		if(Check_Motor_Speed())
 		{
+			if(Check_Motor_Speed_Cnt > 0)
+			{
+				DEBUG_PRINT("\n[电机转速正确]\t目标转速\t%d(rpm)\t实际转速\t%d(rpm)\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed);
+			}
+			if(Number_Of_Fault_Alarms >= 3)//已经报故障
+			{
+				//电机转速不准 故障 202 驱动故障
+				Motor_Fault_State &= ~FAULT_MOTOR_DRIVER;
+				DEBUG_PRINT("\n[电机故障恢复]\t  实际转速\t%d(rpm)\n",*p_Motor_Reality_Speed);
+			}
+				
 			Check_Motor_Speed_Cnt = 0;
+			Number_Of_Fault_Alarms = 0;
+			
 		}
 		else
 		{
 			if(Check_Motor_Speed_Cnt <= MOTOR_SPEED_ERROR_TIME)
 			{
-				Check_Motor_Speed_Cnt ++;
-				DEBUG_PRINT("\n[判断电机转速]\t目标转速\t%d(rpm)\t实际转速\t%d(rpm)\t计数器\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
+				if(Check_Motor_Speed_Cnt == 0)
+				{
+					DEBUG_PRINT("\n[电机转速错误]\t目标转速\t%d(rpm)\t实际转速\t%d(rpm)\t计数器\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
+				}
+				Check_Motor_Speed_Cnt++;
 			}
 			else
 			{
-				//电机转速不准 故障 202 驱动故障
-				//Motor_Fault_State |= FAULT_MOTOR_DRIVER;
+				if(Number_Of_Fault_Alarms >= 3)
+				{
+					//电机转速不准 故障 202 驱动故障
+					Motor_Fault_State |= FAULT_MOTOR_DRIVER;
+					if(Number_Of_Fault_Alarms == 3)
+					{
+						Number_Of_Fault_Alarms ++ ;
+						DEBUG_PRINT("\n[ERROR]\t电机转速不准\t目标转速\t%d(rpm)\t实际转速\t%d(rpm)\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed);
+					}
+				}
+				else
+				{
+					//把当前速度同步成驱动板速度
+					Motor_Speed_Now = Motor_Rpm_To_Speed(*p_Motor_Reality_Speed);
+					DEBUG_PRINT("\n[把当前速度同步成驱动板速度]\t转速\t%d(rpm)\t百分比\t%d()\n",*p_Motor_Reality_Speed,Motor_Speed_Now);
 				
-				//把当前速度同步成驱动板速度
-				Motor_Speed_Now = Motor_Rpm_To_Speed(*p_Motor_Reality_Speed);
-				DEBUG_PRINT("\n[把当前速度同步成驱动板速度]\t转速\t%d(rpm)\t百分比\t%d()\n",*p_Motor_Reality_Speed,Motor_Speed_Now);
-			
-				//Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);	//光圈重新闪烁
+					//Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);	//光圈重新闪烁
+					Number_Of_Fault_Alarms ++ ;
+					Check_Motor_Speed_Cnt = 0;
+				}
 			}
 		}
 	}
-	else
-	{
-		Check_Motor_Speed_Cnt = 0;
-	}
+//	else
+//	{
+//		Check_Motor_Speed_Cnt = 0;
+//	}
 #endif
 }
 
@@ -677,6 +703,9 @@ void Drive_Status_Inspection_Motor_Current(void)
 {
 //判断电机电流
 #ifdef MOTOR_CANNOT_START_TIME
+		static uint16_t Check_Motor_Current_Cnt=0;	// 计时器
+	
+	
 		if(Check_Motor_Current())
 		{
 			Check_Motor_Current_Cnt = 0;
@@ -902,7 +931,7 @@ void Motor_Read_Register(void)
 uint8_t Check_Motor_Current(void)
 {
 #ifdef MOTOR_CURRENT_MIX
-	if(Motor_Speed_Now >= MOTOR_POWER_SPEED)
+	if(Motor_Speed_Now >= MOTOR_PERCENT_SPEED_MIX)
 	{
 		if(*p_Motor_Current < MOTOR_CURRENT_MIX)
 			return 0;

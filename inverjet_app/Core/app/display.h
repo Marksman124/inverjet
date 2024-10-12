@@ -49,6 +49,11 @@ extern "C" {
 
 #define LCD_SYMBOL_FOT_FAULT								(STATUS_BIT_BLUETOOTH + STATUS_BIT_WIFI)
 
+
+// 自由模式 特别状态
+#define FREE_MODE_AUTO_START					0
+#define FREE_MODE_NOT_AUTO_START			1
+
 /* Exported functions prototypes ---------------------------------------------*/
 
 //------------------- 硬件 & 驱动 ----------------------------

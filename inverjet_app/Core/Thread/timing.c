@@ -260,7 +260,6 @@ void CallOut_Fault_State(void)
 {
 	Clean_Fault_State();
 	System_Fault_Timing_Cnt = 0;
-	Check_Motor_Current_Cnt = 0;
 	
 	System_Wifi_State_Clean();
 	Lcd_Show();
@@ -349,6 +348,7 @@ void Running_State_Handler(void)
 	}
 	else if(*p_System_State_Machine == TIMING_MODE_RUNNING)					// 定时
 	{
+		Finish_Statistics_Count(1);	//计算 完成统计
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time - 1);
 		Lcd_Show();
 		if(*p_OP_ShowNow_Time == 0)
@@ -359,6 +359,7 @@ void Running_State_Handler(void)
 	}
 	else if(*p_System_State_Machine == TRAINING_MODE_RUNNING)					// 训练
 	{
+		Finish_Statistics_Count(1);	//计算 完成统计
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time + 1);
 		if(*p_PMode_Now == SURFING_MODE_NUMBER_ID)//冲浪
 		{
@@ -539,8 +540,9 @@ void Stop_State_Handler(void)
 	}
 	else
 	{
+		Finish_Statistics_Upload();//上传 完成统计
 		// 返回 自由模式 初始状态
-		To_Free_Mode(1);
+		To_Free_Mode(FREE_MODE_NOT_AUTO_START);
 		Lcd_Show();
 		Timing_Timer_Cnt = 0;
 	}

@@ -21,7 +21,6 @@
 
 
 /* Private function prototypes -----------------------------------------------*/
-extern void To_Free_Mode(uint8_t mode);
 
 //------------------- 按键回调 ----------------------------
 //--------------- 短按 -----------------------
@@ -604,8 +603,6 @@ static void on_Button_4_Short_Press(void)
 
 	mcu_reset_wifi();// 复位模组
 	SysSoftReset();// 软件复位
-	//退出
-	//To_Free_Mode(1);
 }
 
 // ① + ③  组合键  短按   切换档位 100级 or 5级
