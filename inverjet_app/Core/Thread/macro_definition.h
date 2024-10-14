@@ -32,14 +32,14 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.2"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.3"
 
 /**
 ******************************************************************************
 * 系统宏定义
 ******************************************************************************
 */
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
@@ -133,7 +133,7 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					1
 #else
-#define BUZZER_FREQUENCY					50					//50
+#define BUZZER_FREQUENCY					50					// wuqingguang
 #endif
 //*******************************************************
 
@@ -257,9 +257,9 @@ extern "C" {
 
 
 // 驱动状态检验   电机电流 报警时间  ------------------
-//#define MOTOR_CANNOT_START_TIME						(5000 / MOTOR_POLLING_PERIOD / MOTOR_THREAD_LIFECYCLE)
+//#define MOTOR_CANNOT_START_TIME						(5000 / MOTOR_POLLING_PERIOD / MOTOR_THREAD_LIFECYCLE)		// wuqingguang
 // 驱动状态检验   电机转速 报警时间  ------------------
-//#define MOTOR_SPEED_ERROR_TIME						(5000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)
+//#define MOTOR_SPEED_ERROR_TIME						(5000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)			// wuqingguang
 
 
 //*****************************************************************************

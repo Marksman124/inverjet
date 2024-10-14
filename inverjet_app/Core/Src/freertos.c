@@ -139,9 +139,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
+
   /* Create the thread(s) */
   /* definition and creation of Breath_Light_Ta */
-  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityIdle, 0, 128);
+  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 128);
   Breath_Light_TaHandle = osThreadCreate(osThread(Breath_Light_Ta), NULL);
 
   /* definition and creation of Rs485_Modbus_Ta */
@@ -153,22 +154,23 @@ void MX_FREERTOS_Init(void) {
   Main_TaskHandle = osThreadCreate(osThread(Main_Task), NULL);
 
   /* definition and creation of Key_Button_Task */
-  osThreadDef(Key_Button_Task, Key_Button_Handler, osPriorityNormal, 0, 128);
+  osThreadDef(Key_Button_Task, Key_Button_Handler, osPriorityIdle, 0, 128);
   Key_Button_TaskHandle = osThreadCreate(osThread(Key_Button_Task), NULL);
 
   /* definition and creation of Motor_Task */
-  osThreadDef(Motor_Task, Motor_Handler, osPriorityHigh, 0, 256);
+  osThreadDef(Motor_Task, Motor_Handler, osPriorityIdle, 0, 256);
   Motor_TaskHandle = osThreadCreate(osThread(Motor_Task), NULL);
 
   /* definition and creation of wifi_module */
-  osThreadDef(wifi_module, wifi_module_Handler, osPriorityAboveNormal, 0, 640);
+  osThreadDef(wifi_module, wifi_module_Handler, osPriorityHigh, 0, 640);
   wifi_moduleHandle = osThreadCreate(osThread(wifi_module), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
 }
-	
+
 /* USER CODE BEGIN Header_Breath_Light_Handler */
 /**
   * @brief  Function implementing the Breath_Light_Ta thread.
@@ -273,7 +275,6 @@ void Key_Button_Handler(void const * argument)
 {
   /* USER CODE BEGIN Key_Button_Handler */
 
-	
 	App_Key_Init();
 	
   /* Infinite loop */
@@ -298,7 +299,6 @@ void Key_Button_Handler(void const * argument)
 void Motor_Handler(void const * argument)
 {
   /* USER CODE BEGIN Motor_Handler */
-
 	
 	Metering_Receive_Init();
 	Debug_Protocol_Init();

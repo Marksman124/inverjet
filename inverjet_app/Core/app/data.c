@@ -291,6 +291,16 @@ void Update_OP_All(void)
 	}
 }
 
+//检查 新 速度 & 时间  防止溢出
+void Check_OP_All(void)
+{
+	if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MIX)
+		*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+	else if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
+		*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
+		
+}
+
 //------------------- 判断 模式 合法 ----------------------------
 uint8_t Is_Mode_Legal(uint8_t mode)
 {

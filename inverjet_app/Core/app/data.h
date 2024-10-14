@@ -89,6 +89,8 @@ extern void Update_OP_Speed(void);
 extern void Update_OP_Time(void);
 //存储 新 速度 & 时间
 extern void Update_OP_All(void);
+//检查 新 速度 & 时间  防止溢出
+void Check_OP_All(void);
 
 // 更改属性值
 extern uint8_t Set_Data_OPMode(Operating_Parameters* p_op);

@@ -280,8 +280,6 @@ void USART1_IRQHandler(void)
 /**
   * @brief This function handles USART2 global interrupt.
   */
-//unsigned char Res=0;
-
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */

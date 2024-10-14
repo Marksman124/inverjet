@@ -74,8 +74,8 @@ void App_Timing_Init(void)
 	LCD_Show_Bit = STATUS_BIT_PERCENTAGE;
 	
 	System_Boot_Screens();
-	Dev_Check_Control_Methods();
 	System_Power_Off();
+	Dev_Check_Control_Methods();
 	//开机完成
 	System_PowerUp_Finish = 0xAA;
 }

@@ -599,9 +599,9 @@ static void on_Button_4_Short_Press(void)
 	//保存 flash
 	Memset_OPMode();//存flash
 	
-	Dev_Check_Control_Methods();
+	//Dev_Check_Control_Methods();
 
-	mcu_reset_wifi();// 复位模组
+	//mcu_reset_wifi();// 复位模组
 	SysSoftReset();// 软件复位
 }
 

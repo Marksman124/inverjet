@@ -306,9 +306,12 @@ void Wifi_Module_Handler(void)
 	
 	wifi_uart_service();
 	
-	WIFI_Update_State_Upload();
-	
-	WIFI_Get_Work_State();
+	if(System_is_OTA() == 0)
+	{
+		WIFI_Update_State_Upload();
+		
+		WIFI_Get_Work_State();
+	}
 	
 }
 

@@ -104,10 +104,14 @@ void Error_Handler(void);
 #define RS485_A_GPIO_Port GPIOA
 #define RS485_B_Pin GPIO_PIN_3
 #define RS485_B_GPIO_Port GPIOA
+#define SW_3_Pin GPIO_PIN_4
+#define SW_3_GPIO_Port GPIOA
 #define ADC_CN6_Pin GPIO_PIN_5
 #define ADC_CN6_GPIO_Port GPIOA
 #define ADC_CN6A6_Pin GPIO_PIN_6
 #define ADC_CN6A6_GPIO_Port GPIOA
+#define SW_4_Pin GPIO_PIN_7
+#define SW_4_GPIO_Port GPIOA
 #define SW_1_Pin GPIO_PIN_4
 #define SW_1_GPIO_Port GPIOC
 #define SW_2_Pin GPIO_PIN_5
