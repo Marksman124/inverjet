@@ -671,7 +671,7 @@ void App_Key_Handler(void)
 	
 	if(*p_Analog_key_Value > 0)
 	{
-		if(*p_Analog_key_Value & 0x8000)
+		if((*p_Analog_key_Value>>8) >= 2)
 		{
 			//³¤°´
 			Key_IO_Hardware = (*p_Analog_key_Value & 0xFF);

@@ -263,6 +263,8 @@ static unsigned char dp_download_preparation_time_handle(const unsigned char val
 
     */
 		*p_Preparation_Time_BIT = preparation_time;
+		//保存
+		Memset_OPMode();
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_PREPARATION_TIME,*p_Preparation_Time_BIT);
     if(ret == SUCCESS)

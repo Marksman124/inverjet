@@ -391,10 +391,11 @@ uint32_t get_uint3_version(char * buffer)
 			// 软件子版本号初始化
 			tmp = strtok(NULL, ".");
 			if (tmp != NULL) {
-					tmp = strtok(NULL, ".");
-					if (tmp != NULL) {
-							version |= (uint8_t)atoi(tmp);
-					}
+				version |= (uint8_t)atoi(tmp);
+//					tmp = strtok(NULL, ".");
+//					if (tmp != NULL) {
+//							version |= (uint8_t)atoi(tmp);
+//					}
 			}
 	}
 	return version;

@@ -216,5 +216,16 @@ void Dev_Check_Control_Methods( void )
 #endif
 }
 
+// 检查是否屏蔽 1:屏蔽 0:正常
+uint8_t Dev_Is_Control_Methods(uint16_t bit)
+{
+	if( *p_Support_Control_Methods & bit)
+		return 1;
+	else
+		return 0;
+	
+}
+
+
 
 

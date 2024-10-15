@@ -32,7 +32,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 // 通用计数器
-static uint8_t Timing_Timer_Cnt = 0;
+static uint32_t Timing_Timer_Cnt = 0;
 
 // 任务计时器
 static uint32_t Timing_Thread_Task_Cnt = 0;
@@ -126,8 +126,38 @@ void Speed_Save_Flash(Operating_Parameters op_node,uint8_t system_state)
 void WIFI_State_Handler(void)
 {
 	static uint8_t wifi_state = 0;
+	//static uint8_t wifi_time_cnt = 0;
 	
-	if(WIFI_Get_Machine_State() == WIFI_ERROR)
+	// -------- 屏蔽
+	if(Dev_Is_Control_Methods(MACRO_WIFI_USART))
+	{
+		LCD_Show_Bit &= ~STATUS_BIT_WIFI;
+//		// 周期 3s
+//		if(wifi_time_cnt < (TIMING_THREAD_HALF_SECOND*2))
+//		{
+//			LCD_Show_Bit |= STATUS_BIT_WIFI;
+//		}
+//		else if(wifi_time_cnt < (TIMING_THREAD_HALF_SECOND*4))
+//		{
+//			if((wifi_time_cnt & 5)==0)
+//			{
+//				if((LCD_Show_Bit & STATUS_BIT_WIFI) == 0)
+//					LCD_Show_Bit |= STATUS_BIT_WIFI;
+//				else
+//					LCD_Show_Bit &= ~STATUS_BIT_WIFI;
+//			}
+//		}
+//		else if(wifi_time_cnt < (TIMING_THREAD_HALF_SECOND*6))
+//		{
+//			LCD_Show_Bit &= ~STATUS_BIT_WIFI;
+//		}
+//		else
+//			wifi_time_cnt = 0;
+//		
+//		wifi_time_cnt ++;
+	}
+	// -------- 故障
+	else if(WIFI_Get_Machine_State() == WIFI_ERROR)
 	{
 		if((Timing_Thread_Task_Cnt % WIFI_ERROR_BLINK_TIME) == 0)
 		{
@@ -138,6 +168,7 @@ void WIFI_State_Handler(void)
 				LCD_Show_Bit &= ~STATUS_BIT_WIFI;
 		}
 	}
+	// -------- 正常
 	else
 	{
 		if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND) //半秒
@@ -157,25 +188,6 @@ void WIFI_State_Handler(void)
 				
 				if((Timing_Half_Second_Cnt % WIFI_DISTRIBUTION_BLINK_TIME) == 0)
 				{
-					if((LCD_Show_Bit & STATUS_BIT_WIFI) == 0)
-						LCD_Show_Bit |= STATUS_BIT_WIFI;
-					else
-						LCD_Show_Bit &= ~STATUS_BIT_WIFI;
-				}
-				
-				//超时配网恢复
-		//		if( (Timing_Half_Second_Cnt - WIFI_Distribution_Timing_Cnt) > WIFI_DISTRIBUTION_TIME_CALLOUT)
-		//		{
-		//			WIFI_Distribution_Timing_Cnt = 0;
-		//			WIFI_Set_Machine_State(WIFI_NO_CONNECT);
-		//			LCD_Show_Bit &= ~STATUS_BIT_WIFI;
-		//		}
-			}
-			else if(WIFI_Get_Machine_State() == WIFI_ERROR)
-			{
-				if((Timing_Thread_Task_Cnt % WIFI_ERROR_BLINK_TIME) == 0)
-				{
-					WIFI_Distribution_Timing_Cnt = 0;
 					if((LCD_Show_Bit & STATUS_BIT_WIFI) == 0)
 						LCD_Show_Bit |= STATUS_BIT_WIFI;
 					else
@@ -555,16 +567,6 @@ void Initial_State_Handler(void)
 {
 	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// 跳过 自动启动
 	{
-		if(((Timing_Half_Second_Cnt - Automatic_Shutdown_Timing_Cnt) > AUTOMATIC_SHUTDOWN_TIME) && (Timing_Half_Second_Cnt > Automatic_Shutdown_Timing_Cnt))
-		{
-			System_Power_Off();
-		}
-		return;
-	}
-	
-	// 3秒 闪烁
-	if(Timing_Timer_Cnt < 2)
-	{
 		if((Timing_Timer_Cnt % 2) == 1)
 		{
 			LCD_Refresh_Set(1);
@@ -575,44 +577,65 @@ void Initial_State_Handler(void)
 			//LCD_Refresh_Set(0);
 			Lcd_Show();
 		}
+		
+		if(((Timing_Half_Second_Cnt - Automatic_Shutdown_Timing_Cnt) > AUTOMATIC_SHUTDOWN_TIME) && (Timing_Half_Second_Cnt > Automatic_Shutdown_Timing_Cnt))
+		{
+			System_Power_Off();
+		}
 	}
 	else
 	{
-		LCD_Refresh_Set(0);//恢复刷新
-		
-		Add_Ctrl_Log();
-		
-		if(*p_System_State_Machine == TIMING_MODE_INITIAL)
+		// 3秒 闪烁
+		if(Timing_Timer_Cnt < 2)
 		{
-			p_OP_ShowLater->time = *p_OP_ShowNow_Time;
+			if((Timing_Timer_Cnt % 2) == 1)
+			{
+				LCD_Refresh_Set(1);
+				Lcd_Speed_Off();
+			}
+			else
+			{
+				//LCD_Refresh_Set(0);
+				Lcd_Show();
+			}
 		}
-		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
-		
-		
-//		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))	//跳过 软启动
+		else
 		{
-			//Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING); //底层转速同步后再删除
-			p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+			LCD_Refresh_Set(0);//恢复刷新
 			
-			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+			Add_Ctrl_Log();
 			
-			//保存
+			if(*p_System_State_Machine == TIMING_MODE_INITIAL)
+			{
+				p_OP_ShowLater->time = *p_OP_ShowNow_Time;
+			}
+			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 			
-			Lcd_Show();
-			Arbitrarily_To_Running();
+			
+	//		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))	//跳过 软启动
+			{
+				//Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING); //底层转速同步后再删除
+				p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+				
+				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+				
+				//保存
+				
+				Lcd_Show();
+				Arbitrarily_To_Running();
+			}
+	//		else
+	//		{
+	//			// 进入 软启动
+	//			Arbitrarily_To_Starting();
+	//			//*p_OP_ShowLater->time = *p_OP_ShowNow_Time;
+	//			*p_OP_ShowNow_Time = 20;
+	//			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+	//			Lcd_Show();
+	//		}
+			Timing_Timer_Cnt = 0;
 		}
-//		else
-//		{
-//			// 进入 软启动
-//			Arbitrarily_To_Starting();
-//			//*p_OP_ShowLater->time = *p_OP_ShowNow_Time;
-//			*p_OP_ShowNow_Time = 20;
-//			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
-//			Lcd_Show();
-//		}
-		Timing_Timer_Cnt = 0;
 	}
-	
 	Timing_Timer_Cnt++;
 }
 

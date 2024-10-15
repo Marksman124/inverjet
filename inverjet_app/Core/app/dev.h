@@ -46,6 +46,9 @@ extern void Set_Baud_Rate(uint16_t rate);
 extern void Set_Software_Version(void);
 extern void Disable_Usart_Receiver(uint8_t no);
 extern void Dev_Check_Control_Methods( void );
+// 检查是否屏蔽 1:屏蔽 0:正常
+extern uint8_t Dev_Is_Control_Methods(uint16_t bit);
+
 
 #ifdef __cplusplus
 }

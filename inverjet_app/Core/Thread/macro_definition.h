@@ -32,14 +32,15 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.3"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.3"
 
 /**
 ******************************************************************************
 * 系统宏定义
 ******************************************************************************
 */
-#define SYSTEM_DEBUG_MODE								1	// 调试模式
+
+//#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
@@ -98,9 +99,9 @@ extern "C" {
 #endif
 //*******************************************************
 //档位
-#define BREATH_LIGHT_GEAR_POSITION				(1000/BREATH_LIGHT_THREAD_LIFECYCLE)				// 档位 50
+#define BREATH_LIGHT_GEAR_POSITION						(1000/BREATH_LIGHT_THREAD_LIFECYCLE)				// 档位 50
 //步进
-#define LIGHT_BRIGHTNESS_STEP							((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION)
+#define LIGHT_BRIGHTNESS_STEP									((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION)
 
 //---------- 暂停下 5秒周期
 //档位
@@ -133,7 +134,7 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					1
 #else
-#define BUZZER_FREQUENCY					50					// wuqingguang
+#define BUZZER_FREQUENCY					5					// wuqingguang
 #endif
 //*******************************************************
 
@@ -275,7 +276,7 @@ extern "C" {
 //每 1% 转速
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /80)			//15.6			78
 
-//每 20% 转速 
+//每 20% 转速
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT_20				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /4)			//312.5     1562
 
 //电机最高速度  百分比  100%
