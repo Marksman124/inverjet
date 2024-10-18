@@ -22,6 +22,21 @@ extern "C" {
 
 #include "model_parameter.h"
 
+
+/* Exported types ------------------------------------------------------------*/
+
+// 降频 类型
+typedef enum 
+{
+	MOTOR_DOWN_CONVERSION_NO = 0,						//	无
+	MOTOR_DOWN_CONVERSION_MOS_TEMPER,				//	mos 高温
+	MOTOR_DOWN_CONVERSION_BOX_TEMPER,				//	机箱 高温
+	MOTOR_DOWN_CONVERSION_OUT_CURRENT,			//	输出 电流
+	MOTOR_DOWN_CONVERSION_OUT_POWER,				//	输出 功率
+} Motor_Down_Conversion_Type_enum;
+
+
+
 /* Exported macro ------------------------------------------------------------*/
 
 
@@ -32,7 +47,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.3"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"0.0.4"
 
 /**
 ******************************************************************************
@@ -134,7 +149,7 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					1
 #else
-#define BUZZER_FREQUENCY					5					// wuqingguang
+#define BUZZER_FREQUENCY					50					// wuqingguang
 #endif
 //*******************************************************
 

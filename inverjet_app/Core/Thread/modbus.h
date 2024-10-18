@@ -64,7 +64,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_SLAVE_NODE_ADDRESS								( 0x00 )	//	从机节点地址
 #define MB_SLAVE_BAUD_RATE             			( 0x01 )	//	波特率
 #define MB_SUPPORT_CONTROL_METHODS          ( 0x02 )	//	0:可控;1：屏蔽  // 1bit：蓝牙; 2bit：Modbus-RS485; 3bit：wifi;
-#define MB_DISTRIBUTION_NETWORK_CONTROL  		( 0x03 )	//	配网控制 遥控 & wifi
+
 #define MB_MOTOR_POLE_NUMBER  							( 0x04 )	//	电机磁极数
 #define MB_MOTOR_SPEED_MODE  								( 0x05 )	//	转速 方式
 #define MB_MOTOR_BREATH_LIGHT_MAX  					( 0x06 )	//	光圈亮度

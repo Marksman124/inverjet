@@ -25,14 +25,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 
-uint32_t Product_Model_Ccode[MODEL_DIAL_SWITCH_NUMBER] = 
-{
-	PRODUCT_MODEL_CODE_SJ230,
-	PRODUCT_MODEL_CODE_SJ200,
-	PRODUCT_MODEL_CODE_SJ160,
-	PRODUCT_MODEL_CODE_SJ230
-};
-
 /* Private variables ---------------------------------------------------------*/
 
 Operating_Parameters OP_ShowNow;
@@ -213,22 +205,29 @@ void App_Data_Init(void)
 void App_Data_ReInit(void)
 {
 	
-	*p_Local_Address = MODBUS_LOCAL_ADDRESS;
-	*p_Baud_Rate = MODBUS_BAUDRATE_DEFAULT;
-	*p_Support_Control_Methods = 0;
+	memset(p_Local_Address,0,REG_HOLDING_NREGS*2);
 	
+	*p_Local_Address 					= MODBUS_LOCAL_ADDRESS;
+	*p_Baud_Rate 							= MODBUS_BAUDRATE_DEFAULT;
+	*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// 电机级数		5
+	//*p_Preparation_Time_BIT 	= 0;				// 预备时间
 	
 	// 训练模式 当前状态
-	*p_PMode_Now = 0;
+//	*p_System_State_Machine 	= 0;			// 状态机
+//	*p_PMode_Now 							= 0;			// 当前模式
+//	*p_OP_ShowNow_Speed 			= 0;			// 当前速度
+//	*p_OP_ShowNow_Time 				= 0;			// 当前时间
 	Period_Now = 0;
 	
 	// 各模式 属性
 	*p_OP_Free_Mode = OP_Init_Free;
 	*p_OP_Timing_Mode = OP_Init_Timing;
-	
-	*p_Motor_Pole_Number = MOTOR_RPM_NUMBER_OF_POLES;
-	
-	memcpy(&p_OP_PMode[0][0], &OP_Init_PMode[0][0], sizeof(OP_Init_PMode));
+		
+	memcpy(&p_OP_PMode[0][0], &OP_Init_PMode[0][0], sizeof(OP_Init_PMode[0]));
+	memcpy(&p_OP_PMode[1][0], &OP_Init_PMode[1][0], sizeof(OP_Init_PMode[1]));
+	memcpy(&p_OP_PMode[2][0], &OP_Init_PMode[2][0], sizeof(OP_Init_PMode[2]));
+	memcpy(&p_OP_PMode[3][0], &OP_Init_PMode[3][0], sizeof(OP_Init_PMode[3]));
+	memcpy(&p_OP_PMode[4][0], &OP_Init_PMode[4][0], sizeof(OP_Init_PMode[4]));
 	
 	//存储  存一个 还是 扇区存
 	Memset_OPMode();
@@ -439,148 +438,6 @@ void LCD_TO_Mapping(void)
 {
 	
 }
-
-
-//------------------- 获取机型码 ----------------------------
-uint32_t Get_Model_Code_Num(void)
-{
-	System_Dial_Switch = Gpio_Get_Dial_Switch();
-	
-	if(System_Dial_Switch < MODEL_DIAL_SWITCH_NUMBER)
-		return Product_Model_Ccode[System_Dial_Switch];
-	else
-		return PRODUCT_MODEL_CODE_SJ230;//默认
-}
-
-// 每 %1 每秒 增加游泳距离 放大100倍
-uint32_t Get_Every_1Percent_Distance_Per_Second(void)
-{
-	uint32_t code=0;
-	
-	code = Get_Model_Code_Num();
-
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
-	{
-		return SJ160_EVERY_1PERCENT_DISTANCE_PER_SECOND;
-	}
-	else if(PRODUCT_MODEL_CODE_SJ200 == code)
-	{
-		return SJ200_EVERY_1PERCENT_DISTANCE_PER_SECOND;
-	}
-	else
-	{
-		return SJ230_EVERY_1PERCENT_DISTANCE_PER_SECOND;
-	}
-}
-
-//最大转速 100%
-uint32_t Get_Motor_Rpm_Speed_Max(void)
-{
-	uint32_t code=0;
-	
-	code = Get_Model_Code_Num();
-
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
-	{
-		return SJ160_MOTOR_RPM_SPEED_MAX;
-	}
-	else if(PRODUCT_MODEL_CODE_SJ200 == code)
-	{
-		return SJ200_MOTOR_RPM_SPEED_MAX;
-	}
-	else
-	{
-		return SJ230_MOTOR_RPM_SPEED_MAX;
-	}
-}
-
-
-//最低转速 20%
-uint32_t Get_Motor_Rpm_Speed_Mix(void)
-{
-	uint32_t code=0;
-	
-	code = Get_Model_Code_Num();
-
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
-	{
-		return SJ160_MOTOR_RPM_SPEED_MIX;
-	}
-	else if(PRODUCT_MODEL_CODE_SJ200 == code)
-	{
-		return SJ200_MOTOR_RPM_SPEED_MIX;
-	}
-	else
-	{
-		return SJ230_MOTOR_RPM_SPEED_MIX;
-	}
-}
-
-// 功率 降频
-//*********************************************************************************************
-//-------------- 电机功率 报警值  -------------------
-uint32_t Get_Motor_Power_Alarm_Value(void)
-{
-	uint32_t code=0;
-	
-	code = Get_Model_Code_Num();
-
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
-	{
-		return SJ160_MOTOR_POWER_ALARM_VALUE;
-	}
-	else if(PRODUCT_MODEL_CODE_SJ200 == code)
-	{
-		return SJ200_MOTOR_POWER_ALARM_VALUE;
-	}
-	else
-	{
-		return SJ230_MOTOR_POWER_ALARM_VALUE;
-	}
-}
-
-//-------------- 电机功率 降速  -------------------
-uint32_t Get_Motor_Power_Reduce_Speed(void)
-{
-	uint32_t code=0;
-	
-	code = Get_Model_Code_Num();
-
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
-	{
-		return SJ160_MOTOR_POWER_REDUCE_SPEED;
-	}
-	else if(PRODUCT_MODEL_CODE_SJ200 == code)
-	{
-		return SJ200_MOTOR_POWER_REDUCE_SPEED;
-	}
-	else
-	{
-		return SJ230_MOTOR_POWER_REDUCE_SPEED;
-	}
-}
-
-//-------------- 电机功率 恢复  -------------------
-uint32_t Get_Motor_Power_Restore_Speed(void)
-{
-	uint32_t code=0;
-	
-	code = Get_Model_Code_Num();
-
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
-	{
-		return SJ160_MOTOR_POWER_RESTORE_SPEED;
-	}
-	else if(PRODUCT_MODEL_CODE_SJ200 == code)
-	{
-		return SJ200_MOTOR_POWER_RESTORE_SPEED;
-	}
-	else
-	{
-		return SJ230_MOTOR_POWER_RESTORE_SPEED;
-	}
-}
-
 
 // 完成数据统计
 //*********************************************************************************************

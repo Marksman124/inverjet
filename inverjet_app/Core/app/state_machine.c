@@ -31,8 +31,6 @@
 uint8_t Special_Status_Bit = 0;
 
 
-// 拨码开关
-uint8_t System_Dial_Switch = 0;
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -50,10 +48,11 @@ void App_State_Machine_Init(void)
 // machine: 新状态机
 void Check_Mode_Change(uint16_t machine)
 {
-	//	切换模式时上传<统计数据>
+	//	切换模式时
 	if(Is_Change_System_Mode(machine))
 	{
-		Finish_Statistics_Upload();
+		Finish_Statistics_Upload();			// 上传<统计数据>
+		Down_Conversion_State_Clea();		// 清除 降频状态
 	}
 	
 }

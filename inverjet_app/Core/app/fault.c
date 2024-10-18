@@ -166,8 +166,8 @@ uint8_t If_System_Is_Error(void)
 		else
 		{
 			//Ô¤¾¯ ½µËÙ
-			if(Get_Temp_Slow_Down_State() == 0)
-				Set_Temp_Slow_Down_State(2);
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_NO)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_BOX_TEMPER);
 		}
 	}
 	else if(Temperature <= AMBIENT_TEMP_RESTORE_SPEED)
@@ -176,8 +176,8 @@ uint8_t If_System_Is_Error(void)
 			Chassis_TEMP_Timer_cnt = 0;
 		else
 		{
-			if(Get_Temp_Slow_Down_State() == 2)
-				Set_Temp_Slow_Down_State(0);
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_BOX_TEMPER)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
 		}
 	}
 

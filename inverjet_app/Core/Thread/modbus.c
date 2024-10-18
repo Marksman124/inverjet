@@ -28,7 +28,7 @@ USHORT   usRegHoldingBuf[REG_HOLDING_NREGS+1];
 USHORT   usRegInputBuf[REG_INPUT_NREGS+1];
 
 USHORT		MB_Data_Addr_Need_CallOut[] = {
-	MB_SLAVE_NODE_ADDRESS,MB_SLAVE_BAUD_RATE,MB_DISTRIBUTION_NETWORK_CONTROL,
+	MB_SLAVE_NODE_ADDRESS,MB_SLAVE_BAUD_RATE,
 	MB_SYSTEM_WORKING_MODE,MB_SYSTEM_WORKING_STATUS,MB_MOTOR_CURRENT_SPEED,
 	//MB_MOTOR_CURRENT_SPEED,MB_MOTOR_CURRENT_TIME,
 };
@@ -85,10 +85,6 @@ HoldingCallOut( USHORT usAddress )
 #endif
 		__HAL_UART_ENABLE(p_huart_mb);
 	}
-//	else if(usAddress == MB_DISTRIBUTION_NETWORK_CONTROL) //	配网控制 遥控 & wifi
-//	{
-//		Ctrl_GetIn_Distribution(usRegHoldingBuf[MB_DISTRIBUTION_NETWORK_CONTROL]);
-//	}
 	else if(usAddress == MB_SYSTEM_WORKING_MODE) //	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
 	{
 		if(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE] > 0)//P模式
@@ -508,7 +504,6 @@ void Get_Mapping_Register(void)
 	if(*p_Breath_Light_Max > 500)
 		*p_Breath_Light_Max = 500;
 
-	//p_Motor_Pole_Number = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_DISTRIBUTION_NETWORK_CONTROL);
 	p_Motor_Pole_Number = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_POLE_NUMBER);
 	
 	//驱动板软件版本

@@ -800,7 +800,6 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
     }
 		Lcd_Show_Upgradation(pack_sum,(++pack_cnt*100)/pack_sum);//(num*100)/sum;
 		
-		//osDelay(50);
     return SUCCESS;
 }
 #endif

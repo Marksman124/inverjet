@@ -35,8 +35,9 @@ UART_HandleTypeDef* p_huart_motor = &huart4;
 /* Private macro -------------------------------------------------------------*/
 #define MOTOR_SPEED_STEPPING			(1)
 
-#define MOTOR_FAULT_TIMER_MAX			(3-1)
-#define MOTOR_TEMP_TIMER_MAX			(10-1)
+#define MOTOR_CHECK_FAULT_TIMER					(3-1)				// 故障 去抖时间
+#define MOTOR_DOWN_CONVERSION_TIMER			(10-1)			// 降频 去抖时间
+
 /* Private variables ---------------------------------------------------------*/
 
 //**************** 收发缓冲区
@@ -58,8 +59,11 @@ uint16_t Motor_Fault_State=0;//电机故障状态
 
 static uint32_t Motor_Rx_Timer_cnt= 0;
 
-static uint32_t Motor_Fault_Timer_cnt= 0;	//故障计数器
-static uint32_t Motor_TEMP_Timer_cnt= 0;	//高温 计数器
+static uint32_t Motor_Fault_Timer_cnt= 0;			// 故障计数器
+static uint32_t Motor_TEMP_Timer_cnt= 0;			// 高温 计数器
+static uint32_t Motor_Current_Timer_cnt= 0;		// 过流 计数器
+static uint32_t Motor_Power_Timer_cnt= 0;			// 功率 计数器
+
 
 #if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 static uint8_t Rx_State= 0;		//从机接收状态
@@ -525,7 +529,7 @@ void Motor_State_Analysis(void)
 	CLEAN_MOTOR_FAULT(Motor_Fault_State);
 	if(*p_Motor_Fault_Static > 0)
 	{
-		if(Motor_Fault_Timer_cnt < MOTOR_FAULT_TIMER_MAX)
+		if(Motor_Fault_Timer_cnt < MOTOR_CHECK_FAULT_TIMER)
 			Motor_Fault_Timer_cnt ++;
 		else
 		{
@@ -538,8 +542,13 @@ void Motor_State_Analysis(void)
 		Motor_Fault_Timer_cnt = 0;
 	}
 	
-	// 高温降速	mos
+	// 高温 		降频	mos
 	Check_Down_Conversion_MOS_Temperature(Temperature/10);
+	// 输出电流 	降频
+	Check_Down_Conversion_Motor_Current(*p_Motor_Current/100);
+	// 输出功率 		降频
+	//Check_Down_Conversion_Motor_Power(*p_Motor_Reality_Power);
+	
 	// 驱动状态检验   电机转速
 	Drive_Status_Inspection_Motor_Speed();
 	// 驱动状态检验   电机电流
@@ -608,7 +617,7 @@ void Motor_State_Analysis(void)
 	CLEAN_MOTOR_FAULT(Motor_Fault_State);
 	if(*p_Motor_Fault_Static > 0)
 	{
-		if(Motor_Fault_Timer_cnt < MOTOR_FAULT_TIMER_MAX)
+		if(Motor_Fault_Timer_cnt < MOTOR_CHECK_FAULT_TIMER)
 			Motor_Fault_Timer_cnt ++;
 		else
 		{
@@ -621,8 +630,12 @@ void Motor_State_Analysis(void)
 		Motor_Fault_Timer_cnt = 0;
 	}
 	
-	// 高温降速	mos
-	Check_Down_Conversion_MOS_Temperature(*p_Mos_Temperature/10);
+	// 高温 		降频	mos
+	Check_Down_Conversion_MOS_Temperature(Temperature/10);
+	// 输出电流 	降频
+	Check_Down_Conversion_Motor_Current(*p_Motor_Current/100);
+	// 输出功率 		降频
+	Check_Down_Conversion_Motor_Power(p_Motor_Reality_Power);
 }
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 #endif
@@ -733,7 +746,7 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 {
 	if(Temperature >= (MOS_TEMP_ALARM_VALUE))				//-------------  停机
 	{
-		if(Motor_TEMP_Timer_cnt < (MOTOR_TEMP_TIMER_MAX*2))
+		if(Motor_TEMP_Timer_cnt < (MOTOR_DOWN_CONVERSION_TIMER*2))
 			Motor_TEMP_Timer_cnt ++;
 		else
 		{
@@ -742,13 +755,13 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 	}
 	else if(Temperature >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速
 	{
-		if(Motor_TEMP_Timer_cnt < MOTOR_TEMP_TIMER_MAX)
+		if(Motor_TEMP_Timer_cnt < MOTOR_DOWN_CONVERSION_TIMER)
 			Motor_TEMP_Timer_cnt ++;
 		else
 		{
 			//预警 降速
-			if(Get_Temp_Slow_Down_State() == 0)
-				Set_Temp_Slow_Down_State(1);
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_NO)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_MOS_TEMPER);
 		}
 	}
 	else if(Temperature <= (MOS_TEMP_RESTORE_SPEED))				//-------------  恢复
@@ -757,8 +770,8 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 			Motor_TEMP_Timer_cnt = 0;
 		else
 		{
-			if(Get_Temp_Slow_Down_State() == 1)
-				Set_Temp_Slow_Down_State(0);
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_MOS_TEMPER)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
 		}
 	}
 }
@@ -766,37 +779,85 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 //-------------------- 功率降频   ----------------------------
 void Check_Down_Conversion_Motor_Power(uint16_t power)
 {
-	if(power >= (MOS_TEMP_ALARM_VALUE))				//-------------  停机
+	if(power >= (MOTOR_POWER_ALARM_VALUE))				//-------------  停机
 	{
-		if(Motor_TEMP_Timer_cnt < (MOTOR_TEMP_TIMER_MAX*2))
-			Motor_TEMP_Timer_cnt ++;
+		if(Motor_Power_Timer_cnt < (MOTOR_DOWN_CONVERSION_TIMER*2))
+			Motor_Power_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= FAULT_TEMPERATURE_AMBIENT;
+			Motor_Fault_State |= FAULT_BUS_CURRENT_ABNORMAL;
 		}
 	}
-	else if(power >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速
+	else if(power >= (MOTOR_POWER_REDUCE_SPEED))				//-------------  降速
 	{
-		if(Motor_TEMP_Timer_cnt < MOTOR_TEMP_TIMER_MAX)
-			Motor_TEMP_Timer_cnt ++;
+		if(Motor_Power_Timer_cnt < MOTOR_DOWN_CONVERSION_TIMER)
+			Motor_Power_Timer_cnt ++;
 		else
 		{
 			//预警 降速
-			if(Get_Temp_Slow_Down_State() == 0)
-				Set_Temp_Slow_Down_State(3);
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_NO)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_OUT_POWER);
 		}
 	}
-	else if(power <= (MOS_TEMP_RESTORE_SPEED))				//-------------  恢复
+	else if(power <= (MOTOR_POWER_RESTORE_SPEED))				//-------------  恢复
 	{
-		if(Motor_TEMP_Timer_cnt > 0)
-			Motor_TEMP_Timer_cnt = 0;
+		if(Motor_Power_Timer_cnt > 0)
+			Motor_Power_Timer_cnt = 0;
 		else
 		{
-			if(Get_Temp_Slow_Down_State() == 1)
-				Set_Temp_Slow_Down_State(0);
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_OUT_POWER)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
 		}
 	}
 }
+
+//-------------------- 电流降频   ----------------------------
+void Check_Down_Conversion_Motor_Current(uint32_t Current)
+{
+	if(Current >= (MOTOR_CURRENT_ALARM_VALUE))				//-------------  停机
+	{
+		if(Motor_Current_Timer_cnt < (MOTOR_DOWN_CONVERSION_TIMER*2))
+			Motor_Current_Timer_cnt ++;
+		else
+		{
+			Motor_Fault_State |= FAULT_BUS_CURRENT_ABNORMAL;
+		}
+	}
+	else if(Current >= (MOTOR_CURRENT_REDUCE_SPEED))				//-------------  降速
+	{
+		if(Motor_Current_Timer_cnt < MOTOR_DOWN_CONVERSION_TIMER)
+			Motor_Current_Timer_cnt ++;
+		else
+		{
+			//预警 降速
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_NO)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_OUT_CURRENT);
+		}
+	}
+	else if(Current <= (MOTOR_CURRENT_RESTORE_SPEED))				//-------------  恢复
+	{
+		if(Motor_Current_Timer_cnt > 0)
+			Motor_Current_Timer_cnt = 0;
+		else
+		{
+			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_OUT_CURRENT)
+				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
+		}
+	}
+}
+
+//-------------------- 降频 状态恢复   ----------------------------
+void Down_Conversion_State_Clea(void)
+{
+	// 计数器 清零
+	Motor_Fault_Timer_cnt = 0;			// 故障计数器
+	Motor_TEMP_Timer_cnt = 0;				// 高温 计数器
+	Motor_Current_Timer_cnt = 0;		// 过流 计数器
+	Motor_Power_Timer_cnt = 0;			// 功率 计数器
+	
+	Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
+}
+
 //-------------------- 获取电机故障状态 ----------------------------
 uint16_t Get_Motor_Fault_State(void)
 {

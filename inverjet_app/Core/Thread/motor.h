@@ -180,12 +180,19 @@ extern uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm);
 
 //================================================== 内部调用接口
 //-------------------- 驱动状态检验   电机转速 ----------------------------
-void Drive_Status_Inspection_Motor_Speed(void);
+extern void Drive_Status_Inspection_Motor_Speed(void);
 //-------------------- 驱动状态检验   电机电流 ----------------------------
-void Drive_Status_Inspection_Motor_Current(void);
+extern void Drive_Status_Inspection_Motor_Current(void);
+
 //-------------------- 高温降速  mos ----------------------------
-void Check_Down_Conversion_MOS_Temperature(short int Temperature);
-	
+extern void Check_Down_Conversion_MOS_Temperature(short int Temperature);
+//-------------------- 功率降频   ----------------------------
+extern void Check_Down_Conversion_Motor_Power(uint16_t power);
+//-------------------- 电流降频   ----------------------------
+extern void Check_Down_Conversion_Motor_Current(uint32_t Current);
+//-------------------- 降频 状态恢复   ----------------------------
+extern void Down_Conversion_State_Clea(void);
+
 //-------------------- 获取电机故障状态 ----------------------------
 uint16_t Get_Motor_Fault_State(void);
 

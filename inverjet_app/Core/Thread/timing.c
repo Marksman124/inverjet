@@ -331,7 +331,6 @@ void Fault_State_Handler(void)
 // 软启动 状态基  1秒进一次
 void Starting_State_Handler(void)
 {
-	all_data_update();		// wifi 上传
 	Arbitrarily_To_Running();
 	return;
 	
@@ -486,6 +485,7 @@ void Running_State_Handler(void)
 	{
 		if(Temp_Slow_Down_Timing_Cnt > 0)
 		{
+			LCD_Refresh_Set(0);
 			Data_Set_Current_Speed(Motor_Speed_Target_Get() + Temp_Slow_Down_Speed);
 			Temp_Slow_Down_Speed = 0;
 			Temp_Slow_Down_Timing_Cnt = 0;//可提前退出
@@ -760,9 +760,7 @@ void App_Timing_Task(void)
 		}
 	}
 	
-	if(LCD_Refresh_Get()== 1)
-		Lcd_Speed_Off();
-	else
+	if(LCD_Refresh_Get() == 0)
 		Lcd_Show();
 }
 

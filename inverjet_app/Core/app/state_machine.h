@@ -150,9 +150,6 @@ extern uint8_t Special_Status_Get(uint8_t num);
 /* Private defines -----------------------------------------------------------*/
 extern uint8_t Special_Status_Bit;
 
-// ²¦Âë¿ª¹Ø
-extern uint8_t System_Dial_Switch;
-
 extern uint16_t *p_PMode_Now;
 
 extern uint8_t Period_Now;
