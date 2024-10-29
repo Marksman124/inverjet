@@ -377,6 +377,8 @@ void Modbus_Init(void)
 
 void Modbus_Handle_Task(void)
 {
+	Thread_Activity_Sign_Set(THREAD_ACTIVITY_RS485_MODBUS);
+	
 	( void )eMBPoll(  );//启动modbus侦听
 	
 	if(ModbusTimerCnt++ > MODBUS_RESTART_TIMEOUT)
@@ -493,6 +495,22 @@ void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8
 	//taskEXIT_CRITICAL();
 }
 
+
+//================= 冲浪模式 全局 参数 ================================
+void Surf_Mode_Info_Get_Mapping(void)
+{
+	// ----------------------------------------------------------------------------------------------
+	p_Surf_Mode_Info_Acceleration = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_ACCELERATION);		//	冲浪模式 -- 加速度
+	p_Surf_Mode_Info_Prepare_Time = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_PREPARE_TIME);		//	冲浪模式 -- 准备时间
+	p_Surf_Mode_Info_Low_Speed		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_LOW_SPEED);				//	冲浪模式 -- 低速档 -- 速度
+	p_Surf_Mode_Info_Low_Time 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_LOW_TIME);				//	冲浪模式 -- 低速档 -- 时间
+	p_Surf_Mode_Info_High_Speed 	= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_HIGH_SPEED);			//	冲浪模式 -- 高速档 -- 速度
+	p_Surf_Mode_Info_High_Time 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_HIGH_TIME);				//	冲浪模式 -- 高速档 -- 时间
+	// ----------------------------------------------------------------------------------------------
+}
+
+
+
 void Get_Mapping_Register(void)
 {
 	p_OP_ShowLater = 		(Operating_Parameters*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_LEATER_SPEED);
@@ -530,8 +548,6 @@ void Get_Mapping_Register(void)
 	//母线 电压
 	p_Motor_Bus_Voltage = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_VOLTAGE);
 	
-	p_Simulated_Swim_Distance = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SIMULATED_SWIM_DISTANCE);
-
 
 	//--------------------------- 系统属性
 	// 状态机
@@ -560,6 +576,10 @@ void Get_Mapping_Register(void)
 	p_Finish_Statistics_Distance = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_DISTANCE);	//	完成统计 --> 游泳距离
 	p_Preparation_Time_BIT 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_PREPARATION_TIME_BIT);			//	准备时间 Bit: 定时模式 P1-P6
 	
+	p_Thread_Activity_Sign 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_THREAD_ACTIVITY_SGIN);			//	线程 活动 标志位
+
+	//================= 冲浪模式 全局 参数 ================================
+	Surf_Mode_Info_Get_Mapping();
 }
 
 

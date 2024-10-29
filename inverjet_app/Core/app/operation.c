@@ -284,12 +284,11 @@ void To_Operation_Menu(void)
 	Set_Software_Version();
 	// 操作 菜单
 	App_Operation_Init();
-	Clean_Timing_Timer_Cnt();
 	//功能暂停, 电机关闭
 	Set_System_State_Machine(OPERATION_MENU_STATUS);
 #ifdef OPERATION_P5_ACCELERATION
 	Operation_State_Machine = OPERATION_P5_ACCELERATION;		//	状态机	
-  Operation_Menu_Value = Temp_Data_P5_Acceleration;		//	菜单值	
+  Operation_Menu_Value = *p_Surf_Mode_Info_Acceleration;		//	菜单值	
 #else
 	Operation_State_Machine = OPERATION_ADDR_SET;		//	状态机	
   Operation_Menu_Value = Operation_Addr_Value;		//	菜单值	
@@ -307,35 +306,34 @@ void To_Operation_Menu(void)
 // ① 档位键
 static void on_Button_1_clicked(void)
 {
-	Clean_Timing_Timer_Cnt();
 	button_cnt = 0;
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_ACCELERATION)
 	{
-		if(Temp_Data_P5_Acceleration < 4)
-			(Temp_Data_P5_Acceleration)++;
+		if(*p_Surf_Mode_Info_Acceleration < 4)
+			(*p_Surf_Mode_Info_Acceleration)++;
 		else
-			Temp_Data_P5_Acceleration = 1;
+			*p_Surf_Mode_Info_Acceleration = 1;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_Acceleration);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Acceleration);
 	}
 	else if(Operation_State_Machine == OPERATION_P5_100_TIME)
 	{
-		if(Temp_Data_P5_100_Time < 60)
-			(Temp_Data_P5_100_Time)++;
+		if(*p_Surf_Mode_Info_High_Time < 60)
+			(*p_Surf_Mode_Info_High_Time)++;
 		else
-			Temp_Data_P5_100_Time = 1;
+			*p_Surf_Mode_Info_High_Time = 1;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_100_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_High_Time);
 	}
 	else if(Operation_State_Machine == OPERATION_P5_0_TIME)
 	{
-		if(Temp_Data_P5_0_Time < 60)
-			(Temp_Data_P5_0_Time)++;
+		if(*p_Surf_Mode_Info_Low_Time < 60)
+			(*p_Surf_Mode_Info_Low_Time)++;
 		else
-			Temp_Data_P5_0_Time = 1;
+			*p_Surf_Mode_Info_Low_Time = 1;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_0_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Low_Time);
 	}
 #endif
 	//------- 地址
@@ -410,34 +408,33 @@ static void on_Button_1_clicked(void)
 static void on_Button_2_clicked(void)
 {
 	button_cnt = 0;
-	Clean_Timing_Timer_Cnt();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_ACCELERATION)
 	{
-		if(Temp_Data_P5_Acceleration > 1)
-			(Temp_Data_P5_Acceleration)--;
+		if(*p_Surf_Mode_Info_Acceleration > 1)
+			(*p_Surf_Mode_Info_Acceleration)--;
 		else
-			Temp_Data_P5_Acceleration = 4;
+			*p_Surf_Mode_Info_Acceleration = 4;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_Acceleration);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Acceleration);
 	}
 	else if(Operation_State_Machine == OPERATION_P5_100_TIME)
 	{
-		if(Temp_Data_P5_100_Time > 1)
-			(Temp_Data_P5_100_Time)--;
+		if(*p_Surf_Mode_Info_High_Time > 1)
+			(*p_Surf_Mode_Info_High_Time)--;
 		else
-			Temp_Data_P5_100_Time = 60;
+			*p_Surf_Mode_Info_High_Time = 60;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_100_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_High_Time);
 	}
 	else if(Operation_State_Machine == OPERATION_P5_0_TIME)
 	{
-		if(Temp_Data_P5_0_Time > 1)
-			(Temp_Data_P5_0_Time)--;
+		if(*p_Surf_Mode_Info_Low_Time > 1)
+			(*p_Surf_Mode_Info_Low_Time)--;
 		else
-			Temp_Data_P5_0_Time = 60;
+			*p_Surf_Mode_Info_Low_Time = 60;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_0_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Low_Time);
 	}
 #endif
 	//------- 地址
@@ -511,7 +508,6 @@ static void on_Button_2_clicked(void)
 // ③ 模式键
 static void on_Button_3_clicked(void)
 {
-	Clean_Timing_Timer_Cnt();
 	button_cnt = 0;
 	
 	switch(Operation_State_Machine)
@@ -519,11 +515,11 @@ static void on_Button_3_clicked(void)
 #ifdef OPERATION_P5_ACCELERATION
 		case OPERATION_P5_ACCELERATION:
 			Operation_State_Machine += 1;
-			Lcd_Show_Operation( Operation_State_Machine, (Temp_Data_P5_100_Time));
+			Lcd_Show_Operation( Operation_State_Machine, (*p_Surf_Mode_Info_High_Time));
 		break;
 		case OPERATION_P5_100_TIME:
 			Operation_State_Machine += 1;
-			Lcd_Show_Operation( Operation_State_Machine, (Temp_Data_P5_0_Time));
+			Lcd_Show_Operation( Operation_State_Machine, (*p_Surf_Mode_Info_Low_Time));
 		break;
 		case OPERATION_P5_0_TIME:
 			Operation_State_Machine = OPERATION_ADDR_SET;
@@ -572,7 +568,7 @@ static void on_Button_3_clicked(void)
 		default:
 #ifdef OPERATION_P5_ACCELERATION
 			Operation_State_Machine = OPERATION_P5_ACCELERATION;
-			Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_Acceleration);
+			Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Acceleration);
 #else
 			Operation_State_Machine = OPERATION_ADDR_SET;
 			Lcd_Show_Operation( Operation_State_Machine, Operation_Addr_Value);
@@ -639,21 +635,21 @@ static void on_Button_1_Long_Press(void)
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_100_TIME)
 	{
-		if(Temp_Data_P5_100_Time < 60)
-			(Temp_Data_P5_100_Time)++;
+		if(*p_Surf_Mode_Info_High_Time < 60)
+			(*p_Surf_Mode_Info_High_Time)++;
 		else
-			Temp_Data_P5_100_Time = 1;
+			*p_Surf_Mode_Info_High_Time = 1;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_100_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_High_Time);
 	}
 	else if(Operation_State_Machine == OPERATION_P5_0_TIME)
 	{
-		if(Temp_Data_P5_0_Time < 60)
-			(Temp_Data_P5_0_Time)++;
+		if(*p_Surf_Mode_Info_Low_Time < 60)
+			(*p_Surf_Mode_Info_Low_Time)++;
 		else
-			Temp_Data_P5_0_Time = 1;
+			*p_Surf_Mode_Info_Low_Time = 1;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_0_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Low_Time);
 	}
 #endif
 	if(Operation_State_Machine == OPERATION_ADDR_SET)
@@ -735,21 +731,21 @@ static void on_Button_2_Long_Press(void)
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_100_TIME)
 	{
-		if(Temp_Data_P5_100_Time > 1)
-			(Temp_Data_P5_100_Time)--;
+		if(*p_Surf_Mode_Info_High_Time > 1)
+			(*p_Surf_Mode_Info_High_Time)--;
 		else
-			Temp_Data_P5_100_Time = 60;
+			*p_Surf_Mode_Info_High_Time = 60;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_100_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_High_Time);
 	}
 	else if(Operation_State_Machine == OPERATION_P5_0_TIME)
 	{
-		if(Temp_Data_P5_0_Time > 1)
-			(Temp_Data_P5_0_Time)--;
+		if(*p_Surf_Mode_Info_Low_Time > 1)
+			(*p_Surf_Mode_Info_Low_Time)--;
 		else
-			Temp_Data_P5_0_Time = 60;
+			*p_Surf_Mode_Info_Low_Time = 60;
 		
-		Lcd_Show_Operation( Operation_State_Machine, Temp_Data_P5_0_Time);
+		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Low_Time);
 	}
 #endif
 	if(Operation_State_Machine == OPERATION_ADDR_SET)

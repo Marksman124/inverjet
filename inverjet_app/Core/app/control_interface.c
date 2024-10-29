@@ -113,7 +113,7 @@ void Ctrl_Set_System_Status(uint16_t para)
 		}
 		else if(System_Mode_Train())
 		{
-			To_Train_Mode(*p_PMode_Now);	//	训练 模式
+			To_Train_Mode(Get_System_State_Mode());	//	训练 模式
 		}
 	}
 	else if(para == 3)

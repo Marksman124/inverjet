@@ -166,11 +166,6 @@ extern uint8_t Motor_Speed_Is_Reach(void);
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern void Motor_Speed_Target_Set(uint8_t speed);
 
-//------------------- 清除 计算游泳距离 ----------------------------
-extern void Clean_Swimming_Distance(void);
-//------------------- 计算游泳距离 每秒----------------------------
-extern void Calculate_Swimming_Distance(void);
-
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern uint8_t Motor_Speed_Target_Get(void);
 //------------------- 百分比 转 转速 ----------------------------

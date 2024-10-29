@@ -45,6 +45,18 @@ typedef enum
 	CTRL_FROM_RS485,					//	modbus 485	
 } System_Ctrl_Mode_Type_enum;
 
+
+// 降频 类型
+typedef enum 
+{
+	MOTOR_DOWN_CONVERSION_NO = 0,						//	无
+	MOTOR_DOWN_CONVERSION_MOS_TEMPER,				//	mos 高温
+	MOTOR_DOWN_CONVERSION_BOX_TEMPER,				//	机箱 高温
+	MOTOR_DOWN_CONVERSION_OUT_CURRENT,			//	输出 电流
+	MOTOR_DOWN_CONVERSION_OUT_POWER,				//	输出 功率
+} Motor_Down_Conversion_Type_enum;
+
+
 /* Exported constants --------------------------------------------------------*/
 
 
@@ -53,16 +65,16 @@ typedef enum
 
 //-------------- 训练模式 最大值 -------------------
 
-#define TRAINING_MODE_NUMBER_MAX						5
+#define TRAINING_MODE_NUMBER_MAX						SYSTEM_MODE_TRAIN_P5
 #define TRAINING_MODE_PERIOD_MAX						50
 //冲浪模式 --》 P5
-#define SURFING_MODE_NUMBER_ID							5
+#define SURFING_MODE_NUMBER_ID							SYSTEM_MODE_TRAIN_P5
 //------------------- 合法范围 ----------------------------
-#define SPEED_LEGAL_MIN						20
-#define SPEED_LEGAL_MAX						100
+#define SPEED_LEGAL_MIN						MOTOR_PERCENT_SPEED_MIX
+#define SPEED_LEGAL_MAX						MOTOR_PERCENT_SPEED_MAX
 
 #define TIME_LEGAL_MIN						20
-#define TIME_LEGAL_MAX						6000
+#define TIME_LEGAL_MAX						MOTOR_TIME_SHOW_MAX
 
 #define	MOTOR_RPM_NUMBER_OF_POLES								5		//电机级数 默认值
 #define	MOTOR_RPM_MIX_OF_POLES									1		//电机级数 合法最小值
@@ -72,9 +84,21 @@ typedef enum
 #define	BLOCK_BLUETOOTH_CONTROL									1		// 屏蔽 蓝牙 控制
 #define	BLOCK_MODBUS_CONTROL										2		// 屏蔽 MODBUS 控制
 #define	BLOCK_WIFI_CONTROL											4		// 屏蔽 WIFI 控制
-/* Exported functions prototypes ---------------------------------------------*/
 
-extern void Check_Data_Init(void);
+// 线程 活动
+#define	THREAD_ACTIVITY_BREATH_LIGHT						( 1<<0 )
+#define	THREAD_ACTIVITY_RS485_MODBUS						( 1<<1 )
+#define	THREAD_ACTIVITY_MAIN										( 1<<2 )
+#define	THREAD_ACTIVITY_KEY_BUTTON							( 1<<3 )
+#define	THREAD_ACTIVITY_MOTOR										( 1<<4 )
+#define	THREAD_ACTIVITY_WIFI										( 1<<5 )
+
+
+/* Exported functions prototypes ---------------------------------------------*/
+//================= 冲浪模式 全局 参数 ================================
+extern void Surf_Mode_Info_Data_Init(void);
+
+extern uint8_t Check_Data_Init(void);
 
 extern void App_Data_Init(void);
 
@@ -89,6 +113,8 @@ extern void Update_OP_Speed(void);
 extern void Update_OP_Time(void);
 //存储 新 速度 & 时间
 extern void Update_OP_All(void);
+
+extern void OP_Update_Mode(void);
 //检查 新 速度 & 时间  防止溢出
 void Check_OP_All(void);
 
@@ -153,13 +179,19 @@ extern uint32_t Get_Motor_Current_Restore_Speed(void);
 // 完成数据统计
 //*********************************************************************************************
 //-------------- 计算 完成统计  -------------------
-void Finish_Statistics_Count(uint8_t count);
+extern void Finish_Statistics_Count(uint8_t count);
 //-------------- 清除 完成统计  -------------------
-void Finish_Statistics_Clean( void );
+extern void Finish_Statistics_Clean( void );
 //-------------- 上传 完成统计  -------------------
-void Finish_Statistics_Upload( void );
+extern void Finish_Statistics_Upload( void );
 	
+
+//-------------- 线程 活动 标志清零  -------------------
+extern void Thread_Activity_Sign_Clean( void );
+//-------------- 线程 活动 设置  -------------------
+extern void Thread_Activity_Sign_Set( uint16_t val );
 	
+
 /* Private defines -----------------------------------------------------------*/
 
 extern Operating_Parameters OP_ShowNow;
@@ -212,7 +244,6 @@ extern uint16_t* p_Motor_Bus_Current;						// 母线 电流  	输入
 extern uint16_t* p_System_Fault_Static;					// 故障状态		整机
 extern uint16_t* p_Box_Temperature;							// 电箱 温度
 extern uint32_t* p_Send_Reality_Speed;					// 下发 实际 转速
-extern uint16_t* p_Simulated_Swim_Distance;			// 模拟游泳距离
 
 
 extern uint16_t* p_Support_Control_Methods;			//屏蔽控制方式
@@ -222,9 +253,14 @@ extern uint16_t* p_Breath_Light_Max;						//光圈亮度
 extern uint8_t Motor_State_Storage[MOTOR_PROTOCOL_ADDR_MAX];	//电机状态
 
 //================= 临时变量  全局 ================================
-extern uint16_t Temp_Data_P5_Acceleration;				//P5 加速度
-extern uint16_t Temp_Data_P5_100_Time;						//P5 100% 时间	秒
-extern uint16_t Temp_Data_P5_0_Time;							//P5 0% 	时间	秒
+// ----------------------------------------------------------------------------------------------
+extern uint16_t* p_Surf_Mode_Info_Acceleration;  			//	冲浪模式 -- 加速度
+extern uint16_t* p_Surf_Mode_Info_Prepare_Time;  			//	冲浪模式 -- 准备时间
+extern uint16_t* p_Surf_Mode_Info_Low_Speed;  				//	冲浪模式 -- 低速档 -- 速度
+extern uint16_t* p_Surf_Mode_Info_Low_Time;						//	冲浪模式 -- 低速档 -- 时间
+extern uint16_t* p_Surf_Mode_Info_High_Speed;  				//	冲浪模式 -- 高速档 -- 速度
+extern uint16_t* p_Surf_Mode_Info_High_Time;  				//	冲浪模式 -- 高速档 -- 时间
+// ----------------------------------------------------------------------------------------------
 
 extern uint8_t WIFI_Rssi;
 
@@ -248,6 +284,7 @@ extern uint16_t* p_Finish_Statistics_Speed;					//	完成统计 --> 强度
 extern uint32_t* p_Finish_Statistics_Distance;			//	完成统计 --> 游泳距离
 extern uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
 
+extern uint16_t* p_Thread_Activity_Sign;					//	线程 活动 标志位
 
 #ifdef __cplusplus
 }

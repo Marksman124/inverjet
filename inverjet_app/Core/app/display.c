@@ -301,7 +301,7 @@ void Lcd_Show(void)
 	LCD_Refresh_Restore();//恢复刷新
 	taskENTER_CRITICAL();
 	//
-	Lcd_Display(*p_OP_ShowNow_Speed, *p_OP_ShowNow_Time, LCD_Show_Bit,*p_PMode_Now);
+	Lcd_Display(*p_OP_ShowNow_Speed, *p_OP_ShowNow_Time, LCD_Show_Bit,Get_System_State_Mode());
 	
 	TM1621_LCD_Redraw();
 	taskEXIT_CRITICAL();
@@ -386,7 +386,7 @@ void Lcd_Speed_Off(void)
 	//TM1621_BLACK_OFF()
 	//
 	taskENTER_CRITICAL();
-	Lcd_No_Speed(*p_OP_ShowNow_Time, LCD_Show_Bit,*p_PMode_Now);
+	Lcd_No_Speed(*p_OP_ShowNow_Time, LCD_Show_Bit,Get_System_State_Mode());
 	TM1621_LCD_Redraw();
 	taskEXIT_CRITICAL();
 }
@@ -420,11 +420,9 @@ void To_Power_Off(void)
 	System_Self_Testing_State = 0;
 	
 	Set_System_State_Machine(POWER_OFF_STATUS);		// 状态机
-	*p_PMode_Now = 0;															// 当前模式
 	*p_OP_ShowNow_Speed = 0;											// 当前速度
 	*p_OP_ShowNow_Time = 0;												// 当前时间
 	
-	Period_Now = 0;
 	Special_Status_Bit = 0;
 
 	Lcd_Off();
@@ -447,13 +445,13 @@ void To_Free_Mode(uint8_t mode)
 	*p_OP_ShowNow_Time  = p_OP_ShowLater->time;
 	
 	LCD_Show_Bit |= STATUS_BIT_PERCENTAGE;
-	*p_PMode_Now = 0;
 	Lcd_Show();
 }
 
 //-------------  To-->定时模式 ------------------------------------
 void To_Timing_Mode(void)
 {
+	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 	Set_System_State_Machine(TIMING_MODE_INITIAL);
 
@@ -463,32 +461,29 @@ void To_Timing_Mode(void)
 	*p_OP_ShowNow_Time  = p_OP_ShowLater->time;
 	
 	LCD_Show_Bit |= STATUS_BIT_PERCENTAGE;
-	*p_PMode_Now = 0;
 	Lcd_Show();
 }
 
 //-------------  To-->训练模式  num:1-4 ------------------------------------
 void To_Train_Mode(uint8_t num)
 {
+	uint8_t plan=1;
+	
 	if(Is_Mode_Legal(num) == 0)
-		return;
+		plan = 1;
+	else
+		plan = num;
 	
-	//	切换模式时上传<统计数据> 如： 从 P1 切到 P2
-	if(*p_PMode_Now != num)
-	{
-		Finish_Statistics_Upload();
-	}
-	
-	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
-	*p_PMode_Now = num;
-	
+	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 	Set_System_State_Machine(TRAINING_MODE_INITIAL);
-
-	p_OP_ShowLater->speed = p_OP_PMode[num-1][0].speed;
+	Set_System_State_Mode(plan);
+	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
+	
+	p_OP_ShowLater->speed = p_OP_PMode[plan-1][0].speed;
 	p_OP_ShowLater->time = 0;
 	
-	*p_OP_ShowNow_Speed = p_OP_PMode[num-1][0].speed;
-	*p_OP_ShowNow_Time = 0;//p_OP_PMode[num-1][TRAINING_MODE_PERIOD_MAX-1].time;
+	*p_OP_ShowNow_Speed = p_OP_PMode[plan-1][0].speed;
+	*p_OP_ShowNow_Time = 0;
 	
 	LCD_Show_Bit |= STATUS_BIT_PERCENTAGE;
 	

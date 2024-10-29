@@ -84,7 +84,6 @@ uint16_t* p_Motor_Bus_Current;						// 母线 电流  	输入
 uint16_t* p_System_Fault_Static;					// 故障状态		整机
 uint16_t* p_Box_Temperature;							// 电箱 温度
 uint32_t* p_Send_Reality_Speed;						// 下发 实际 转速
-uint16_t* p_Simulated_Swim_Distance;			// 模拟游泳距离
 
 
 uint16_t* p_Support_Control_Methods;	//屏蔽控制方式
@@ -93,10 +92,15 @@ uint16_t* p_Breath_Light_Max;					//光圈亮度
 	
 uint8_t Motor_State_Storage[MOTOR_PROTOCOL_ADDR_MAX]={0};//电机状态
 
-//================= 临时变量  全局 ================================
-uint16_t Temp_Data_P5_Acceleration = 2;				//P5 加速度
-uint16_t Temp_Data_P5_100_Time = 15;					//P5 100% 时间	秒
-uint16_t Temp_Data_P5_0_Time = 15;						//P5 0% 	时间	秒
+//================= 冲浪模式 全局 参数 ================================
+// ----------------------------------------------------------------------------------------------
+uint16_t* p_Surf_Mode_Info_Acceleration;  		//	冲浪模式 -- 加速度
+uint16_t* p_Surf_Mode_Info_Prepare_Time;  		//	冲浪模式 -- 准备时间
+uint16_t* p_Surf_Mode_Info_Low_Speed;  				//	冲浪模式 -- 低速档 -- 速度
+uint16_t* p_Surf_Mode_Info_Low_Time;					//	冲浪模式 -- 低速档 -- 时间
+uint16_t* p_Surf_Mode_Info_High_Speed;  			//	冲浪模式 -- 高速档 -- 速度
+uint16_t* p_Surf_Mode_Info_High_Time;  				//	冲浪模式 -- 高速档 -- 时间
+// ----------------------------------------------------------------------------------------------
 
 uint8_t WIFI_Rssi = 0xFF;
 
@@ -119,6 +123,7 @@ uint32_t* p_Finish_Statistics_Distance;			//	完成统计 --> 游泳距离
 uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
 
 
+uint16_t* p_Thread_Activity_Sign;					//	线程 活动 标志位
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -126,10 +131,26 @@ uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
 /* Private user code ---------------------------------------------------------*/
 //------------------- 硬件 & 驱动 ----------------------------
 
-// 初始化 开机执行
-void Check_Data_Init(void)
+// 初始化 冲浪模式 参数
+void Surf_Mode_Info_Data_Init(void)
 {
-	static uint8_t x=0,y=0;
+	
+	//================= 冲浪模式 全局 参数 ================================
+	// ----------------------------------------------------------------------------------------------
+	*p_Surf_Mode_Info_Acceleration	=	2;  			//	冲浪模式 -- 加速度
+	*p_Surf_Mode_Info_Prepare_Time	=	10;  			//	冲浪模式 -- 准备时间
+	*p_Surf_Mode_Info_Low_Speed			=	30;  			//	冲浪模式 -- 低速档 -- 速度
+	*p_Surf_Mode_Info_Low_Time			=	15;				//	冲浪模式 -- 低速档 -- 时间
+	*p_Surf_Mode_Info_High_Speed		=	100;  		//	冲浪模式 -- 高速档 -- 速度
+	*p_Surf_Mode_Info_High_Time			=	15;  			//	冲浪模式 -- 高速档 -- 时间
+	// ----------------------------------------------------------------------------------------------
+}
+
+// 初始化 开机执行
+uint8_t Check_Data_Init(void)
+{
+	uint8_t x=0,y=0;
+	uint8_t result = 0;
 	
 	*p_System_Runing_Second_Cnt = 0; 		//运行 时间
 	*p_No_Operation_Second_Cnt = 0;			//无人操作 时间
@@ -139,17 +160,23 @@ void Check_Data_Init(void)
 	if(Is_Speed_Legal(p_OP_Free_Mode->speed) == 0)
 	{
 		*p_OP_Free_Mode = OP_Init_Free;
+		result = 1;
 	}
 	
 	if((Is_Speed_Legal(p_OP_Timing_Mode->speed) == 0) || (Is_Time_Legal(p_OP_Timing_Mode->time) == 0))
 	{
 		*p_OP_Timing_Mode = OP_Init_Timing;
+		result = 1;
 	}
 
 	if( ( *p_Motor_Pole_Number > MOTOR_RPM_MAX_OF_POLES) || ( *p_Motor_Pole_Number < MOTOR_RPM_MIX_OF_POLES))
 	{
 		*p_Motor_Pole_Number = MOTOR_RPM_NUMBER_OF_POLES;
+		result = 1;
 	}
+	
+	//================= 冲浪模式 全局 参数 ================================
+	Surf_Mode_Info_Data_Init();
 	
 	for(x=0; x<TRAINING_MODE_NUMBER_MAX; x++)
 	{
@@ -158,18 +185,22 @@ void Check_Data_Init(void)
 			if((Is_Speed_Legal(p_OP_PMode[x][y].speed) == 0) || (Is_Time_Legal(p_OP_PMode[x][y].time) == 0))
 			{
 				memcpy(p_OP_PMode, OP_Init_PMode, (sizeof(Operating_Parameters)*TRAINING_MODE_NUMBER_MAX*TRAINING_MODE_PERIOD_MAX));
-				return;
+				result = 1;
+				break;
 			}
 			if(y>0)
 			{
 				if(p_OP_PMode[x][y].time <= p_OP_PMode[x][y-1].time)
 				{
 					memcpy(p_OP_PMode, &OP_Init_PMode, (sizeof(Operating_Parameters)*TRAINING_MODE_NUMBER_MAX*TRAINING_MODE_PERIOD_MAX));
-					return;
+					result = 1;
+					break;
 				}
 			}
 		}
 	}
+	
+	return result;
 }
 
 
@@ -180,16 +211,10 @@ void App_Data_Init(void)
 	Read_OPMode();
 	// 获取映射  flash已读
 	Get_Mapping_Register();
-	
-	// 训练模式 当前状态
-	*p_PMode_Now = 0;
-	Period_Now = 0;
-	
-	// 各模式 属性
-	Check_Data_Init();
-	
-	//存储  存一个 还是 扇区存
-	//Memset_OPMode();
+
+	// 检查各模式 属性
+	if(Check_Data_Init())
+		Memset_OPMode();//存储
 	
 	// 屏幕初始化
 	TM1621_LCD_Init();
@@ -217,12 +242,15 @@ void App_Data_ReInit(void)
 //	*p_PMode_Now 							= 0;			// 当前模式
 //	*p_OP_ShowNow_Speed 			= 0;			// 当前速度
 //	*p_OP_ShowNow_Time 				= 0;			// 当前时间
-	Period_Now = 0;
+	Set_Pmode_Period_Now(0);
 	
 	// 各模式 属性
 	*p_OP_Free_Mode = OP_Init_Free;
 	*p_OP_Timing_Mode = OP_Init_Timing;
-		
+
+	//================= 冲浪模式 全局 参数 ================================
+	Surf_Mode_Info_Data_Init();
+	
 	memcpy(&p_OP_PMode[0][0], &OP_Init_PMode[0][0], sizeof(OP_Init_PMode[0]));
 	memcpy(&p_OP_PMode[1][0], &OP_Init_PMode[1][0], sizeof(OP_Init_PMode[1]));
 	memcpy(&p_OP_PMode[2][0], &OP_Init_PMode[2][0], sizeof(OP_Init_PMode[2]));
@@ -250,14 +278,27 @@ uint8_t Memset_OPMode(void)
 //存储 新 速度
 void Update_OP_Speed(void)
 {
+	if(System_is_Pause())	// 暂停
+		return;
+	
 	if(System_Mode_Free())	// 自由
 	{
+		if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MIX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+		else if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
+			
 		p_OP_Free_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Free_Mode->time = 0;
 		Memset_OPMode();//存flash
 	}
 	else if(System_Mode_Time())	// 定时
 	{
+		if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MIX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+		else if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
+		
 		p_OP_Timing_Mode->speed = *p_OP_ShowNow_Speed;
 		Memset_OPMode();//存flash
 	}
@@ -290,14 +331,104 @@ void Update_OP_All(void)
 	}
 }
 
+extern void System_Power_Off(void);
+extern void Clean_Timing_Timer_Cnt(void);
+extern void Clean_Automatic_Shutdown_Timer(void);
+
+void OP_Update_Mode(void)
+{
+	if(System_is_Stop())
+	{
+		if(System_Mode_Train())
+			*p_OP_ShowNow_Speed = p_OP_PMode[Get_System_State_Mode()-1][0].speed;
+		else if(System_Mode_Time())
+			*p_OP_ShowNow_Time = p_OP_Timing_Mode->time - *p_OP_ShowNow_Time;
+				
+		Motor_Speed_Target_Set(0);
+		Clean_Automatic_Shutdown_Timer();
+		Clean_Timing_Timer_Cnt();
+	}
+	else if(System_is_Pause())
+	{
+		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+		*p_OP_ShowNow_Speed = 0;
+		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"启动"
+	}
+	else
+	{
+		// 速度
+		if(System_Mode_Free())
+		{
+			*p_OP_ShowNow_Speed = p_OP_Free_Mode->speed;
+		}
+		else if(System_Mode_Time())
+		{
+			*p_OP_ShowNow_Speed = p_OP_Timing_Mode->speed;
+		}
+		else if(System_Mode_Train())
+		{
+			if((p_OP_ShowLater->speed < MOTOR_PERCENT_SPEED_MIX)||(p_OP_ShowLater->speed > MOTOR_PERCENT_SPEED_MAX))
+				*p_OP_ShowNow_Speed = p_OP_PMode[Get_System_State_Mode()-1][Period_Now].speed;
+			else
+				*p_OP_ShowNow_Speed = p_OP_ShowLater->speed ;
+			
+		}
+	}
+	
+	if(Motor_is_Start())
+	{
+		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
+		Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+	}
+	else
+		Motor_Speed_Target_Set(0);
+}
+
 //检查 新 速度 & 时间  防止溢出
 void Check_OP_All(void)
 {
-	if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MIX)
-		*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
-	else if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
-		*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
+	if(System_is_Power_Off())
+	{
+		System_Power_Off();
+	}
+	else if(System_is_Pause())
+	{
+		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"启动"
+	}
+	else
+	{
+		// 速度
+		if(System_Mode_Free())
+		{
+			*p_OP_ShowNow_Speed = p_OP_Free_Mode->speed;
+			*p_OP_ShowNow_Time = 0;
+		}
+		else if(System_Mode_Time())
+		{
+			*p_OP_ShowNow_Speed = p_OP_Timing_Mode->speed;
+			*p_OP_ShowNow_Time = p_OP_Timing_Mode->time;
+		}
+		else if(System_Mode_Train())
+		{
+			if(Is_Mode_Legal(Get_System_State_Mode()) == 0)
+				Set_System_State_Mode(SYSTEM_MODE_TRAIN_P1);
+			Set_Pmode_Period_Now(0);
+			*p_OP_ShowNow_Speed = p_OP_PMode[Get_System_State_Mode()-1][0].speed;
+			
+			if(System_is_Stop() == 0)
+				*p_OP_ShowNow_Time = 0;
+
+		}
 		
+		if(Motor_is_Start())
+		{
+			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
+			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+		}
+		else
+			Motor_Speed_Target_Set(0);
+	}
 }
 
 //------------------- 判断 模式 合法 ----------------------------
@@ -469,9 +600,17 @@ void Finish_Statistics_Upload( void )
 }
 
 
+//-------------- 线程 活动 标志清零  -------------------
+void Thread_Activity_Sign_Clean( void )
+{
+	*p_Thread_Activity_Sign = 0;
+}
 
-
-
+//-------------- 线程 活动 设置  -------------------
+void Thread_Activity_Sign_Set( uint16_t val )
+{
+	*p_Thread_Activity_Sign |= val;
+}
 
 
 

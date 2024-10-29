@@ -44,7 +44,7 @@ typedef enum
 
 #define WIFI_DISTRIBUTION_BLINK_TIME				2				// 2.5 S
 
-#define WIFI_ERROR_BLINK_TIME								8				// 1 S
+#define WIFI_ERROR_BLINK_TIME								4				// 1 S
 
 
 #define WIFI_DISTRIBUTION_TIME_OUT				180				// 3 min
@@ -81,6 +81,9 @@ extern void wifi_Module_Init(void);
 //  20 ms
 extern void Wifi_Module_Handler(void);
 
+
+// 上传dp点 (统一接口)
+extern  void Wifi_DP_Data_Update(uint16_t id);
 
 #ifdef __cplusplus
 }

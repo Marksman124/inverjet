@@ -69,6 +69,14 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_MOTOR_SPEED_MODE  								( 0x05 )	//	转速 方式
 #define MB_MOTOR_BREATH_LIGHT_MAX  					( 0x06 )	//	光圈亮度
 // ----------------------------------------------------------------------------------------------
+//====================== 冲浪模式 全局 参数 ======================================================
+#define MB_SURF_MODE_INFO_ACCELERATION  			( 0x10 )	//	冲浪模式 -- 加速度
+#define MB_SURF_MODE_INFO_PREPARE_TIME  			( 0x11 )	//	冲浪模式 -- 准备时间
+#define MB_SURF_MODE_INFO_LOW_SPEED  					( 0x12 )	//	冲浪模式 -- 低速档 -- 速度
+#define MB_SURF_MODE_INFO_LOW_TIME						( 0x13 )	//	冲浪模式 -- 低速档 -- 时间
+#define MB_SURF_MODE_INFO_HIGH_SPEED  				( 0x14 )	//	冲浪模式 -- 高速档 -- 速度
+#define MB_SURF_MODE_INFO_HIGH_TIME  					( 0x15 )	//	冲浪模式 -- 高速档 -- 时间
+// ----------------------------------------------------------------------------------------------
 #define MB_PREPARATION_TIME_BIT     				( 0x20 )	//	预备时间（标志位）  准备时间 Bit: 定时模式 P1-P6
 // ----------------------------------------------------------------------------------------------
 #define MB_SYSTEM_WORKING_MODE     					( 0x21 )	//	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
@@ -95,31 +103,71 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_USER_TRAIN_MODE_SPEED_P1_50		      ( 0x162 )	//	用户 训练模式 	转速
 #define MB_USER_TRAIN_MODE_TIME_P1_50        		( 0x163 )	//								时间
 // ----------------------------------------------------------------------------------------------
-#define MB_USER_TRAIN_MODE_SPEED_P2_1		        ( 0x180 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P2_1        		( 0x181 )	//								时间
-#define MB_USER_TRAIN_MODE_SPEED_P2_2		        ( 0x182 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P2_2        		( 0x183 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P2_1		        ( 0x164 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P2_1        		( 0x165 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P2_2		        ( 0x166 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P2_2        		( 0x167 )	//								时间
 //		.......  50
-#define MB_USER_TRAIN_MODE_SPEED_P2_50		      ( 0x1E2 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P2_50        		( 0x1E3 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P2_50		      ( 0x1C6 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P2_50        		( 0x1C7 )	//								时间
 // ----------------------------------------------------------------------------------------------
-#define MB_USER_TRAIN_MODE_SPEED_P3_1		        ( 0x200 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P3_1        		( 0x201 )	//								时间
-#define MB_USER_TRAIN_MODE_SPEED_P3_2		        ( 0x202 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P3_2        		( 0x203 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P3_1		        ( 0x1C7 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P3_1        		( 0x1C8 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P3_2		        ( 0x1C9 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P3_2        		( 0x1CA )	//								时间
 //		.......  50
-#define MB_USER_TRAIN_MODE_SPEED_P3_50		      ( 0x262 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P3_50        		( 0x263 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P3_50		      ( 0x12A )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P3_50        		( 0x12B )	//								时间
 // ----------------------------------------------------------------------------------------------
-#define MB_USER_TRAIN_MODE_SPEED_P4_1		        ( 0x280 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P4_1        		( 0x281 )	//								时间
-#define MB_USER_TRAIN_MODE_SPEED_P4_2		        ( 0x282 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P4_2        		( 0x283 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P4_1		        ( 0x12C )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P4_1        		( 0x12D )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P4_2		        ( 0x12E )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P4_2        		( 0x12F )	//								时间
 //		.......  50
-#define MB_USER_TRAIN_MODE_SPEED_P4_50		      ( 0x2E2 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P4_50        		( 0x2E3 )	//								时间
-
-#define MB_HOLDING_BUFFER_SIZE_MAX        			( 0x2FF )	//	
+#define MB_USER_TRAIN_MODE_SPEED_P4_50		      ( 0x18E )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P4_50        		( 0x18F )	//								时间
+// ----------------------------------------------------------------------------------------------
+#define MB_USER_TRAIN_MODE_SPEED_P5_1		        ( 0x190 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P5_1        		( 0x191 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P5_2		        ( 0x192 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P5_2        		( 0x193 )	//								时间
+//		.......  50
+#define MB_USER_TRAIN_MODE_SPEED_P5_50		      ( 0x1F2 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P5_50        		( 0x1F3 )	//			
+// ----------------------------------------------------------------------------------------------
+#define MB_USER_TRAIN_MODE_SPEED_P6_1		        ( 0x1F4 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P6_1        		( 0x1F5 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P6_2		        ( 0x1F6 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P6_2        		( 0x1F7 )	//								时间
+//		.......  50
+#define MB_USER_TRAIN_MODE_SPEED_P6_50		      ( 0x256 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P6_50        		( 0x257 )	//			
+// ----------------------------------------------------------------------------------------------
+#define MB_USER_TRAIN_MODE_SPEED_P7_1		        ( 0x258 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P7_1        		( 0x259 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P7_2		        ( 0x25A )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P7_2        		( 0x25B )	//								时间
+//		.......  50
+#define MB_USER_TRAIN_MODE_SPEED_P7_50		      ( 0x2BA )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P7_50        		( 0x2BB )	//			
+// ----------------------------------------------------------------------------------------------
+#define MB_USER_TRAIN_MODE_SPEED_P8_1		        ( 0x2BC )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P8_1        		( 0x2BD )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P8_2		        ( 0x2BE )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P8_2        		( 0x2BF )	//								时间
+//		.......  50
+#define MB_USER_TRAIN_MODE_SPEED_P8_50		      ( 0x31E )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P8_50        		( 0x31F )	//		
+// ----------------------------------------------------------------------------------------------
+#define MB_USER_TRAIN_MODE_SPEED_P9_1		        ( 0x320 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P9_1        		( 0x321 )	//								时间
+#define MB_USER_TRAIN_MODE_SPEED_P9_2		        ( 0x322 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P9_2        		( 0x323 )	//								时间
+//		.......  50
+#define MB_USER_TRAIN_MODE_SPEED_P9_50		      ( 0x382 )	//	用户 训练模式 	转速
+#define MB_USER_TRAIN_MODE_TIME_P9_50        		( 0x383 )	//	
+// ----------------------------------------------------------------------------------------------
+#define MB_HOLDING_BUFFER_SIZE_MAX        			( 0x400 )	//	2K 
 // ----------------------------------------------------------------------------------------------
 
 
@@ -129,7 +177,6 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_DRIVER_SOFTWARE_VERSION								( 0x04 )	//	驱动板 软件版本
 #define MB_DRIVER_HARDWARE_VERSION             		( 0x06 )	//	驱动板 硬件版本
 #define MB_SYSTEM_FAULT_STATUS					          ( 0x08 )	//	系统故障状态
-//#define MB_CHASSIS_TEMPERATURE					          ( 0x09 )	//	机箱  温度
 
 #define MB_MOTOR_FAULT_STATUS					          	( 0x09 )	// 	电机 	故障状态
 #define MB_MOS_TEMPERATURE					          		( 0x0A )	//	mos 	温度
@@ -140,8 +187,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_MOTOR_REALITY_SPEED					          ( 0x10 )	//	（2字节） 电机 	实际 转速
 #define MB_SEND_REALITY_SPEED					          	( 0x12 )	//	（2字节） 电机 	实际 转速  下发
 #define MB_MOTOR_REALITY_POWER					          ( 0x14 )	//	（2字节） 电机 	实际 功率
-#define MB_SIMULATED_SWIM_DISTANCE		      			( 0x16 )	//	模拟游泳距离
-
+#define MB_THREAD_ACTIVITY_SGIN		      					( 0x16 )	//	线程 活动 标志位
 #define MB_FINISH_STATISTICS_TIME		      				( 0x17 )	//	完成统计 --> 时长
 #define MB_FINISH_STATISTICS_SPEED		      			( 0x18 )	//	完成统计 --> 游泳强度
 #define MB_FINISH_STATISTICS_DISTANCE		      		( 0x19 )	//	完成统计 --> 游泳距离
@@ -211,6 +257,9 @@ extern uint16_t Get_DataAddr_Value(UCHAR ucFunctionCode, USHORT addr);
 extern void Set_DataAddr_Value(UCHAR ucFunctionCode, USHORT addr, uint16_t value);
 extern void Set_DataValue_U32(UCHAR ucFunctionCode, USHORT addr, uint32_t value);
 extern void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8_t len);
+
+//================= 冲浪模式 全局 参数 ================================
+extern void Surf_Mode_Info_Get_Mapping(void);
 
 extern void Get_Mapping_Register(void);
 #ifdef __cplusplus

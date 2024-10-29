@@ -74,10 +74,12 @@ void App_Timing_Init(void)
 	LCD_Show_Bit = STATUS_BIT_PERCENTAGE;
 	
 	System_Boot_Screens();
-	System_Power_Off();
 	Dev_Check_Control_Methods();
 	//开机完成
 	System_PowerUp_Finish = 0xAA;
+	all_data_update();		// wifi 上传
+	
+	System_Power_Off();
 }
 
 void Clean_Timing_Timer_Cnt(void)
@@ -349,15 +351,15 @@ void Running_State_Handler(void)
 {
 	uint8_t slow_down_speed;//高温降速使用
 	
-	if(*p_System_State_Machine == FREE_MODE_RUNNING)									// 自由
+	if(Get_System_State_Machine() == FREE_MODE_RUNNING)									// 自由
 	{
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time + 1);
-		if(*p_OP_ShowNow_Time >= 6000)
+		if(*p_OP_ShowNow_Time >= MOTOR_TIME_SHOW_MAX)
 		{
 			*p_OP_ShowNow_Time = 0;
 		}
 	}
-	else if(*p_System_State_Machine == TIMING_MODE_RUNNING)					// 定时
+	else if(Get_System_State_Machine() == TIMING_MODE_RUNNING)					// 定时
 	{
 		Finish_Statistics_Count(1);	//计算 完成统计
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time - 1);
@@ -368,37 +370,37 @@ void Running_State_Handler(void)
 			*p_OP_ShowNow_Time = p_OP_Timing_Mode->time;
 		}
 	}
-	else if(*p_System_State_Machine == TRAINING_MODE_RUNNING)					// 训练
+	else if(Get_System_State_Machine() == TRAINING_MODE_RUNNING)					// 训练
 	{
 		Finish_Statistics_Count(1);	//计算 完成统计
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time + 1);
-		if(*p_PMode_Now == SURFING_MODE_NUMBER_ID)//冲浪
+		
+		if(Get_System_State_Mode() == SURFING_MODE_NUMBER_ID)//冲浪
 		{
-			if(*p_OP_ShowNow_Time >= 6000)
+			if(*p_OP_ShowNow_Time >= MOTOR_TIME_SHOW_MAX)
 			{
 				*p_OP_ShowNow_Time = 0;
 			}
-			
-			if((*p_OP_ShowNow_Time < 10))
-				Data_Set_Current_Speed(30);//注意,需要在切完运行状态后再设置速度,如"暂停"
-			else if(((*p_OP_ShowNow_Time-10) % (Temp_Data_P5_100_Time+Temp_Data_P5_0_Time)) == 0)
-				Data_Set_Current_Speed(100);//注意,需要在切完运行状态后再设置速度,如"暂停"
-			else if(((*p_OP_ShowNow_Time-10) % (Temp_Data_P5_100_Time+Temp_Data_P5_0_Time)) == Temp_Data_P5_100_Time)
-				Data_Set_Current_Speed(30);//注意,需要在切完运行状态后再设置速度,如"暂停"
+			if((*p_OP_ShowNow_Time < *p_Surf_Mode_Info_Prepare_Time))
+				Data_Set_Current_Speed(*p_Surf_Mode_Info_Low_Speed);//注意,需要在切完运行状态后再设置速度,如"暂停"
+			else if(((*p_OP_ShowNow_Time - (*p_Surf_Mode_Info_Prepare_Time)) % (*p_Surf_Mode_Info_High_Time + *p_Surf_Mode_Info_Low_Time)) == 0)
+				Data_Set_Current_Speed(*p_Surf_Mode_Info_High_Speed);//注意,需要在切完运行状态后再设置速度,如"暂停"
+			else if(((*p_OP_ShowNow_Time - (*p_Surf_Mode_Info_Prepare_Time)) % (*p_Surf_Mode_Info_High_Time + *p_Surf_Mode_Info_Low_Time)) == *p_Surf_Mode_Info_High_Time)
+				Data_Set_Current_Speed(*p_Surf_Mode_Info_Low_Speed);//注意,需要在切完运行状态后再设置速度,如"暂停"
 		}
-		else if(Is_Mode_Legal(*p_PMode_Now))
+		else if(Is_Mode_Legal(Get_System_State_Mode()))
 		{
-			if(*p_OP_ShowNow_Time >= p_OP_PMode[*p_PMode_Now-1][Period_Now].time)
+			if(*p_OP_ShowNow_Time >= p_OP_PMode[Get_System_State_Mode()-1][Period_Now].time)
 			{
-				if((Period_Now == (TRAINING_MODE_PERIOD_MAX-1))||(p_OP_PMode[*p_PMode_Now-1][Period_Now+1].time < p_OP_PMode[*p_PMode_Now-1][Period_Now].time))
+				if((Period_Now == (TRAINING_MODE_PERIOD_MAX-1))||(p_OP_PMode[Get_System_State_Mode()-1][Period_Now+1].time < p_OP_PMode[Get_System_State_Mode()-1][Period_Now].time))
 				{
 					Arbitrarily_To_Stop();
-					*p_OP_ShowNow_Speed = p_OP_PMode[*p_PMode_Now-1][0].speed;
+					*p_OP_ShowNow_Speed = p_OP_PMode[Get_System_State_Mode()-1][0].speed;
 				}
 				else
 				{
 					Period_Now ++;
-					Data_Set_Current_Speed(p_OP_PMode[*p_PMode_Now-1][Period_Now].speed);//注意,需要在切完运行状态后再设置速度,如"暂停"
+					Data_Set_Current_Speed(p_OP_PMode[Get_System_State_Mode()-1][Period_Now].speed);//注意,需要在切完运行状态后再设置速度,如"暂停"
 				}
 			}
 		}
@@ -415,8 +417,6 @@ void Running_State_Handler(void)
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 	}
-	// 计算 模拟 距离
-	Calculate_Swimming_Distance();
 	// 转速达到目标值
 	if(Motor_Speed_Is_Reach())
 	{
@@ -512,11 +512,18 @@ void Pause_State_Handler(void)
 	if(*p_OP_ShowNow_Speed != 0)
 		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
 	
-	if(((Timing_Half_Second_Cnt - Automatic_Shutdown_Timing_Cnt) > AUTOMATIC_SHUTDOWN_TIME)&&(Timing_Half_Second_Cnt > Automatic_Shutdown_Timing_Cnt))
+	if(Timing_Half_Second_Cnt >= Automatic_Shutdown_Timing_Cnt)
 	{
-		System_Power_Off();
+		if((Timing_Half_Second_Cnt - Automatic_Shutdown_Timing_Cnt) > AUTOMATIC_SHUTDOWN_TIME)
+		{
+			System_Power_Off();
+		}
 	}
-	
+	else
+	{
+		Clean_Automatic_Shutdown_Timer();
+	}
+		
 	if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 		Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 }
@@ -567,6 +574,7 @@ void Initial_State_Handler(void)
 {
 	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// 跳过 自动启动
 	{
+		/* wuqingguang 持续闪烁
 		if((Timing_Timer_Cnt % 2) == 1)
 		{
 			LCD_Refresh_Set(1);
@@ -577,7 +585,7 @@ void Initial_State_Handler(void)
 			//LCD_Refresh_Set(0);
 			Lcd_Show();
 		}
-		
+		*/
 		if(((Timing_Half_Second_Cnt - Automatic_Shutdown_Timing_Cnt) > AUTOMATIC_SHUTDOWN_TIME) && (Timing_Half_Second_Cnt > Automatic_Shutdown_Timing_Cnt))
 		{
 			System_Power_Off();
@@ -605,7 +613,7 @@ void Initial_State_Handler(void)
 			
 			Add_Ctrl_Log();
 			
-			if(*p_System_State_Machine == TIMING_MODE_INITIAL)
+			if(Get_System_State_Machine() == TIMING_MODE_INITIAL)
 			{
 				p_OP_ShowLater->time = *p_OP_ShowNow_Time;
 			}
@@ -776,6 +784,7 @@ void App_Timing_Handler(void)
 //			SysSoftReset();// 软件复位
 //		}
 //	}
+	Thread_Activity_Sign_Clean();
 	
 	if(System_Self_Testing_State == 0xAA)
 	{

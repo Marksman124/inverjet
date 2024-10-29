@@ -104,7 +104,7 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_SYSTEM_WORKING_STATUS, DP_TYPE_ENUM},
     {DPID_MOTOR_CURRENT_SPEED, DP_TYPE_VALUE},
     {DPID_MOTOR_CURRENT_TIME, DP_TYPE_VALUE},
-    {DPID_SWIMMING_DISTANCE, DP_TYPE_VALUE},
+    {DPID_SYSTEM_STATUS_MODE, DP_TYPE_RAW},
     {DPID_FREE_MODE_SPEEN, DP_TYPE_VALUE},
     {DPID_TIMING_MODE_SPEEN, DP_TYPE_VALUE},
     {DPID_TIMING_MODE_TIME, DP_TYPE_VALUE},
@@ -113,6 +113,9 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_SET_TRAIN_PLAN_03, DP_TYPE_RAW},
     {DPID_SET_TRAIN_PLAN_04, DP_TYPE_RAW},
     {DPID_SET_TRAIN_PLAN_05, DP_TYPE_RAW},
+    {DPID_CUSTOM_TRAIN_PLAN_01, DP_TYPE_RAW},
+    {DPID_CUSTOM_TRAIN_PLAN_02, DP_TYPE_RAW},
+    {DPID_CUSTOM_TRAIN_PLAN_03, DP_TYPE_RAW},
     {DPID_FINISH_STATISTICS_TIME, DP_TYPE_VALUE},
     {DPID_FINISH_STATISTICS_SEED, DP_TYPE_VALUE},
     {DPID_FINISH_STATISTICS_DISTANCE, DP_TYPE_VALUE},
@@ -183,11 +186,12 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,当前系统运行时间 (调试用)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_NO_OPERATION_TIME,当前无操作时间 (调试用)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,当前启动时间 (调试用)); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,当前线程活动标准); //VALUE型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,当前工作模式); //枚举型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,当前系统状态机); //枚举型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,当前当前转速); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,当前当前时间); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_SWIMMING_DISTANCE,当前游泳距离); //VALUE型数据上报;
+    mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,当前模式+状态指针,当前模式+状态数据长度); //RAW型数据上报;
     mcu_dp_value_update(DPID_FREE_MODE_SPEEN,当前自由模式默认速度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,当前定时模式默认速度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_TIMING_MODE_TIME,当前定时模式默认时间); //VALUE型数据上报;
@@ -196,6 +200,9 @@ void all_data_update(void)
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,当前训练计划03指针,当前训练计划03数据长度); //RAW型数据上报;
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,当前训练计划04指针,当前训练计划04数据长度); //RAW型数据上报;
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,当前训练计划05指针,当前训练计划05数据长度); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,当前自定义训练计划_01指针,当前自定义训练计划_01数据长度); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,当前自定义训练计划_02指针,当前自定义训练计划_02数据长度); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,当前自定义训练计划_03指针,当前自定义训练计划_03数据长度); //RAW型数据上报;
     mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,当前完成统计_时长); //VALUE型数据上报;
     mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,当前完成统计_游泳强度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,当前完成统计_距离); //VALUE型数据上报;
@@ -204,24 +211,29 @@ void all_data_update(void)
     */
 		mcu_dp_value_update(DPID_PREPARATION_TIME,				*p_Preparation_Time_BIT); 			// 准备时间(APP管理,本地只负责保存)
 		mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,				*p_Motor_Fault_Static); 				// 驱动板故障
-    //mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,	*p_System_Fault_Static); 				// 系统 故障型数据上报
+    mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,	*p_System_Fault_Static); 				// 系统 故障型数据上报
     mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,			*p_Mos_Temperature); 						// MOS温度
     mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,			*p_Box_Temperature); 						// 机箱温度
     mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,				*p_Motor_Current); 							// 输出电流（电机)
     mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed); 				// 实际转速;
     mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,				*p_Motor_Bus_Voltage); 					// 输入电压（母线）;
-    //mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed); 					// 下发转速;
+    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed); 				// 下发转速;
     mcu_dp_value_update(DPID_MOTOR_POWER,							*p_Motor_Reality_Power); 				// 当前功率;
     mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,			*p_Motor_Bus_Current); 					// 输入电流（母线）;
-    //mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,			*p_System_Runing_Second_Cnt); 			// 运行时间;
-    //mcu_dp_value_update(DPID_NO_OPERATION_TIME,				*p_No_Operation_Second_Cnt);				// 无操作时间;
-    //mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,			*p_System_Startup_Second_Cnt);			// 启动 时间;
-    mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,			*p_PMode_Now);									// 工作模式;
+    mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,			*p_System_Runing_Second_Cnt); 	// 运行时间;
+    mcu_dp_value_update(DPID_NO_OPERATION_TIME,				*p_No_Operation_Second_Cnt);		// 无操作时间;
+    mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,			*p_System_Startup_Second_Cnt);	// 启动 时间;
+    
+		mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,*p_Thread_Activity_Sign);						//线程活动标志;
+		
+		mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,			Get_System_State_Mode());				// 工作模式;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,		Get_System_State_Machine());		// 状态机;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,			*p_OP_ShowNow_Speed);						// 当前速度;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,			*p_OP_ShowNow_Time);						// 当前时间;
-    //mcu_dp_value_update(DPID_SWIMMING_DISTANCE,				*p_Simulated_Swim_Distance);					// 游泳距离;
-    mcu_dp_value_update(DPID_FREE_MODE_SPEEN,					p_OP_Free_Mode->speed);					// 自由模式 速度;
+
+		mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now,	4);				// 合并上传;
+		
+		mcu_dp_value_update(DPID_FREE_MODE_SPEEN,					p_OP_Free_Mode->speed);					// 自由模式 速度;
     mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,				p_OP_Timing_Mode->speed);				// 定时模式 速度;
     mcu_dp_value_update(DPID_TIMING_MODE_TIME,				p_OP_Timing_Mode->time);				// 定时模式 时间;
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,	(unsigned char *)p_OP_PMode[0],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P1
@@ -230,9 +242,13 @@ void all_data_update(void)
     mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,	(unsigned char *)p_OP_PMode[3],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P4
     //mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,	(unsigned char *)p_OP_PMode[4],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P5
 
-//		mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 				// 当前完成统计_时长
-//    mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 		// 当前完成统计_游泳强度
-//    mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); 		// 当前完成统计_距离
+		//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,(unsigned char *),TRAINING_MODE_PERIOD_MAX*4); // 自定义训练计划_01;
+    //mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,当前自定义训练计划_02指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_02;
+    //mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,当前自定义训练计划_03指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_03;
+    
+		mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 			// 当前完成统计_时长
+    mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 			// 当前完成统计_游泳强度
+    mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); 	// 当前完成统计_距离
 
 }
 
@@ -290,17 +306,12 @@ static unsigned char dp_download_system_working_mode_handle(const unsigned char 
 	
 		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
-			//	切换模式时上传<统计数据> 如： 从 P1 切到 P2
-			if((*p_PMode_Now != system_working_mode)&&(*p_PMode_Now > 0))
-			{
-				Finish_Statistics_Upload();
-			}
-			*p_PMode_Now = system_working_mode;
+			Set_System_State_Mode(system_working_mode);
+			
 			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-			Set_Pmode_Period_Now(0);
 		}
     //There should be a report after processing the DP
-    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE, *p_PMode_Now);
+    ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE, Get_System_State_Mode());
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -326,15 +337,21 @@ static unsigned char dp_download_system_working_status_handle(const unsigned cha
 		{
 			if(system_working_status <= TRAINING_MODE_STOP)
 			{
-				Set_System_State_Machine(system_working_status);
-				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-				if(System_is_Power_Off())
+				
+				//	切换模式时
+				if(Is_Change_System_Mode(system_working_status))
 				{
-					System_Power_Off();
+					Set_System_State_Machine(system_working_status);
+					Check_OP_All();		// 确保参数合法
 				}
-				//确保这个最后收到的前提下
-				Check_OP_All();		// 确保参数合法
-				Update_OP_All();
+				else
+				{
+					Set_System_State_Machine(system_working_status);
+					OP_Update_Mode();
+				}
+				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+				//Check_OP_All();		// 确保参数合法
+				//Update_OP_All();
 			}
 		}
     //There should be a report after processing the DP
@@ -364,7 +381,7 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
     */
 		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
-			if(motor_current_speed < MOTOR_PERCENT_SPEED_MIX)
+			if((motor_current_speed < MOTOR_PERCENT_SPEED_MIX)&&(motor_current_speed > 0))
 				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
 			else if(motor_current_speed > MOTOR_PERCENT_SPEED_MAX)
 				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
@@ -376,10 +393,8 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
 				Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 			}
-//			else
-//			{
-//				Motor_Speed_Target_Set(0);
-//			}
+			// 保存
+			Update_OP_Speed();
 		}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed);
@@ -408,11 +423,65 @@ static unsigned char dp_download_motor_current_time_handle(const unsigned char v
     */
 		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
+			if(motor_current_time >= MOTOR_TIME_SHOW_MAX)
+				motor_current_time = MOTOR_TIME_SHOW_MAX - 1;
+			
 			*p_OP_ShowNow_Time = motor_current_time;
 			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+			
+			// 保存
+			Update_OP_Time();
 		}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_system_status_mode_handle
+功能描述 : 针对DPID_SYSTEM_STATUS_MODE的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_system_status_mode_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为RAW
+    unsigned char ret;
+		unsigned char system_working_mode;
+		unsigned char system_working_status;
+    /*
+    //RAW type data processing
+    */
+		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
+		{
+			system_working_mode = value[0] | value[1]<<8;
+			system_working_status = value[2] | value[3]<<8;
+			
+			Set_System_State_Mode(system_working_mode);
+			
+			if(system_working_status <= TRAINING_MODE_STOP)
+			{
+				//	切换模式时
+				if(Is_Change_System_Mode(system_working_status))
+				{
+					Set_System_State_Machine(system_working_status);
+					Check_OP_All();		// 确保参数合法
+				}
+				else
+				{
+					Set_System_State_Machine(system_working_status);
+					OP_Update_Mode();
+				}
+				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+			}
+		}
+    //There should be a report after processing the DP
+    //ret = mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,value,length);
+		ret = mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now,	4);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -436,13 +505,18 @@ static unsigned char dp_download_free_mode_speen_handle(const unsigned char valu
     /*
     //VALUE type data processing
     */
-		p_OP_Free_Mode->speed = free_mode_speen;
+		if(free_mode_speen < MOTOR_PERCENT_SPEED_MIX)
+			p_OP_Free_Mode->speed = MOTOR_PERCENT_SPEED_MIX;
+		else if(free_mode_speen > MOTOR_PERCENT_SPEED_MAX)
+			p_OP_Free_Mode->speed = MOTOR_PERCENT_SPEED_MAX;
+		else
+			p_OP_Free_Mode->speed = free_mode_speen;
 		p_OP_Free_Mode->time = 0;
 		//保存
 		Memset_OPMode();
 	
     //There should be a report after processing the DP
-    ret = mcu_dp_value_update(DPID_FREE_MODE_SPEEN,free_mode_speen);
+    ret = mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -466,12 +540,17 @@ static unsigned char dp_download_timing_mode_speen_handle(const unsigned char va
     /*
     //VALUE type data processing
     */
-		p_OP_Timing_Mode->speed = timing_mode_speen;
+		if(timing_mode_speen < MOTOR_PERCENT_SPEED_MIX)
+			p_OP_Timing_Mode->speed = MOTOR_PERCENT_SPEED_MIX;
+		else if(timing_mode_speen > MOTOR_PERCENT_SPEED_MAX)
+			p_OP_Timing_Mode->speed = MOTOR_PERCENT_SPEED_MAX;
+		else
+			p_OP_Timing_Mode->speed = timing_mode_speen;
 		//保存
 		Memset_OPMode();
 	
     //There should be a report after processing the DP
-    ret = mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,timing_mode_speen);
+    ret = mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -495,12 +574,17 @@ static unsigned char dp_download_timing_mode_time_handle(const unsigned char val
     /*
     //VALUE type data processing
     */
-		p_OP_Timing_Mode->time = timing_mode_time;
+		if(timing_mode_time < 180)
+			p_OP_Timing_Mode->time = 180;
+		else if(timing_mode_time >= MOTOR_TIME_SHOW_MAX)
+			p_OP_Timing_Mode->time = (MOTOR_TIME_SHOW_MAX-1);
+		else
+			p_OP_Timing_Mode->time = timing_mode_time;
 		//保存
 		Memset_OPMode();
 	
     //There should be a report after processing the DP
-    ret = mcu_dp_value_update(DPID_TIMING_MODE_TIME,timing_mode_time);
+    ret = mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -632,6 +716,78 @@ static unsigned char dp_download_set_train_plan_05_handle(const unsigned char va
     else
         return ERROR;
 }
+/*****************************************************************************
+函数名称 : dp_download_custom_train_plan_01_handle
+功能描述 : 针对DPID_CUSTOM_TRAIN_PLAN_01的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_custom_train_plan_01_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为RAW
+    unsigned char ret;
+    /*
+    //RAW type data processing
+
+    */
+
+    //There should be a report after processing the DP
+    ret = mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,value,length);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_custom_train_plan_02_handle
+功能描述 : 针对DPID_CUSTOM_TRAIN_PLAN_02的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_custom_train_plan_02_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为RAW
+    unsigned char ret;
+    /*
+    //RAW type data processing
+
+    */
+
+    //There should be a report after processing the DP
+    ret = mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,value,length);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_custom_train_plan_03_handle
+功能描述 : 针对DPID_CUSTOM_TRAIN_PLAN_03的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_custom_train_plan_03_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为RAW
+    unsigned char ret;
+    /*
+    //RAW type data processing
+
+    */
+
+    //There should be a report after processing the DP
+    ret = mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,value,length);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
 
 
 
@@ -680,6 +836,10 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
             //当前时间处理函数
             ret = dp_download_motor_current_time_handle(value,length);
         break;
+        case DPID_SYSTEM_STATUS_MODE:
+            //模式+状态处理函数
+            ret = dp_download_system_status_mode_handle(value,length);
+        break;
         case DPID_FREE_MODE_SPEEN:
             //自由模式默认速度处理函数
             ret = dp_download_free_mode_speen_handle(value,length);
@@ -711,6 +871,18 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
         case DPID_SET_TRAIN_PLAN_05:
             //训练计划05处理函数
             ret = dp_download_set_train_plan_05_handle(value,length);
+        break;
+        case DPID_CUSTOM_TRAIN_PLAN_01:
+            //自定义训练计划_01处理函数
+            ret = dp_download_custom_train_plan_01_handle(value,length);
+        break;
+        case DPID_CUSTOM_TRAIN_PLAN_02:
+            //自定义训练计划_02处理函数
+            ret = dp_download_custom_train_plan_02_handle(value,length);
+        break;
+        case DPID_CUSTOM_TRAIN_PLAN_03:
+            //自定义训练计划_03处理函数
+            ret = dp_download_custom_train_plan_03_handle(value,length);
         break;
 
         

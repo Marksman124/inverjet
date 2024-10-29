@@ -44,17 +44,25 @@ void App_State_Machine_Init(void)
 	Special_Status_Bit = 0;
 }
 
+//-----------------------------------------------------------------------------------------------
+//******************************************************************************************
 //------------- 模式发生切换 ------------------------------------
 // machine: 新状态机
 void Check_Mode_Change(uint16_t machine)
 {
-	//	切换模式时
-	if(Is_Change_System_Mode(machine))
+	if(Get_System_State_Machine() != machine)
 	{
-		Finish_Statistics_Upload();			// 上传<统计数据>
+		Clean_Automatic_Shutdown_Timer();	// 清除 自动关机计时器
+		Clean_Timing_Timer_Cnt();					// 清除运行(timing) 计时器
+		//Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 		Down_Conversion_State_Clea();		// 清除 降频状态
+		
+		//	切换模式时
+		if(Is_Change_System_Mode(machine))
+		{
+			Finish_Statistics_Upload();			// 上传<统计数据>
+		}
 	}
-	
 }
 
 //------------------- 设置状态机  ----------------------------
@@ -68,6 +76,16 @@ uint8_t Set_System_State_Machine(uint8_t val)
 	
 	*p_System_State_Machine = val;
 	
+	// 模式
+	if(System_Mode_Train())
+	{
+		if(Get_System_State_Mode() == 0)
+		{
+			Set_System_State_Mode(SYSTEM_MODE_TRAIN_P1);
+			Set_Pmode_Period_Now(0);
+		}
+	}
+	
 	return 1;
 }
 
@@ -78,6 +96,44 @@ uint8_t Get_System_State_Machine(void)
 {
 	return *p_System_State_Machine;
 }
+
+//******************************************************************************************
+//-----------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------
+//******************************************************************************************
+//------------------- 设置 模式  ----------------------------
+
+uint8_t Set_System_State_Mode(uint8_t val)
+{
+	if(val > TRAINING_MODE_NUMBER_MAX) //溢出
+		return 0;
+		
+	//	切换模式时
+	if(val != *p_PMode_Now)
+	{
+		Set_Pmode_Period_Now(0);
+		Finish_Statistics_Upload();			// 上传<统计数据>
+		Down_Conversion_State_Clea();		// 清除 降频状态
+		Clean_Timing_Timer_Cnt();				// 清除运行(timing) 计时器
+	}
+	
+	*p_PMode_Now = val;
+	
+	return 1;
+}
+
+
+//------------------- 获取 模式  ----------------------------
+
+uint8_t Get_System_State_Mode(void)
+{
+	return *p_PMode_Now;
+}
+
+//******************************************************************************************
+//-----------------------------------------------------------------------------------------------
+
 
 //------------------- 快速获取状态  ----------------------------
 
@@ -228,6 +284,7 @@ void Arbitrarily_To_Initial(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 4;
 	
+	Clean_Timing_Timer_Cnt();
 	return;
 }
 	
@@ -246,6 +303,7 @@ void Arbitrarily_To_Starting(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 3;
 	
+	Clean_Timing_Timer_Cnt();
 	return;
 }
 
@@ -264,6 +322,7 @@ void Arbitrarily_To_Running(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 2;
 	
+	Clean_Timing_Timer_Cnt();
 	return;
 }
 
@@ -283,6 +342,7 @@ void Arbitrarily_To_Pause(void)
 		*p_System_State_Machine -= 1;
 	
 	Clean_Automatic_Shutdown_Timer();
+	Clean_Timing_Timer_Cnt();
 	return;
 }
 
@@ -303,6 +363,7 @@ void Arbitrarily_To_Stop(void)
 	
 	Motor_Speed_Target_Set(0);
 	Clean_Automatic_Shutdown_Timer();
+	Clean_Timing_Timer_Cnt();
 	return;
 }
 

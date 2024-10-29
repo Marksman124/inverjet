@@ -20,10 +20,10 @@ typedef  void (*iapfun)(void);				//定义一个函数类型的参数.
 #define STM_FLASH_SECTOR_SIZE				(2048)
 
 #define FLASH_APP_PROGRAM_ADDR			(0x08008000)  	// app 程序 起始地址(存放在FLASH)
-#define FLASH_APP_PROGRAM_PAGE			(56)  					// app 程序升级包 大小 (页数 n*2048)
-#define FLASH_APP_PATCH_ADDR				(0x08024000)  	// app 程序升级包 起始地址(存放在FLASH)
+#define FLASH_APP_PROGRAM_PAGE			(55)  					// app 程序升级包 大小 (页数 n*2048)
+#define FLASH_APP_PATCH_ADDR				(0x08023800)  	// app 程序升级包 起始地址(存放在FLASH)
 
-#define FLASH_APP_PARAM_ADDR				(0x08007C00)  	// app 程序参数 起始地址(存放在FLASH)
+#define FLASH_APP_PARAM_ADDR				(0x0803F000)  	// app 程序参数 起始地址(存放在FLASH)
 #define USER_FLASH_ADDR_SOFTWARE_VERSION			(USER_FLASH_ADDR_BAUD_RATE + (21*FLASH_ADDR_OFFSET_SIZE))		//	软件版本
 
 //只可用于读

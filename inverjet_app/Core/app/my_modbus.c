@@ -344,7 +344,7 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 	
 	if(addr == MB_SYSTEM_WORKING_MODE) //	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
 	{
-		if(*p_PMode_Now > 0)//P模式
+		if(Get_System_State_Mode() > 0)//P模式
 		{
 			Set_Pmode_Period_Now(0);
 		}
@@ -542,7 +542,7 @@ MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 	
 	if(addr == MB_SYSTEM_WORKING_MODE) //	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
 	{
-		if(*p_PMode_Now > 0)//P模式
+		if(Get_System_State_Mode() > 0)//P模式
 		{
 			Set_Pmode_Period_Now(0);
 		}

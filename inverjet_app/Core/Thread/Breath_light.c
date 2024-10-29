@@ -54,6 +54,8 @@ void App_Breath_light_Init(void)
 
 void App_Breath_light_Handler(void)
 {
+	Thread_Activity_Sign_Set(THREAD_ACTIVITY_BREATH_LIGHT);
+	
 	if( Light_Brightness_cmp != Light_Brightness )
 	{
 		if(Light_Brightness > LIGHT_BRIGHTNESS_MAX)

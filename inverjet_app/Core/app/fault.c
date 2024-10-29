@@ -91,9 +91,9 @@ void (*p_Fault_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Fault_Button_2_3_Long_Press, on_Fault_Button_2_4_Long_Press,
 };
 
-uint8_t State_Machine_Memory = 0;
-uint8_t Motor_Speed_Memory = 0;
-uint16_t Motor_Time_Memory = 0;
+static uint8_t State_Machine_Memory = 0;
+static uint8_t Motor_Speed_Memory = 0;
+static uint16_t Motor_Time_Memory = 0;
 
 /* Private user code ---------------------------------------------------------*/
 
@@ -279,7 +279,8 @@ void To_Fault_Menu(void)
 	//功能暂停
 	Set_System_State_Machine(ERROR_DISPLAY_STATUS);
 	//电机关闭
-	Motor_Speed_Target_Set(0);
+	*p_OP_ShowNow_Speed = 0;
+	Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 	
 	Fault_Number_Sum = Get_Fault_Number_Sum(*p_MB_Fault_State);
 	

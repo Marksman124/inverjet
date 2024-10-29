@@ -136,9 +136,9 @@ void on_pushButton_clicked(void)
 {
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop())
 			return;
-	if(PMode_Now == 5)//冲浪
+	if(Get_System_State_Mode() == SURFING_MODE_NUMBER_ID)//冲浪
 			return;
-	Clean_Timing_Timer_Cnt();
+	//Clean_Timing_Timer_Cnt();
 	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
@@ -186,19 +186,19 @@ void on_pushButton_2_clicked(void)
 {
 	if(System_is_Power_Off())
 		return;
-	Clean_Swimming_Distance();//清除计算距离
-	Clean_Timing_Timer_Cnt();//清除 timing线程计时器
+	//Clean_Swimming_Distance();//清除计算距离
+	//Clean_Timing_Timer_Cnt();//清除 timing线程计时器
 	
-	if(*p_System_State_Machine == TIMING_MODE_INITIAL)
+	if(Get_System_State_Machine() == TIMING_MODE_INITIAL)
 	{
-			if(*p_OP_ShowNow_Time >= 5400)
-					*p_OP_ShowNow_Time = 900;
+			if(*p_OP_ShowNow_Time >= MOTOR_TIME_GEAR_MAX)
+					*p_OP_ShowNow_Time = MOTOR_TIME_GEAR_MIX;
 			else
 			{
-					if((*p_OP_ShowNow_Time % 900) != 0)
-							*p_OP_ShowNow_Time += (900-(*p_OP_ShowNow_Time % 900));
+					if((*p_OP_ShowNow_Time % MOTOR_TIME_GEAR_OFFSET) != 0)
+							*p_OP_ShowNow_Time += (MOTOR_TIME_GEAR_OFFSET-(*p_OP_ShowNow_Time % MOTOR_TIME_GEAR_OFFSET));
 					else
-							*p_OP_ShowNow_Time += 900;
+							*p_OP_ShowNow_Time += MOTOR_TIME_GEAR_OFFSET;
 			}
 			
 			Update_OP_Time();
@@ -210,7 +210,7 @@ void on_pushButton_2_clicked(void)
 	}
 	Arbitrarily_To_Initial();
 	
-//	if(*p_System_State_Machine <= TIMING_MODE_STOP)	// 定时
+//	if(Get_System_State_Machine() <= TIMING_MODE_STOP)	// 定时
 //	{
 //		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
 //	}
@@ -221,8 +221,8 @@ void on_pushButton_3_clicked(void)
 {
 	if(System_is_Power_Off())
 		return;
-	Clean_Swimming_Distance();//清除计算距离
-	Clean_Timing_Timer_Cnt();//清除 timing线程计时器
+	//Clean_Swimming_Distance();//清除计算距离
+	//Clean_Timing_Timer_Cnt();//清除 timing线程计时器
 		
 	if(System_Mode_Free())
 	{
@@ -230,27 +230,25 @@ void on_pushButton_3_clicked(void)
 	}
 	else if(System_Mode_Train())
 	{
-			if(*p_PMode_Now >= TRAINING_MODE_NUMBER_MAX)
+			if(Get_System_State_Mode() >= TRAINING_MODE_NUMBER_MAX)
 			{
 					To_Free_Mode(FREE_MODE_AUTO_START);
 			}
 			else
 			{
-					To_Train_Mode((*p_PMode_Now+1));
+					To_Train_Mode((Get_System_State_Mode()+1));
 			}
 	}
 	else
 	{
 			To_Free_Mode(FREE_MODE_AUTO_START);
 	}
-
-	Period_Now = 0;
 }
 
 //================================== ④ 开机键  短按
 void on_pushButton_4_Short_Press(void)
 {
-	Clean_Timing_Timer_Cnt();
+	//Clean_Timing_Timer_Cnt();
 	if(System_is_Power_Off())//关机中 执行开机
 	{
 			return;
@@ -279,7 +277,7 @@ void on_pushButton_4_Short_Press(void)
 		else
 		{
 			p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
-			//*p_OP_ShowNow_Speed = 0;
+			*p_OP_ShowNow_Speed = 0;
 			Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"启动"
 		}
 		Arbitrarily_To_Pause();
@@ -340,7 +338,7 @@ void on_pushButton_1_Long_Press(void)
 //		if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR) == 0)
 //			Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 //	}
-	Clean_Timing_Timer_Cnt();
+	//Clean_Timing_Timer_Cnt();
 	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
@@ -669,6 +667,8 @@ void App_Key_Handler(void)
 	static uint8_t io_shake_cnt=0;
 	uint8_t i;
 	
+	Thread_Activity_Sign_Set(THREAD_ACTIVITY_KEY_BUTTON);
+	
 	if(*p_Analog_key_Value > 0)
 	{
 		if((*p_Analog_key_Value>>8) >= 2)
@@ -760,16 +760,15 @@ void System_Power_On(void)
 	
 	Out_Of_Upgradation();
 	Freertos_TaskResume_All();
-	// 检查 属性
-	Check_Data_Init();
+	// 检查各模式 属性
+	if(Check_Data_Init())
+		Memset_OPMode();//存储
 
 	//	状态
 	To_Free_Mode(FREE_MODE_AUTO_START);			// ui
 	
 	Led_Button_On(0x0F);	// 按键
-	all_data_update();		// wifi 上传
-	//
-	
+		
 	// 后台定时器
 	//BlackGround_Task_On();
 }
@@ -779,7 +778,7 @@ void System_Power_Off(void)
 {
 	char show_mapping[9] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 	
-	Clean_Swimming_Distance();//清除计算距离
+	//Clean_Swimming_Distance();//清除计算距离
 	//清除故障状态
 	CallOut_Fault_State();
 	//清除计数器

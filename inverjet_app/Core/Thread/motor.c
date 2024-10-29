@@ -110,6 +110,8 @@ void Clean_Motor_OffLine_Timer(void)
 //------------------- 主循环函数  ----------------------------
 void App_Motor_Handler(void)
 {
+	Thread_Activity_Sign_Set(THREAD_ACTIVITY_MOTOR);
+	
 	//通信故障计数器
 	Motor_Rx_Timer_cnt++;  //不报故障 记得删  wuqingguang 2024-09-09
 	
@@ -189,8 +191,8 @@ uint8_t Motor_Speed_Update(void)
 	uint8_t result=1;
 	uint8_t Motor_Acceleration=0;
 	
-	if((*p_System_State_Machine == TRAINING_MODE_RUNNING)&&(PMode_Now == 5)&&(OP_ShowNow.time > 10))					// 训练 P5
-		Motor_Acceleration = Temp_Data_P5_Acceleration;
+	if((Get_System_State_Machine() == TRAINING_MODE_RUNNING)&&(PMode_Now == 5)&&(OP_ShowNow.time > 10))					// 训练 P5
+		Motor_Acceleration = *p_Surf_Mode_Info_Acceleration;
 	else
 		Motor_Acceleration = MOTOR_ACCELERATION;
 	
@@ -246,29 +248,18 @@ uint8_t Motor_Speed_Is_Reach(void)
 //------------------- 电机转速 目标值 设置 ----------------------------
 void Motor_Speed_Target_Set(uint8_t speed)
 {
-	if(speed > 100)
-		speed = 100;
+	if(speed > MOTOR_PERCENT_SPEED_MAX)
+		speed = MOTOR_PERCENT_SPEED_MAX;
 	
+	if((speed < MOTOR_PERCENT_SPEED_MIX) && (speed > 0))
+		speed = MOTOR_PERCENT_SPEED_MIX;
+	
+	//*p_OP_ShowNow_Speed = speed;
+
 	Motor_Speed_Target = speed;
 	Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 }
 
-//------------------- 清除 计算游泳距离 ----------------------------
-void Clean_Swimming_Distance(void)
-{
-	*p_Simulated_Swim_Distance = 0;
-}
-//------------------- 计算游泳距离 每秒----------------------------
-void Calculate_Swimming_Distance(void)
-{
-	uint16_t distance = 0;
-	
-	
-	distance = Motor_Speed_Now * EVERY_1PERCENT_DISTANCE_PER_SECOND;
-	
-	*p_Simulated_Swim_Distance += distance;
-	
-}
 //------------------- 电机转速 目标值 设置 ----------------------------
 uint8_t Motor_Speed_Target_Get(void)
 {
@@ -297,20 +288,20 @@ uint32_t Motor_Speed_To_Rpm(uint8_t speed)
 
 	//转速百分比
 	//speed_rpm = speed*MOTOR_RPM_CONVERSION_COEFFICIENT;
-	if(speed < 20)
+	if(speed < MOTOR_PERCENT_SPEED_MIX)
 	{
-		speed_rpm = speed*(MOTOR_RPM_SPEED_MIX/20);
+		speed_rpm = speed*(MOTOR_RPM_SPEED_MIX/MOTOR_PERCENT_SPEED_MIX);
 	}
-	else if(speed == 20)
+	else if(speed == MOTOR_PERCENT_SPEED_MIX)
 		speed_rpm = MOTOR_RPM_SPEED_MIX;
-	else if(speed == 100)
+	else if(speed == MOTOR_PERCENT_SPEED_MAX)
 		speed_rpm = MOTOR_RPM_SPEED_MAX;
 	else
 	{
 		p = MOTOR_RPM_CONVERSION_COEFFICIENT;
 		a = MOTOR_RPM_CONVERSION_COEFFICIENT_20;
 		
-		speed_rpm = (((speed-20)/20)*a) + ((speed%20)*p)+ MOTOR_RPM_SPEED_MIX;			
+		speed_rpm = (((speed-MOTOR_PERCENT_SPEED_MIX)/MOTOR_PERCENT_SPEED_MIX)*a) + ((speed%MOTOR_PERCENT_SPEED_MIX)*p)+ MOTOR_RPM_SPEED_MIX;			
 	}
 	
 	return (uint32_t)speed_rpm;
@@ -321,19 +312,19 @@ uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm)
 	uint32_t speed;
 	
 	if(speed_rpm > MOTOR_RPM_SPEED_MAX)
-		return 100;
+		return MOTOR_PERCENT_SPEED_MAX;
 
 	if(speed_rpm < MOTOR_RPM_SPEED_MIX)
 	{
-		speed = speed_rpm/(MOTOR_RPM_SPEED_MIX/20);
+		speed = speed_rpm/(MOTOR_RPM_SPEED_MIX/MOTOR_PERCENT_SPEED_MIX);
 	}
 	else if(speed_rpm == MOTOR_RPM_SPEED_MIX)
-		speed = 20;
+		speed = MOTOR_PERCENT_SPEED_MIX;
 	else if(speed_rpm == MOTOR_RPM_SPEED_MAX)
-		speed = 100;
+		speed = MOTOR_PERCENT_SPEED_MAX;
 	else
 	{
-		speed = 20 + ((speed_rpm-MOTOR_RPM_SPEED_MIX)*80/(MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX));
+		speed = MOTOR_PERCENT_SPEED_MIX + ((speed_rpm-MOTOR_RPM_SPEED_MIX)*80/(MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX));
 	}
 	
 	return (speed&0xFF);

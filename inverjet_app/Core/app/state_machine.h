@@ -26,6 +26,9 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
+//*********************************
+//========== 状态机 ===============
+//*********************************
 typedef enum 
 {
 	POWER_OFF_STATUS = 0,			//	关机
@@ -53,8 +56,21 @@ typedef enum
 	ERROR_DISPLAY_STATUS,			//			故障界面
 	OTA_UPGRADE_STATUS,				//			OTA 升级
 	SYSTEM_STATE_END,					//	结束
-} SYSTEM_STATE_MODE_E;
+} SYSTEM_STATE_MACHINE_E;
 
+
+//*********************************
+//========== 训练模式 =============
+//*********************************
+typedef enum 
+{
+	SYSTEM_MODE_FREE_0 = 0,			//	自由 & 定时 模式
+  SYSTEM_MODE_TRAIN_P1,				//	P1
+	SYSTEM_MODE_TRAIN_P2,				//	
+  SYSTEM_MODE_TRAIN_P3,				//	
+	SYSTEM_MODE_TRAIN_P4,				//	
+	SYSTEM_MODE_TRAIN_P5,				//	冲浪
+} SYSTEM_MODE_NUM_E;
 
 /* Exported constants --------------------------------------------------------*/
 
@@ -83,6 +99,11 @@ extern void Check_Mode_Change(uint16_t machine);
 extern uint8_t Set_System_State_Machine(uint8_t val);
 //------------------- 获取状态机  ----------------------------
 extern uint8_t Get_System_State_Machine(void);
+
+//------------------- 设置 模式  ----------------------------
+extern uint8_t Set_System_State_Mode(uint8_t val);
+//------------------- 获取 模式  ----------------------------
+extern uint8_t Get_System_State_Mode(void);
 
 //------------------- 快速获取状态  ----------------------------
 // 电机启动状态

@@ -302,6 +302,12 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //启动时间 (调试用)(只上报)
 //备注:
 #define DPID_SYSTEM_STARTUP_TIME 18
+//线程活动标准(只上报)
+//备注:
+#define DPID_THREAD_ACTIVITY_SIGN 19
+//模式+状态(可下发可上报)
+//备注:(4字节)  uint16_t 模式 + uint8_t 状态机
+#define DPID_SYSTEM_STATUS_MODE 20
 //工作模式(可下发可上报)
 //备注:
 #define DPID_SYSTEM_WORKING_MODE 21
@@ -314,9 +320,6 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //当前时间(可下发可上报)
 //备注:
 #define DPID_MOTOR_CURRENT_TIME 24
-//游泳距离(只上报)
-//备注:
-#define DPID_SWIMMING_DISTANCE 25
 //自由模式默认速度(可下发可上报)
 //备注:
 #define DPID_FREE_MODE_SPEEN 28
@@ -341,6 +344,15 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //训练计划05(可下发可上报)
 //备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
 #define DPID_SET_TRAIN_PLAN_05 35
+//自定义训练计划_01(可下发可上报)
+//备注:
+#define DPID_CUSTOM_TRAIN_PLAN_01 36
+//自定义训练计划_02(可下发可上报)
+//备注:
+#define DPID_CUSTOM_TRAIN_PLAN_02 37
+//自定义训练计划_03(可下发可上报)
+//备注:
+#define DPID_CUSTOM_TRAIN_PLAN_03 38
 //完成统计_时长(只上报)
 //备注:
 #define DPID_FINISH_STATISTICS_TIME 40
