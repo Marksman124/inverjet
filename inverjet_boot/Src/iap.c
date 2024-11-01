@@ -89,17 +89,23 @@ uint8_t Check_Pack_CRC(void)
 void iap_Process(void)
 {
 	uint8_t i=0;
-	uint32_t writeAddr=0,readAddr=0;
+	uint32_t writeAddr=0,readAddr=0,readSize=0;
 	uint32_t sign=0;
 	
 	writeAddr=FLASH_APP_PROGRAM_ADDR;
-	readAddr=FLASH_APP_PATCH_ADDR;
+	
+	readAddr = *(uint32_t *)BOOT_FLASH_ADDR_OTA_PACK_ADDR;
+	//readAddr = FLASH_APP_PATCH_ADDR;
+	
+	readSize = *(uint32_t *)BOOT_FLASH_ADDR_OTA_PACK_SIZE;
+	if(readSize > FLASH_APP_PROGRAM_PAGE)
+		return;
 	
 	//HAL_WWDG_Refresh(&hwwdg);
 	if(Check_Pack_CRC())
 	{
 		IntxDisable(); // 禁用所有中断
-		for(i=0; i<FLASH_APP_PROGRAM_PAGE; i++)
+		for(i=0; i<readSize; i++)
 		{
 			STMFLASH_Read(readAddr,buff,1024);
 			STMFLASH_Write(writeAddr,buff,1024);

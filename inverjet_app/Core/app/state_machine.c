@@ -266,7 +266,14 @@ uint8_t System_Mode_Train(void)
 		return 0;
 }
 
-
+// 冲浪 模式
+uint8_t System_Mode_Surf(void)
+{
+	if( System_Mode_Train() && (Get_System_State_Mode() == SURFING_MODE_NUMBER_ID))
+		return 1;
+	else
+		return 0;
+}
 
 //------------------- 更改状态 不改变模式  ----------------------------
 // --> 初始状态 （不更改模式）

@@ -20,26 +20,47 @@ typedef  void (*iapfun)(void);				//定义一个函数类型的参数.
 #define STM_FLASH_SECTOR_SIZE				(2048)
 
 #define FLASH_APP_PROGRAM_ADDR			(0x08008000)  	// app 程序 起始地址(存放在FLASH)
-#define FLASH_APP_PROGRAM_PAGE			(55)  					// app 程序升级包 大小 (页数 n*2048)
-#define FLASH_APP_PATCH_ADDR				(0x08023800)  	// app 程序升级包 起始地址(存放在FLASH)
+#define FLASH_APP_PROGRAM_PAGE			(56)  					// app 程序升级包 大小 (页数 n*2048)
 
-#define FLASH_APP_PARAM_ADDR				(0x0803F000)  	// app 程序参数 起始地址(存放在FLASH)
+#define FLASH_APP_PATCH_ADDR				(0x08024000)  	// app 程序升级包 起始地址(存放在FLASH)
+#define FLASH_APP_PARAM_ADDR				(0x0803E800)  	// app 程序参数 起始地址(存放在FLASH)
+
 #define USER_FLASH_ADDR_SOFTWARE_VERSION			(USER_FLASH_ADDR_BAUD_RATE + (21*FLASH_ADDR_OFFSET_SIZE))		//	软件版本
 
-//只可用于读
-#define USER_FLASH_ADDR_LOCAL_ADDR						(FLASH_APP_PARAM_ADDR)			//	本地地址
-#define USER_FLASH_ADDR_BAUD_RATE							(USER_FLASH_ADDR_LOCAL_ADDR + 2)		//	波特率
 
-
+#define FLASH_BOOT_PROGRAM_ADDR			(0x08000000)  	// boot 程序 起始地址(存放在FLASH)
+#define FLASH_BOOT_PROGRAM_PAGE			(15)  
 
 #define FLASH_BOOT_PARAM_ADDR  			(0x08007800)  	// boot 程序参数 起始地址(存放在FLASH)
-#define BOOT_FLASH_ADDR_OTA_PASSWORD						(FLASH_BOOT_PARAM_ADDR)			//	OTA标识
-#define BOOT_FLASH_ADDR_OTA_PACK_LEN						(FLASH_BOOT_PARAM_ADDR + FLASH_ADDR_OFFSET_SIZE)		//	包长度
 
-#define RANGE_OTA_PACK_LEN_MIN						(10 * STM_FLASH_SECTOR_SIZE)		//	包长度 最小
+//	OTA标识
+#define BOOT_FLASH_ADDR_OTA_PASSWORD						(FLASH_BOOT_PARAM_ADDR)
+//	包长度
+#define BOOT_FLASH_ADDR_OTA_PACK_LEN						(BOOT_FLASH_ADDR_OTA_PASSWORD + FLASH_ADDR_OFFSET_SIZE)
+
+//	boot版本号
+#define BOOT_FLASH_ADDR_BOOT_VERSION						(BOOT_FLASH_ADDR_OTA_PACK_LEN + FLASH_ADDR_OFFSET_SIZE)
+#define FLASH_ADDR_OFFSET_BOOT_VERSION					(16)  					// 数据存储偏移量
+
+//	程序升级包 地址
+#define BOOT_FLASH_ADDR_OTA_PACK_ADDR						(BOOT_FLASH_ADDR_BOOT_VERSION + FLASH_ADDR_OFFSET_BOOT_VERSION)
+
+//	程序升级包 大小
+#define BOOT_FLASH_ADDR_OTA_PACK_SIZE						(BOOT_FLASH_ADDR_OTA_PACK_ADDR + FLASH_ADDR_OFFSET_SIZE)
+
+//	app 程序参数 地址
+#define BOOT_FLASH_ADDR_APP_PARAM_ADDR					(BOOT_FLASH_ADDR_OTA_PACK_SIZE + FLASH_ADDR_OFFSET_SIZE)
+
+
+
+
+#define RANGE_OTA_PACK_LEN_MIN						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	包长度 最小
 #define RANGE_OTA_PACK_LEN_MAX						(FLASH_APP_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	包长度 最大
 
-//#define RECORD_LEN_PAGE_MAX		238
+#define RANGE_BOOT_PACK_LEN_MIN						(STM_FLASH_SECTOR_SIZE)		//	包长度 最小
+#define RANGE_BOOT_PACK_LEN_MAX						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	包长度 最大
+
+#define RECORD_LEN_PAGE_MAX		238
 
 #define PRODUCT_APP_PASSWORD 				(0xFee1Dead)  	// feel dead  直接重启
 #define PRODUCT_BOOT_PASSWORD 			(0x9070B007)  	// go to boot  进入升级
@@ -48,6 +69,8 @@ typedef  void (*iapfun)(void);				//定义一个函数类型的参数.
 void iap_load_app(uint32_t appxaddr);			//跳转到APP程序执行
 void iap_write_appbin(uint32_t appxaddr,uint8_t *appbuf,uint32_t applen);	//在指定地址开始,写入bin
 void iap_Process(void);
+void iap_Bootloader_Process(void);
+
 
 #endif
 

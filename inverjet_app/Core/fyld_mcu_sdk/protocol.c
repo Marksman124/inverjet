@@ -71,6 +71,8 @@ unsigned long Wifi_OTA_Pack_Len=0;					// 总长度
 
 unsigned char pack_cnt=0;
 unsigned char pack_sum=0;
+
+unsigned char Ota_Chan=0;
 /******************************************************************************
                               第一步:初始化
 1:在需要使用到wifi相关文件的文件中include "wifi.h"
@@ -278,9 +280,12 @@ static unsigned char dp_download_preparation_time_handle(const unsigned char val
     //VALUE type data processing
 
     */
-		*p_Preparation_Time_BIT = preparation_time;
-		//保存
-		Memset_OPMode();
+		if(*p_Preparation_Time_BIT != preparation_time )
+		{
+			*p_Preparation_Time_BIT = preparation_time;
+			//保存
+			Write_MbBuffer_Later();
+		}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_PREPARATION_TIME,*p_Preparation_Time_BIT);
     if(ret == SUCCESS)
@@ -505,6 +510,8 @@ static unsigned char dp_download_free_mode_speen_handle(const unsigned char valu
     /*
     //VALUE type data processing
     */
+	if(p_OP_Free_Mode->speed != free_mode_speen)
+	{
 		if(free_mode_speen < MOTOR_PERCENT_SPEED_MIX)
 			p_OP_Free_Mode->speed = MOTOR_PERCENT_SPEED_MIX;
 		else if(free_mode_speen > MOTOR_PERCENT_SPEED_MAX)
@@ -513,8 +520,8 @@ static unsigned char dp_download_free_mode_speen_handle(const unsigned char valu
 			p_OP_Free_Mode->speed = free_mode_speen;
 		p_OP_Free_Mode->time = 0;
 		//保存
-		Memset_OPMode();
-	
+		Write_MbBuffer_Later();
+	}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_FREE_MODE_SPEEN,p_OP_Free_Mode->speed);
     if(ret == SUCCESS)
@@ -540,6 +547,8 @@ static unsigned char dp_download_timing_mode_speen_handle(const unsigned char va
     /*
     //VALUE type data processing
     */
+	if(p_OP_Timing_Mode->speed != timing_mode_speen)
+	{
 		if(timing_mode_speen < MOTOR_PERCENT_SPEED_MIX)
 			p_OP_Timing_Mode->speed = MOTOR_PERCENT_SPEED_MIX;
 		else if(timing_mode_speen > MOTOR_PERCENT_SPEED_MAX)
@@ -547,8 +556,8 @@ static unsigned char dp_download_timing_mode_speen_handle(const unsigned char va
 		else
 			p_OP_Timing_Mode->speed = timing_mode_speen;
 		//保存
-		Memset_OPMode();
-	
+		Write_MbBuffer_Later();
+	}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,p_OP_Timing_Mode->speed);
     if(ret == SUCCESS)
@@ -574,6 +583,8 @@ static unsigned char dp_download_timing_mode_time_handle(const unsigned char val
     /*
     //VALUE type data processing
     */
+	if(p_OP_Timing_Mode->time != timing_mode_time)
+	{
 		if(timing_mode_time < 180)
 			p_OP_Timing_Mode->time = 180;
 		else if(timing_mode_time >= MOTOR_TIME_SHOW_MAX)
@@ -581,8 +592,8 @@ static unsigned char dp_download_timing_mode_time_handle(const unsigned char val
 		else
 			p_OP_Timing_Mode->time = timing_mode_time;
 		//保存
-		Memset_OPMode();
-	
+		Write_MbBuffer_Later();
+	}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_TIMING_MODE_TIME,p_OP_Timing_Mode->time);
     if(ret == SUCCESS)
@@ -919,7 +930,7 @@ unsigned char get_download_cmd_total(void)
  * @return Null
  * @note   MCU需要自行实现该功能
  */
-void upgrade_package_choose(unsigned long package_sz)
+void upgrade_package_choose(unsigned char chan, unsigned long package_sz)
 {
     //#error "请自行实现请自行实现升级包大小选择代码,完成后请删除该行"
     unsigned short send_len = 0;
@@ -933,8 +944,8 @@ void upgrade_package_choose(unsigned long package_sz)
 	Out_Of_Upgradation();
 	System_To_OTA();
 	Lcd_Show_Upgradation(pack_sum,0);
+	Ota_Chan = chan;//bootloader
 	Freertos_TaskSuspend_Wifi();
-	
 }
 
 /**
@@ -952,13 +963,27 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
 		unsigned long sign=0;
 	
     if(length == 0) {
+			if(Ota_Chan == 10)
+			{
+				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&Wifi_OTA_Pack_Len,2); // 写包长度 (含crc)
+				iap_Bootloader_Process();
+			}
+			else
+			{
         //固件数据发送完成
 				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&Wifi_OTA_Pack_Len,2); // 写包长度 (含crc)
 				sign = PRODUCT_BOOT_PASSWORD;
-				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // 进入OTA 
-
-				SysSoftReset();// 软件复位
-      
+				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); 		// 进入OTA
+				sign = FLASH_APP_PATCH_ADDR;
+				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_ADDR,(uint16_t*)&sign,2); 	// 程序升级包 地址
+				sign = FLASH_APP_PARAM_ADDR;
+				STMFLASH_Write(BOOT_FLASH_ADDR_APP_PARAM_ADDR,(uint16_t*)&sign,2); 	// app 程序参数 地址
+				sign = FLASH_APP_PROGRAM_PAGE;
+				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_SIZE,(uint16_t*)&sign,2); 	// 程序升级包 大小
+				
+			}
+			
+			SysSoftReset();// 软件复位
     }else {
         //固件数据处理
       if(position == REG_FILE_NUMBER_STAR) // 起始包

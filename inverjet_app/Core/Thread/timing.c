@@ -535,7 +535,7 @@ void Operation_State_Handler(void)
 	if(Timing_Timer_Cnt > 60)
 	{
 		//±£´æ flash
-		Memset_OPMode();//´æflash
+		Write_MbBuffer_Later();//´æflash
 		System_Power_Off();
 		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 			Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
@@ -785,6 +785,7 @@ void App_Timing_Handler(void)
 //		}
 //	}
 	Thread_Activity_Sign_Clean();
+	MB_Write_Timer_CallOut();
 	
 	if(System_Self_Testing_State == 0xAA)
 	{

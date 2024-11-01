@@ -172,44 +172,46 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 
 
 // 04 Input
-#define MB_DISPLAY_SOFTWARE_VERSION								( 0x00 )	//	显示板 软件版本
-#define MB_DISPLAY_HARDWARE_VERSION             	( 0x02 )	//	显示板 硬件版本
-#define MB_DRIVER_SOFTWARE_VERSION								( 0x04 )	//	驱动板 软件版本
-#define MB_DRIVER_HARDWARE_VERSION             		( 0x06 )	//	驱动板 硬件版本
-#define MB_SYSTEM_FAULT_STATUS					          ( 0x08 )	//	系统故障状态
+#define MB_DISPLAY_SOFTWARE_VERSION								( 0x00 )														//	（3字节）显示板 软件版本
+#define MB_DISPLAY_HARDWARE_VERSION             	( MB_DISPLAY_SOFTWARE_VERSION + 3 )	//	（2字节）显示板 硬件版本
+#define MB_DRIVER_SOFTWARE_VERSION								( MB_DISPLAY_HARDWARE_VERSION + 2 )	//	（2字节）驱动板 软件版本
+#define MB_DRIVER_HARDWARE_VERSION             		( MB_DRIVER_SOFTWARE_VERSION + 2 )	//	（2字节）驱动板 硬件版本
+#define MB_SYSTEM_FAULT_STATUS					          ( MB_DRIVER_HARDWARE_VERSION + 2 )	//	（2字节）系统故障状态
 
-#define MB_MOTOR_FAULT_STATUS					          	( 0x09 )	// 	电机 	故障状态
-#define MB_MOS_TEMPERATURE					          		( 0x0A )	//	mos 	温度
-#define MB_BOX_TEMPERATURE					          		( 0x0B )	//	电箱	温度
-#define MB_MOTOR_BUS_VOLTAGE					          	( 0x0C )	//	母线 	电压
-#define MB_MOTOR_BUS_CURRENT					          	( 0x0D )	//	母线 	电流
-#define MB_MOTOR_CURRENT					          			( 0x0E )	// 	（2字节） 电机 	电流
-#define MB_MOTOR_REALITY_SPEED					          ( 0x10 )	//	（2字节） 电机 	实际 转速
-#define MB_SEND_REALITY_SPEED					          	( 0x12 )	//	（2字节） 电机 	实际 转速  下发
-#define MB_MOTOR_REALITY_POWER					          ( 0x14 )	//	（2字节） 电机 	实际 功率
-#define MB_THREAD_ACTIVITY_SGIN		      					( 0x16 )	//	线程 活动 标志位
-#define MB_FINISH_STATISTICS_TIME		      				( 0x17 )	//	完成统计 --> 时长
-#define MB_FINISH_STATISTICS_SPEED		      			( 0x18 )	//	完成统计 --> 游泳强度
-#define MB_FINISH_STATISTICS_DISTANCE		      		( 0x19 )	//	完成统计 --> 游泳距离
+#define MB_MOTOR_FAULT_STATUS					          	( MB_SYSTEM_FAULT_STATUS + 1 )			// 	电机 	故障状态
+#define MB_MOS_TEMPERATURE					          		( MB_MOTOR_FAULT_STATUS + 1 )				//	mos 	温度
+#define MB_BOX_TEMPERATURE					          		( MB_MOS_TEMPERATURE + 1 )					//	电箱	温度
+#define MB_MOTOR_BUS_VOLTAGE					          	( MB_BOX_TEMPERATURE + 1 )					//	母线 	电压
+#define MB_MOTOR_BUS_CURRENT					          	( MB_MOTOR_BUS_VOLTAGE + 1 )				//	母线 	电流
+#define MB_MOTOR_CURRENT					          			( MB_MOTOR_BUS_CURRENT + 1 )				// 	（2字节） 电机 	电流
+#define MB_MOTOR_REALITY_SPEED					          ( MB_MOTOR_CURRENT + 2 )						//	（2字节） 电机 	实际 转速
+#define MB_SEND_REALITY_SPEED					          	( MB_MOTOR_REALITY_SPEED + 2 )			//	（2字节） 电机 	实际 转速  下发
+#define MB_MOTOR_REALITY_POWER					          ( MB_SEND_REALITY_SPEED + 2 )				//	（2字节） 电机 	实际 功率
+#define MB_THREAD_ACTIVITY_SGIN		      					( MB_MOTOR_REALITY_POWER + 2 )			//	线程 活动 标志位
+#define MB_FINISH_STATISTICS_TIME		      				( MB_THREAD_ACTIVITY_SGIN + 1 )			//	完成统计 --> 时长
+#define MB_FINISH_STATISTICS_SPEED		      			( MB_FINISH_STATISTICS_TIME + 1 )		//	完成统计 --> 游泳强度
+#define MB_FINISH_STATISTICS_DISTANCE		      		( MB_FINISH_STATISTICS_SPEED + 1 )	//	完成统计 --> 游泳距离
 // ----------------------------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------------------------
-#define MB_SYSTEM_LAST_KEY_VALUE        		( 0x22 )	//	最后一次按键
-#define MB_SYSTEM_LAST_KEY_MODE        			( 0x23 )	//	最后一次 模式
-#define MB_SYSTEM_LAST_KEY_STATUS        		( 0x24 )	//	最后一次 状态
-#define MB_SYSTEM_LAST_KEY_SPEED        		( 0x25 )	//	最后一次 速度
-#define MB_SYSTEM_LAST_KEY_TIME        			( 0x26 )	//	最后一次 时间
 
 // ----------------------------------------------------------------------------------------------
-#define MB_LCD_MAPPING_MODE        					( 0x30 )	//	模式
-#define MB_LCD_MAPPING_SPEED        				( 0x31 )	//	速度
-#define MB_LCD_MAPPING_TIME_HIGH        		( 0x32 )	//	时间 高
-#define MB_LCD_MAPPING_TIME_LOW        			( 0x33 )	//	时间 低
-#define MB_LCD_MAPPING_SYMBOL        				( 0x34 )	//	符号
+#define MB_SYSTEM_LAST_KEY_VALUE        		( MB_FINISH_STATISTICS_DISTANCE + 1 )			//	最后一次按键
+#define MB_SYSTEM_LAST_KEY_MODE        			( MB_SYSTEM_LAST_KEY_VALUE + 1 )					//	最后一次 模式
+#define MB_SYSTEM_LAST_KEY_STATUS        		( MB_SYSTEM_LAST_KEY_MODE + 1 )						//	最后一次 状态
+#define MB_SYSTEM_LAST_KEY_SPEED        		( MB_SYSTEM_LAST_KEY_STATUS + 1 )					//	最后一次 速度
+#define MB_SYSTEM_LAST_KEY_TIME        			( MB_SYSTEM_LAST_KEY_SPEED + 1 )					//	最后一次 时间
+
 // ----------------------------------------------------------------------------------------------
-#define MB_SYSTEM_RUNNING_TIME        			( 0x40 )	//	运行时间
-#define MB_NO_OPERATION_TIME        				( 0x42 )	//	无人操作时间
-#define MB_SYSTEM_SLEEP_TIME        				( 0x44 )	//	休眠时间
+#define MB_LCD_MAPPING_MODE        					( MB_SYSTEM_LAST_KEY_TIME + 1 )						//	模式
+#define MB_LCD_MAPPING_SPEED        				( MB_LCD_MAPPING_MODE + 1 )								//	速度
+#define MB_LCD_MAPPING_TIME_HIGH        		( MB_LCD_MAPPING_SPEED + 1 )							//	时间 高
+#define MB_LCD_MAPPING_TIME_LOW        			( MB_LCD_MAPPING_TIME_HIGH + 1 )					//	时间 低
+#define MB_LCD_MAPPING_SYMBOL        				( MB_LCD_MAPPING_TIME_LOW + 1 )						//	符号
+// ----------------------------------------------------------------------------------------------
+#define MB_SYSTEM_RUNNING_TIME        			( MB_LCD_MAPPING_SYMBOL + 1 )							//	（2字节）运行时间
+#define MB_NO_OPERATION_TIME        				( MB_SYSTEM_RUNNING_TIME + 2 )						//	（2字节）无人操作时间
+#define MB_SYSTEM_SLEEP_TIME        				( MB_NO_OPERATION_TIME + 2 )							//	（2字节）休眠时间
+// ----------------------------------------------------------------------------------------------
+#define MB_INPUT_BUFFER_END        					( MB_SYSTEM_SLEEP_TIME + 2 )							//	结束
 // ----------------------------------------------------------------------------------------------
 #define MB_INPUT_BUFFER_SIZE_MAX        					( 0xFF )	//	
 /*

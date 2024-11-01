@@ -20,8 +20,9 @@
 //FLASH_ProcessTypeDef p_Flash; 
 uint16_t* p_Local_Address;			//	本地地址
 
-uint16_t* p_Software_Version_high;		//	软件版本
-uint16_t* p_Software_Version_low;		//	软件版本 低
+uint16_t* p_Software_Version_high;			//	软件版本 高
+uint16_t* p_Software_Version_middle;		//	软件版本 中
+uint16_t* p_Software_Version_low;				//	软件版本 低
 
 //与上位机modbus
 uint16_t* p_Baud_Rate;							//	波特率
@@ -79,8 +80,9 @@ void Dev_Information_Init(void)
 	p_Baud_Rate = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SLAVE_BAUD_RATE);
 	Dev_BaudRate_Get(MODBUS_USART);
 	
-	p_Software_Version_high = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION);//	软件版本
-	p_Software_Version_low = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION+1);
+	p_Software_Version_high 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION);//	软件版本
+	p_Software_Version_middle = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION + 1);
+	p_Software_Version_low	 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION + 2);
 	
 	// 屏蔽 控制方式
 	p_Support_Control_Methods = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SUPPORT_CONTROL_METHODS);
@@ -110,7 +112,6 @@ void Set_Local_Address(uint16_t addr)
 {
 	*p_Local_Address = addr;
 	// 写flash
-	//STMFLASH_Write(USER_FLASH_ADDR_LOCAL_ADDR, p_Local_Address, 1);
 	MB_Flash_Buffer_Write();
 }
 
@@ -123,16 +124,11 @@ void Set_Baud_Rate(uint16_t rate)
 }
 
 void Set_Software_Version(void)
-{
-	uint32_t version_u32=0;
+{	
+	get_uint3_version(SOFTWARE_VERSION_UINT32);
 	
-	version_u32 = get_uint3_version(SOFTWARE_VERSION_UINT32);
-	
-	*p_Software_Version_high = version_u32>>16;
-	*p_Software_Version_low = version_u32;
 	
 	// 写flash
-	//STMFLASH_Write(USER_FLASH_ADDR_SOFTWARE_VERSION, (uint16_t*)p_Software_Version, 2);
 	MB_Flash_Buffer_Write();
 }
  

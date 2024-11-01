@@ -134,7 +134,8 @@ extern uint8_t System_Mode_Free(void);
 extern uint8_t System_Mode_Time(void);
 // 训练 模式
 extern uint8_t System_Mode_Train(void);
-	
+// 冲浪 模式
+extern uint8_t System_Mode_Surf(void);
 //------------------- 更改状态 不改变模式  ----------------------------
 
 // --> 初始状态 （不更改模式）

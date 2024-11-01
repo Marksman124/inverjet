@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "stmflash.h"
 #include "iap.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,7 +67,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	uint32_t password=0;
 	uint8_t time_cnt=0;
-	
+	char buffer[FLASH_ADDR_OFFSET_BOOT_VERSION] = {"1.1.0"};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -112,7 +113,10 @@ int main(void)
 			}
 		}
 		else{
-			iap_load_app(FLASH_APP_PROGRAM_ADDR);}
+			STMFLASH_Write(BOOT_FLASH_ADDR_BOOT_VERSION,(uint16_t*)buffer,FLASH_ADDR_OFFSET_BOOT_VERSION/2);
+			//STMFLASH_Write(BOOT_FLASH_ADDR_BOOT_VERSION,(uint16_t*)"1.1.0",6);	
+			iap_load_app(FLASH_APP_PROGRAM_ADDR);
+		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

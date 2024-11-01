@@ -249,6 +249,14 @@ void WIFI_Finish_Statistics_Upload( void )
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
 	}
+	else
+	{
+		DEBUG_PRINT("\n统计时间低于3分钟，上传0\n");
+		Finish_Statistics_Clean();
+		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_TIME); 		//	完成统计 --> 时长
+		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
+		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
+	}
 }
 
 

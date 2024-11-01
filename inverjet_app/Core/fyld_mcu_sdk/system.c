@@ -20,6 +20,7 @@
 #define SYSTEM_GLOBAL
 
 #include "wifi.h"
+#include "iap.h"
 
 extern const DOWNLOAD_CMD_S download_cmd[];
 
@@ -147,13 +148,20 @@ static void heat_beat_check(void)
 static void product_info_update(void)
 {
     unsigned char length = 0;
+		char str_version[32] = {0};
 #ifdef CONFIG_MODE_DELAY_TIME
     unsigned char str[10] = {0};
 #endif
     length = set_wifi_uart_buffer(length, "{\"p\":\"", my_strlen("{\"p\":\""));
     length = set_wifi_uart_buffer(length,(unsigned char *)PRODUCT_KEY,my_strlen((unsigned char *)PRODUCT_KEY));
     length = set_wifi_uart_buffer(length, "\",\"v\":\"", my_strlen("\",\"v\":\""));
-    length = set_wifi_uart_buffer(length,(unsigned char *)MCU_VER,my_strlen((unsigned char *)MCU_VER));
+    
+		//length = set_wifi_uart_buffer(length,(unsigned char *)MCU_VER,my_strlen((unsigned char *)MCU_VER));
+		//strcat(str_version, MCU_VER);
+		//strcat(str_version, (char*)BOOT_FLASH_ADDR_BOOT_VERSION);
+		sprintf(str_version,"%s,%s",MCU_VER,(char*)BOOT_FLASH_ADDR_BOOT_VERSION);
+		length = set_wifi_uart_buffer(length,(unsigned char *)str_version,my_strlen((unsigned char *)str_version));
+		
     length = set_wifi_uart_buffer(length, "\",\"m\":", my_strlen("\",\"m\":"));
     length = set_wifi_uart_buffer(length, (unsigned char *)CONFIG_MODE, my_strlen((unsigned char *)CONFIG_MODE));
 #ifdef CONFIG_MODE_DELAY_TIME
@@ -398,7 +406,7 @@ void data_handle(unsigned short offset)
     static unsigned short firm_size;                                            //升级包一包的大小
     static unsigned long firm_length;                                           //MCU升级文件长度
     unsigned long dp_len;
-    //unsigned char firm_chan;                                                    //升级通道号9~15
+    unsigned char firm_chan;                                                    //升级通道号9~15
     unsigned char firm_flag;                                                    //升级包大小标志
 #else
     unsigned short dp_len;
@@ -501,9 +509,9 @@ void data_handle(unsigned short offset)
             firm_length |= wifi_data_process_buf[offset + DATA_START + 2];
             firm_length <<= 8;
             firm_length |= wifi_data_process_buf[offset + DATA_START + 3];
-            //firm_chan = wifi_data_process_buf[offset + DATA_START + 4];
+            firm_chan = wifi_data_process_buf[offset + DATA_START + 4];
 
-            upgrade_package_choose(firm_length);
+            upgrade_package_choose(firm_chan, firm_length);
             firm_update_flag = UPDATE_START_CMD;
         break;
     

@@ -210,7 +210,7 @@ void Display_Oper_Letter(uint8_t value)
 ******************************************************************************
 Display_Show_Sum
 
-显示故障总数
+隐藏模式
 ******************************************************************************
 */  
 void Display_Mode_Hide(void)
@@ -220,6 +220,18 @@ void Display_Mode_Hide(void)
 	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  0xFF);
 	
 	//TM1621_LCD_Redraw();
+}
+/*
+******************************************************************************
+Display_Mode_Show
+
+显示模式
+******************************************************************************
+*/  
+void Display_Mode_Show(uint8_t sum)
+{
+	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH, (sum/10)%10);
+	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  	sum%10);
 }
 
 /***********************************************************************
@@ -248,17 +260,18 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 	else
 #endif
 		Display_Oper_value(num);
-	Display_Mode_Hide();
 	
 	
 	//版本号显示小数点
 	if((type == OPERATION_DISPLAY_VERSION) || (type == OPERATION_DEIVES_VERSION))
 	{
+		Display_Mode_Show(*p_Software_Version_low);
 		Lcd_Display_Symbol(STATUS_BIT_POINT);
 		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 8);
 	}
 	else
 	{
+		Display_Mode_Hide();
 		Lcd_Display_Symbol(0);
 		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
 	}
@@ -550,7 +563,7 @@ static void on_Button_3_clicked(void)
 		case OPERATION_SHIELD_MENU:
 			Operation_State_Machine = OPERATION_DISPLAY_VERSION;
 			
-			Lcd_Show_Operation( Operation_State_Machine, ((*p_Software_Version_high)*100 + (*p_Software_Version_low)));
+			Lcd_Show_Operation( Operation_State_Machine, ((*p_Software_Version_high)*100 + (*p_Software_Version_middle)));
 		break;
 		
 		case OPERATION_DISPLAY_VERSION:
@@ -597,8 +610,7 @@ static void on_Button_4_Short_Press(void)
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SLAVE_BAUD_RATE, Operation_Baud_Rate );
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SUPPORT_CONTROL_METHODS, Operation_Shield_Value );
 	//保存 flash
-	Memset_OPMode();//存flash
-	
+	Write_MbBuffer_Now();
 	//Dev_Check_Control_Methods();
 
 	//mcu_reset_wifi();// 复位模组

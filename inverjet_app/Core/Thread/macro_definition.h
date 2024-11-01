@@ -47,7 +47,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.6"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.9"
 
 /**
 ******************************************************************************
@@ -55,7 +55,7 @@ extern "C" {
 ******************************************************************************
 */
 
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
@@ -149,7 +149,7 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					1
 #else
-#define BUZZER_FREQUENCY					5					// wuqingguang
+#define BUZZER_FREQUENCY					50					// wuqingguang
 #endif
 //*******************************************************
 

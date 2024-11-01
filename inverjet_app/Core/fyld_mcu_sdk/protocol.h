@@ -413,7 +413,7 @@ unsigned char get_download_cmd_total(void);
  * @return Null
  * @note   MCU需要自行实现该功能
  */
-void upgrade_package_choose(unsigned long package_sz);
+void upgrade_package_choose(unsigned char chan, unsigned long package_sz);
 
 /**
  * @brief  MCU进入固件升级模式

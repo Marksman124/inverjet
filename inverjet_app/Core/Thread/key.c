@@ -134,10 +134,9 @@ uint8_t Key_Buzzer_Type = 0;	//蜂鸣器长短 类型
 //================================== ① 档位键
 void on_pushButton_clicked(void)
 {
-	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop())
+	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
 			return;
-	if(Get_System_State_Mode() == SURFING_MODE_NUMBER_ID)//冲浪
-			return;
+	
 	//Clean_Timing_Timer_Cnt();
 	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
@@ -762,8 +761,9 @@ void System_Power_On(void)
 	Freertos_TaskResume_All();
 	// 检查各模式 属性
 	if(Check_Data_Init())
-		Memset_OPMode();//存储
-
+	{
+		Write_MbBuffer_Now();
+	}
 	//	状态
 	To_Free_Mode(FREE_MODE_AUTO_START);			// ui
 	

@@ -11,7 +11,7 @@
 */	
 #include "iap.h"
 #include "cmsis_os.h"
-
+#include "mbcrc.h"
 
 uint32_t  ProductAppPassword  =     PRODUCT_APP_PASSWORD;  //产品应用秘钥
 
@@ -59,6 +59,29 @@ void iap_load_app(uint32_t appxaddr)
 }		 
 
 
+//未验证
+uint8_t Check_Pack_CRC(void)
+{
+	uint32_t len_sum=0;
+	static uint16_t crc_read, crc_calculate;
+	
+	len_sum = *(uint32_t *)BOOT_FLASH_ADDR_OTA_PACK_LEN;
+	if( ( len_sum < RANGE_BOOT_PACK_LEN_MIN ) || ( len_sum > RANGE_BOOT_PACK_LEN_MAX  ))
+	{
+		return 0;
+	}
+	crc_read = *(uint8_t*)(FLASH_APP_PATCH_ADDR + len_sum - 2)<<8 | *(uint8_t*)(FLASH_APP_PATCH_ADDR + len_sum - 1);
+
+	crc_calculate = usMBCRC16( ( uint8_t * ) FLASH_APP_PATCH_ADDR, len_sum-2 );
+	//crc_calculate = HAL_CRC_Accumulate(&hcrc, (uint32_t *)FLASH_APP_PATCH_ADDR, len_sum-2);
+	
+	if(crc_read == crc_calculate)
+	{
+		return 1;
+	}
+	return 0;
+}
+
 ////升级
 void iap_Process(void)
 {
@@ -82,7 +105,34 @@ void iap_Process(void)
 
 
 
-
+////升级
+void iap_Bootloader_Process(void)
+{
+	uint16_t buff[1024];//缓冲
+	uint8_t i=0;
+	uint32_t writeAddr=0,readAddr=0;
+	
+	writeAddr=FLASH_BOOT_PROGRAM_ADDR;
+	readAddr=FLASH_APP_PATCH_ADDR;
+	
+	if(Check_Pack_CRC())
+	{
+		IntxDisable(); // 禁用所有中断
+		for(i=0; i<FLASH_BOOT_PROGRAM_PAGE; i++)
+		{
+			STMFLASH_Read(readAddr,buff,1024);
+			STMFLASH_Write(writeAddr,buff,1024);
+			writeAddr+=2048;
+			readAddr+=2048;
+		}
+		IntxEnable();// 开中断
+	}
+	else{
+		
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);}
+	ProductAppPassword = PRODUCT_APP_PASSWORD;
+	STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&ProductAppPassword,2);
+}
 
 
 

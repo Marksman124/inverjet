@@ -107,6 +107,10 @@ uint8_t WIFI_Rssi = 0xFF;
 uint16_t* p_Analog_key_Value;					// 虚拟按键
 
 uint8_t System_PowerUp_Finish = 0;
+
+uint8_t MB_Buffer_Write_Timer = 0;
+uint8_t MB_Buffer_Write_Cnt = 0;
+
 //================= 调试使用  时间 ================================
 
 uint32_t* p_System_Runing_Second_Cnt;			// 系统时间
@@ -214,8 +218,9 @@ void App_Data_Init(void)
 
 	// 检查各模式 属性
 	if(Check_Data_Init())
-		Memset_OPMode();//存储
-	
+	{
+		Write_MbBuffer_Now();
+	}
 	// 屏幕初始化
 	TM1621_LCD_Init();
 	
@@ -258,7 +263,7 @@ void App_Data_ReInit(void)
 	memcpy(&p_OP_PMode[4][0], &OP_Init_PMode[4][0], sizeof(OP_Init_PMode[4]));
 	
 	//存储  存一个 还是 扇区存
-	Memset_OPMode();
+	Write_MbBuffer_Now();
 }
 
 // 读 flash
@@ -268,10 +273,38 @@ uint8_t Read_OPMode(void)
 	return 1;
 }
 
+void MB_Write_Timer_CallOut(void)
+{
+	if(MB_Buffer_Write_Timer > 0)
+	{
+		MB_Buffer_Write_Timer ++;
+		if((MB_Buffer_Write_Timer > 10)||(MB_Buffer_Write_Cnt > 10))
+		{
+			MB_Flash_Buffer_Write();
+			MB_Buffer_Write_Timer = 0;
+			MB_Buffer_Write_Cnt = 0;
+		}
+	}
+}
+
+
 // 存 flash
-uint8_t Memset_OPMode(void)
+uint8_t Write_MbBuffer_Later(void)
+{
+	MB_Buffer_Write_Timer = 1;
+	MB_Buffer_Write_Cnt ++;
+
+	return 1;
+}
+
+
+// 立即存 flash
+uint8_t Write_MbBuffer_Now(void)
 {
 	MB_Flash_Buffer_Write();
+	MB_Buffer_Write_Timer = 0;
+	MB_Buffer_Write_Cnt = 0;
+
 	return 1;
 }
 
@@ -290,7 +323,7 @@ void Update_OP_Speed(void)
 			
 		p_OP_Free_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Free_Mode->time = 0;
-		Memset_OPMode();//存flash
+		Write_MbBuffer_Later();//存flash
 	}
 	else if(System_Mode_Time())	// 定时
 	{
@@ -300,7 +333,7 @@ void Update_OP_Speed(void)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
 		
 		p_OP_Timing_Mode->speed = *p_OP_ShowNow_Speed;
-		Memset_OPMode();//存flash
+		Write_MbBuffer_Later();//存flash
 	}
 }
 
@@ -310,7 +343,7 @@ void Update_OP_Time(void)
 	if(System_Mode_Time())	// 定时
 	{
 		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
-		Memset_OPMode();//存flash
+		Write_MbBuffer_Later();//存flash
 	}
 }
 
@@ -321,13 +354,13 @@ void Update_OP_All(void)
 	{
 		p_OP_Free_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Free_Mode->time = 0;
-		Memset_OPMode();//存flash
+		Write_MbBuffer_Later();//存flash
 	}
 	else if(System_Mode_Time())	// 定时
 	{
 		p_OP_Timing_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
-		Memset_OPMode();//存flash
+		Write_MbBuffer_Later();//存flash
 	}
 }
 
@@ -506,29 +539,27 @@ uint8_t If_Accept_External_Control(uint8_t mode)
 }
 
 //------------------- 获取软件版本号  字符串转 uint32 ----------------------------
-uint32_t get_uint3_version(char * buffer)
+void get_uint3_version(char * buffer)
 {
 	char str[32];
 	char *tmp;
-	uint32_t version = 0;
-	
+
 	strncpy(str, (const char *)buffer, strlen(buffer));
 	
 	tmp = strtok(str, ".");
 	if (tmp != NULL) {
-			version = (uint8_t)atoi(tmp)<<16;
+			*p_Software_Version_high = (uint8_t)atoi(tmp);
 
 			// 软件子版本号初始化
 			tmp = strtok(NULL, ".");
 			if (tmp != NULL) {
-				version |= (uint8_t)atoi(tmp);
-//					tmp = strtok(NULL, ".");
-//					if (tmp != NULL) {
-//							version |= (uint8_t)atoi(tmp);
-//					}
+				*p_Software_Version_middle |= (uint8_t)atoi(tmp);
+					tmp = strtok(NULL, ".");
+					if (tmp != NULL) {
+							*p_Software_Version_low |= (uint8_t)atoi(tmp);
+					}
 			}
 	}
-	return version;
 }
 
 //------------------- 清除wifi标志 ----------------------------

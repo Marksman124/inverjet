@@ -105,8 +105,12 @@ extern void App_Data_Init(void);
 extern void App_Data_ReInit(void);
 // 读 flash
 extern uint8_t Read_OPMode(void);
-extern uint8_t Memset_OPMode(void);
 
+extern void MB_Write_Timer_CallOut(void);
+
+extern uint8_t Write_MbBuffer_Later(void);
+
+extern uint8_t Write_MbBuffer_Now(void);
 //存储 新 速度
 extern void Update_OP_Speed(void);
 //存储 新 时间
@@ -136,7 +140,7 @@ extern void Set_Pmode_Period_Now(uint16_t value);
 //------------------- 是否接收外部控制 ----------------------------
 extern uint8_t If_Accept_External_Control(uint8_t mode);
 //------------------- 获取软件版本号  字符串转 uint32 ----------------------------
-extern uint32_t get_uint3_version(char * buffer);
+extern void get_uint3_version(char * buffer);
 //------------------- 清除wifi标志 ----------------------------
 extern void System_Wifi_State_Clean(void);
 
