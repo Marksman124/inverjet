@@ -31,8 +31,6 @@
 
 #define KEY_IO_NUMBER_MAX			4
 
-#define KEY_MULTIPLE_CLICKS_MAX				8						// 8次
-#define KEY_MULTIPLE_CLICKS_TIME			3000				// 3秒内
 //------------------- 按键 & 引脚 ----------------------------
 #define KEY_SPEED_IO_PORT			GPIOC
 #define KEY_SPEED_IO_PIN			GPIO_PIN_7
@@ -98,8 +96,8 @@ void (*p_Funtion_Long_Press[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 
 // 各槽 长按判断 时长
 uint32_t Key_Long_Press_Confirm_Value[KEY_CALL_OUT_NUMBER_MAX]={
-	KEY_LONG_PRESS_TIME_SHORT, KEY_LONG_PRESS_TIME, KEY_LONG_PRESS_TIME, KEY_LONG_PRESS_TIME,
-	KEY_LONG_PRESS_TIME, KEY_LONG_PRESS_TIME,KEY_LONG_PRESS_TIME,KEY_LONG_PRESS_TIME,
+	KEY_LONG_PRESS_TIME_1S, KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S,
+	KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,
 };
 
 
@@ -331,7 +329,7 @@ void on_pushButton_1_Long_Press(void)
 	if(PMode_Now == 5)//冲浪
 			return;
 	
-//	if(Key_Long_Press_cnt[0] == KEY_LONG_PRESS_TIME)
+//	if(Key_Long_Press_cnt[0] == KEY_LONG_PRESS_TIME_2S)
 //	{
 //		//长按可设 高精度转速
 //		if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR) == 0)
@@ -476,11 +474,11 @@ void Special_Button_Rules(uint8_t key_value)
 	//关机下 计数 8次
 	if( Key_Multiple_Clicks_Old != key_value)
 	{
-		Key_Multiple_Clicks_cnt = 0;
+		Key_Multiple_Clicks_cnt = 1;
 		Key_Multiple_Clicks_Old = key_value;
 		Key_Multiple_Clicks_time =  Key_Handler_Timer;
 	}
-	Key_Multiple_Clicks_cnt ++;
+
 	if( ( Key_Handler_Timer - Key_Multiple_Clicks_time ) <= (KEY_MULTIPLE_CLICKS_TIME/KEY_THREAD_LIFECYCLE))
 	{
 		if(Key_Multiple_Clicks_cnt >= KEY_MULTIPLE_CLICKS_MAX)
@@ -508,9 +506,11 @@ void Special_Button_Rules(uint8_t key_value)
 	}
 	else
 	{
-		Key_Multiple_Clicks_cnt = 0;
+		Key_Multiple_Clicks_cnt = 1;
 		Key_Multiple_Clicks_time =  Key_Handler_Timer;
 	}
+	
+	Key_Multiple_Clicks_cnt ++;
 }
 
 void Buzzer_Click_On(void)
@@ -597,7 +597,7 @@ void App_Key_Task(void)
 				
 				Key_Long_Press_cnt[i]++;
 				
-				if(Key_Long_Press_cnt[i] == KEY_LONG_PRESS_TIME)//长按
+				if(Key_Long_Press_cnt[i] == KEY_LONG_PRESS_TIME_2S)//长按
 				{
 					Buzzer_Click_On();
 					
@@ -619,7 +619,7 @@ void App_Key_Task(void)
 			{
 				if(Key_IO_Old == Key_IO_Ordering_Value[i])//已经按下
 				{
-					if(Key_Long_Press_cnt[i] >= KEY_LONG_PRESS_TIME)//
+					if(Key_Long_Press_cnt[i] >= KEY_LONG_PRESS_TIME_2S)//
 					{
 						//测试发送串口
 						DEBUG_PRINT("[按键短按]: %d\n",Key_IO_Ordering_Value[i]);
@@ -678,7 +678,7 @@ void App_Key_Handler(void)
 			{
 				if(Key_IO_Hardware == Key_IO_Ordering_Value[i])
 				{
-					Key_Long_Press_cnt[i] = KEY_LONG_PRESS_TIME-1;
+					Key_Long_Press_cnt[i] = KEY_LONG_PRESS_TIME_2S-1;
 				}
 			}
 			
@@ -780,9 +780,9 @@ void System_Power_Off(void)
 	
 	//Clean_Swimming_Distance();//清除计算距离
 	//清除故障状态
-	CallOut_Fault_State();
+	Timing_Clean_Fault_State();
 	//清除计数器
-	Clean_Fault_Recovery_Cnt();
+	//Clean_Fault_Recovery_Cnt();
 	//to 关机模式
 	To_Power_Off();
 	//设置电机转速

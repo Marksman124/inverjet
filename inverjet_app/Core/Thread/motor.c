@@ -35,9 +35,6 @@ UART_HandleTypeDef* p_huart_motor = &huart4;
 /* Private macro -------------------------------------------------------------*/
 #define MOTOR_SPEED_STEPPING			(1)
 
-#define MOTOR_CHECK_FAULT_TIMER					(3-1)				// 故障 去抖时间
-#define MOTOR_DOWN_CONVERSION_TIMER			(10-1)			// 降频 去抖时间
-
 /* Private variables ---------------------------------------------------------*/
 
 //**************** 收发缓冲区
@@ -260,6 +257,14 @@ void Motor_Speed_Target_Set(uint8_t speed)
 	Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 }
 
+//------------------- 电机 快速停止 ----------------------------
+void Motor_Quick_Stop(void)
+{
+	Motor_Speed_Target = 0;
+	Motor_Speed_Now = 1;
+	Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
+}
+
 //------------------- 电机转速 目标值 设置 ----------------------------
 uint8_t Motor_Speed_Target_Get(void)
 {
@@ -331,33 +336,45 @@ uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm)
 }
 
 //------------------- 故障类型转换 ----------------------------
-uint8_t Change_Faule_To_Upper(uint8_t type)
+uint16_t Change_Faule_To_Upper(uint8_t type)
 {
-	uint8_t change_fault=0;
+	uint16_t change_fault=0;
 	
 	if(type == 0)
 		return 0;
 	
 #if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	//-----------母线电压 过压 | 欠压
-	if((type == 0x01)||(type == 0x02))
-		change_fault = FAULT_BUS_VOLTAGE_ABNORMAL;
-	//----------- 输出电压异常
-	else if(type == 0x03)
-		change_fault = FAULT_ABNORMAL_OUTPUT_VOLTAGE;
-	//-----------过流
-	else if(type == 0x04)
-		change_fault = FAULT_BUS_CURRENT_ABNORMAL;
-	//----------- MOS 过热
-	else if(type == 0x05)
-		change_fault = FAULT_TEMPERATURE_AMBIENT;
-	//-----------电流传感器1\2\3 偏置故障-硬件误差过大
-	else if(type == 0x12)
-		change_fault = FAULT_BUS_CURRENT_BIAS;
-	//----------- 其它 故障
-	else
-		change_fault = FAULT_MOTOR_DRIVER;
+	if((type >= MOTOR_FAULT_OVER_VOLTAGE) && (type <= MOTOR_FAULT_OUTPUT_LOCKROTOR))
+	{
+		if((type == MOTOR_FAULT_OVER_VOLTAGE ) || (type == MOTOR_FAULT_UNDER_VOLTAGE ))	//-----------母线电压 过压 | 欠压
+			change_fault = FAULT_BUS_VOLTAGE_ABNORMAL;
+		
+		else if(type == MOTOR_FAULT_ABS_OVER_CURRENT)			//----------- 过流
+			change_fault = FAULT_BUS_CURRENT_ABNORMAL;
+		
+		else if(type == MOTOR_FAULT_UNBALANCED_CURRENTS) //-----------输出三相电流不平衡
+			change_fault = FAULT_BUS_CURRENT_BIAS;
+		
+		else if(type == MOTOR_FAULT_DRV)		//-----------短路
+			change_fault = FAULT_ABNORMAL_OUTPUT_VOLTAGE;
+		
+		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- 缺相
+			change_fault = FAULT_LACK_PHASE;
+		
+		else if(type == MOTOR_FAULT_OUTPUT_LOCKROTOR)		//-----------堵转
+			change_fault = FAULT_LOCK_ROTOR;
+		
+		else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS 过热
+			change_fault = FAULT_TEMPERATURE_MOS;
+
+		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
+			change_fault = FAULT_VOLTAGE_AMBIENT;
+		
+		//----------- 其它 故障
+		else
+			change_fault = FAULT_MOTOR_DRIVER;
+	}
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 #elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -741,7 +758,7 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 			Motor_TEMP_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= FAULT_TEMPERATURE_AMBIENT;
+			Motor_Fault_State |= FAULT_TEMPERATURE_MOS;
 		}
 	}
 	else if(Temperature >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速

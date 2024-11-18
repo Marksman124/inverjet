@@ -64,14 +64,14 @@ UART_HandleTypeDef* p_huart_operation = &huart3;		 //调试串口 UART句柄
 
 static uint8_t Operation_State_Machine = 0;		//	状态机	
 
-static uint8_t Operation_Menu_Value = 0;		//	菜单值	
+static uint8_t Operation_Menu_Value = 0;			//	菜单值	
 
 
-static uint16_t Operation_Addr_Value = 0;		//	地址	
+static uint16_t Operation_Addr_Value = 0;			//	地址	
 static uint16_t Operation_Baud_Rate = 0;			//	波特率	
 static uint16_t Operation_Shield_Value = 0;		//	控制方式	
 static uint16_t Operation_Motor_Poles = 0;		//	电机极数	
-static uint16_t Operation_Speed_Mode = 0;		//	转速方式  0：转速   1：功率	
+static uint16_t Operation_Speed_Mode = 0;			//	转速方式  0：转速   1：功率	
 //static uint16_t Operation_Breath_Light_Max = 0;		//	光圈亮度	
 // 发送缓冲区
 uint8_t operation_send_buffer[24] = {0};
@@ -300,7 +300,7 @@ void To_Operation_Menu(void)
 	//功能暂停, 电机关闭
 	Set_System_State_Machine(OPERATION_MENU_STATUS);
 #ifdef OPERATION_P5_ACCELERATION
-	Operation_State_Machine = OPERATION_P5_ACCELERATION;		//	状态机	
+	Operation_State_Machine = OPERATION_P5_ACCELERATION;			//	状态机	
   Operation_Menu_Value = *p_Surf_Mode_Info_Acceleration;		//	菜单值	
 #else
 	Operation_State_Machine = OPERATION_ADDR_SET;		//	状态机	

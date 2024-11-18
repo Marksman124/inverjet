@@ -109,6 +109,52 @@ extern "C" {
 #define	MOTOR_ADDR_NTC2_TEMP_OFFSET							60
 #define	MOTOR_ADDR_NTC3_TEMP_OFFSET							62
 
+
+//======= 电机故障代码 ================================================================================
+#define	MOTOR_FAULT_NONE																									0						//
+#define	MOTOR_FAULT_OVER_VOLTAGE																					1						//	输入电压小于 最小允许值的5%
+#define	MOTOR_FAULT_UNDER_VOLTAGE																					2						//	输入电压大于 最大允许值的5%
+#define	MOTOR_FAULT_DRV																										3						//	硬件短路保护
+#define	MOTOR_FAULT_ABS_OVER_CURRENT																			4						//	SQRT(iq*iq+id*id)大于最大电流
+#define	MOTOR_FAULT_OVER_TEMP_FET																					5						//	MOSFET温度大于最大允许温度-0.1时报过温故障
+#define	MOTOR_FAULT_OVER_TEMP_MOTOR																				6						//	xxx
+#define	MOTOR_FAULT_GATE_DRIVER_OVER_VLOTAGE															7						//	xxx
+#define	MOTOR_FAULT_GATE_DRIVER_UNDER_VLOTAGE															8						//	xxx
+#define	MOTOR_FAULT_MCU_UNDER_VLOTAGE																			9						//	 mcu电压不稳故障
+#define	MOTOR_FAULT_BOOTING_FROM_WATCHDOG_RESET														10					//	机器发生看门狗复位故障
+#define	MOTOR_FAULT_ENCODER_SPI																						11					//	xxx
+#define	MOTOR_FAULT_ENCODER_SINCOS_BELOW_MIN_AMPLITUDE										12					//	xxx
+#define	MOTOR_FAULT_ENCODER_SINCOS_ABOVE_MAN_AMPLITUDE										13					//	xxx
+#define	MOTOR_FAULT_FLASH_CORRUPTION																			14					//	lash损坏（参数存储区）
+#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_1													15					//	1.65+/-0.5V的偏差
+#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_2													16					//	1.65+/-0.5V的偏差
+#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_3													17					//	1.65+/-0.5V的偏差
+#define	MOTOR_FAULT_UNBALANCED_CURRENTS																		18					//	三相电流不平衡故障
+#define	MOTOR_FAULT_BRK																										19					//	xxx
+#define	MOTOR_FAULT_RESOLVER_LOT																					20					//	xxx
+#define	MOTOR_FAULT_RESOLVER_DOS																					21					//	xxx
+#define	MOTOR_FAULT_RESOLVER_LOS																					22					//	xxx
+#define	MOTOR_FAULT_FLASH_CURRUPTION_APP_CFG															23					//	应用参数flash校验出错-采用默认参数进行
+#define	MOTOR_FAULT_FLASH_CURRUPTION_MC_CFG																24					//	电机参数flash校验出错-采用默认参数进行
+#define	MOTOR_FAULT_ENCODER_NO_MAGNET																			25					//	xxx
+#define	MOTOR_FAULT_ENCODER_MAGNET_TOO_STRONG															26					//	xxx
+
+
+#define	MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR																	27					//	A相电压传感器损坏
+#define	MOTOR_FAULT_OUTPUT_PHASE_B_SENSOR																	28					//	B相电压传感器损坏
+#define	MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR																	29					//	C相电压传感器损坏
+#define	MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON													30					//	A相上电缺相
+#define	MOTOR_FAULT_OUTPUT_PHASE_B_LOSS_POWER_ON													31					//	B相上电缺相
+#define	MOTOR_FAULT_OUTPUT_PHASE_C_LOSS_POWER_ON													32					//	C相上电缺相
+#define	MOTOR_FAULT_OUTPUT_PHASE_2_AND_3_LOSS_POWER_ON										33					//	上电缺2/3相
+#define	MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_RUNNING														34					//	运行中 缺A相
+#define	MOTOR_FAULT_OUTPUT_PHASE_B_LOSS_RUNNING														35					//	运行中 缺A相
+#define	MOTOR_FAULT_OUTPUT_PHASE_C_LOSS_RUNNING														36					//	运行中 缺A相
+#define	MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING											37					//	运行中 缺2/3相
+#define	MOTOR_FAULT_OUTPUT_LOCKROTOR																			38					//	堵转
+
+//====================================================================================================
+
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 #elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -165,7 +211,8 @@ extern uint8_t Motor_Speed_Update(void);
 extern uint8_t Motor_Speed_Is_Reach(void);
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern void Motor_Speed_Target_Set(uint8_t speed);
-
+//------------------- 电机 快速停止 ----------------------------
+extern void Motor_Quick_Stop(void);
 //------------------- 电机转速 目标值 设置 ----------------------------
 extern uint8_t Motor_Speed_Target_Get(void);
 //------------------- 百分比 转 转速 ----------------------------

@@ -13,6 +13,7 @@
 #include "wifi_thread.h"
 #include "wifi.h"
 #include "data.h"
+#include "fault.h"
 #include "debug_protocol.h"
 /* Private includes ----------------------------------------------------------*/
 
@@ -85,7 +86,6 @@ void WIFI_Get_In_Error(void)
 //------------------- 上传状态更新 ----------------------------
 void WIFI_Update_State_Upload(void)
 {
-
 	static uint16_t Wifi_Motor_Fault_Static = 0;
 	static uint16_t Wifi_System_Fault_Static = 0;
 	static uint16_t Wifi_PMode_Now = 0;
@@ -109,7 +109,8 @@ void WIFI_Update_State_Upload(void)
 	short int box_temperature = 0;
 	short int mos_temperature = 0;
 		
-	static uint16_t State_Upload_Cnt=0;
+	static uint16_t Upload_Timer_Cnt = 0;							// 上传时间 计时器
+	static uint8_t Upload_Debounce_Cnt = 0;						// 上传时间 计时器
 	
 	//------------------- 故障上传 ----------------------------
 	if(Wifi_Motor_Fault_Static != *p_Motor_Fault_Static)
@@ -119,8 +120,16 @@ void WIFI_Update_State_Upload(void)
 	}
 	if(Wifi_System_Fault_Static != *p_System_Fault_Static)
 	{
-		Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
-		Wifi_System_Fault_Static = *p_System_Fault_Static;
+		// 故障 去抖动
+		if(Upload_Debounce_Cnt++ > WIFI_FAULT_DEBOUNCE_TIMES)
+		{
+			if(Fault_Check_Status_Legal(*p_System_Fault_Static))
+			{
+				Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
+				Wifi_System_Fault_Static = *p_System_Fault_Static;
+				Upload_Debounce_Cnt = 0;
+			}
+		}
 	}
 	//------------------- 系统状态 (重要)  ----------------------------
 	if((Wifi_PMode_Now != Get_System_State_Mode())||(Wifi_System_State_Machine != Get_System_State_Machine()))
@@ -150,7 +159,7 @@ void WIFI_Update_State_Upload(void)
 	//*********************************
 	//===== 一般数据 1s 上传   =========
 	//*********************************
-	if((State_Upload_Cnt % WIFI_DATE_UPLOAD_TIME_NORMAL)==0)
+	if((Upload_Timer_Cnt % WIFI_DATE_UPLOAD_TIME_NORMAL)==0)
 	{
 		//------------------- Debug 数据  ----------------------------
 		memcpy(&box_temperature, p_Box_Temperature, 2);
@@ -217,7 +226,7 @@ void WIFI_Update_State_Upload(void)
 	//*********************************
 	//===== 不重要数据 10s 上传   ======
 	//*********************************
-	if((State_Upload_Cnt % WIFI_DATE_UPLOAD_TIME)==0)
+	if((Upload_Timer_Cnt % WIFI_DATE_UPLOAD_TIME)==0)
 	{
 		// debug 用
 		Wifi_DP_Data_Update(DPID_SYSTEM_RUNNING_TIME); 		// 运行时间;
@@ -232,7 +241,7 @@ void WIFI_Update_State_Upload(void)
 //		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_TIME); 				// 当前时间
 	}
 	
-	State_Upload_Cnt++;
+	Upload_Timer_Cnt++;
 	//State_Upload_Cnt = 0;
 }
 
@@ -241,7 +250,7 @@ void WIFI_Update_State_Upload(void)
 //-------------- 上传 完成统计  -------------------
 void WIFI_Finish_Statistics_Upload( void )
 {
-	if(*p_Finish_Statistics_Time > WIFI_STATISTICE_UPLOAD_MINIMUM_TIME)
+	if(*p_Finish_Statistics_Time >= WIFI_STATISTICE_UPLOAD_MINIMUM_TIME)
 	{
 		DEBUG_PRINT("\n上传统计数据:\t时长:\t%d\t强度:\t%d\t距离:\t%d\t\n",*p_Finish_Statistics_Time,*p_Finish_Statistics_Speed,*p_Finish_Statistics_Distance);
 		

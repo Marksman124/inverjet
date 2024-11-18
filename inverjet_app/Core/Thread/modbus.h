@@ -172,8 +172,8 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 
 
 // 04 Input
-#define MB_DISPLAY_SOFTWARE_VERSION								( 0x00 )														//	（3字节）显示板 软件版本
-#define MB_DISPLAY_HARDWARE_VERSION             	( MB_DISPLAY_SOFTWARE_VERSION + 3 )	//	（2字节）显示板 硬件版本
+#define MB_DISPLAY_SOFTWARE_VERSION								( 0x00 )														//	（4字节）显示板 软件版本
+#define MB_DISPLAY_HARDWARE_VERSION             	( MB_DISPLAY_SOFTWARE_VERSION + 4 )	//	（2字节）显示板 硬件版本
 #define MB_DRIVER_SOFTWARE_VERSION								( MB_DISPLAY_HARDWARE_VERSION + 2 )	//	（2字节）驱动板 软件版本
 #define MB_DRIVER_HARDWARE_VERSION             		( MB_DRIVER_SOFTWARE_VERSION + 2 )	//	（2字节）驱动板 硬件版本
 #define MB_SYSTEM_FAULT_STATUS					          ( MB_DRIVER_HARDWARE_VERSION + 2 )	//	（2字节）系统故障状态

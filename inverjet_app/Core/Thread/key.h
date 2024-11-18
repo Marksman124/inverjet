@@ -53,8 +53,9 @@ typedef struct IO_Hardware_Pin
 
 #define KEY_THREAD_LIFECYCLE								20				// 任务生命周期 200ms
 
-#define KEY_LONG_PRESS_TIME									(3000/KEY_THREAD_LIFECYCLE)			//长按时间 3s
-#define KEY_LONG_PRESS_TIME_SHORT						(1000/KEY_THREAD_LIFECYCLE)			//短一点的 长按时间  1s
+#define KEY_LONG_PRESS_TIME_3S									(2000/KEY_THREAD_LIFECYCLE)			//长按时间 3s
+#define KEY_LONG_PRESS_TIME_2S									(2000/KEY_THREAD_LIFECYCLE)			//长按时间 2s
+#define KEY_LONG_PRESS_TIME_1S									(1000/KEY_THREAD_LIFECYCLE)			//短一点的 长按时间  1s
 
 #define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//????  5 min  300000
 

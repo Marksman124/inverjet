@@ -63,15 +63,13 @@ static uint32_t Chassis_TEMP_Timer_cnt= 0;	//高温 计数器
 
 /* Private variables ---------------------------------------------------------*/
 
-uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,
-															0x101,
-															0x201,0x202,0x203,0x204,
-															0x301,0x302,0x303,0x304,0x305,0x306};
+uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,0x006,
+														0x101,0x102,
+														0x201,0x202,0x203,0x205,
+														0x301,0x302,0x303,0x304};
 
 uint8_t Fault_Number_Sum = 0;	// 故障总数
 uint8_t Fault_Number_Cnt = 0;	// 当前故障
-
-uint16_t *p_MB_Fault_State;	//系统故障状态
 
 // 发送缓冲区
 uint8_t fault_send_buffer[24] = {0};
@@ -100,9 +98,16 @@ static uint16_t Motor_Time_Memory = 0;
 
 // 初始化
 void App_Fault_Init(void)
+{	
+}
+
+// 检查 故障状态 是否合法
+uint8_t Fault_Check_Status_Legal(uint16_t parameter)
 {
-	p_MB_Fault_State = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_FAULT_STATUS );
+	if(parameter >= FAULT_STATE_MAX)
+		return 0;
 	
+	return 1;
 }
 
 // 检测故障
@@ -184,14 +189,15 @@ uint8_t If_System_Is_Error(void)
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
+		//********  故障自动恢复    *********************
 		if( ( *p_System_Fault_Static >0 ) && (system_fault == 0))
 		{
-			// 通讯故障不累加
+			// 通讯故障 可立刻恢复
 			if(*p_System_Fault_Static == FAULT_MOTOR_LOSS )
 			{
 				CallOut_Fault_State();
 			}
-			//拨码自动恢复
+			//拨码自动恢复  
 //			else if(System_Dial_Switch == 1)
 //			{
 //				//超过3次锁住 不再更新
@@ -218,7 +224,7 @@ uint8_t If_System_Is_Error(void)
 void Set_Fault_Data(uint16_t type)
 {
 	
-	*p_MB_Fault_State = type;
+	*p_System_Fault_Static = type;
 	
 }
 
@@ -260,7 +266,7 @@ uint8_t Get_Fault_Number_Now(uint16_t para, uint8_t num)
 
 void Fault_Number_Update(void)
 {
-	Fault_Number_Sum = Get_Fault_Number_Sum(*p_MB_Fault_State);
+	Fault_Number_Sum = Get_Fault_Number_Sum(*p_System_Fault_Static);
 	
 	if(Fault_Number_Cnt > Fault_Number_Sum)
 		Fault_Number_Cnt = 1;
@@ -280,34 +286,32 @@ void To_Fault_Menu(void)
 	Set_System_State_Machine(ERROR_DISPLAY_STATUS);
 	//电机关闭
 	*p_OP_ShowNow_Speed = 0;
-	Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+	Motor_Quick_Stop();//故障立即停止  wuqingguang
 	
-	Fault_Number_Sum = Get_Fault_Number_Sum(*p_MB_Fault_State);
+	Fault_Number_Sum = Get_Fault_Number_Sum(*p_System_Fault_Static);
 	
-	Fault_Number_Cnt = 1;
+	Fault_Number_Cnt = Fault_Number_Sum;
 	
-	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_MB_Fault_State,Fault_Number_Cnt));
+	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 	
 	Clean_Automatic_Shutdown_Timer();  //自动关机
 }
 // 故障界面 更新
 void Update_Fault_Menu(void)
 {
-	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_MB_Fault_State,Fault_Number_Cnt));
+	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
 // 清除故障状态
 void Clean_Fault_State(void)
 {
 	Clean_Motor_OffLine_Timer();
-	*p_MB_Fault_State = 0;
+	*p_System_Fault_Static = 0;
 	
 	Fault_Number_Sum = 0;
 	
 	Fault_Number_Cnt = 0;
-	
-	*p_System_Fault_Static = 0;
-	
+		
 	Set_System_State_Machine(State_Machine_Memory);
 	*p_OP_ShowNow_Speed = Motor_Speed_Memory;
 	*p_OP_ShowNow_Time = Motor_Time_Memory;
@@ -350,6 +354,7 @@ void Display_Show_FaultCode(uint16_t code)
 	
 	TM1621_display_number(TM1621_COORDINATE_SEC_HIGH,  	(code & 0x00F0)>>4);
 	TM1621_display_number(TM1621_COORDINATE_SEC_LOW,  	(code & 0x000F));
+	
 	//TM1621_LCD_Redraw();
 }
 /*
@@ -414,7 +419,7 @@ static void on_Fault_Button_1_clicked(void)
 	else
 		Fault_Number_Cnt = 1;
 	
-	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_MB_Fault_State,Fault_Number_Cnt));
+	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
 // ② 时间键
@@ -425,7 +430,7 @@ static void on_Fault_Button_2_clicked(void)
 	else
 		Fault_Number_Cnt = Fault_Number_Sum;
 	
-	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_MB_Fault_State,Fault_Number_Cnt));
+	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
 // ③ 模式键
@@ -484,7 +489,7 @@ static void on_Fault_Button_3_Long_Press(void)
 static void on_Fault_Button_4_Long_Press(void)
 {
 	//if(If_Fault_Recovery_Max()==0)
-		System_Power_Off();
+		//System_Power_Off();
 }
 
 static void on_Fault_Button_1_2_Long_Press(void)

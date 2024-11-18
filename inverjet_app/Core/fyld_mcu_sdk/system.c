@@ -149,6 +149,7 @@ static void product_info_update(void)
 {
     unsigned char length = 0;
 		char str_version[32] = {0};
+		char boot_version[FLASH_ADDR_OFFSET_BOOT_VERSION] = {0};
 #ifdef CONFIG_MODE_DELAY_TIME
     unsigned char str[10] = {0};
 #endif
@@ -158,8 +159,10 @@ static void product_info_update(void)
     
 		//length = set_wifi_uart_buffer(length,(unsigned char *)MCU_VER,my_strlen((unsigned char *)MCU_VER));
 		//strcat(str_version, MCU_VER);
-		//strcat(str_version, (char*)BOOT_FLASH_ADDR_BOOT_VERSION);
-		sprintf(str_version,"%s,%s",MCU_VER,(char*)BOOT_FLASH_ADDR_BOOT_VERSION);
+		memcpy(boot_version, (char*)BOOT_FLASH_ADDR_BOOT_VERSION, FLASH_ADDR_OFFSET_BOOT_VERSION);
+		boot_version[FLASH_ADDR_OFFSET_BOOT_VERSION-1] = 0;
+		
+		sprintf(str_version,"%s,%s",MCU_VER,boot_version);
 		length = set_wifi_uart_buffer(length,(unsigned char *)str_version,my_strlen((unsigned char *)str_version));
 		
     length = set_wifi_uart_buffer(length, "\",\"m\":", my_strlen("\",\"m\":"));

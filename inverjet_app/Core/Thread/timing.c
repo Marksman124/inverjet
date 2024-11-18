@@ -268,14 +268,23 @@ void BT_State_Handler(void)
 }
 
 
-
 // 清除 故障 状态基
-void CallOut_Fault_State(void)
+void Timing_Clean_Fault_State(void)
 {
 	Clean_Fault_State();
 	System_Fault_Timing_Cnt = 0;
-	
 	System_Wifi_State_Clean();
+}
+
+
+// 退出 故障 状态
+void CallOut_Fault_State(void)
+{
+	Timing_Clean_Fault_State();
+	if(System_is_Power_Off())//关机
+	{
+		System_Power_Off();
+	}
 	Lcd_Show();
 }
 
@@ -559,7 +568,7 @@ void Stop_State_Handler(void)
 	}
 	else
 	{
-		Finish_Statistics_Upload();//上传 完成统计
+		//Finish_Statistics_Upload();//上传 完成统计
 		// 返回 自由模式 初始状态
 		To_Free_Mode(FREE_MODE_NOT_AUTO_START);
 		Lcd_Show();
@@ -650,31 +659,6 @@ void Initial_State_Handler(void)
 // 定时任务主线程
 void App_Timing_Task(void)
 {
-	if(System_is_Power_Off())
-	{
-		Timing_Thread_Task_Cnt++;		
-		if(Timing_Thread_Task_Cnt >= (TIMING_THREAD_HALF_SECOND*2)) //半秒
-		{
-			Timing_Thread_Task_Cnt = 0;
-			*p_System_Runing_Second_Cnt += 1;			// 运行时间
-			*p_No_Operation_Second_Cnt += 1;			// 无操作时间
-			*p_System_Startup_Second_Cnt = 0;			// 启动时间
-#ifdef SYSTEM_LONG_RUNNING_MODE
-		//********* 老化工装 ***********************************************
-		// 老化工装 2h关  7200
-			Old_Chemical_Equipment_Cnt++;
-			if(Old_Chemical_Equipment_Cnt > 7200)
-			{
-				Buzzer_Click_Long_On(1);
-				Old_Chemical_Equipment_Cnt = 0;
-				System_Power_On();
-			}
-		//******************************************************************
-#endif
-		}
-		return;
-	}
-	
 	Timing_Thread_Task_Cnt++;
 	
 	WIFI_State_Handler();
@@ -697,11 +681,23 @@ void App_Timing_Task(void)
 			//********* 老化工装 ***********************************************
 			// 老化工装 4h开  14400
 			Old_Chemical_Equipment_Cnt ++;
-			if(Old_Chemical_Equipment_Cnt > 14400)
+			if(System_is_Power_Off())//关机
 			{
-				Buzzer_Click_Long_On(1);
-				Old_Chemical_Equipment_Cnt = 0;
-				System_Power_Off();
+				if(Old_Chemical_Equipment_Cnt > 7200)
+				{
+					Buzzer_Click_Long_On(1);
+					Old_Chemical_Equipment_Cnt = 0;
+					System_Power_On();
+				}
+			}
+			else
+			{
+				if(Old_Chemical_Equipment_Cnt > 14400)
+				{
+					Buzzer_Click_Long_On(1);
+					Old_Chemical_Equipment_Cnt = 0;
+					System_Power_Off();
+				}
 			}
 			//******************************************************************
 #endif
@@ -735,7 +731,7 @@ void App_Timing_Task(void)
 				
 				if(ERROR_DISPLAY_STATUS == Get_System_State_Machine())// && (If_Fault_Recovery_Max() == 0))
 				{
-					Clean_Fault_State();
+					Timing_Clean_Fault_State();
 					Lcd_Show();
 				}
 				

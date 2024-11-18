@@ -33,26 +33,44 @@ extern "C" {
 
 typedef enum 
 {
-	NO_FAULT_STATE = 0,			//	操作菜单
-	ss
-} FAULT_STATE_MODE_E;
+	FAULT_BIT_VOLTAGE_ABNORMAL = 0,					// 电压 异常
+	FAULT_BIT_CURRENT_ABNORMAL,							// 电流 异常
+	FAULT_BIT_CURRENT_BIAS,									// 电流传感器偏置故障
+	FAULT_BIT_SHORT_CIRCUIT,								// 短路
+	FAULT_BIT_LACK_PHASE,										// 缺相
+	FAULT_BIT_LOCK_ROTOR,										// 堵转
+	
+	FAULT_BIT_TEMPERATURE_MOS,							// 温度 MOS
+	FAULT_BIT_TEMPERATURE_AMBIENT,					// 温度 环境
+	FAULT_BIT_TEMPERATURE_SENSOR,						// 温度 传感器
+	
+	FAULT_BIT_DRIVE_BOARD,									// 驱动板 异常
+	FAULT_BIT_DRIVE_LOSS,										// 驱动板 通信故障
+	FAULT_BIT_VOLTAGE_AMBIENT,							// 电压 传感器
+	
+} FAULT_STATE_BIT_E;
 
 /* Exported constants --------------------------------------------------------*/
 
 
 
 /* Exported macro ------------------------------------------------------------*/
-#define FAULT_BUS_VOLTAGE_ABNORMAL					0x1
-#define FAULT_BUS_CURRENT_ABNORMAL					0x2
-#define FAULT_BUS_CURRENT_BIAS							0x4
-#define FAULT_ABNORMAL_OUTPUT_VOLTAGE				0x8
-#define FAULT_LACK_PHASE										0x10	//缺相
-#define FAULT_TEMPERATURE_AMBIENT						0x20
-#define FAULT_TEMPERATURE_SENSOR						0x40
-#define FAULT_MOTOR_DRIVER									0x80
-#define FAULT_MOTOR_LOSS										0x100
+#define FAULT_STATE_MAX									(1<<11)
 
-#define FAULT_WIFI_TEST_ERROR								0x200
+#define FAULT_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_VOLTAGE_ABNORMAL)
+#define FAULT_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_CURRENT_ABNORMAL)
+#define FAULT_BUS_CURRENT_BIAS							(1 << FAULT_BIT_CURRENT_BIAS)
+#define FAULT_ABNORMAL_OUTPUT_VOLTAGE				(1 << FAULT_BIT_SHORT_CIRCUIT)
+#define FAULT_LACK_PHASE										(1 << FAULT_BIT_LACK_PHASE)
+#define FAULT_LOCK_ROTOR										(1 << FAULT_BIT_LOCK_ROTOR)
+#define FAULT_TEMPERATURE_MOS								(1 << FAULT_BIT_TEMPERATURE_MOS)
+#define FAULT_TEMPERATURE_AMBIENT						(1 << FAULT_BIT_TEMPERATURE_AMBIENT)
+#define FAULT_TEMPERATURE_SENSOR						(1 << FAULT_BIT_TEMPERATURE_SENSOR)
+#define FAULT_MOTOR_DRIVER									(1 << FAULT_BIT_DRIVE_BOARD)
+#define FAULT_MOTOR_LOSS										(1 << FAULT_BIT_DRIVE_LOSS)
+#define FAULT_VOLTAGE_AMBIENT								(1 << FAULT_BIT_VOLTAGE_AMBIENT)
+
+//#define FAULT_WIFI_TEST_ERROR								0x200
 //-------------- 按键组合响应 总数 -------------------
 #define CALL_OUT_NUMBER_MAX						8
 
@@ -66,6 +84,8 @@ typedef enum
 /* Exported functions prototypes ---------------------------------------------*/
 // 初始化
 extern void App_Fault_Init(void);
+// 检查 故障状态 是否合法
+extern uint8_t Fault_Check_Status_Legal(uint16_t parameter);
 // 检测故障
 extern uint8_t If_System_Is_Error(void);
 // 设置故障值

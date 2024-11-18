@@ -17,7 +17,7 @@
 #include "operation.h"		// 操作 菜单
 #include "fault.h"				// 故障 菜单
 
-//FLASH_ProcessTypeDef p_Flash; 
+//FLASH_ProcessTypeDef p_Flash;
 uint16_t* p_Local_Address;			//	本地地址
 
 uint16_t* p_Software_Version_high;			//	软件版本 高
@@ -80,7 +80,7 @@ void Dev_Information_Init(void)
 	p_Baud_Rate = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SLAVE_BAUD_RATE);
 	Dev_BaudRate_Get(MODBUS_USART);
 	
-	p_Software_Version_high 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION);//	软件版本
+	p_Software_Version_high 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION);					//	软件版本
 	p_Software_Version_middle = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION + 1);
 	p_Software_Version_low	 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION + 2);
 	

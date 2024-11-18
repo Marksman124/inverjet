@@ -179,6 +179,14 @@ uint8_t Check_Data_Init(void)
 		result = 1;
 	}
 	
+	if(result == 1)
+	{
+		*p_Local_Address 					= MODBUS_LOCAL_ADDRESS;
+		*p_Baud_Rate 							= MODBUS_BAUDRATE_DEFAULT;
+		*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// 电机级数		5
+		*p_Support_Control_Methods 	= 0;			//	控制方式	
+	}
+	
 	//================= 冲浪模式 全局 参数 ================================
 	Surf_Mode_Info_Data_Init();
 	

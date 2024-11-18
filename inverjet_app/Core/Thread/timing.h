@@ -102,7 +102,9 @@ uint8_t Get_Temp_Slow_Down_State(void);
 void Set_Temp_Slow_Down_Speed(uint8_t vaule);
 //-------------------- 获取高温降速 速度 ----------------------------
 uint8_t Get_Temp_Slow_Down_Speed(void);
-
+// 清除 故障 状态基
+void Timing_Clean_Fault_State(void);
+// 退出 故障 状态
 void CallOut_Fault_State(void);
 //-------------------- 清除故障恢复计数器 ----------------------------
 void Clean_Fault_Recovery_Cnt(void);

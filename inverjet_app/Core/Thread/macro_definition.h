@@ -47,7 +47,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.0.9"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.1"					//显示故障码
 
 /**
 ******************************************************************************
@@ -55,17 +55,17 @@ extern "C" {
 ******************************************************************************
 */
 
-#define SYSTEM_DEBUG_MODE								1	// 调试模式
+//#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
 //*******************************************************
 
-//******************  驱动板 型号选择 **************************
+//******************  驱动板 型号选择 ****************************************
 #define MOTOR_DEVICE_HARDWARE_AQPED002					(1)			//	郭工 版
 #define MOTOR_DEVICE_HARDWARE_TEMP001						(2)			//	蓝工 版
 
-//*******************************************************
+//***************************************************************************
 
 #define MOTOR_DEVICE_PROTOCOL_VERSION						(MOTOR_DEVICE_HARDWARE_AQPED002)				// 驱动协议版本
 
@@ -138,8 +138,12 @@ extern "C" {
 //线程周期
 #define KEY_THREAD_LIFECYCLE								(20)	// 任务生命周期 200ms
 
-#define KEY_LONG_PRESS_TIME									(2000/KEY_THREAD_LIFECYCLE)			//长按时间 2s
-#define KEY_LONG_PRESS_TIME_SHORT						(1000/KEY_THREAD_LIFECYCLE)			//短一点的 长按时间  1s
+#define KEY_LONG_PRESS_TIME_3S									(3000/KEY_THREAD_LIFECYCLE)			//长按时间 3s
+#define KEY_LONG_PRESS_TIME_2S									(2000/KEY_THREAD_LIFECYCLE)			//长按时间 2s
+#define KEY_LONG_PRESS_TIME_1S									(1000/KEY_THREAD_LIFECYCLE)			//短一点的 长按时间  1s
+//-------------- 特殊按键  -------------------
+#define KEY_MULTIPLE_CLICKS_MAX				8						// 8次
+#define KEY_MULTIPLE_CLICKS_TIME			5000				// 5秒内
 //-------------- 蜂鸣器 长度 -------------------
 #define KEY_BUZZER_TIME								((200/KEY_THREAD_LIFECYCLE)-2)					//周期  KEY_THREAD_LIFECYCLE 倍数
 #define KEY_BUZZER_TIME_LONG					((400/KEY_THREAD_LIFECYCLE)-2)					//周期  KEY_THREAD_LIFECYCLE 倍数
@@ -183,46 +187,41 @@ extern "C" {
 #if(TIMING_THREAD_TURN_ON)
 #define TIMING_THREAD_LIFECYCLE				(24)				// ms
 
-//半秒周期数
+//-------------- 半秒周期数 -------------------
 #define TIMING_THREAD_HALF_SECOND			(480/TIMING_THREAD_LIFECYCLE)				// 0.5 s   16   // wuqingguang
-//1秒周期数
+//-------------- 1秒周期数 -------------------
 #define TIMING_THREAD_ONE_SECOND			(2)				// 1 s
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
-//配网时长
+//-------------- 配网时长 -------------------
 #define WIFI_DISTRIBUTION_TIME_CALLOUT				(60*TIMING_THREAD_ONE_SECOND)				// 6 s
 #define BT_DISTRIBUTION_TIME_CALLOUT					(60*TIMING_THREAD_ONE_SECOND)				// 6 s
-//故障自恢复
-#define SYSTEM_FAULT_TIME_CALLOUT							(20*TIMING_THREAD_ONE_SECOND)				// 20 s
-#define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
+//-------------- 故障 去抖时间 -------------------
+#define MOTOR_CHECK_FAULT_TIMER								(1)
+//-------------- 故障自恢复 -------------------
+#define SYSTEM_FAULT_TIME_CALLOUT							(6*TIMING_THREAD_ONE_SECOND)				// 6 s
+#define SYSTEM_FAULT_RECOVERY_MAX							(200)				// 3 次故障
 #define SYSTEM_FAULT_RECOVERY_TIME						(60*TIMING_THREAD_ONE_SECOND)				// 1 分钟  60 s
-//自动关机
+//-------------- 自动关机 -------------------
 #define AUTOMATIC_SHUTDOWN_TIME								(600*TIMING_THREAD_ONE_SECOND)				// 10 min
 
 #else
-//配网时长
+//-------------- 配网时长 -------------------
 #define WIFI_DISTRIBUTION_TIME_CALLOUT				(60*TIMING_THREAD_ONE_SECOND)				// 60 s
 #define BT_DISTRIBUTION_TIME_CALLOUT					(60*TIMING_THREAD_ONE_SECOND)				// 60 s
-//故障自恢复
+//-------------- 故障 去抖时间 -------------------
+#define MOTOR_CHECK_FAULT_TIMER								(3-1)
+//-------------- 故障自恢复 -------------------
 #define SYSTEM_FAULT_TIME_CALLOUT							(120*TIMING_THREAD_ONE_SECOND)				// 120 s
 #define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
 #define SYSTEM_FAULT_RECOVERY_TIME						(3600*TIMING_THREAD_ONE_SECOND)				// 1 小时内  3600 s
-//自动关机
+//-------------- 自动关机 -------------------
 #define AUTOMATIC_SHUTDOWN_TIME								(1800*TIMING_THREAD_ONE_SECOND)				// 0.5 小时内  1800 s
 
 #endif
 
-
-//-------------------------------------------------------------------------------------------------
-//*********************************************************************************************
-//-------------- 机箱温度报警值 90°C -------------------
-#define AMBIENT_TEMP_ALARM_VALUE									(80)
-//-------------- 机箱温度 降速 70°C -------------------
-#define AMBIENT_TEMP_REDUCE_SPEED									(70)		// 降档 温度
-#define AMBIENT_TEMP_RESTORE_SPEED								(65)		// 恢复 温度
-//*********************************************************************************************
-//-------------------------------------------------------------------------------------------------
-
+//-------------- 降频 去抖时间 -------------------
+#define MOTOR_DOWN_CONVERSION_TIMER									(10-1)			
 //-------------- 降速检查时间 -------------------
 #define TIME_SLOW_DOWN_TIME													(120)		//2 min  120*2 个周期,与线程周期相关
 //-------------- 降速 档位 -------------------
@@ -331,15 +330,6 @@ extern "C" {
 //*********************************************************************************************
 //-------------------------------------------------------------------------------------------------
 
-//-------------------------------------------------------------------------------------------------
-//*********************************************************************************************
-//-------------- MOS 温度报警值 90°C -------------------
-#define MOS_TEMP_ALARM_VALUE								(90)
-//-------------- MOS 温度 降速 80°C -------------------
-#define MOS_TEMP_REDUCE_SPEED								(80)		// 降档 温度
-#define MOS_TEMP_RESTORE_SPEED							(75)		// 恢复 温度
-//*********************************************************************************************
-//-------------------------------------------------------------------------------------------------
 
 
 //-------------------------------------------------------------------------------------------------
@@ -392,11 +382,15 @@ extern "C" {
 //******************************************************************
 #endif
 
-//wifi 故障 判断值
+// wifi 故障 信号判断值
 #define WIFI_RSSI_ERROR_VAULE										(50)
 
-// 结束统计 上传 最低时间 -- 低于 3min 不计入统计  单位(秒)
-#define WIFI_STATISTICE_UPLOAD_MINIMUM_TIME										(180)
+// 故障上传 去抖 次数
+#define WIFI_FAULT_DEBOUNCE_TIMES								(3)
+
+
+// 结束统计 上传 最低时间 -- 低于 1min 不计入统计  单位(秒)
+#define WIFI_STATISTICE_UPLOAD_MINIMUM_TIME										(60)
 
 
 #endif

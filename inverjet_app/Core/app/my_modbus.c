@@ -622,7 +622,6 @@ MsState _MsAnalyzeCmd15(ModbusSlaveObj_t *pObj)
 //			
 //			if(fileNumber == REG_FILE_NUMBER_END)//最后一帧
 //			{
-//				//STMFLASH_Write(USER_FLASH_ADDR_SOFTWARE_VERSION,&fileNumber,1); // 写版本信息 
 //				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&OTA_Pack_Len,2); // 写包长度 (含crc)
 //				sign = PRODUCT_BOOT_PASSWORD;
 //				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // 进入OTA 

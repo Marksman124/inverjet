@@ -23,41 +23,39 @@ typedef  void (*iapfun)(void);				//定义一个函数类型的参数.
 #define FLASH_APP_PROGRAM_PAGE			(56)  					// app 程序升级包 大小 (页数 n*2048)
 
 #define FLASH_APP_PATCH_ADDR				(0x08024000)  	// app 程序升级包 起始地址(存放在FLASH)
-#define FLASH_APP_PARAM_ADDR				(0x0803E800)  	// app 程序参数 起始地址(存放在FLASH)
-
-#define USER_FLASH_ADDR_SOFTWARE_VERSION			(USER_FLASH_ADDR_BAUD_RATE + (21*FLASH_ADDR_OFFSET_SIZE))		//	软件版本
+#define FLASH_APP_PARAM_ADDR				(0x0803E800)  	// app 参数 起始地址
 
 
-#define FLASH_BOOT_PROGRAM_ADDR			(0x08000000)  	// boot 程序 起始地址(存放在FLASH)
+#define FLASH_BOOT_PROGRAM_ADDR			(0x08000000)  	// boot 起始地址(存放在FLASH)
 #define FLASH_BOOT_PROGRAM_PAGE			(15)  
 
 #define FLASH_BOOT_PARAM_ADDR  			(0x08007800)  	// boot 程序参数 起始地址(存放在FLASH)
 
-//	OTA标识
+//	OTA 标志
 #define BOOT_FLASH_ADDR_OTA_PASSWORD						(FLASH_BOOT_PARAM_ADDR)
-//	包长度
+//	升级包 大小
 #define BOOT_FLASH_ADDR_OTA_PACK_LEN						(BOOT_FLASH_ADDR_OTA_PASSWORD + FLASH_ADDR_OFFSET_SIZE)
 
-//	boot版本号
+//	boot 软件版本
 #define BOOT_FLASH_ADDR_BOOT_VERSION						(BOOT_FLASH_ADDR_OTA_PACK_LEN + FLASH_ADDR_OFFSET_SIZE)
-#define FLASH_ADDR_OFFSET_BOOT_VERSION					(16)  					// 数据存储偏移量
+#define FLASH_ADDR_OFFSET_BOOT_VERSION					(16)  					// 长度  （字符串存储）
 
-//	程序升级包 地址
+//	app 程序升级包 起始地址
 #define BOOT_FLASH_ADDR_OTA_PACK_ADDR						(BOOT_FLASH_ADDR_BOOT_VERSION + FLASH_ADDR_OFFSET_BOOT_VERSION)
 
-//	程序升级包 大小
+//	app 程序升级包 大小
 #define BOOT_FLASH_ADDR_OTA_PACK_SIZE						(BOOT_FLASH_ADDR_OTA_PACK_ADDR + FLASH_ADDR_OFFSET_SIZE)
 
-//	app 程序参数 地址
+//	app 参数 起始地址
 #define BOOT_FLASH_ADDR_APP_PARAM_ADDR					(BOOT_FLASH_ADDR_OTA_PACK_SIZE + FLASH_ADDR_OFFSET_SIZE)
 
 
 
-#define RANGE_OTA_PACK_LEN_MIN						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	包长度 最小
-#define RANGE_OTA_PACK_LEN_MAX						(FLASH_APP_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	包长度 最大
+#define RANGE_OTA_PACK_LEN_MIN						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	APP 升级包 最小值
+#define RANGE_OTA_PACK_LEN_MAX						(FLASH_APP_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	APP 升级包 最大值
 
-#define RANGE_BOOT_PACK_LEN_MIN						(STM_FLASH_SECTOR_SIZE)		//	包长度 最小
-#define RANGE_BOOT_PACK_LEN_MAX						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	包长度 最大
+#define RANGE_BOOT_PACK_LEN_MIN						(STM_FLASH_SECTOR_SIZE)															//	boot 升级包 最大值
+#define RANGE_BOOT_PACK_LEN_MAX						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	boot 升级包 最大值
 
 #define RECORD_LEN_PAGE_MAX		238
 

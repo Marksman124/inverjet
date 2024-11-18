@@ -439,6 +439,8 @@ void To_Free_Mode(uint8_t mode)
 	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 	
 	Set_System_State_Machine(FREE_MODE_INITIAL);
+	Set_System_State_Mode(SYSTEM_MODE_FREE_0);
+	
 	*p_OP_ShowLater = *p_OP_Free_Mode;
 
 	*p_OP_ShowNow_Speed = p_OP_ShowLater->speed;
@@ -454,7 +456,8 @@ void To_Timing_Mode(void)
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 	Set_System_State_Machine(TIMING_MODE_INITIAL);
-
+	Set_System_State_Mode(SYSTEM_MODE_FREE_0);
+	
 	*p_OP_ShowLater = *p_OP_Timing_Mode;
 
 	*p_OP_ShowNow_Speed = p_OP_ShowLater->speed;
