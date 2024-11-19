@@ -509,6 +509,8 @@ void Data_Set_Current_Speed(uint8_t speed)
 {
 	//if(System_is_Starting())
 		//return;
+	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// 跳过 自动启动
+		return;
 	
 	*p_OP_ShowNow_Speed = speed;	
 	Motor_Speed_Target_Set(speed);

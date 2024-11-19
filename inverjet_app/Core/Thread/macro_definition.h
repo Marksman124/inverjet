@@ -59,7 +59,7 @@ extern "C" {
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
-//*******************************************************
+//***************************************************************************
 
 //******************  驱动板 型号选择 ****************************************
 #define MOTOR_DEVICE_HARDWARE_AQPED002					(1)			//	郭工 版
@@ -338,7 +338,7 @@ extern "C" {
 //-------------------------------------------------------------------------------------------------
 
 //通讯故障 报警时间
-#define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒
+#define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒  wuqingguang
 //通讯故障 尝试重启 时间
 #define FAULT_MOTOR_TRY_RESTAR_TIME				(FAULT_MOTOR_LOSS_TIME/5)								// 6秒
 
