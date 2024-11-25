@@ -92,8 +92,8 @@ extern "C" {
 
 
 //驱动板故障 标志位
-#define MOTOR_FAULT_SIGN_BIT						FAULT_TEMPERATURE_AMBIENT
-#define CLEAN_MOTOR_FAULT(n)						(n &= ~MOTOR_FAULT_SIGN_BIT)
+#define MOTOR_FAULT_SIGN_BIT						(FAULT_TEMPERATURE_AMBIENT)
+#define CLEAN_MOTOR_FAULT(n)						(n &= MOTOR_FAULT_SIGN_BIT)
 
 #define	MOTOR_PROTOCOL_HEADER_OFFSET						3
 #define	MOTOR_PROTOCOL_ADDR_MAX									73
@@ -153,6 +153,11 @@ extern "C" {
 #define	MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING											37					//	运行中 缺2/3相
 #define	MOTOR_FAULT_OUTPUT_LOCKROTOR																			38					//	堵转
 
+#define	MOTOR_FAULT_MOSFET_NTC_ERR																				39					//	Mos温度传感器故障
+
+
+#define	MOTOR_FAULT_CODE_START							(MOTOR_FAULT_OVER_VOLTAGE)
+#define	MOTOR_FAULT_CODE_END								(MOTOR_FAULT_MOSFET_NTC_ERR)
 //====================================================================================================
 
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑

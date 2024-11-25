@@ -25,7 +25,7 @@ uint32_t ModbusTimerCnt=0;
 USHORT   usRegHoldingBuf[REG_HOLDING_NREGS+1];
 
 //USHORT   usRegInputStart = REG_INPUT_START;
-USHORT   usRegInputBuf[REG_INPUT_NREGS+1];
+USHORT   usRegInputBuf[REG_INPUT_NREGS+1] = {0};
 
 USHORT		MB_Data_Addr_Need_CallOut[] = {
 	MB_SLAVE_NODE_ADDRESS,MB_SLAVE_BAUD_RATE,
@@ -510,7 +510,7 @@ void Surf_Mode_Info_Get_Mapping(void)
 
 
 
-void Get_Mapping_Register(void)
+void MB_Get_Mapping_Register(void)
 {
 	p_OP_ShowLater = 		(Operating_Parameters*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_LEATER_SPEED);
 	p_OP_Free_Mode = 		(Operating_Parameters*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_FREE_MODE_SPEED);
@@ -557,7 +557,19 @@ void Get_Mapping_Register(void)
 	p_OP_ShowNow_Speed = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_CURRENT_SPEED);
 	// 当前时间
 	p_OP_ShowNow_Time = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_CURRENT_TIME);
-		
+
+	//****************************************************************************************************************************************
+	//--------------------------- 临时 用于故障等界面记录返回值
+	// 状态机
+	p_System_State_Machine_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SYSTEM_WORKING_STATUS_MEMORY);
+	// 当前模式
+	p_PMode_Now_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SYSTEM_WORKING_MODE_MEMORY);
+	// 当前速度
+	p_OP_ShowNow_Speed_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_CURRENT_SPEED_MEMORY);
+	// 当前时间
+	p_OP_ShowNow_Time_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_CURRENT_TIME_MEMORY);
+	//****************************************************************************************************************************************
+
 	//--------------------------- 调试 使用
 	// 系统时间
 	p_System_Runing_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_RUNNING_TIME);		// 系统时间
@@ -582,7 +594,9 @@ void Get_Mapping_Register(void)
 }
 
 
-
-
+void MB_InputBuffer_Init(void)
+{
+	memset(usRegInputBuf,sizeof(usRegInputBuf),0);
+}
 
 

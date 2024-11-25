@@ -33,6 +33,12 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 
+
+//-------------- NTC ´«¸ÐÆ÷¹ÊÕÏ ADC -------------------
+#define FAULT_NTC_ADC_MIX										(124)
+#define FAULT_NTC_ADC_MAX										(4000)
+
+
 /* Exported functions prototypes ---------------------------------------------*/
 
 

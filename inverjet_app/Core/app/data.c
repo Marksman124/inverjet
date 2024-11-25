@@ -55,6 +55,12 @@ uint16_t* p_PMode_Now;								// 当前模式
 uint16_t* p_OP_ShowNow_Speed;					// 当前速度
 uint16_t* p_OP_ShowNow_Time;					// 当前时间
 
+//--------------------------- 临时 用于故障等界面记录返回值
+uint16_t* p_System_State_Machine_Memory;			// 状态机
+uint16_t* p_PMode_Now_Memory;									// 当前模式
+uint16_t* p_OP_ShowNow_Speed_Memory;					// 当前速度
+uint16_t* p_OP_ShowNow_Time_Memory;						// 当前时间
+
 System_Ctrl_Mode_Type_enum Ctrl_Mode_Type = CTRL_FROM_KEY;				// 控制方式
 
 // 各模式 属性
@@ -128,6 +134,8 @@ uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
 
 
 uint16_t* p_Thread_Activity_Sign;					//	线程 活动 标志位
+
+
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -216,14 +224,17 @@ uint8_t Check_Data_Init(void)
 }
 
 
-extern void Get_Mapping_Register(void);
+//extern void MB_Get_Mapping_Register(void);
+//extern void MB_InputBuffer_Init(void);
+
 // 初始化
 void App_Data_Init(void)
 {
 	Read_OPMode();
 	// 获取映射  flash已读
-	Get_Mapping_Register();
-
+	MB_Get_Mapping_Register();
+	//
+	MB_InputBuffer_Init();
 	// 检查各模式 属性
 	if(Check_Data_Init())
 	{
@@ -617,6 +628,7 @@ void LCD_TO_Mapping(void)
 //	count 秒
 void Finish_Statistics_Count(uint8_t count)
 {
+
 	* p_Finish_Statistics_Time += count;								//	完成统计 --> 时长
 	if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MIX)
 		* p_Finish_Statistics_Speed = *p_OP_ShowNow_Speed;	//	完成统计 --> 强度

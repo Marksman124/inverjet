@@ -89,16 +89,13 @@ void (*p_Fault_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Fault_Button_2_3_Long_Press, on_Fault_Button_2_4_Long_Press,
 };
 
-static uint8_t State_Machine_Memory = 0;
-static uint8_t Motor_Speed_Memory = 0;
-static uint16_t Motor_Time_Memory = 0;
 
 /* Private user code ---------------------------------------------------------*/
 
 
 // 初始化
 void App_Fault_Init(void)
-{	
+{
 }
 
 // 检查 故障状态 是否合法
@@ -275,9 +272,10 @@ void Fault_Number_Update(void)
 // 进入故障界面
 void To_Fault_Menu(void)
 {
-	State_Machine_Memory = Get_System_State_Machine();
-	Motor_Speed_Memory = *p_OP_ShowNow_Speed;
-	Motor_Time_Memory = *p_OP_ShowNow_Time;
+	*p_System_State_Machine_Memory = Get_System_State_Machine();
+	*p_PMode_Now_Memory = Get_System_State_Mode();
+	*p_OP_ShowNow_Speed_Memory = *p_OP_ShowNow_Speed;
+	*p_OP_ShowNow_Time_Memory = *p_OP_ShowNow_Time;
 	
 	// 故障 菜单
 	App_Fault_Init();
@@ -312,10 +310,12 @@ void Clean_Fault_State(void)
 	
 	Fault_Number_Cnt = 0;
 		
-	Set_System_State_Machine(State_Machine_Memory);
-	*p_OP_ShowNow_Speed = Motor_Speed_Memory;
-	*p_OP_ShowNow_Time = Motor_Time_Memory;
-	Data_Set_Current_Speed(Motor_Speed_Memory);
+	Set_System_State_Machine(*p_System_State_Machine_Memory);
+	Set_System_State_Mode(*p_PMode_Now_Memory);
+	*p_OP_ShowNow_Speed = *p_OP_ShowNow_Speed_Memory;
+	*p_OP_ShowNow_Time = *p_OP_ShowNow_Time_Memory;
+	
+	Data_Set_Current_Speed(*p_OP_ShowNow_Speed_Memory);
 }
 /* Private function prototypes -----------------------------------------------*/
 

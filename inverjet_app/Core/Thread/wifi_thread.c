@@ -110,7 +110,7 @@ void WIFI_Update_State_Upload(void)
 	short int mos_temperature = 0;
 		
 	static uint16_t Upload_Timer_Cnt = 0;							// 上传时间 计时器
-	static uint8_t Upload_Debounce_Cnt = 0;						// 上传时间 计时器
+	//static uint8_t Upload_Debounce_Cnt = 0;						// 上传时间 计时器
 	
 	//------------------- 故障上传 ----------------------------
 	if(Wifi_Motor_Fault_Static != *p_Motor_Fault_Static)
@@ -120,15 +120,10 @@ void WIFI_Update_State_Upload(void)
 	}
 	if(Wifi_System_Fault_Static != *p_System_Fault_Static)
 	{
-		// 故障 去抖动
-		if(Upload_Debounce_Cnt++ > WIFI_FAULT_DEBOUNCE_TIMES)
+		if(Fault_Check_Status_Legal(*p_System_Fault_Static))
 		{
-			if(Fault_Check_Status_Legal(*p_System_Fault_Static))
-			{
-				Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
-				Wifi_System_Fault_Static = *p_System_Fault_Static;
-				Upload_Debounce_Cnt = 0;
-			}
+			Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
+			Wifi_System_Fault_Static = *p_System_Fault_Static;
 		}
 	}
 	//------------------- 系统状态 (重要)  ----------------------------
@@ -235,9 +230,10 @@ void WIFI_Update_State_Upload(void)
 		Wifi_DP_Data_Update(DPID_THREAD_ACTIVITY_SIGN); 	//线程活动标志;
 		
 		// 怕不同步 补发一次
-//		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_MODE);  			// 工作模式;
+//		Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
+//		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_MODE);  			// 工作模式
 //		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_STATUS); 			// 状态机
-//		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_SPEED); 				// 当前速度;
+//		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_SPEED); 				// 当前速度
 //		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_TIME); 				// 当前时间
 	}
 	
@@ -250,21 +246,27 @@ void WIFI_Update_State_Upload(void)
 //-------------- 上传 完成统计  -------------------
 void WIFI_Finish_Statistics_Upload( void )
 {
+	if(* p_Finish_Statistics_Time == 0)
+		return;
+	
 	if(*p_Finish_Statistics_Time >= WIFI_STATISTICE_UPLOAD_MINIMUM_TIME)
 	{
 		DEBUG_PRINT("\n上传统计数据:\t时长:\t%d\t强度:\t%d\t距离:\t%d\t\n",*p_Finish_Statistics_Time,*p_Finish_Statistics_Speed,*p_Finish_Statistics_Distance);
-		
+		taskENTER_CRITICAL();
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_TIME); 		//	完成统计 --> 时长
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
+		taskEXIT_CRITICAL();
 	}
 	else
 	{
-		DEBUG_PRINT("\n统计时间低于3分钟，上传0\n");
+		DEBUG_PRINT("\n统计时间低于3分钟，上传 %d\n",* p_Finish_Statistics_Time);
+		taskENTER_CRITICAL();
 		Finish_Statistics_Clean();
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_TIME); 		//	完成统计 --> 时长
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
 		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
+		taskEXIT_CRITICAL();
 	}
 }
 
@@ -350,6 +352,7 @@ void Wifi_DP_Data_Update(uint16_t id)
 			mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,				*p_Motor_Fault_Static);
 			break;
 		case DPID_GET_SYSTEM_FAULT_STATUS:// 系统故障上报
+			
 			mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,	*p_System_Fault_Static);
 			break;
 		case DPID_GET_MOS_TEMPERATURE:// MOS温度
@@ -395,7 +398,10 @@ void Wifi_DP_Data_Update(uint16_t id)
 			mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,			Get_System_State_Mode());
 			break;
 		case DPID_SYSTEM_WORKING_STATUS:// 状态机
-			mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,		Get_System_State_Machine());
+			/*if(System_is_Error())	//非故障 上传  wuqingguang
+				mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,		*p_System_State_Machine_Memory);
+			else*/
+				mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,		Get_System_State_Machine());
 			break;
 		case DPID_MOTOR_CURRENT_SPEED:// 当前速度
 			mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,			*p_OP_ShowNow_Speed);
@@ -404,7 +410,10 @@ void Wifi_DP_Data_Update(uint16_t id)
 			mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,			*p_OP_ShowNow_Time);
 			break;
 		case DPID_SYSTEM_STATUS_MODE:// 合并上传
-			mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now,	4);
+			/*if(System_is_Error())//非故障 上传  wuqingguang
+				mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now_Memory,	4);
+			else*/
+				mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now,	4);
 			break;
 		//*********************************
 		//=========== 初始值  =============

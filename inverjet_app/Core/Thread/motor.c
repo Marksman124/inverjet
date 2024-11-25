@@ -345,7 +345,7 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 	
 #if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	if((type >= MOTOR_FAULT_OVER_VOLTAGE) && (type <= MOTOR_FAULT_OUTPUT_LOCKROTOR))
+	if((type >= MOTOR_FAULT_CODE_START) && (type <= MOTOR_FAULT_CODE_END))
 	{
 		if((type == MOTOR_FAULT_OVER_VOLTAGE ) || (type == MOTOR_FAULT_UNDER_VOLTAGE ))	//-----------母线电压 过压 | 欠压
 			change_fault = FAULT_BUS_VOLTAGE_ABNORMAL;
@@ -370,6 +370,9 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 
 		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
 			change_fault = FAULT_VOLTAGE_AMBIENT;
+		
+		else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS 传感器故障
+			change_fault = FAULT_TEMPERATURE_SENSOR;
 		
 		//----------- 其它 故障
 		else

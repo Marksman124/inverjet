@@ -327,6 +327,7 @@ void wifi_module_Handler(void const * argument)
 	uint16_t time_cnt=0;
 	
 	wifi_Module_Init();
+	osDelay(POWER_ON_WAITE_TIME_TASK);
   /* Infinite loop */
   for(;;)
   {

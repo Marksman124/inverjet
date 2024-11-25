@@ -206,7 +206,7 @@ float Get_External_Temp(void)
 		}
     //Temperature = u16Check_NTC_TabTemp(Temp);
 
-		if((adc == 0) || (adc == 4096))
+		if((adc <= FAULT_NTC_ADC_MIX) || (adc >= FAULT_NTC_ADC_MAX))
 		{
 			if(Temperature_Fault_Cnt ++ > 10)
 			{

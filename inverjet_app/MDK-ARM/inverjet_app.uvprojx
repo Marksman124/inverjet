@@ -81,9 +81,9 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
-            <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>..\Tools\after_build_script.exe</UserProg1Name>
-            <UserProg2Name>..\Tools\keil_killl.exe</UserProg2Name>
+            <RunUserProg2>1</RunUserProg2>
+            <UserProg1Name>fromelf --bin --output=.\output\inverjet_app.bin .\output\inverjet_app.axf</UserProg1Name>
+            <UserProg2Name>..\Tools\after_build_script.exe</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopA1X>0</nStopA1X>

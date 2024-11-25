@@ -568,9 +568,14 @@ void Stop_State_Handler(void)
 	}
 	else
 	{
-		//Finish_Statistics_Upload();//上传 完成统计
 		// 返回 自由模式 初始状态
 		To_Free_Mode(FREE_MODE_NOT_AUTO_START);
+		// 返回 自由模式 暂停状态
+		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
+		*p_OP_ShowNow_Speed = 0;
+		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"启动"
+		Arbitrarily_To_Pause();
+		
 		Lcd_Show();
 		Timing_Timer_Cnt = 0;
 	}
@@ -620,7 +625,7 @@ void Initial_State_Handler(void)
 		{
 			LCD_Refresh_Set(0);//恢复刷新
 			
-			Add_Ctrl_Log();
+			//Add_Ctrl_Log();
 			
 			if(Get_System_State_Machine() == TIMING_MODE_INITIAL)
 			{

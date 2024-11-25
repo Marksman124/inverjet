@@ -33,20 +33,20 @@ extern "C" {
 
 typedef enum 
 {
-	FAULT_BIT_VOLTAGE_ABNORMAL = 0,					// 电压 异常
-	FAULT_BIT_CURRENT_ABNORMAL,							// 电流 异常
-	FAULT_BIT_CURRENT_BIAS,									// 电流传感器偏置故障
-	FAULT_BIT_SHORT_CIRCUIT,								// 短路
-	FAULT_BIT_LACK_PHASE,										// 缺相
-	FAULT_BIT_LOCK_ROTOR,										// 堵转
+	FAULT_BIT_VOLTAGE_ABNORMAL = 0,					// 电压 异常									E001
+	FAULT_BIT_CURRENT_ABNORMAL,							// 电流 异常									E002
+	FAULT_BIT_CURRENT_BIAS,									// 电流传感器偏置故障				E003
+	FAULT_BIT_SHORT_CIRCUIT,								// 短路											E004
+	FAULT_BIT_LACK_PHASE,										// 缺相											E005
+	FAULT_BIT_LOCK_ROTOR,										// 堵转											E006
 	
-	FAULT_BIT_TEMPERATURE_MOS,							// 温度 MOS
-	FAULT_BIT_TEMPERATURE_AMBIENT,					// 温度 环境
-	FAULT_BIT_TEMPERATURE_SENSOR,						// 温度 传感器
+	FAULT_BIT_TEMPERATURE_MOS,							// 温度 MOS									E101
+	FAULT_BIT_TEMPERATURE_AMBIENT,					// 温度 环境									E102
 	
-	FAULT_BIT_DRIVE_BOARD,									// 驱动板 异常
-	FAULT_BIT_DRIVE_LOSS,										// 驱动板 通信故障
-	FAULT_BIT_VOLTAGE_AMBIENT,							// 电压 传感器
+	FAULT_BIT_TEMPERATURE_SENSOR,						// 温度 传感器								E201
+	FAULT_BIT_DRIVE_BOARD,									// 驱动板 异常								E202
+	FAULT_BIT_DRIVE_LOSS,										// 驱动板 通信故障						E203
+	FAULT_BIT_VOLTAGE_AMBIENT,							// 电压 传感器								E205
 	
 } FAULT_STATE_BIT_E;
 
@@ -55,7 +55,7 @@ typedef enum
 
 
 /* Exported macro ------------------------------------------------------------*/
-#define FAULT_STATE_MAX									(1<<11)
+#define FAULT_STATE_MAX									(1<<(FAULT_BIT_VOLTAGE_AMBIENT+1))
 
 #define FAULT_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_VOLTAGE_ABNORMAL)
 #define FAULT_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_CURRENT_ABNORMAL)
@@ -77,6 +77,7 @@ typedef enum
 
 // 恢复故障后等待时间
 #define RECOVERY_ATTEMPT_TIME							30
+
 
 
 //extern uint8_t Fault_Recovery_Attempt_cnt;				//

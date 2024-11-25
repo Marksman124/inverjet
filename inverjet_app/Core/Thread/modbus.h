@@ -176,17 +176,19 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_DISPLAY_HARDWARE_VERSION             	( MB_DISPLAY_SOFTWARE_VERSION + 4 )	//	（2字节）显示板 硬件版本
 #define MB_DRIVER_SOFTWARE_VERSION								( MB_DISPLAY_HARDWARE_VERSION + 2 )	//	（2字节）驱动板 软件版本
 #define MB_DRIVER_HARDWARE_VERSION             		( MB_DRIVER_SOFTWARE_VERSION + 2 )	//	（2字节）驱动板 硬件版本
-#define MB_SYSTEM_FAULT_STATUS					          ( MB_DRIVER_HARDWARE_VERSION + 2 )	//	（2字节）系统故障状态
 
+#define MB_SYSTEM_FAULT_STATUS					          ( MB_DRIVER_HARDWARE_VERSION + 2 )	//	系统故障状态
 #define MB_MOTOR_FAULT_STATUS					          	( MB_SYSTEM_FAULT_STATUS + 1 )			// 	电机 	故障状态
 #define MB_MOS_TEMPERATURE					          		( MB_MOTOR_FAULT_STATUS + 1 )				//	mos 	温度
 #define MB_BOX_TEMPERATURE					          		( MB_MOS_TEMPERATURE + 1 )					//	电箱	温度
 #define MB_MOTOR_BUS_VOLTAGE					          	( MB_BOX_TEMPERATURE + 1 )					//	母线 	电压
 #define MB_MOTOR_BUS_CURRENT					          	( MB_MOTOR_BUS_VOLTAGE + 1 )				//	母线 	电流
+
 #define MB_MOTOR_CURRENT					          			( MB_MOTOR_BUS_CURRENT + 1 )				// 	（2字节） 电机 	电流
 #define MB_MOTOR_REALITY_SPEED					          ( MB_MOTOR_CURRENT + 2 )						//	（2字节） 电机 	实际 转速
 #define MB_SEND_REALITY_SPEED					          	( MB_MOTOR_REALITY_SPEED + 2 )			//	（2字节） 电机 	实际 转速  下发
 #define MB_MOTOR_REALITY_POWER					          ( MB_SEND_REALITY_SPEED + 2 )				//	（2字节） 电机 	实际 功率
+
 #define MB_THREAD_ACTIVITY_SGIN		      					( MB_MOTOR_REALITY_POWER + 2 )			//	线程 活动 标志位
 #define MB_FINISH_STATISTICS_TIME		      				( MB_THREAD_ACTIVITY_SGIN + 1 )			//	完成统计 --> 时长
 #define MB_FINISH_STATISTICS_SPEED		      			( MB_FINISH_STATISTICS_TIME + 1 )		//	完成统计 --> 游泳强度
@@ -211,9 +213,19 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_NO_OPERATION_TIME        				( MB_SYSTEM_RUNNING_TIME + 2 )						//	（2字节）无人操作时间
 #define MB_SYSTEM_SLEEP_TIME        				( MB_NO_OPERATION_TIME + 2 )							//	（2字节）休眠时间
 // ----------------------------------------------------------------------------------------------
-#define MB_INPUT_BUFFER_END        					( MB_SYSTEM_SLEEP_TIME + 2 )							//	结束
+
 // ----------------------------------------------------------------------------------------------
-#define MB_INPUT_BUFFER_SIZE_MAX        					( 0xFF )	//	
+#define MB_SYSTEM_WORKING_MODE_MEMORY     				( MB_SYSTEM_SLEEP_TIME + 2 )								//	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
+#define MB_SYSTEM_WORKING_STATUS_MEMORY      			( MB_SYSTEM_WORKING_MODE_MEMORY + 1 )				//	系统工作状态  0:暂停,   1:暂停恢复,   2:重新开始,  3:结束
+// ----------------------------------------------------------------------------------------------
+#define MB_MOTOR_CURRENT_SPEED_MEMORY		        	( MB_SYSTEM_WORKING_STATUS_MEMORY + 1 )				//	当前转速 (临时有效)
+#define MB_MOTOR_CURRENT_TIME_MEMORY        			( MB_MOTOR_CURRENT_SPEED_MEMORY + 1 )				//	当前时间
+// ----------------------------------------------------------------------------------------------
+
+
+#define MB_INPUT_BUFFER_END        					( MB_MOTOR_CURRENT_TIME_MEMORY + 1 )							//	结束
+// ----------------------------------------------------------------------------------------------
+#define MB_INPUT_BUFFER_SIZE_MAX        					( MB_INPUT_BUFFER_END )	//	
 /*
 #define MB_DEFAULT_FREE_MODE_SPEED		        		( 0x11 )	//	默认 自由模式 	转速
 #define MB_DEFAULT_FREE_MODE_TIME        					( 0x12 )	//								时间
@@ -263,7 +275,11 @@ extern void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data
 //================= 冲浪模式 全局 参数 ================================
 extern void Surf_Mode_Info_Get_Mapping(void);
 
-extern void Get_Mapping_Register(void);
+extern void MB_Get_Mapping_Register(void);
+
+extern void MB_InputBuffer_Init(void);
+
+
 #ifdef __cplusplus
 }
 #endif

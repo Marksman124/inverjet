@@ -221,6 +221,12 @@ extern uint16_t* p_PMode_Now;									// 当前模式
 extern uint16_t* p_OP_ShowNow_Speed;					// 当前速度
 extern uint16_t* p_OP_ShowNow_Time;						// 当前时间
 
+//--------------------------- 临时 用于故障等界面记录返回值
+extern uint16_t* p_System_State_Machine_Memory;			// 状态机
+extern uint16_t* p_PMode_Now_Memory;								// 当前模式
+extern uint16_t* p_OP_ShowNow_Speed_Memory;					// 当前速度
+extern uint16_t* p_OP_ShowNow_Time_Memory;					// 当前时间
+
 extern System_Ctrl_Mode_Type_enum Ctrl_Mode_Type;				// 控制方式  0:按键   1:wifi 2:bt
 // 各模式 属性
 extern Operating_Parameters* p_OP_Free_Mode;

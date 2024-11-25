@@ -25,16 +25,6 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
-// 降频 类型
-/*typedef enum 
-{
-	MOTOR_DOWN_CONVERSION_NO = 0,						//	无
-	MOTOR_DOWN_CONVERSION_MOS_TEMPER,				//	mos 高温
-	MOTOR_DOWN_CONVERSION_BOX_TEMPER,				//	机箱 高温
-	MOTOR_DOWN_CONVERSION_OUT_CURRENT,			//	输出 电流
-	MOTOR_DOWN_CONVERSION_OUT_POWER,				//	输出 功率
-} Motor_Down_Conversion_Type_enum;
-*/
 
 
 /* Exported macro ------------------------------------------------------------*/
@@ -47,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.1"					//显示故障码
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.4"					//显示故障码
 
 /**
 ******************************************************************************
@@ -151,7 +141,7 @@ extern "C" {
 /* 蜂鸣器 音量  50最大  ------------------------------------------------------------*/
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
-#define BUZZER_FREQUENCY					1
+#define BUZZER_FREQUENCY					0
 #else
 #define BUZZER_FREQUENCY					50					// wuqingguang
 #endif
@@ -230,6 +220,7 @@ extern "C" {
 //-------------- 降速 最低速度 -------------------
 #define TIME_SLOW_DOWN_SPEED_MIX										(20)		//最低降到 20%
 #define TIME_SLOW_DOWN_SPEED_MAX										(100)		//恢复速度最高恢复到 100%
+
 
 #endif
 /*==============================================================================================================*/
