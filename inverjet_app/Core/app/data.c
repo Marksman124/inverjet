@@ -396,7 +396,7 @@ void OP_Update_Mode(void)
 		else if(System_Mode_Time())
 			*p_OP_ShowNow_Time = p_OP_Timing_Mode->time - *p_OP_ShowNow_Time;
 				
-		Motor_Speed_Target_Set(0);
+		//Motor_Speed_Target_Set(0);
 		Clean_Automatic_Shutdown_Timer();
 		Clean_Timing_Timer_Cnt();
 	}

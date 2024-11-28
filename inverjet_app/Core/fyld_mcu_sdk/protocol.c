@@ -393,13 +393,14 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
 			else
 				*p_OP_ShowNow_Speed = motor_current_speed;
 			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+			// 保存
+			Update_OP_Speed();
+			
 			if(Motor_is_Start())
 			{
 				Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 			}
-			// 保存
-			Update_OP_Speed();
 		}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed);
@@ -1071,8 +1072,8 @@ void mcu_write_rtctime(unsigned char time[])
 void wifi_test_result(unsigned char result,unsigned char rssi)
 {
     //#error "请自行实现wifi功能测试成功/失败代码,完成后请删除该行"
-	WIFI_Rssi = rssi;
-    if(result == 0) {
+	
+	if(result == 0) {
         //测试失败
         if(rssi == 0x00) {
             //未扫描到名称为tuya_mdev_test路由器,请检查
@@ -1083,6 +1084,8 @@ void wifi_test_result(unsigned char result,unsigned char rssi)
         //测试成功
         //rssi为信号强度(0-100, 0信号最差，100信号最强)
     }
+		
+		WIFI_Rssi = rssi;
 }
 #endif
 

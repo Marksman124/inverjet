@@ -33,20 +33,20 @@ extern "C" {
 
 typedef enum 
 {
-	FAULT_BIT_VOLTAGE_ABNORMAL = 0,					// 电压 异常									E001
-	FAULT_BIT_CURRENT_ABNORMAL,							// 电流 异常									E002
-	FAULT_BIT_CURRENT_BIAS,									// 电流传感器偏置故障				E003
-	FAULT_BIT_SHORT_CIRCUIT,								// 短路											E004
-	FAULT_BIT_LACK_PHASE,										// 缺相											E005
-	FAULT_BIT_LOCK_ROTOR,										// 堵转											E006
+	FAULT_BIT_01_VOLTAGE_ABNORMAL = 0,					// 电压 异常									E001
+	FAULT_BIT_02_CURRENT_ABNORMAL,							// 电流 异常									E002
+	FAULT_BIT_03_CURRENT_BIAS,									// 电流传感器偏置故障				E003
+	FAULT_BIT_04_SHORT_CIRCUIT,									// 短路											E004
+	FAULT_BIT_05_LACK_PHASE,										// 缺相											E005
+	FAULT_BIT_06_LOCK_ROTOR,										// 堵转											E006
 	
-	FAULT_BIT_TEMPERATURE_MOS,							// 温度 MOS									E101
-	FAULT_BIT_TEMPERATURE_AMBIENT,					// 温度 环境									E102
-	
-	FAULT_BIT_TEMPERATURE_SENSOR,						// 温度 传感器								E201
-	FAULT_BIT_DRIVE_BOARD,									// 驱动板 异常								E202
-	FAULT_BIT_DRIVE_LOSS,										// 驱动板 通信故障						E203
-	FAULT_BIT_VOLTAGE_AMBIENT,							// 电压 传感器								E205
+	FAULT_BIT_07_TEMPERATURE_MOS,								// 温度 MOS									E101
+	FAULT_BIT_08_TEMPERATURE_AMBIENT,						// 温度 环境									E102
+		
+	FAULT_BIT_09_TEMPERATURE_SENSOR,						// 温度 传感器								E201
+	FAULT_BIT_10_DRIVE_BOARD,										// 驱动板 异常								E202
+	FAULT_BIT_11_DRIVE_LOSS,										// 驱动板 通信故障						E203
+	FAULT_BIT_12_VOLTAGE_AMBIENT,								// 电压 传感器								E205
 	
 } FAULT_STATE_BIT_E;
 
@@ -55,20 +55,20 @@ typedef enum
 
 
 /* Exported macro ------------------------------------------------------------*/
-#define FAULT_STATE_MAX									(1<<(FAULT_BIT_VOLTAGE_AMBIENT+1))
+#define FAULT_STATE_MAX										(1<<(FAULT_BIT_12_VOLTAGE_AMBIENT+1))
 
-#define FAULT_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_VOLTAGE_ABNORMAL)
-#define FAULT_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_CURRENT_ABNORMAL)
-#define FAULT_BUS_CURRENT_BIAS							(1 << FAULT_BIT_CURRENT_BIAS)
-#define FAULT_ABNORMAL_OUTPUT_VOLTAGE				(1 << FAULT_BIT_SHORT_CIRCUIT)
-#define FAULT_LACK_PHASE										(1 << FAULT_BIT_LACK_PHASE)
-#define FAULT_LOCK_ROTOR										(1 << FAULT_BIT_LOCK_ROTOR)
-#define FAULT_TEMPERATURE_MOS								(1 << FAULT_BIT_TEMPERATURE_MOS)
-#define FAULT_TEMPERATURE_AMBIENT						(1 << FAULT_BIT_TEMPERATURE_AMBIENT)
-#define FAULT_TEMPERATURE_SENSOR						(1 << FAULT_BIT_TEMPERATURE_SENSOR)
-#define FAULT_MOTOR_DRIVER									(1 << FAULT_BIT_DRIVE_BOARD)
-#define FAULT_MOTOR_LOSS										(1 << FAULT_BIT_DRIVE_LOSS)
-#define FAULT_VOLTAGE_AMBIENT								(1 << FAULT_BIT_VOLTAGE_AMBIENT)
+#define E001_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_01_VOLTAGE_ABNORMAL)
+#define E002_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_02_CURRENT_ABNORMAL)
+#define E003_BUS_CURRENT_BIAS							(1 << FAULT_BIT_03_CURRENT_BIAS)
+#define E004_ABNORMAL_SHORT_CIRCUIT				(1 << FAULT_BIT_04_SHORT_CIRCUIT)
+#define E005_LACK_PHASE										(1 << FAULT_BIT_05_LACK_PHASE)
+#define E006_LOCK_ROTOR										(1 << FAULT_BIT_06_LOCK_ROTOR)
+#define E101_TEMPERATURE_MOS							(1 << FAULT_BIT_07_TEMPERATURE_MOS)
+#define E102_TEMPERATURE_AMBIENT					(1 << FAULT_BIT_08_TEMPERATURE_AMBIENT)
+#define E201_TEMPERATURE_SENSOR						(1 << FAULT_BIT_09_TEMPERATURE_SENSOR)
+#define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)
+#define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)
+#define E205_VOLTAGE_AMBIENT							(1 << FAULT_BIT_12_VOLTAGE_AMBIENT)
 
 //#define FAULT_WIFI_TEST_ERROR								0x200
 //-------------- 按键组合响应 总数 -------------------

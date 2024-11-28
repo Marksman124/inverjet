@@ -230,7 +230,8 @@ void WIFI_Update_State_Upload(void)
 		Wifi_DP_Data_Update(DPID_THREAD_ACTIVITY_SIGN); 	//线程活动标志;
 		
 		// 怕不同步 补发一次
-//		Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
+		if(Wifi_System_Fault_Static == 0)
+			Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
 //		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_MODE);  			// 工作模式
 //		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_STATUS); 			// 状态机
 //		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_SPEED); 				// 当前速度

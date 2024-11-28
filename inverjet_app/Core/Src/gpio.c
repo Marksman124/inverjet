@@ -21,27 +21,35 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 
-/* USER CODE BEGIN 0 */
-#define GEAR_MAX		4
 
-#define DIAL_SWITCH_NUMBER		2
+/* USER CODE BEGIN 0 */
+//#define GEAR_MAX		4
 
 //IO_Hardware_Info IO_LED[2]	= {{GPIOB,GPIO_PIN_4},{GPIOB,GPIO_PIN_5}};	//  PB5
-
+/*
 IO_Hardware_Info IO_Pump[2][4] = {
 // PB12, PB13, PB14, PB15,
 {	{GPIOB,GPIO_PIN_12},{GPIOB,GPIO_PIN_13},{GPIOB,GPIO_PIN_14},{GPIOB,GPIO_PIN_15}},
 // PC6, PC7, PC8, PC9,
 {	{GPIOC,GPIO_PIN_6},{GPIOC,GPIO_PIN_7},{GPIOC,GPIO_PIN_8},{GPIOC,GPIO_PIN_9}}
 };
-
+*/
 //IO_Hardware_Info IO_Extend[6] = {	// PA6, PA7, PC4, PC5, PB0, PB1,
 //{GPIOA,GPIO_PIN_6},{GPIOA,GPIO_PIN_7},
 //{GPIOC,GPIO_PIN_4},{GPIOC,GPIO_PIN_5},
 //{GPIOB,GPIO_PIN_0},{GPIOB,GPIO_PIN_1}
 //};
 
-IO_Hardware_Info IO_Dial_Switch[DIAL_SWITCH_NUMBER]	= {{GPIOC,GPIO_PIN_4},{GPIOC,GPIO_PIN_5}};	//  PB5
+
+//--------------- 拨码开关  ----------------------------------
+//*************  位数
+//#define DIAL_SWITCH_NUMBER		2
+#define DIAL_SWITCH_NUMBER		4
+
+//*************  IO 引脚
+//IO_Hardware_Info IO_Dial_Switch[DIAL_SWITCH_NUMBER]	= {{GPIOC,GPIO_PIN_4},{GPIOC,GPIO_PIN_5}};	//  PB5
+IO_Hardware_Info IO_Dial_Switch[DIAL_SWITCH_NUMBER]	= {{SW_1_GPIO_Port,SW_1_Pin},{SW_2_GPIO_Port,SW_2_Pin},{SW_3_GPIO_Port,SW_3_Pin},{SW_4_GPIO_Port,SW_4_Pin}};	//  PB5
+
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
@@ -147,55 +155,55 @@ void MX_GPIO_Init(void)
 //}
 	
 
-void StartUp_Pump(uint8_t num, uint16_t para)
-{
-	if( num > 1)
-		return;
-	
-	switch(para){
-		case 0:
-			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
-		break;
-		case 1:
-			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
-		break;
-		case 2:
-			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
-		break;
-		case 3:
-			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
-		break;
-		case 4:
-			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_SET);
-		break;
-		default:
-#ifdef SYSTEM_HARDWARE_DEBUG
-		if(para == 0xFF)
-		{
-			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_SET);
-		}
-#endif
-			break;
-	}
-}
+//void StartUp_Pump(uint8_t num, uint16_t para)
+//{
+//	if( num > 1)
+//		return;
+//	
+//	switch(para){
+//		case 0:
+//			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
+//		break;
+//		case 1:
+//			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
+//		break;
+//		case 2:
+//			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
+//		break;
+//		case 3:
+//			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_RESET);
+//		break;
+//		case 4:
+//			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_SET);
+//		break;
+//		default:
+//#ifdef SYSTEM_HARDWARE_DEBUG
+//		if(para == 0xFF)
+//		{
+//			HAL_GPIO_WritePin(IO_Pump[num][0].io_type, IO_Pump[num][0].io_pin, GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(IO_Pump[num][1].io_type, IO_Pump[num][1].io_pin, GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(IO_Pump[num][2].io_type, IO_Pump[num][2].io_pin, GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(IO_Pump[num][3].io_type, IO_Pump[num][3].io_pin, GPIO_PIN_SET);
+//		}
+//#endif
+//			break;
+//	}
+//}
 
 uint8_t Gpio_Get_Dial_Switch(void)
 {

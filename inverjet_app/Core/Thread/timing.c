@@ -297,7 +297,7 @@ void Fault_State_Handler(void)
 	}
 	else if(System_is_Error())//故障 2min恢复 非通讯故障
 	{
-		if((If_Fault_Recovery_Max()==0)&&(Get_Motor_Fault_State() != FAULT_MOTOR_LOSS))
+		if((If_Fault_Recovery_Max()==0)&&(Get_Motor_Fault_State() != E203_MOTOR_LOSS))
 		{
 			// 3次以内 退出故障, 超过3次只能重启
 			if((Timing_Half_Second_Cnt - Fault_Recovery_Timing_Cnt) > SYSTEM_FAULT_RECOVERY_TIME)

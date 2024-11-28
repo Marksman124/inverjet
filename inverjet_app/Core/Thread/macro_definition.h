@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.4"					//显示故障码
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.5"					//显示故障码
 
 /**
 ******************************************************************************
@@ -157,7 +157,7 @@ extern "C" {
 //屏幕背光 最大亮度
 #define BACK_LIGHT_BRIGHTNESS_MAX						(500)			// 最大亮度  0~500
 //休眠时间(目前无效)
-#define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//5 min  300000
+#define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//5 min  300 000
 
 // 电机速度每档增加量 5档
 #define	KEY_SPEED_INCREASE_20_GEAR										(1)

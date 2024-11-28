@@ -99,7 +99,7 @@ void Motor_Usart_Restar(void)
 void Clean_Motor_OffLine_Timer(void)
 {
 	Motor_Rx_Timer_cnt = 0;
-	//Motor_Fault_State &= ~FAULT_MOTOR_LOSS;
+	//Motor_Fault_State &= ~E203_MOTOR_LOSS;
 	
 	Motor_Fault_State = 0;
 }
@@ -122,7 +122,7 @@ void App_Motor_Handler(void)
 	if(Motor_Rx_Timer_cnt > FAULT_MOTOR_LOSS_TIME)
 	{
 		//驱动板 通讯故障
-		Motor_Fault_State |= FAULT_MOTOR_LOSS;
+		Motor_Fault_State |= E203_MOTOR_LOSS;
 	}
 #endif
 	// ===================  尝试重启串口
@@ -347,67 +347,67 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	if((type >= MOTOR_FAULT_CODE_START) && (type <= MOTOR_FAULT_CODE_END))
 	{
-		if((type == MOTOR_FAULT_OVER_VOLTAGE ) || (type == MOTOR_FAULT_UNDER_VOLTAGE ))	//-----------母线电压 过压 | 欠压
-			change_fault = FAULT_BUS_VOLTAGE_ABNORMAL;
+		if((type == MOTOR_FAULT_OVER_VOLTAGE ) || (type == MOTOR_FAULT_UNDER_VOLTAGE ))	//-----------母线电压 过压 | 欠压 01 02
+			change_fault = E001_BUS_VOLTAGE_ABNORMAL;
 		
-		else if(type == MOTOR_FAULT_ABS_OVER_CURRENT)			//----------- 过流
-			change_fault = FAULT_BUS_CURRENT_ABNORMAL;
+		else if(type == MOTOR_FAULT_ABS_OVER_CURRENT)			//----------- 过流  04
+			change_fault = E002_BUS_CURRENT_ABNORMAL;
 		
-		else if(type == MOTOR_FAULT_UNBALANCED_CURRENTS) //-----------输出三相电流不平衡
-			change_fault = FAULT_BUS_CURRENT_BIAS;
+		else if((type >= MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_1) && (type <= MOTOR_FAULT_UNBALANCED_CURRENTS ) )//-----------输出三相电流不平衡  15 - 18
+			change_fault = E003_BUS_CURRENT_BIAS;
 		
-		else if(type == MOTOR_FAULT_DRV)		//-----------短路
-			change_fault = FAULT_ABNORMAL_OUTPUT_VOLTAGE;
+		else if(type == MOTOR_FAULT_DRV)		//-----------短路  03
+			change_fault = E004_ABNORMAL_SHORT_CIRCUIT;
 		
-		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- 缺相
-			change_fault = FAULT_LACK_PHASE;
+		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- 缺相 34 - 37
+			change_fault = E005_LACK_PHASE;
 		
-		else if(type == MOTOR_FAULT_OUTPUT_LOCKROTOR)		//-----------堵转
-			change_fault = FAULT_LOCK_ROTOR;
+		else if(type == MOTOR_FAULT_OUTPUT_LOCKROTOR)		//-----------堵转  38
+			change_fault = E006_LOCK_ROTOR;
 		
-		else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS 过热
-			change_fault = FAULT_TEMPERATURE_MOS;
+		else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS 过热 05
+			change_fault = E101_TEMPERATURE_MOS;
 
 		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
-			change_fault = FAULT_VOLTAGE_AMBIENT;
+			change_fault = E205_VOLTAGE_AMBIENT;
 		
-		else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS 传感器故障
-			change_fault = FAULT_TEMPERATURE_SENSOR;
+		else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS 传感器故障 39
+			change_fault = E201_TEMPERATURE_SENSOR;
 		
 		//----------- 其它 故障
 		else
-			change_fault = FAULT_MOTOR_DRIVER;
+			change_fault = E202_MOTOR_DRIVER;
 	}
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 #elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	//母线电压异常
 	if((type & MOTOR_FAULT_BUS_VOLTAGE_UNDER)||(type & MOTOR_FAULT_BUS_CURRENT_OVER))
-		change_fault |= FAULT_BUS_VOLTAGE_ABNORMAL;
+		change_fault |= E001_BUS_VOLTAGE_ABNORMAL;
 	
 	//硬件故障
 	if((type & MOTOR_FAULT_OUT_STEP_FAULT)||(type & MOTOR_FAULT_STARTUP_FAILED))
-		change_fault |= FAULT_MOTOR_DRIVER;
+		change_fault |= E202_MOTOR_DRIVER;
 	
 	//通信故障
 	if((type & MOTOR_FAULT_TIME_OUT)||(type & MOTOR_FAULT_CRC_ERROR))
-		change_fault |= FAULT_MOTOR_LOSS;
+		change_fault |= E203_MOTOR_LOSS;
 		
 	//偏置异常
 	if(type & MOTOR_FAULT_SAMPLE_ERROR)
-		change_fault |= FAULT_BUS_CURRENT_BIAS;
+		change_fault |= E003_BUS_CURRENT_BIAS;
 	
 	//硬件过流  --短路
 	if(type & MOTOR_FAULT_HARDWARE_OVERCURRENT)
-		change_fault |= FAULT_ABNORMAL_OUTPUT_VOLTAGE;
+		change_fault |= E004_ABNORMAL_SHORT_CIRCUIT;
 	
 	//输出过流
 	if(type & MOTOR_FAULT_OUTPUT_OVERCURRENT)
-		change_fault |= FAULT_BUS_CURRENT_ABNORMAL;
+		change_fault |= E002_BUS_CURRENT_ABNORMAL;
 	
 	//缺相
 	if(type & MOTOR_FAULT_LACK_PHASE)
-		change_fault |= FAULT_LACK_PHASE;
+		change_fault |= E005_LACK_PHASE;
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 #endif
 	
@@ -491,7 +491,7 @@ void Motor_State_Analysis(void)
 	uint16_t ntc_tmp[3]={0};
 	
 	//驱动板 通讯故障 恢复
-	Motor_Fault_State &= ~FAULT_MOTOR_LOSS;
+	Motor_Fault_State &= ~E203_MOTOR_LOSS;
 
 	//
 	// 滤波后的mosfet温度
@@ -579,7 +579,7 @@ void Motor_State_Analysis(void)
 
 	
 	//驱动板 通讯故障 恢复
-	Motor_Fault_State &= ~FAULT_MOTOR_LOSS;
+	Motor_Fault_State &= ~E203_MOTOR_LOSS;
 	
 	// 当前 转速
 	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]*10;
@@ -672,7 +672,7 @@ void Drive_Status_Inspection_Motor_Speed(void)
 			if(Number_Of_Fault_Alarms >= 3)//已经报故障
 			{
 				//电机转速不准 故障 202 驱动故障
-				Motor_Fault_State &= ~FAULT_MOTOR_DRIVER;
+				Motor_Fault_State &= ~E202_MOTOR_DRIVER;
 				DEBUG_PRINT("\n[电机故障恢复]\t  实际转速\t%d(rpm)\n",*p_Motor_Reality_Speed);
 			}
 				
@@ -695,7 +695,7 @@ void Drive_Status_Inspection_Motor_Speed(void)
 				if(Number_Of_Fault_Alarms >= 3)
 				{
 					//电机转速不准 故障 202 驱动故障
-					Motor_Fault_State |= FAULT_MOTOR_DRIVER;
+					Motor_Fault_State |= E202_MOTOR_DRIVER;
 					if(Number_Of_Fault_Alarms == 3)
 					{
 						Number_Of_Fault_Alarms ++ ;
@@ -744,7 +744,7 @@ void Drive_Status_Inspection_Motor_Current(void)
 			else
 			{
 				//电机起不来 故障 202 驱动故障
-				Motor_Fault_State |= FAULT_MOTOR_DRIVER;
+				Motor_Fault_State |= E202_MOTOR_DRIVER;
 			}
 		}
 #endif
@@ -761,7 +761,7 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 			Motor_TEMP_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= FAULT_TEMPERATURE_MOS;
+			Motor_Fault_State |= E101_TEMPERATURE_MOS;
 		}
 	}
 	else if(Temperature >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速
@@ -796,7 +796,7 @@ void Check_Down_Conversion_Motor_Power(uint16_t power)
 			Motor_Power_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= FAULT_BUS_CURRENT_ABNORMAL;
+			Motor_Fault_State |= E002_BUS_CURRENT_ABNORMAL;
 		}
 	}
 	else if(power >= (MOTOR_POWER_REDUCE_SPEED))				//-------------  降速
@@ -831,7 +831,7 @@ void Check_Down_Conversion_Motor_Current(uint32_t Current)
 			Motor_Current_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= FAULT_BUS_CURRENT_ABNORMAL;
+			Motor_Fault_State |= E002_BUS_CURRENT_ABNORMAL;
 		}
 	}
 	else if(Current >= (MOTOR_CURRENT_REDUCE_SPEED))				//-------------  降速

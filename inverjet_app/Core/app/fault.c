@@ -154,12 +154,12 @@ uint8_t If_System_Is_Error(void)
 	if(Temperature == -100)
 	{
 		//传感器故障
-		system_fault |= FAULT_TEMPERATURE_SENSOR;
+		system_fault |= E201_TEMPERATURE_SENSOR;
 	}
 	else if(Temperature >= AMBIENT_TEMP_ALARM_VALUE)
 	{
 		//报警 停机
-		system_fault |= FAULT_TEMPERATURE_AMBIENT;
+		system_fault |= E102_TEMPERATURE_AMBIENT;
 	}
 	else if(Temperature >= AMBIENT_TEMP_REDUCE_SPEED)
 	{
@@ -190,7 +190,7 @@ uint8_t If_System_Is_Error(void)
 		if( ( *p_System_Fault_Static >0 ) && (system_fault == 0))
 		{
 			// 通讯故障 可立刻恢复
-			if(*p_System_Fault_Static == FAULT_MOTOR_LOSS )
+			if(*p_System_Fault_Static == E203_MOTOR_LOSS )
 			{
 				CallOut_Fault_State();
 			}
@@ -198,7 +198,7 @@ uint8_t If_System_Is_Error(void)
 //			else if(System_Dial_Switch == 1)
 //			{
 //				//超过3次锁住 不再更新
-//				if((If_Fault_Recovery_Max())&&(*p_System_Fault_Static != FAULT_MOTOR_LOSS))
+//				if((If_Fault_Recovery_Max())&&(*p_System_Fault_Static != E203_MOTOR_LOSS))
 //					return 1;
 //				Add_Fault_Recovery_Cnt();
 //				CallOut_Fault_State();
