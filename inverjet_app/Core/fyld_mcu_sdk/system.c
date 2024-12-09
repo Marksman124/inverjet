@@ -24,7 +24,7 @@
 
 extern const DOWNLOAD_CMD_S download_cmd[];
 
-
+static unsigned char mcu_reset_state = FALSE;
 
 /**
  * @brief  写wifi_uart字节
@@ -128,7 +128,6 @@ void wifi_uart_write_frame(unsigned char fr_type, unsigned char fr_ver, unsigned
 static void heat_beat_check(void)
 {
     unsigned char length = 0;
-    static unsigned char mcu_reset_state = FALSE;
     
     if(FALSE == mcu_reset_state) {
         length = set_wifi_uart_byte(length, FALSE);
@@ -138,6 +137,16 @@ static void heat_beat_check(void)
     }
     
     wifi_uart_write_frame(HEAT_BEAT_CMD, MCU_TX_VER, length);
+}
+
+/**
+ * @brief  获取心跳包检测
+ * @param  Null
+ * @return 心跳包检测结果
+ */
+unsigned char get_mcu_reset_state(void)
+{
+	return mcu_reset_state;
 }
 
 /**

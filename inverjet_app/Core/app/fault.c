@@ -65,8 +65,8 @@ static uint32_t Chassis_TEMP_Timer_cnt= 0;	//高温 计数器
 
 uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,0x006,
 														0x101,0x102,
-														0x201,0x202,0x203,0x205,
-														0x301,0x302,0x303,0x304};
+														0x201,0x202,0x203,0x205,0x206,0x207,
+														0x301,0x302};
 
 uint8_t Fault_Number_Sum = 0;	// 故障总数
 uint8_t Fault_Number_Cnt = 0;	// 当前故障
@@ -142,19 +142,11 @@ uint8_t If_System_Is_Error(void)
 		memcpy(p_Box_Temperature, &vaule, 2);
 	}
 	
-	// wifi故障 
-	if(WIFI_Rssi < WIFI_RSSI_ERROR_VAULE)
-	{
-		DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
-		//system_fault |= FAULT_WIFI_TEST_ERROR;  // 报故障
-		WIFI_Set_Machine_State(WIFI_ERROR);
-	}
-	
 	// 机箱 温度
 	if(Temperature == -100)
 	{
 		//传感器故障
-		system_fault |= E201_TEMPERATURE_SENSOR;
+		system_fault |= E201_TEMPERATURE_HARDWARE;
 	}
 	else if(Temperature >= AMBIENT_TEMP_ALARM_VALUE)
 	{
@@ -194,15 +186,6 @@ uint8_t If_System_Is_Error(void)
 			{
 				CallOut_Fault_State();
 			}
-			//拨码自动恢复  
-//			else if(System_Dial_Switch == 1)
-//			{
-//				//超过3次锁住 不再更新
-//				if((If_Fault_Recovery_Max())&&(*p_System_Fault_Static != E203_MOTOR_LOSS))
-//					return 1;
-//				Add_Fault_Recovery_Cnt();
-//				CallOut_Fault_State();
-//			}
 		}
 		else
 		{
@@ -223,6 +206,24 @@ void Set_Fault_Data(uint16_t type)
 	
 	*p_System_Fault_Static = type;
 	
+}
+
+
+void Clean_Comm_Test(void)
+{
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH, 0);
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485, 0);
+}
+
+
+void Self_Testing_Check_Comm(void)
+{
+	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH ) != 0xAA)
+		Set_Motor_Fault_State(E206_BT_HARDWARE);
+	
+	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) != 0xAA)
+		Set_Motor_Fault_State(E207_RS485_HARDWARE);
 }
 
 //-------------------   ----------------------------
@@ -305,17 +306,17 @@ void Clean_Fault_State(void)
 {
 	Clean_Motor_OffLine_Timer();
 	*p_System_Fault_Static = 0;
-	
 	Fault_Number_Sum = 0;
-	
 	Fault_Number_Cnt = 0;
-		
+	
 	Set_System_State_Machine(*p_System_State_Machine_Memory);
 	Set_System_State_Mode(*p_PMode_Now_Memory);
 	*p_OP_ShowNow_Speed = *p_OP_ShowNow_Speed_Memory;
 	*p_OP_ShowNow_Time = *p_OP_ShowNow_Time_Memory;
-	
-	Data_Set_Current_Speed(*p_OP_ShowNow_Speed_Memory);
+	//恢复后暂停
+	Arbitrarily_To_Pause();
+	//恢复后直接启动
+//	Data_Set_Current_Speed(*p_OP_ShowNow_Speed_Memory);
 }
 /* Private function prototypes -----------------------------------------------*/
 
@@ -490,6 +491,9 @@ static void on_Fault_Button_4_Long_Press(void)
 {
 	//if(If_Fault_Recovery_Max()==0)
 		//System_Power_Off();
+	
+	CallOut_Fault_State();
+	System_Power_Off();
 }
 
 static void on_Fault_Button_1_2_Long_Press(void)

@@ -99,7 +99,6 @@ void Motor_Usart_Restar(void)
 void Clean_Motor_OffLine_Timer(void)
 {
 	Motor_Rx_Timer_cnt = 0;
-	//Motor_Fault_State &= ~E203_MOTOR_LOSS;
 	
 	Motor_Fault_State = 0;
 }
@@ -119,10 +118,15 @@ void App_Motor_Handler(void)
 	// ===================  通讯故障
 	//******************  调试模式 **************************
 #ifndef SYSTEM_DEBUG_MODE
-	if(Motor_Rx_Timer_cnt > FAULT_MOTOR_LOSS_TIME)
+	if(IS_SELF_TEST_MODE())
 	{
-		//驱动板 通讯故障
-		Motor_Fault_State |= E203_MOTOR_LOSS;
+		if(Motor_Rx_Timer_cnt > (FAULT_MOTOR_LOSS_TIME/3))
+			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//驱动板 通讯故障
+	}
+	else
+	{
+		if(Motor_Rx_Timer_cnt > FAULT_MOTOR_LOSS_TIME)
+			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//驱动板 通讯故障
 	}
 #endif
 	// ===================  尝试重启串口
@@ -368,11 +372,11 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 		else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS 过热 05
 			change_fault = E101_TEMPERATURE_MOS;
 
-		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
-			change_fault = E205_VOLTAGE_AMBIENT;
+		//else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
+			//change_fault = E205_VOLTAGE_AMBIENT;
 		
 		else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS 传感器故障 39
-			change_fault = E201_TEMPERATURE_SENSOR;
+			change_fault = E201_TEMPERATURE_HARDWARE;
 		
 		//----------- 其它 故障
 		else
@@ -491,7 +495,7 @@ void Motor_State_Analysis(void)
 	uint16_t ntc_tmp[3]={0};
 	
 	//驱动板 通讯故障 恢复
-	Motor_Fault_State &= ~E203_MOTOR_LOSS;
+	ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 
 	//
 	// 滤波后的mosfet温度
@@ -545,7 +549,7 @@ void Motor_State_Analysis(void)
 		else
 		{
 			result_fault = Change_Faule_To_Upper(*p_Motor_Fault_Static);
-			Motor_Fault_State |= result_fault;
+			Set_Motor_Fault_State(result_fault);
 		}
 	}
 	else
@@ -579,7 +583,7 @@ void Motor_State_Analysis(void)
 
 	
 	//驱动板 通讯故障 恢复
-	Motor_Fault_State &= ~E203_MOTOR_LOSS;
+	ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 	
 	// 当前 转速
 	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]*10;
@@ -633,7 +637,7 @@ void Motor_State_Analysis(void)
 		else
 		{
 			result_fault = Change_Faule_To_Upper(*p_Motor_Fault_Static);
-			Motor_Fault_State |= result_fault;
+			Set_Motor_Fault_State(result_fault);
 		}
 	}
 	else
@@ -672,7 +676,7 @@ void Drive_Status_Inspection_Motor_Speed(void)
 			if(Number_Of_Fault_Alarms >= 3)//已经报故障
 			{
 				//电机转速不准 故障 202 驱动故障
-				Motor_Fault_State &= ~E202_MOTOR_DRIVER;
+				ReSet_Motor_Fault_State(E202_MOTOR_DRIVER);
 				DEBUG_PRINT("\n[电机故障恢复]\t  实际转速\t%d(rpm)\n",*p_Motor_Reality_Speed);
 			}
 				
@@ -695,7 +699,7 @@ void Drive_Status_Inspection_Motor_Speed(void)
 				if(Number_Of_Fault_Alarms >= 3)
 				{
 					//电机转速不准 故障 202 驱动故障
-					Motor_Fault_State |= E202_MOTOR_DRIVER;
+					Set_Motor_Fault_State(E202_MOTOR_DRIVER);
 					if(Number_Of_Fault_Alarms == 3)
 					{
 						Number_Of_Fault_Alarms ++ ;
@@ -744,7 +748,7 @@ void Drive_Status_Inspection_Motor_Current(void)
 			else
 			{
 				//电机起不来 故障 202 驱动故障
-				Motor_Fault_State |= E202_MOTOR_DRIVER;
+				Set_Motor_Fault_State(E202_MOTOR_DRIVER);
 			}
 		}
 #endif
@@ -761,7 +765,7 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 			Motor_TEMP_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= E101_TEMPERATURE_MOS;
+			Set_Motor_Fault_State(E101_TEMPERATURE_MOS);
 		}
 	}
 	else if(Temperature >= (MOS_TEMP_REDUCE_SPEED))				//-------------  降速
@@ -796,7 +800,7 @@ void Check_Down_Conversion_Motor_Power(uint16_t power)
 			Motor_Power_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= E002_BUS_CURRENT_ABNORMAL;
+			Set_Motor_Fault_State(E002_BUS_CURRENT_ABNORMAL);
 		}
 	}
 	else if(power >= (MOTOR_POWER_REDUCE_SPEED))				//-------------  降速
@@ -831,7 +835,7 @@ void Check_Down_Conversion_Motor_Current(uint32_t Current)
 			Motor_Current_Timer_cnt ++;
 		else
 		{
-			Motor_Fault_State |= E002_BUS_CURRENT_ABNORMAL;
+			Set_Motor_Fault_State(E002_BUS_CURRENT_ABNORMAL);
 		}
 	}
 	else if(Current >= (MOTOR_CURRENT_REDUCE_SPEED))				//-------------  降速
@@ -876,6 +880,17 @@ uint16_t Get_Motor_Fault_State(void)
 	return Motor_Fault_State;
 }
 
+//-------------------- 设置电机故障状态 ----------------------------
+void Set_Motor_Fault_State(uint16_t fault_bit)
+{
+	 Motor_Fault_State |= fault_bit;
+}
+
+//-------------------- 清除电机故障状态 ----------------------------
+void ReSet_Motor_Fault_State(uint16_t fault_bit)
+{
+	 Motor_Fault_State &= ~fault_bit;
+}
 
 //-------------------- 发送 ----------------------------
 void Motor_UART_Send(uint8_t* p_buff, uint8_t len)

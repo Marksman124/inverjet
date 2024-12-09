@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.5"					//显示故障码
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.6"					//显示故障码
 
 /**
 ******************************************************************************
@@ -237,6 +237,9 @@ extern "C" {
 //1秒周期数
 #define MODBUS_THREAD_ONE_SECOND						(1000/MODBUS_THREAD_LIFECYCLE)				// 1 s
 
+//通讯故障 报警时间
+//#define FAULT_MODBUS_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 秒  wuqingguang
+
 #endif
 /*==============================================================================================================*/
 /*==============================================================================================================*/
@@ -376,9 +379,8 @@ extern "C" {
 // wifi 故障 信号判断值
 #define WIFI_RSSI_ERROR_VAULE										(50)
 
-// 故障上传 去抖 次数
-#define WIFI_FAULT_DEBOUNCE_TIMES								(3)
-
+//通讯故障 报警时间
+#define FAULT_WIFI_LOST_TIME							(3000/(WIFI_THREAD_LIFECYCLE))				// 3 秒  wuqingguang
 
 // 结束统计 上传 最低时间 -- 低于 1min 不计入统计  单位(秒)
 #define WIFI_STATISTICE_UPLOAD_MINIMUM_TIME										(60)

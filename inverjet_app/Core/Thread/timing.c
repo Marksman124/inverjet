@@ -70,7 +70,6 @@ static uint32_t Old_Chemical_Equipment_Cnt =0;
 // 硬件 & 驱动
 void App_Timing_Init(void)
 {
-	
 	LCD_Show_Bit = STATUS_BIT_PERCENTAGE;
 	
 	System_Boot_Screens();
@@ -80,6 +79,7 @@ void App_Timing_Init(void)
 	all_data_update();		// wifi 上传
 	
 	System_Power_Off();
+	Clean_Comm_Test();
 }
 
 void Clean_Timing_Timer_Cnt(void)
@@ -320,8 +320,11 @@ void Fault_State_Handler(void)
 			//超时 故障 恢复
 			if( (Timing_Half_Second_Cnt - System_Fault_Timing_Cnt) > SYSTEM_FAULT_TIME_CALLOUT)
 			{
-				System_Fault_Recovery_Cnt++;
-				CallOut_Fault_State();
+				if(IS_SELF_TEST_MODE() == 0)
+				{
+					System_Fault_Recovery_Cnt++;
+					CallOut_Fault_State();
+				}
 				//Fault_Recovery_Attempt_cnt = RECOVERY_ATTEMPT_TIME;
 			}
 		}
@@ -788,12 +791,14 @@ void App_Timing_Handler(void)
 	Thread_Activity_Sign_Clean();
 	MB_Write_Timer_CallOut();
 	
-	if(System_Self_Testing_State == 0xAA)
+	if(IS_SELF_TEST_MODE())
 	{
 		System_Self_Testing_Porgram();
 		//System_Power_Off();
 		System_Power_On();
-		System_Self_Testing_State = 0;
+		Self_Testing_Check_Comm();
+		
+		//OUT_SELF_TEST_MODE();
 	}
 	else
 	{

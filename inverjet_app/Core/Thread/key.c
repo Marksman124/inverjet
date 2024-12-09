@@ -116,7 +116,7 @@ uint32_t Key_For_Sleep_time = 0;		// 睡眠时间
 
 uint32_t Key_Long_Press_cnt[KEY_CALL_OUT_NUMBER_MAX]={0};	// 长按 计数器
 
-uint8_t System_Self_Testing_State = 0;
+uint8_t System_Self_Testing_State;
 
 uint8_t Key_Buzzer_cnt = 0; //蜂鸣器计时
 uint8_t Key_Buzzer_Type = 0;	//蜂鸣器长短 类型
@@ -486,9 +486,7 @@ void Special_Button_Rules(uint8_t key_value)
 			// 自测
 			if(key_value == KEY_VALUE_BIT_BUTTON_1)
 			{
-				Buzzer_Click_Long_On(1);
-				System_Self_Testing_State = 0xAA;
-				Breath_light_Max();
+				IN_SELF_TEST_MODE();
 			}
 			// 菜单
 			else if(key_value == KEY_VALUE_BIT_BUTTON_2)
@@ -585,6 +583,12 @@ void App_Key_Task(void)
 		if(Key_Handler_Timer > (Key_For_Sleep_time + KEY_FOR_SLEEP_TIME_SHORT))
 		{
 			TM1621_Set_light_Mode(1);
+		}
+		
+		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE) == 0xAA )
+		{
+			Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
+			IN_SELF_TEST_MODE();
 		}
 		
 		for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
@@ -702,7 +706,7 @@ void App_Key_Handler(void)
 				Buzzer_Click_Handler();
 				
 				//自测模式
-				if(System_Self_Testing_State == 0xAA)
+				if(IS_SELF_TEST_MODE())
 				{
 					if(Key_IO_Hardware > 0)
 					{

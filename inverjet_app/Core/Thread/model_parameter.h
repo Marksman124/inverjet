@@ -57,9 +57,9 @@ extern "C" {
 //*********************************************************************************************
 //-------------------------------------------------------------------------------------------------
 //-------------- MOS 温度报警值 90°C -------------------
-#define MOS_TEMP_ALARM_VALUE								(85 + DEBUG_TEMP_ALARM_OFFSET)		//			85
+#define MOS_TEMP_ALARM_VALUE								(95 + DEBUG_TEMP_ALARM_OFFSET)		//			85
 //-------------- MOS 温度 降速 80°C -------------------
-#define MOS_TEMP_REDUCE_SPEED								(80 + DEBUG_TEMP_ALARM_OFFSET)		// 降档 温度			80
+#define MOS_TEMP_REDUCE_SPEED								(90 + DEBUG_TEMP_ALARM_OFFSET)		// 降档 温度			80
 #define MOS_TEMP_RESTORE_SPEED							(75 + DEBUG_TEMP_ALARM_OFFSET)		// 恢复 温度			75
 //-------------------------------------------------------------------------------------------------
 // 温度 降频  机箱

@@ -93,6 +93,9 @@ typedef enum
 #define	THREAD_ACTIVITY_MOTOR										( 1<<4 )
 #define	THREAD_ACTIVITY_WIFI										( 1<<5 )
 
+#define IN_SELF_TEST_MODE()											(System_Self_Testing_State = 0xAA)
+#define OUT_SELF_TEST_MODE()										(System_Self_Testing_State = 0)
+#define IS_SELF_TEST_MODE()											((System_Self_Testing_State == 0xAA) ? 1:0)
 
 /* Exported functions prototypes ---------------------------------------------*/
 //================= 冲浪模式 全局 参数 ================================

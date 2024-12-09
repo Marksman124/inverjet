@@ -15,6 +15,8 @@
 #include "key.h"
 #include "wifi.h"
 #include "debug_protocol.h"
+#include "Breath_light.h"
+
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -290,7 +292,7 @@ void Lcd_Show(void)
 		return ;
 	}
 	
-	if(System_is_Operation() || System_is_Power_Off()|| (System_Self_Testing_State == 0xAA))
+	if(System_is_Operation() || System_is_Power_Off()|| (IS_SELF_TEST_MODE()))
 	{
 			return ;
 	}
@@ -417,7 +419,7 @@ void Lcd_Show_Slow_Down(uint8_t value)
 //-------------  To-->关机 ------------------------------------
 void To_Power_Off(void)
 {
-	System_Self_Testing_State = 0;
+	OUT_SELF_TEST_MODE();
 	
 	Set_System_State_Machine(POWER_OFF_STATUS);		// 状态机
 	*p_OP_ShowNow_Speed = 0;											// 当前速度
@@ -431,6 +433,8 @@ void To_Power_Off(void)
 //-------------  To-->自由模式 ------------------------------------
 void To_Free_Mode(uint8_t mode)
 {
+	OUT_SELF_TEST_MODE();
+	
 	if(mode == 0)
 		Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 	else
@@ -498,9 +502,10 @@ void To_Train_Mode(uint8_t num)
 //-------------  To-->自测 ------------------------------------
 void System_Self_Testing_Porgram(void)
 {
-	System_Self_Testing_State = 0xAA;
-	//wifi 测试
+	Buzzer_Click_Long_On(1);
+	Breath_light_Max();
 	
+	Clean_Comm_Test();
 	mcu_start_wifitest();
 	
 	Led_Button_On(0);	// 按键
@@ -509,6 +514,9 @@ void System_Self_Testing_Porgram(void)
 	TM1621_Show_All();//全亮 2s
 	osDelay(2000);
 	TM1621_Show_Repeat_All();//全部循环
+	
+	Lcd_System_Information();//机型码 & 拨码状态 2s
+	osDelay(2000);
 	//
 }
 

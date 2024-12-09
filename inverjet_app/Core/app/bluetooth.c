@@ -35,6 +35,10 @@ uint8_t BT_Uart_Read_Buffer;
 //声明一个对象
 ModbusSlaveObj_t Ms_BT_Modbus;
 
+//串口接收
+uint8_t BT_Read_Buffer_For_Test[128]={0};
+uint8_t BT_Read_Cnt_For_Test=0;
+
 static uint16_t BT_Halder_cnt = 0;
 /* Private function prototypes -----------------------------------------------*/
 
@@ -50,24 +54,32 @@ void SerialWrite(unsigned char *buff,int length)
 void BT_Read_Data_Bit(unsigned char vaule)
 {
 	//MsSerialRead(&Ms_BT_Modbus,&vaule,1);
-	if(Ms_BT_Modbus.rxWriteLock)
+	if(IS_SELF_TEST_MODE())
 	{
-			return;
-	}
-
-	Ms_BT_Modbus.rxTimerEnable = 1;
-	Ms_BT_Modbus.rxTimerCnt = 0;
-
-	Ms_BT_Modbus.rxBuff[Ms_BT_Modbus.rxWriteIdx] =vaule;
-	if(Ms_BT_Modbus.rxWriteIdx < (MODBUS_SLAVE_TX_RX_MAX_LEN - 1))
-	{
-			Ms_BT_Modbus.rxWriteIdx++;
+		if( vaule == 0x3E)// '>'
+			Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH, 0xAA);
+		BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test++] =vaule;
 	}
 	else
 	{
-		Ms_BT_Modbus.rxWriteIdx = 0;
+		if(Ms_BT_Modbus.rxWriteLock)
+		{
+				return;
+		}
+
+		Ms_BT_Modbus.rxTimerEnable = 1;
+		Ms_BT_Modbus.rxTimerCnt = 0;
+
+		Ms_BT_Modbus.rxBuff[Ms_BT_Modbus.rxWriteIdx] =vaule;
+		if(Ms_BT_Modbus.rxWriteIdx < (MODBUS_SLAVE_TX_RX_MAX_LEN - 1))
+		{
+				Ms_BT_Modbus.rxWriteIdx++;
+		}
+		else
+		{
+			Ms_BT_Modbus.rxWriteIdx = 0;
+		}
 	}
-	
 		
 }
 
@@ -133,13 +145,46 @@ void BT_Set_TRANSENTER(uint8_t data)
 		SerialWrite((uint8_t*)buff,strlen(buff));
 	}
 }
+// AT 指令 扫描
+void BT_Scan_Server(void)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+BLESCAN\r\n");
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+}
+
+// AT 指令 重启
+void BT_Restar(void)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+RST\r\n");
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+}
+
+
+// AT 指令 连接 工装
+void BT_Connect_TestServer(void)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+BLECONNECT=123456789000\r\n");
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+}
+
 //
 void BT_Module_AT_Init(void)
 {
 	BT_Set_TRANSENTER(0);
 	osDelay(1000);
-	BT_Set_MTU(243);
+	BT_Set_Mode(0);
 	osDelay(2000);
+	BT_Set_MTU(243);
+	osDelay(1000);
 	BT_Set_TRANSENTER(1);//进入透传
 }
 //
@@ -163,6 +208,27 @@ void BT_Module_AT_ReInit(void)
 	BT_Set_MTU(243);
 	//osDelay(2000);
 }
+
+
+//------------------- 蓝牙 进入工装 ----------------------------
+void BT_Module_AT_InTest(void)
+{
+	BT_Set_TRANSENTER(0);
+	osDelay(1000);
+	BT_Restar();
+	osDelay(1000);
+	BT_Set_Mode(1);
+	osDelay(3000);
+	BT_Connect_TestServer();
+}
+
+
+//------------------- 蓝牙 持续测试 ----------------------------
+void BT_Module_AT_DoTest(void)
+{
+	BT_Connect_TestServer();
+}
+
 //------------------- 蓝牙 Modbus 配置初始化 ----------------------------
 void BT_Modbus_Config_Init(void)
 {
@@ -204,8 +270,39 @@ BT_STATE_MODE_E BT_Get_Machine_State(void)
 
 //------------------- 接收处理函数 ----------------------------
 void BT_Read_Handler(void)
-{	
-	MsProcess(&Ms_BT_Modbus);
+{
+	static uint8_t self_test_cnt=0;
+	
+	if(IS_SELF_TEST_MODE())
+	{
+		if(self_test_cnt == 0)
+		{
+			BT_Module_AT_InTest();
+			self_test_cnt = 1;
+			memset(BT_Read_Buffer_For_Test,0,128);
+			BT_Read_Cnt_For_Test = 0;
+			osDelay(3000);
+		}
+		
+		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH) == 0xAA)
+		{
+			BT_Set_TRANSENTER(0);
+		}
+		else
+		{
+			osDelay(1000);
+			BT_Module_AT_DoTest();
+		}
+	}
+	else
+	{
+		if(self_test_cnt != 0)
+		{
+			self_test_cnt = 0;
+			BT_Set_Mode(0);
+		}
+		MsProcess(&Ms_BT_Modbus);
+	}
 }
 
 //------------------- 进入配网 ----------------------------

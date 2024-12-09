@@ -76,6 +76,11 @@ extern void BT_Module_AT_Init(void);
 //重新初始化
 extern void BT_Module_AT_ReInit(void);
 
+//------------------- 蓝牙 进入工装 ----------------------------
+extern void BT_Module_AT_InTest(void);
+//------------------- 蓝牙 持续测试 ----------------------------
+extern void BT_Module_AT_DoTest(void);
+
 //------------------- 接收处理函数 ----------------------------
 extern void BT_Read_Handler(void);
 

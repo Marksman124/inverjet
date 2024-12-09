@@ -324,9 +324,31 @@ void wifi_Module_Init(void)
 //  20 ms
 void Wifi_Module_Handler(void)
 {
+	static uint32_t WIFI_Rx_Timer_cnt= 0;
+	
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_WIFI);
 	
 	wifi_uart_service();
+	
+	if(IS_SELF_TEST_MODE())
+	{
+		// ===================  通讯故障
+		if(get_mcu_reset_state() == FALSE)
+			WIFI_Rx_Timer_cnt++;  //通信故障计数器
+		else
+			WIFI_Rx_Timer_cnt = 0;
+		
+		if(WIFI_Rx_Timer_cnt > FAULT_WIFI_LOST_TIME)
+		{
+			Set_Motor_Fault_State(E205_WIFI_HARDWARE);
+		}
+		// =================== wifi 信号故障 
+		if(WIFI_Rssi < WIFI_RSSI_ERROR_VAULE)
+		{
+			DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
+			Set_Motor_Fault_State(E205_WIFI_HARDWARE);
+		}
+	}
 	
 	if(System_is_OTA() == 0)
 	{

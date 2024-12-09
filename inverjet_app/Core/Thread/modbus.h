@@ -90,6 +90,11 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 // ----------------------------------------------------------------------------------------------
 #define MB_ANALOG_KEY_VALUE        					( 0x40 )	//	虚拟按键 (一次有效)
 // ----------------------------------------------------------------------------------------------
+#define MB_SYSTEM_SELF_TEST_STATE        		( 0x60 )	//	
+#define MB_COMM_TEST_BLUETOOTH        			( 0x61 )	//	BT 		写入测试 (测试使用)
+#define MB_COMM_TEST_RS485        					( 0x62 )	//	RS485 写入测试 (测试使用)
+
+// ----------------------------------------------------------------------------------------------
 #define MB_USER_FREE_MODE_SPEED		        	( 0x80 )	//	用户 自由模式 	转速
 #define MB_USER_FREE_MODE_TIME        			( 0x81 )	//								时间
 #define MB_USER_TIME_MODE_SPEED		        	( 0x82 )	//	用户 定时模式 	转速

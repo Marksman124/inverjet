@@ -92,7 +92,7 @@ extern "C" {
 
 
 //驱动板故障 标志位
-#define MOTOR_FAULT_SIGN_BIT						(E102_TEMPERATURE_AMBIENT)
+#define MOTOR_FAULT_SIGN_BIT						(E102_TEMPERATURE_AMBIENT | E205_WIFI_HARDWARE | E206_BT_HARDWARE | E207_RS485_HARDWARE)
 #define CLEAN_MOTOR_FAULT(n)						(n &= MOTOR_FAULT_SIGN_BIT)
 
 #define	MOTOR_PROTOCOL_HEADER_OFFSET						3
@@ -243,6 +243,10 @@ extern void Down_Conversion_State_Clea(void);
 //-------------------- 获取电机故障状态 ----------------------------
 uint16_t Get_Motor_Fault_State(void);
 
+//-------------------- 设置电机故障状态 ----------------------------
+void Set_Motor_Fault_State(uint16_t fault_bit);
+//-------------------- 清除电机故障状态 ----------------------------
+void ReSet_Motor_Fault_State(uint16_t fault_bit);
 
 //------------------- 发送 ----------------------------
 extern void Motor_Speed_Send(uint32_t speed_rpm);

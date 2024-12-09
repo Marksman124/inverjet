@@ -326,6 +326,14 @@ void mcu_set_wifi_mode(unsigned char mode);
  * @note   如果为模块自处理模式,MCU无须调用该函数
  */
 unsigned char mcu_get_wifi_work_state(void);
+
+/**
+ * @brief  获取心跳包检测
+ * @param  Null
+ * @return 心跳包检测结果
+ */
+unsigned char get_mcu_reset_state(void);
+
 #endif
 
 #ifdef SUPPORT_GREEN_TIME

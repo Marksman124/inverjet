@@ -971,6 +971,7 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
 			}
 			else
 			{
+				taskENTER_CRITICAL();
         //固件数据发送完成
 				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&Wifi_OTA_Pack_Len,2); // 写包长度 (含crc)
 				sign = PRODUCT_BOOT_PASSWORD;
@@ -981,7 +982,7 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
 				STMFLASH_Write(BOOT_FLASH_ADDR_APP_PARAM_ADDR,(uint16_t*)&sign,2); 	// app 程序参数 地址
 				sign = FLASH_APP_PROGRAM_PAGE;
 				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_SIZE,(uint16_t*)&sign,2); 	// 程序升级包 大小
-				
+				taskEXIT_CRITICAL();
 			}
 			
 			SysSoftReset();// 软件复位

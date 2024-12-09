@@ -376,11 +376,12 @@ void Modbus_Init(void)
 
 void Modbus_Handle_Task(void)
 {
+	ModbusTimerCnt ++;
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_RS485_MODBUS);
 	
 	( void )eMBPoll(  );//启动modbus侦听
 	
-	if(ModbusTimerCnt++ > MODBUS_RESTART_TIMEOUT)
+	if(ModbusTimerCnt > MODBUS_RESTART_TIMEOUT)
 	{
 		ModbusTimerCnt = 0;
 		vMBPortSerialEnable( TRUE, FALSE );
@@ -591,6 +592,9 @@ void MB_Get_Mapping_Register(void)
 
 	//================= 冲浪模式 全局 参数 ================================
 	Surf_Mode_Info_Get_Mapping();
+	
+	//================= 自检模式  ================================
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
 }
 
 

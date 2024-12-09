@@ -43,10 +43,12 @@ typedef enum
 	FAULT_BIT_07_TEMPERATURE_MOS,								// 温度 MOS									E101
 	FAULT_BIT_08_TEMPERATURE_AMBIENT,						// 温度 环境									E102
 		
-	FAULT_BIT_09_TEMPERATURE_SENSOR,						// 温度 传感器								E201
+	FAULT_BIT_09_TEMPERATURE_HARDWARE,					// 温度 (硬件故障)						E201
 	FAULT_BIT_10_DRIVE_BOARD,										// 驱动板 异常								E202
 	FAULT_BIT_11_DRIVE_LOSS,										// 驱动板 通信故障						E203
-	FAULT_BIT_12_VOLTAGE_AMBIENT,								// 电压 传感器								E205
+	FAULT_BIT_12_WIFI_HARDWARE,									// WIFI 模组 (硬件故障)			E205
+	FAULT_BIT_13_BT_HARDWARE,										// BT 模组 (硬件故障)				E206
+	FAULT_BIT_14_RS485_HARDWARE,								// RS485 模组 (硬件故障)			E207
 	
 } FAULT_STATE_BIT_E;
 
@@ -55,7 +57,7 @@ typedef enum
 
 
 /* Exported macro ------------------------------------------------------------*/
-#define FAULT_STATE_MAX										(1<<(FAULT_BIT_12_VOLTAGE_AMBIENT+1))
+#define FAULT_STATE_MAX										(1<<(FAULT_BIT_14_RS485_HARDWARE+1))
 
 #define E001_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_01_VOLTAGE_ABNORMAL)
 #define E002_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_02_CURRENT_ABNORMAL)
@@ -65,12 +67,13 @@ typedef enum
 #define E006_LOCK_ROTOR										(1 << FAULT_BIT_06_LOCK_ROTOR)
 #define E101_TEMPERATURE_MOS							(1 << FAULT_BIT_07_TEMPERATURE_MOS)
 #define E102_TEMPERATURE_AMBIENT					(1 << FAULT_BIT_08_TEMPERATURE_AMBIENT)
-#define E201_TEMPERATURE_SENSOR						(1 << FAULT_BIT_09_TEMPERATURE_SENSOR)
+#define E201_TEMPERATURE_HARDWARE					(1 << FAULT_BIT_09_TEMPERATURE_HARDWARE)
 #define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)
 #define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)
-#define E205_VOLTAGE_AMBIENT							(1 << FAULT_BIT_12_VOLTAGE_AMBIENT)
+#define E205_WIFI_HARDWARE								(1 << FAULT_BIT_12_WIFI_HARDWARE)
+#define E206_BT_HARDWARE									(1 << FAULT_BIT_13_BT_HARDWARE)
+#define E207_RS485_HARDWARE								(1 << FAULT_BIT_14_RS485_HARDWARE)
 
-//#define FAULT_WIFI_TEST_ERROR								0x200
 //-------------- 按键组合响应 总数 -------------------
 #define CALL_OUT_NUMBER_MAX						8
 
@@ -92,6 +95,9 @@ extern uint8_t If_System_Is_Error(void);
 // 设置故障值
 void Set_Fault_Data(uint16_t type);
 
+// 接口检测
+void Clean_Comm_Test(void);
+void Self_Testing_Check_Comm(void);
 //-------------------   ----------------------------
 
 // 获取总数
