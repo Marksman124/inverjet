@@ -265,7 +265,10 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 	//版本号显示小数点
 	if((type == OPERATION_DISPLAY_VERSION) || (type == OPERATION_DEIVES_VERSION))
 	{
-		Display_Mode_Show(*p_Software_Version_low);
+		if(type == OPERATION_DISPLAY_VERSION)
+			Display_Mode_Show((*p_Software_Version_low)&0xFF);
+		else
+			Display_Mode_Hide();
 		Lcd_Display_Symbol(STATUS_BIT_POINT);
 		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 8);
 	}
@@ -563,7 +566,7 @@ static void on_Button_3_clicked(void)
 		case OPERATION_SHIELD_MENU:
 			Operation_State_Machine = OPERATION_DISPLAY_VERSION;
 			
-			Lcd_Show_Operation( Operation_State_Machine, ((*p_Software_Version_high)*100 + (*p_Software_Version_middle)));
+			Lcd_Show_Operation( Operation_State_Machine, ((*p_Software_Version_high)*100 + ((*p_Software_Version_low)>>8)));
 		break;
 		
 		case OPERATION_DISPLAY_VERSION:
@@ -576,7 +579,7 @@ static void on_Button_3_clicked(void)
 #endif
 			Operation_State_Machine = OPERATION_DEIVES_VERSION;
 			//Lcd_Show_Operation( Operation_State_Machine, (DEVICES_VERSION_HIGH*100 + DEVICES_VERSION_LOW));
-		Lcd_Show_Operation( Operation_State_Machine, (*p_Driver_Software_Version));
+		Lcd_Show_Operation( Operation_State_Machine, (Driver_Software_Version_Read));
 		break;
 		default:
 #ifdef OPERATION_P5_ACCELERATION

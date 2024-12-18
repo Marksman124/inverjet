@@ -97,7 +97,6 @@ HoldingCallOut( USHORT usAddress )
 		}
 		if(Motor_is_Start())
 		{
-			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		else
@@ -111,7 +110,6 @@ HoldingCallOut( USHORT usAddress )
 	{
 		if(Motor_is_Start())
 		{
-			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		else
@@ -524,8 +522,6 @@ void MB_Get_Mapping_Register(void)
 
 	p_Motor_Pole_Number = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_POLE_NUMBER);
 	
-	//驱动板软件版本
-	p_Driver_Software_Version = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER , MB_DRIVER_SOFTWARE_VERSION);
 	//系统 故障状态
 	p_System_Fault_Static = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER , MB_SYSTEM_FAULT_STATUS);
 	//电机 故障状态

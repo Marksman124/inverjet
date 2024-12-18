@@ -67,7 +67,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	uint32_t password=0;
 	uint8_t time_cnt=0;
-	char buffer[FLASH_ADDR_OFFSET_BOOT_VERSION] = {"1.0.9"};
+	char buffer[FLASH_ADDR_OFFSET_BOOT_VERSION] = {"1.1.0"};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

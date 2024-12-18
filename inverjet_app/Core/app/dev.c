@@ -21,7 +21,6 @@
 uint16_t* p_Local_Address;			//	本地地址
 
 uint16_t* p_Software_Version_high;			//	软件版本 高
-uint16_t* p_Software_Version_middle;		//	软件版本 中
 uint16_t* p_Software_Version_low;				//	软件版本 低
 
 //与上位机modbus
@@ -80,9 +79,8 @@ void Dev_Information_Init(void)
 	p_Baud_Rate = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SLAVE_BAUD_RATE);
 	Dev_BaudRate_Get(MODBUS_USART);
 	
-	p_Software_Version_high 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION);					//	软件版本
-	p_Software_Version_middle = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION + 1);
-	p_Software_Version_low	 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION + 2);
+	p_Software_Version_high 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION_HIGH);					//	软件版本
+	p_Software_Version_low	 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_DISPLAY_SOFTWARE_VERSION_LOW);
 	
 	// 屏蔽 控制方式
 	p_Support_Control_Methods = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SUPPORT_CONTROL_METHODS);

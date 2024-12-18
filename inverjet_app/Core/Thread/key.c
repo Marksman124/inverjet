@@ -345,7 +345,6 @@ void on_pushButton_1_Long_Press(void)
 		else
 			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
 
-		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);
 		Arbitrarily_To_Initial();
 		//Lcd_Show();
 	}
@@ -573,6 +572,8 @@ void Buzzer_Click_Handler(void)
 //  20 ms
 void App_Key_Task(void)
 {
+	//static uint8_t self_test_cnt=0;
+		
 	uint8_t i;	
 	Key_Handler_Timer ++;
 	
@@ -587,8 +588,11 @@ void App_Key_Task(void)
 		
 		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE) == 0xAA )
 		{
-			Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
-			IN_SELF_TEST_MODE();
+			//if(self_test_cnt++ > 100)
+			{
+				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
+				IN_SELF_TEST_MODE();
+			}
 		}
 		
 		for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
@@ -760,7 +764,6 @@ uint8_t Key_Get_IO_Input(void)
 //	开机 进入自由模式
 void System_Power_On(void)
 {
-	
 	Out_Of_Upgradation();
 	Freertos_TaskResume_All();
 	// 检查各模式 属性
@@ -801,8 +804,6 @@ void System_Power_Off(void)
 	
 	//退出100档位模式
 	Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
-	
-	Breath_light_Off();
 }
 
 //	开机画面
@@ -844,10 +845,14 @@ void Restore_Factory_Settings(void)
 }
 
 //	OTA
-void System_To_OTA(void)
+uint8_t System_To_OTA(void)
 {
+	if(Motor_is_Start())
+		return ERROR;
 	Set_System_State_Machine(OTA_UPGRADE_STATUS);
 	Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
+	
+	return SUCCESS;
 }
 
 

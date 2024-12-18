@@ -200,18 +200,28 @@ uint8_t Motor_Speed_Update(void)
 	
 	if( Motor_Speed_Now > Motor_Speed_Target )
 	{
-		if((Motor_Speed_Target + Motor_Acceleration) < Motor_Speed_Now)
-			Motor_Speed_Now -= Motor_Acceleration;
+		if((Motor_Speed_Target == 0) && (Motor_Speed_Now <= MOTOR_ACTUAL_SPEED_MIN))// 最低直接关
+			Motor_Speed_Now = 0;
 		else
-			Motor_Speed_Now = Motor_Speed_Target;
+		{
+			if((Motor_Speed_Target + Motor_Acceleration) < Motor_Speed_Now)
+				Motor_Speed_Now -= Motor_Acceleration;
+			else
+				Motor_Speed_Now = Motor_Speed_Target;
+		}
 		result = 1;
 	}
 	else if( Motor_Speed_Now < Motor_Speed_Target )
 	{
-		if((Motor_Speed_Now + Motor_Acceleration) < Motor_Speed_Target)
-			Motor_Speed_Now += Motor_Acceleration;
+		if((Motor_Speed_Now == 0) && (Motor_Speed_Target >= MOTOR_ACTUAL_SPEED_MIN))// 最低直接开
+			Motor_Speed_Now = MOTOR_ACTUAL_SPEED_MIN;
 		else
-			Motor_Speed_Now = Motor_Speed_Target;
+		{
+			if((Motor_Speed_Now + Motor_Acceleration) < Motor_Speed_Target)
+				Motor_Speed_Now += Motor_Acceleration;
+			else
+				Motor_Speed_Now = Motor_Speed_Target;
+		}
 		result = 1;
 	}
 	else
@@ -254,19 +264,21 @@ void Motor_Speed_Target_Set(uint8_t speed)
 	
 	if((speed < MOTOR_PERCENT_SPEED_MIX) && (speed > 0))
 		speed = MOTOR_PERCENT_SPEED_MIX;
-	
-	//*p_OP_ShowNow_Speed = speed;
 
+	if(Motor_Speed_Target != speed)
+		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
+	
 	Motor_Speed_Target = speed;
-	Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 }
 
 //------------------- 电机 快速停止 ----------------------------
 void Motor_Quick_Stop(void)
 {
+	if(Motor_Speed_Target != 0)
+		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
+	
 	Motor_Speed_Target = 0;
 	Motor_Speed_Now = 1;
-	Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 }
 
 //------------------- 电机转速 目标值 设置 ----------------------------
@@ -503,7 +515,11 @@ void Motor_State_Analysis(void)
 	memcpy(p_Mos_Temperature, &Temperature, 2);
 	
 	// 滤波后的电机温度 改用 软件版本
-	*p_Driver_Software_Version = Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET+1];
+	
+	Driver_Software_Version_Read = Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET+1];
+
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_DRIVER_SOFTWARE_VERSION_HIGH, Driver_Software_Version_Read/100);
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_DRIVER_SOFTWARE_VERSION_LOW, Driver_Software_Version_Read%100);
 	// 电机平均电流
 	double mosfet_current = Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET]<<24 |Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET+1]<<16 |Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET+2]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET+3];
 	*p_Motor_Current = (uint16_t)(mosfet_current/1.4);
@@ -519,6 +535,10 @@ void Motor_State_Analysis(void)
 	ntc_tmp[1] = Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET+1];
 	ntc_tmp[2] = Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET+1];
 	
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_01, ntc_tmp[0]);
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_02, ntc_tmp[1]);
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_03, ntc_tmp[2]);
+	
 	//----- 串口打印   ------------------------------------------------------------------------------
 	if(memcmp(Motor_State_Old, Motor_State_Storage, MOTOR_PROTOCOL_ADDR_MAX) != 0)
 	{
@@ -530,7 +550,7 @@ void Motor_State_Analysis(void)
 		母线电压:\t%d.%d (V)\n\
 		电机故障:\t\t%X \n\
 		10KNTC温度1 2 3:\t%d.%d (°C)\t%d.%d (°C)\t%d.%d (°C)\n\n",
-				Temperature/10,Temperature%10,*p_Driver_Software_Version/10,*p_Driver_Software_Version%10,*p_Motor_Current/100,*p_Motor_Current%100,
+				Temperature/10,Temperature%10,Driver_Software_Version_Read/10,Driver_Software_Version_Read%10,*p_Motor_Current/100,*p_Motor_Current%100,
 				*p_Motor_Reality_Speed,*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,*p_Motor_Fault_Static,
 				ntc_tmp[0]/10,ntc_tmp[0]%10,ntc_tmp[1]/10,ntc_tmp[1]%10,ntc_tmp[2]/10,ntc_tmp[2]%10);
 		
@@ -588,7 +608,7 @@ void Motor_State_Analysis(void)
 	// 当前 转速
 	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]*10;
 	// 软件版本
-	*p_Driver_Software_Version = Motor_State_Storage[MOTOR_ADDR_MOTOR_VERSION_OFFSET];
+	Driver_Software_Version_Read = Motor_State_Storage[MOTOR_ADDR_MOTOR_VERSION_OFFSET];
 	// 母线电压
 	*p_Motor_Bus_Voltage = Motor_State_Storage[MOTOR_ADDR_BUS_VOLTAGE_OFFSET] *10;
 	// 母线电流
@@ -620,7 +640,7 @@ void Motor_State_Analysis(void)
 	当前功率:\t%d (W)\n\
 	电机故障:\t\t0x%X\n",
 
-	*p_Motor_Reality_Speed,*p_Driver_Software_Version,
+	*p_Motor_Reality_Speed,Driver_Software_Version_Read,
 	*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,
 	*p_Motor_Bus_Current/100,*p_Motor_Bus_Current%100,
 	*p_Motor_Current/100,*p_Motor_Current%100,

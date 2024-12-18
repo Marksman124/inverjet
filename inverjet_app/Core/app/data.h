@@ -240,7 +240,8 @@ extern Operating_Parameters (*p_OP_PMode)[TRAINING_MODE_PERIOD_MAX];
 //==========================================================
 //--------------------------- 驱动板读取信息
 //==========================================================
-extern uint16_t* p_Driver_Software_Version;			// 驱动板软件版本
+extern uint16_t Driver_Software_Version_Read;		// 驱动板软件版本	 读上来的原始值
+
 extern uint16_t* p_Motor_Fault_Static;						// 故障状态		驱动板
 
 extern uint32_t* p_Motor_Reality_Speed;					// 电机 实际 转速
@@ -276,6 +277,7 @@ extern uint16_t* p_Surf_Mode_Info_High_Time;  				//	冲浪模式 -- 高速档 -- 时间
 // ----------------------------------------------------------------------------------------------
 
 extern uint8_t WIFI_Rssi;
+extern uint8_t BLE_Rssi;
 
 extern uint16_t* p_Analog_key_Value;							// 虚拟按键
 

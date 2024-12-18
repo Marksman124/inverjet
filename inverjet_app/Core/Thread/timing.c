@@ -213,6 +213,9 @@ void WIFI_State_Handler(void)
 // 蓝牙 状态基  TIMING_THREAD_LIFECYCLE
 void BT_State_Handler(void)
 {
+#ifdef BT_ONLINE_CONNECT_MODE
+	static uint8_t bt_connect_cnt = 0;
+#endif
 	if(BT_Get_Machine_State() == BT_ERROR)
 	{
 		BT_Distribution_Timing_Cnt = 0;
@@ -230,7 +233,12 @@ void BT_State_Handler(void)
 		{
 			if(BT_Get_Machine_State() == BT_DISTRIBUTION)
 			{
-				BT_Distribution_Halder();
+#ifdef BT_ONLINE_CONNECT_MODE
+				if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) == 1)	//wuqingguang test
+					BT_Online_Connect_Halder();
+				else
+#endif
+					BT_Distribution_Halder();
 				
 				if(( BT_Distribution_Timing_Cnt == 0)||(BT_Distribution_Timing_Cnt > Timing_Half_Second_Cnt))
 				{
@@ -260,6 +268,17 @@ void BT_State_Handler(void)
 			}
 			else
 			{
+#ifdef BT_ONLINE_CONNECT_MODE
+				if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) == 1)	//wuqingguang test
+				{
+					if((BT_Get_Machine_State() == BT_NO_CONNECT)&&(bt_connect_cnt++ > 20))
+					{
+						BT_Connect_OnlineServer();
+						bt_connect_cnt = 0;
+						BT_Set_Machine_State(BT_WORKING);
+					}
+				}
+#endif
 				BT_Distribution_Timing_Cnt = 0;
 				LCD_Show_Bit &= ~STATUS_BIT_BLUETOOTH;
 			}
@@ -687,11 +706,12 @@ void App_Timing_Task(void)
 			
 #ifdef SYSTEM_LONG_RUNNING_MODE
 			//********* 老化工装 ***********************************************
-			// 老化工装 4h开  14400
+			// 老化工装 4h开  14400 停2h  7200
+			// 苏工 启动测试  开3min  停1min : 180 : 60
 			Old_Chemical_Equipment_Cnt ++;
 			if(System_is_Power_Off())//关机
 			{
-				if(Old_Chemical_Equipment_Cnt > 7200)
+				if(Old_Chemical_Equipment_Cnt > 60)
 				{
 					Buzzer_Click_Long_On(1);
 					Old_Chemical_Equipment_Cnt = 0;
@@ -700,7 +720,7 @@ void App_Timing_Task(void)
 			}
 			else
 			{
-				if(Old_Chemical_Equipment_Cnt > 14400)
+				if(Old_Chemical_Equipment_Cnt > 180)
 				{
 					Buzzer_Click_Long_On(1);
 					Old_Chemical_Equipment_Cnt = 0;
@@ -797,8 +817,9 @@ void App_Timing_Handler(void)
 		//System_Power_Off();
 		System_Power_On();
 		Self_Testing_Check_Comm();
-		
-		//OUT_SELF_TEST_MODE();
+		//To_Free_Mode(FREE_MODE_NOT_AUTO_START);
+		Arbitrarily_To_Pause();
+		OUT_SELF_TEST_MODE();
 	}
 	else
 	{

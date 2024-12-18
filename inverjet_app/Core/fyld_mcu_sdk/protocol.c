@@ -73,6 +73,7 @@ unsigned char pack_cnt=0;
 unsigned char pack_sum=0;
 
 unsigned char Ota_Chan=0;
+
 /******************************************************************************
                               第一步:初始化
 1:在需要使用到wifi相关文件的文件中include "wifi.h"
@@ -398,7 +399,6 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
 			
 			if(Motor_is_Start())
 			{
-				Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//光圈自动判断
 				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 			}
 		}
@@ -933,20 +933,23 @@ unsigned char get_download_cmd_total(void)
  */
 void upgrade_package_choose(unsigned char chan, unsigned long package_sz)
 {
-    //#error "请自行实现请自行实现升级包大小选择代码,完成后请删除该行"
-    unsigned short send_len = 0;
-    send_len = set_wifi_uart_byte(send_len, PACKAGE_SIZE);
-    wifi_uart_write_frame(UPDATE_START_CMD, MCU_TX_VER, send_len);
+	//#error "请自行实现请自行实现升级包大小选择代码,完成后请删除该行"
+	unsigned short send_len = 0;
+	if(System_To_OTA() == SUCCESS)
+	{
+		
+		send_len = set_wifi_uart_byte(send_len, PACKAGE_SIZE);
+		wifi_uart_write_frame(UPDATE_START_CMD, MCU_TX_VER, send_len);
+		
+		pack_sum = package_sz/1024;
+		if(package_sz % 1024)
+			pack_sum ++;
 	
-	pack_sum = package_sz/1024;
-	if(package_sz % 1024)
-		pack_sum ++;
-	
-	Out_Of_Upgradation();
-	System_To_OTA();
-	Lcd_Show_Upgradation(pack_sum,0);
-	Ota_Chan = chan;//bootloader
-	Freertos_TaskSuspend_Wifi();
+		Out_Of_Upgradation();
+		Lcd_Show_Upgradation(pack_sum,0);
+		Ota_Chan = chan;//bootloader
+		Freertos_TaskSuspend_Wifi();
+	}
 }
 
 /**
@@ -962,6 +965,9 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
     //#error "请自行完成MCU固件升级代码,完成后请删除该行"
 		unsigned long write_addr=0;						// flash 写入地址
 		unsigned long sign=0;
+		
+		if(Ota_Chan == 0)
+			return ERROR;
 	
     if(length == 0) {
 			if(Ota_Chan == 10)

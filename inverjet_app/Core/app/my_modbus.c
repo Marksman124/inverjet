@@ -354,7 +354,6 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 		}
 		if(Motor_is_Start())
 		{
-			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//¹âÈ¦×Ô¶¯ÅÐ¶Ï
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		else

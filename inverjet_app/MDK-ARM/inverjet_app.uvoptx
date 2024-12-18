@@ -153,62 +153,57 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_System_Runing_Second_Cnt</ItemText>
+          <ItemText>usRegHoldingBuf</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>usRegInputBuf</ItemText>
+          <ItemText>BLE_Rssi</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Motor_Speed_Target</ItemText>
+          <ItemText>buff</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Motor_Speed_Now</ItemText>
+          <ItemText>mac</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>speed</ItemText>
+          <ItemText>buff</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>motor_current_speed</ItemText>
+          <ItemText>p_System_State_Machine</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_OP_ShowNow_Speed</ItemText>
+          <ItemText>p_OP_ShowNow_Time</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>WIFI_Rx_Timer_cnt</ItemText>
+          <ItemText>pData</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>System_Self_Testing_State</ItemText>
+          <ItemText>Light_Brightness</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>BT_Read_Buffer_For_Test</ItemText>
+          <ItemText>SPECIAL_BIT_SKIP_STARTING</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>usRegHoldingBuf</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>System_Self_Testing_State</ItemText>
+          <ItemText>Special_Status_Bit</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

@@ -219,11 +219,16 @@ void Clean_Comm_Test(void)
 
 void Self_Testing_Check_Comm(void)
 {
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH ) != 0xAA)
+	if(BLE_Rssi > BT_RSSI_ERROR_VAULE)
+	//if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH ) != 0xAA)
 		Set_Motor_Fault_State(E206_BT_HARDWARE);
-	
+	else
+		ReSet_Motor_Fault_State(E206_BT_HARDWARE);
+
 	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) != 0xAA)
 		Set_Motor_Fault_State(E207_RS485_HARDWARE);
+	else
+		ReSet_Motor_Fault_State(E207_RS485_HARDWARE);
 }
 
 //-------------------   ----------------------------

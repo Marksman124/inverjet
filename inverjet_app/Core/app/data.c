@@ -73,7 +73,9 @@ Operating_Parameters (*p_OP_PMode)[TRAINING_MODE_PERIOD_MAX] = OP_Init_PMode;
 //==========================================================
 //--------------------------- 驱动板读取信息
 //==========================================================
-uint16_t* p_Driver_Software_Version;			// 驱动板软件版本
+
+uint16_t Driver_Software_Version_Read;		// 驱动板软件版本	 读上来的原始值
+
 uint16_t* p_Motor_Fault_Static;						// 故障状态		驱动板
 
 uint32_t* p_Motor_Reality_Speed;					// 电机 实际 转速
@@ -109,6 +111,7 @@ uint16_t* p_Surf_Mode_Info_High_Time;  				//	冲浪模式 -- 高速档 -- 时间
 // ----------------------------------------------------------------------------------------------
 
 uint8_t WIFI_Rssi = 0xFF;
+uint8_t BLE_Rssi = 0;
 
 uint16_t* p_Analog_key_Value;					// 虚拟按键
 
@@ -574,7 +577,7 @@ void get_uint3_version(char * buffer)
 			// 软件子版本号初始化
 			tmp = strtok(NULL, ".");
 			if (tmp != NULL) {
-				*p_Software_Version_middle |= (uint8_t)atoi(tmp);
+				*p_Software_Version_low = (uint8_t)atoi(tmp)<<8;
 					tmp = strtok(NULL, ".");
 					if (tmp != NULL) {
 							*p_Software_Version_low |= (uint8_t)atoi(tmp);

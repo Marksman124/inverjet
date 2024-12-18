@@ -53,6 +53,8 @@ typedef enum
 /* Exported functions prototypes ---------------------------------------------*/
 //串口发送接口
 extern void SerialWrite(unsigned char *buff,int length);
+
+extern void BT_UART_Send(uint8_t* p_buff, uint8_t len);
 //串口发送接口
 extern void BT_Read_Data_Bit(unsigned char vaule);
 
@@ -69,12 +71,17 @@ extern BT_STATE_MODE_E BT_Get_Machine_State(void);
 extern void BT_Modbus_Config_Init(void);
 // AT 指令 设 MTU
 extern void BT_Set_MTU(uint8_t data);
+// AT 指令 设 功率
+extern void BT_Set_Power(uint8_t data);
 // AT 指令 进入透传
 extern void BT_Set_TRANSENTER(uint8_t data);
 //
 extern void BT_Module_AT_Init(void);
 //重新初始化
 extern void BT_Module_AT_ReInit(void);
+
+// AT 指令 连接 主机
+extern void BT_Connect_OnlineServer(void);
 
 //------------------- 蓝牙 进入工装 ----------------------------
 extern void BT_Module_AT_InTest(void);
@@ -90,6 +97,8 @@ extern void BT_Get_In_Distribution(void);
 extern void BT_Get_In_Error(void);
 //------------------- 配网处理 0.5秒进一次----------------------------
 extern void BT_Distribution_Halder(void);
+//------------------- 联网处理 0.5秒进一次----------------------------
+extern void BT_Online_Connect_Halder(void);
 
 /* Private defines -----------------------------------------------------------*/
 

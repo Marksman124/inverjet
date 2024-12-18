@@ -360,6 +360,9 @@ void Lcd_System_Information(void)
 	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH,  GET_NUMBER_TEN_DIGIT(System_Dial_Switch));
 	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  GET_NUMBER_ONE_DIGIT(System_Dial_Switch));
 	
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE, System_Dial_Switch);	//	机型码
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MODBUS_RS485_VERSION, 1);
+	
 	//speed
 	//Display_Hide_Speed(0xFF);
 	//TM1621_display_number(TM1621_COORDINATE_SPEED_HIGH, 5);
@@ -433,7 +436,7 @@ void To_Power_Off(void)
 //-------------  To-->自由模式 ------------------------------------
 void To_Free_Mode(uint8_t mode)
 {
-	OUT_SELF_TEST_MODE();
+	//OUT_SELF_TEST_MODE();
 	
 	if(mode == 0)
 		Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);

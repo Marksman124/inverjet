@@ -158,7 +158,7 @@ void MX_FREERTOS_Init(void) {
   Key_Button_TaskHandle = osThreadCreate(osThread(Key_Button_Task), NULL);
 
   /* definition and creation of Motor_Task */
-  osThreadDef(Motor_Task, Motor_Handler, osPriorityIdle, 0, 256);
+  osThreadDef(Motor_Task, Motor_Handler, osPriorityRealtime, 0, 256);
   Motor_TaskHandle = osThreadCreate(osThread(Motor_Task), NULL);
 
   /* definition and creation of wifi_module */
@@ -210,8 +210,9 @@ void Rs485_Modbus_Handler(void const * argument)
 	Modbus_Init();
 	App_Data_Init();
 	BT_Modbus_Config_Init();
-	osDelay(1000);
+	//osDelay(1000);
 	BT_Module_AT_Init();
+	osDelay(1000);
   /* Infinite loop */
   while(1)
   {
