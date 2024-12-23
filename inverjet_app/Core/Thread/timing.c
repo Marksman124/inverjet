@@ -72,7 +72,7 @@ void App_Timing_Init(void)
 {
 	LCD_Show_Bit = STATUS_BIT_PERCENTAGE;
 	
-	System_Boot_Screens();
+	System_Boot_Screens();			// 5s
 	Dev_Check_Control_Methods();
 	//开机完成
 	System_PowerUp_Finish = 0xAA;
@@ -316,24 +316,11 @@ void Fault_State_Handler(void)
 	}
 	else if(System_is_Error())//故障 2min恢复 非通讯故障
 	{
-		if((If_Fault_Recovery_Max()==0)&&(Get_Motor_Fault_State() != E203_MOTOR_LOSS))
+		if((If_Fault_Recovery_Max()==0)&&(*p_System_Fault_Static != E203_MOTOR_LOSS))
 		{
-			// 3次以内 退出故障, 超过3次只能重启
-			if((Timing_Half_Second_Cnt - Fault_Recovery_Timing_Cnt) > SYSTEM_FAULT_RECOVERY_TIME)
-			{
-				DEBUG_PRINT("故障恢复计时超过1小时,清除计数器:\t%d\n",System_Fault_Recovery_Cnt);
-				//超过 1 小时 清除计数器
-				Clean_Fault_Recovery_Cnt();
-				Fault_Recovery_Timing_Cnt = Timing_Half_Second_Cnt; // 重新计时
-			}
-
 			if(( System_Fault_Timing_Cnt == 0)||(System_Fault_Timing_Cnt > Timing_Half_Second_Cnt))
 			{
 				System_Fault_Timing_Cnt = Timing_Half_Second_Cnt;
-				if( Fault_Recovery_Timing_Cnt == 0)
-				{
-					Fault_Recovery_Timing_Cnt = Timing_Half_Second_Cnt;
-				}
 			}
 			
 			//超时 故障 恢复
@@ -341,7 +328,6 @@ void Fault_State_Handler(void)
 			{
 				if(IS_SELF_TEST_MODE() == 0)
 				{
-					System_Fault_Recovery_Cnt++;
 					CallOut_Fault_State();
 				}
 				//Fault_Recovery_Attempt_cnt = RECOVERY_ATTEMPT_TIME;
@@ -703,7 +689,13 @@ void App_Timing_Task(void)
 			*p_System_Runing_Second_Cnt += 1;			// 运行时间
 			*p_No_Operation_Second_Cnt += 1;			// 无操作时间
 			*p_System_Startup_Second_Cnt += 1;		// 休眠时间
-			
+
+			if((Fault_Recovery_Timing_Cnt > 0) && ((Timing_Half_Second_Cnt - Fault_Recovery_Timing_Cnt) > SYSTEM_FAULT_RECOVERY_TIME))
+			{
+				DEBUG_PRINT("故障恢复计时超过1小时,清除计数器:\t%d\n",System_Fault_Recovery_Cnt);
+				Clean_Fault_Recovery_Cnt();//超过 1 小时 清除计数器
+				Fault_Recovery_Timing_Cnt = 0; // 重新计时
+			}
 #ifdef SYSTEM_LONG_RUNNING_MODE
 			//********* 老化工装 ***********************************************
 			// 老化工装 4h开  14400 停2h  7200
@@ -874,15 +866,18 @@ void Clean_Fault_Recovery_Cnt(void)
 }
 
 //-------------------- 累计故障恢复计数器 ----------------------------
-void Add_Fault_Recovery_Cnt(void)
+void Add_Fault_Recovery_Cnt(uint8_t no)
 {
-	 System_Fault_Recovery_Cnt ++;
+	if(System_Fault_Recovery_Cnt == 0)
+		Fault_Recovery_Timing_Cnt = Timing_Half_Second_Cnt; // 重新计时
+	
+	System_Fault_Recovery_Cnt += no;
 }
 
 //-------------------- 超过最大次数 ----------------------------
 uint8_t If_Fault_Recovery_Max(void)
 {
-	if(System_Fault_Recovery_Cnt >= (SYSTEM_FAULT_RECOVERY_MAX-1))
+	if(System_Fault_Recovery_Cnt >= SYSTEM_FAULT_RECOVERY_MAX)
 		return 1;
 	else
 		return 0;

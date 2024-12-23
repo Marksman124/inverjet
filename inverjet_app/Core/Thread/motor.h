@@ -247,6 +247,12 @@ uint16_t Get_Motor_Fault_State(void);
 void Set_Motor_Fault_State(uint16_t fault_bit);
 //-------------------- 清除电机故障状态 ----------------------------
 void ReSet_Motor_Fault_State(uint16_t fault_bit);
+//-------------------- 严重故障 ----------------------------
+uint8_t Motor_Is_Serious_Fault(uint16_t fault_bit);
+//-------------------- 一般故障 ----------------------------
+uint8_t Motor_Is_Ordinary_Fault(uint16_t fault_bit);
+//-------------------- 指定故障 ----------------------------
+uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit);
 
 //------------------- 发送 ----------------------------
 extern void Motor_Speed_Send(uint32_t speed_rpm);

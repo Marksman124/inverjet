@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.7"					//蓝牙 联机
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.9"					//严重故障直接锁机
 
 /**
 ******************************************************************************
@@ -45,11 +45,11 @@ extern "C" {
 ******************************************************************************
 */
 
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
-//#define BT_ONLINE_CONNECT_MODE						1	//  蓝牙联网模式
+#define BT_ONLINE_CONNECT_MODE					1	// 蓝牙联网模式
 //***************************************************************************
 
 //******************  驱动板 型号选择 ****************************************
@@ -203,7 +203,7 @@ extern "C" {
 //-------------- 故障 去抖时间 -------------------
 #define MOTOR_CHECK_FAULT_TIMER								(3-1)
 //-------------- 故障自恢复 -------------------
-#define SYSTEM_FAULT_TIME_CALLOUT							(120*TIMING_THREAD_ONE_SECOND)				// 120 s
+#define SYSTEM_FAULT_TIME_CALLOUT							(10*TIMING_THREAD_ONE_SECOND)				// 120 s   12s  wuqingguang
 #define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
 #define SYSTEM_FAULT_RECOVERY_TIME						(3600*TIMING_THREAD_ONE_SECOND)				// 1 小时内  3600 s
 //-------------- 自动关机 -------------------

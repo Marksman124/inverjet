@@ -374,8 +374,8 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 		
 		else if(type == MOTOR_FAULT_DRV)		//-----------短路  03
 			change_fault = E004_ABNORMAL_SHORT_CIRCUIT;
-		
-		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- 缺相 34 - 37
+		// ------ 不报上电缺相
+		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_RUNNING) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- 缺相 34 - 37
 			change_fault = E005_LACK_PHASE;
 		
 		else if(type == MOTOR_FAULT_OUTPUT_LOCKROTOR)		//-----------堵转  38
@@ -910,6 +910,35 @@ void Set_Motor_Fault_State(uint16_t fault_bit)
 void ReSet_Motor_Fault_State(uint16_t fault_bit)
 {
 	 Motor_Fault_State &= ~fault_bit;
+}
+
+//-------------------- 严重故障 ----------------------------
+uint8_t Motor_Is_Serious_Fault(uint16_t fault_bit)
+{
+	if(fault_bit & E004_ABNORMAL_SHORT_CIRCUIT)
+		return 1;
+	else
+		return 0;
+}
+
+//-------------------- 一般故障 ----------------------------
+uint8_t Motor_Is_Ordinary_Fault(uint16_t fault_bit)
+{
+	uint16_t ordinary_fault_bit = E203_MOTOR_LOSS | E004_ABNORMAL_SHORT_CIRCUIT;
+	
+	if(fault_bit & ~ordinary_fault_bit)
+		return 1;
+	else
+		return 0;
+}
+
+//-------------------- 指定故障 ----------------------------
+uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit)
+{
+	if(fault_bit & specified_bit)
+		return 1;
+	else
+		return 0;
 }
 
 //-------------------- 发送 ----------------------------

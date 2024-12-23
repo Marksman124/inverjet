@@ -109,7 +109,7 @@ void CallOut_Fault_State(void);
 //-------------------- 清除故障恢复计数器 ----------------------------
 void Clean_Fault_Recovery_Cnt(void);
 //-------------------- 累计故障恢复计数器 ----------------------------
-void Add_Fault_Recovery_Cnt(void);
+void Add_Fault_Recovery_Cnt(uint8_t no);
 //-------------------- 超过最大次数 ----------------------------
 uint8_t If_Fault_Recovery_Max(void);
 

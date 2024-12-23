@@ -281,7 +281,7 @@ void BT_Module_AT_Init(void)
 		BT_Out_Connect();
 		osDelay(1000);
 		BT_Set_Mode(1);
-		osDelay(3000);
+		osDelay(4000);
 		BT_Connect_OnlineServer();
 		osDelay(1000);
 	}
@@ -391,7 +391,9 @@ BT_STATE_MODE_E BT_Get_Machine_State(void)
 void BT_Read_Handler(void)
 {
 	static uint8_t self_test_cnt=0;
+	
 #ifdef BT_ONLINE_CONNECT_MODE
+	static uint8_t BT_Thread_Task_Cnt=0;
 	static uint16_t static_machine_buff[4];
 #endif
 	if(IS_SELF_TEST_MODE())
@@ -409,7 +411,6 @@ void BT_Read_Handler(void)
 			DEBUG_PRINT("蓝牙模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",BLE_Rssi, BT_RSSI_ERROR_VAULE);
 			Set_Motor_Fault_State(E206_BT_HARDWARE);
 		}
-		
 	}
 	else
 	{
@@ -423,8 +424,9 @@ void BT_Read_Handler(void)
 #ifdef BT_ONLINE_CONNECT_MODE
 	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) == 1)	//wuqingguang test
 	{
-		if(memcmp(static_machine_buff, p_System_State_Machine, 8) != 0)
+		if((BT_Thread_Task_Cnt ++ > 125) || (memcmp(static_machine_buff, p_System_State_Machine, 6) != 0))  // 40ms 进一次
 		{
+			BT_Thread_Task_Cnt = 0;
 			BT_State_Machine_Update();
 			memcpy(static_machine_buff, p_System_State_Machine, 8);
 		}

@@ -89,6 +89,7 @@ unsigned char Ota_Chan=0;
 ******************************************************************************/
 const DOWNLOAD_CMD_S download_cmd[] =
 {
+    {DPID_INVERJET_MODEL_NO, DP_TYPE_ENUM},
     {DPID_PREPARATION_TIME, DP_TYPE_VALUE},
     {DPID_DEVICE_ERROR_CODE, DP_TYPE_VALUE},
     {DPID_GET_SYSTEM_FAULT_STATUS, DP_TYPE_BITMAP},
@@ -175,6 +176,7 @@ void all_data_update(void)
     //#error "请在此处理可下发可上报数据及只上报数据示例,处理完成后删除该行"
     /*
     //此代码为平台自动生成，请按照实际数据修改每个可下发可上报函数和只上报函数
+    mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,当前机型); //枚举型数据上报;
     mcu_dp_value_update(DPID_PREPARATION_TIME,当前预备时间（标志位）); //VALUE型数据上报;
     mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,当前驱动板故障); //VALUE型数据上报;
     mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,当前读系统故障); //故障型数据上报;
@@ -212,6 +214,7 @@ void all_data_update(void)
     
 
     */
+		mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
 		mcu_dp_value_update(DPID_PREPARATION_TIME,				*p_Preparation_Time_BIT); 			// 准备时间(APP管理,本地只负责保存)
 		mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,				*p_Motor_Fault_Static); 				// 驱动板故障
     mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,	*p_System_Fault_Static); 				// 系统 故障型数据上报

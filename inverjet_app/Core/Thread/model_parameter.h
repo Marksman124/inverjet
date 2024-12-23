@@ -109,9 +109,10 @@ extern "C" {
 // 1.5米处 流速 1.8m/s   出水口流速 4m/s
 #define	SJ230_EVERY_1PERCENT_DISTANCE_PER_SECOND								(180)
 
-//====== < 700 >  < 1012 >   < 1324 >   < 1637 >   < 1950 > =============================== 1886
+//====== < 700 >  < 1012 >   < 1324 >   < 1637 >   < 1950 > =============================== 1.1.7 以前
+//====== < 700 >  < 1000 >   < 1300 >   < 1600 >   < 1900 > =============================== 1.1.8
 //最大转速 100%
-#define	SJ230_MOTOR_RPM_SPEED_MAX								(1950*MOTOR_POLE_NUMBER)		// 9750
+#define	SJ230_MOTOR_RPM_SPEED_MAX								(1900*MOTOR_POLE_NUMBER)		// 9750
 //最低转速 100%
 #define	SJ230_MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)			// 3500
 
@@ -222,7 +223,7 @@ extern "C" {
 
 //====== < 700 >  < 820 >   < 940 >   < 1060 >   < 1180 > =============================== 
 //最大转速 100%
-#define	SJ100_MOTOR_RPM_SPEED_MAX								(1168*MOTOR_POLE_NUMBER)
+#define	SJ100_MOTOR_RPM_SPEED_MAX								(1180*MOTOR_POLE_NUMBER)
 //最低转速 100%
 #define	SJ100_MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
 

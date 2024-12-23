@@ -178,18 +178,30 @@ uint8_t If_System_Is_Error(void)
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
-		//********  故障自动恢复    *********************
-		if( ( *p_System_Fault_Static >0 ) && (system_fault == 0))
+		// 严重故障
+		if(Motor_Is_Serious_Fault(system_fault))
 		{
-			// 通讯故障 可立刻恢复
-			if(*p_System_Fault_Static == E203_MOTOR_LOSS )
-			{
-				CallOut_Fault_State();
-			}
+			Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
 		}
-		else
+		else if((Motor_Is_Ordinary_Fault(system_fault)) &&(Motor_Is_Ordinary_Fault(*p_System_Fault_Static) == 0))
 		{
-			*p_System_Fault_Static = system_fault;
+			Add_Fault_Recovery_Cnt(1);  //普通故障
+		}
+		
+		
+		//通信故障恢复
+		if(Motor_Is_Specified_Fault(*p_System_Fault_Static, E203_MOTOR_LOSS) && (Motor_Is_Specified_Fault(system_fault, E203_MOTOR_LOSS) == 0))
+		{
+			*p_System_Fault_Static &= ~E203_MOTOR_LOSS;
+		}
+
+		*p_System_Fault_Static |= system_fault;
+		
+		//********  故障自动恢复    *********************
+		// 通讯故障 可立刻恢复
+		if(*p_System_Fault_Static == 0 )
+		{
+			CallOut_Fault_State();
 		}
 	}
 
@@ -319,9 +331,9 @@ void Clean_Fault_State(void)
 	*p_OP_ShowNow_Speed = *p_OP_ShowNow_Speed_Memory;
 	*p_OP_ShowNow_Time = *p_OP_ShowNow_Time_Memory;
 	//恢复后暂停
-	Arbitrarily_To_Pause();
+	//Arbitrarily_To_Pause();
 	//恢复后直接启动
-//	Data_Set_Current_Speed(*p_OP_ShowNow_Speed_Memory);
+	Data_Set_Current_Speed(*p_OP_ShowNow_Speed_Memory);
 }
 /* Private function prototypes -----------------------------------------------*/
 
@@ -494,25 +506,31 @@ static void on_Fault_Button_3_Long_Press(void)
 
 static void on_Fault_Button_4_Long_Press(void)
 {
-	//if(If_Fault_Recovery_Max()==0)
+	if(If_Fault_Recovery_Max()==1)
+		return;
 		//System_Power_Off();
-	
+	Add_Fault_Recovery_Cnt(1);
 	CallOut_Fault_State();
 	System_Power_Off();
 }
 
 static void on_Fault_Button_1_2_Long_Press(void)
 {
+	//   wifi配对
+	Buzzer_Click_On();
+	WIFI_Get_In_Distribution();
 }
 
 static void on_Fault_Button_1_3_Long_Press(void)
 {
 }
 
-// 复位
+// 
 static void on_Fault_Button_2_3_Long_Press(void)
 {
-	//Clean_Fault_State();
+	//   蓝牙配对
+	Buzzer_Click_On();
+	BT_Get_In_Distribution();
 }
 
 //
