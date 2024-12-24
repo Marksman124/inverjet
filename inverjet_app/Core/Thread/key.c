@@ -143,7 +143,7 @@ void on_pushButton_clicked(void)
 		if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
 		else
-			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
 		
 		if(Motor_is_Start())
 		{
@@ -161,7 +161,7 @@ void on_pushButton_clicked(void)
 		if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
 			*p_OP_ShowNow_Speed += (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
 		else
-			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
 		
 		if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
@@ -293,13 +293,13 @@ void on_pushButton_1_2_Short_Press(void)
 //================================== ① + ③  组合键  短按   切换档位 100级 or 5级
 void on_pushButton_1_3_Short_Press(void)
 {
-	if(System_is_Power_Off())
-		return;
-	
-	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
-		Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
-	else
-		Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
+//	if(System_is_Power_Off())
+//		return;
+//	
+//	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
+//		Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
+//	else
+//		Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 }
 
 //================================== ② + ③  组合键  恢复出厂设置
@@ -391,8 +391,16 @@ void on_pushButton_1_2_Long_Press(void)
 //================================== ① + ③  组合键
 void on_pushButton_1_3_Long_Press(void)
 {
-	//test 
-	//TM1621_LCD_Init();
+	if(System_is_Power_Off())
+		return;
+	
+	Buzzer_Click_On();
+	
+	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
+		Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
+	else
+		Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
+	
 }
 //================================== ② + ③  组合键
 //   蓝牙配对
@@ -588,7 +596,7 @@ void App_Key_Task(void)
 		
 		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE) == 0xAA )
 		{
-			//if(self_test_cnt++ > 100)
+			if(IS_SELF_TEST_MODE() == 0)
 			{
 				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
 				IN_SELF_TEST_MODE();
@@ -718,6 +726,7 @@ void App_Key_Handler(void)
 						
 						Key_IO_Old |= Key_IO_Hardware;
 						Led_Button_On(Key_IO_Old);	// 按键
+						Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY, Key_IO_Old);
 					}
 				}
 				else//正常使用

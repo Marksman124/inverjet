@@ -110,8 +110,8 @@ uint16_t* p_Surf_Mode_Info_High_Speed;  			//	冲浪模式 -- 高速档 -- 速度
 uint16_t* p_Surf_Mode_Info_High_Time;  				//	冲浪模式 -- 高速档 -- 时间
 // ----------------------------------------------------------------------------------------------
 
-uint8_t WIFI_Rssi = 0xFF;
-uint8_t BLE_Rssi = 0;
+uint16_t *p_WIFI_Rssi;
+uint16_t *p_BLE_Rssi;
 
 uint16_t* p_Analog_key_Value;					// 虚拟按键
 
@@ -589,7 +589,7 @@ void get_uint3_version(char * buffer)
 //------------------- 清除wifi标志 ----------------------------
 void System_Wifi_State_Clean(void)
 {
-	WIFI_Rssi = 0xFF;
+	*p_WIFI_Rssi = 0xFF;
 }
 	
 extern void LCD_Refresh_Restore(void);

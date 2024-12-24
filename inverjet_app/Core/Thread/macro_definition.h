@@ -45,11 +45,11 @@ extern "C" {
 ******************************************************************************
 */
 
-#define SYSTEM_DEBUG_MODE								1	// 调试模式
+//#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
-#define BT_ONLINE_CONNECT_MODE					1	// 蓝牙联网模式
+//#define BT_ONLINE_CONNECT_MODE					1	// 蓝牙联网模式
 //***************************************************************************
 
 //******************  驱动板 型号选择 ****************************************
@@ -80,7 +80,7 @@ extern "C" {
 #define	MACRO_SYSTEM_USER_USART_MAX										(5)
 
 
-#define MACRO_POWER_ON_WAITE_TIME_TASK								(4000)			//上电等待时间 （等显示开机界面 机型码）
+#define MACRO_POWER_ON_WAITE_TIME_TASK								(5000)			//上电等待时间 （等显示开机界面 机型码）
 
 /*==============================================================================================================*/
 /*==============================================================================================================*/
@@ -98,7 +98,7 @@ extern "C" {
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
-#define LIGHT_BRIGHTNESS_MAX					(50)		// 最大亮度  0~500
+#define LIGHT_BRIGHTNESS_MAX					(100)		// 最大亮度  0~500
 #else
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
 #define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// 最大亮度  0~500
@@ -144,7 +144,7 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					0
 #else
-#define BUZZER_FREQUENCY					50					// wuqingguang
+#define BUZZER_FREQUENCY					5					// wuqingguang	50
 #endif
 //*******************************************************
 
@@ -161,9 +161,9 @@ extern "C" {
 #define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//5 min  300 000
 
 // 电机速度每档增加量 5档
-#define	KEY_SPEED_INCREASE_20_GEAR										(1)
+#define	KEY_SPEED_INCREASE_20_GEAR										(20)
 // 电机速度每档增加量	100档
-#define	KEY_SPEED_INCREASE_100_GEAR										(20)
+#define	KEY_SPEED_INCREASE_100_GEAR										(1)
 
 
 #endif
@@ -176,10 +176,10 @@ extern "C" {
 #define TIMING_THREAD_TURN_ON					1
 
 #if(TIMING_THREAD_TURN_ON)
-#define TIMING_THREAD_LIFECYCLE				(24)				// ms
+#define TIMING_THREAD_LIFECYCLE				(24)				// ms    41  492
 
 //-------------- 半秒周期数 -------------------
-#define TIMING_THREAD_HALF_SECOND			(480/TIMING_THREAD_LIFECYCLE)				// 0.5 s   16   // wuqingguang
+#define TIMING_THREAD_HALF_SECOND			(480/TIMING_THREAD_LIFECYCLE)				 // wuqingguang   480
 //-------------- 1秒周期数 -------------------
 #define TIMING_THREAD_ONE_SECOND			(2)				// 1 s
 //******************  调试模式 **************************
@@ -203,7 +203,7 @@ extern "C" {
 //-------------- 故障 去抖时间 -------------------
 #define MOTOR_CHECK_FAULT_TIMER								(3-1)
 //-------------- 故障自恢复 -------------------
-#define SYSTEM_FAULT_TIME_CALLOUT							(10*TIMING_THREAD_ONE_SECOND)				// 120 s   12s  wuqingguang
+#define SYSTEM_FAULT_TIME_CALLOUT							(10*TIMING_THREAD_ONE_SECOND)				// 120 s   12s  wuqingguang  10
 #define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
 #define SYSTEM_FAULT_RECOVERY_TIME						(3600*TIMING_THREAD_ONE_SECOND)				// 1 小时内  3600 s
 //-------------- 自动关机 -------------------
@@ -240,9 +240,6 @@ extern "C" {
 
 //通讯故障 报警时间
 //#define FAULT_MODBUS_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 秒  wuqingguang
-
-// 蓝牙 故障 信号判断值
-#define BT_RSSI_ERROR_VAULE										(80)
 
 #endif
 /*==============================================================================================================*/
@@ -339,7 +336,7 @@ extern "C" {
 //-------------------------------------------------------------------------------------------------
 
 //通讯故障 报警时间
-#define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒  wuqingguang
+#define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒  wuqingguang   30000
 //通讯故障 尝试重启 时间
 #define FAULT_MOTOR_TRY_RESTAR_TIME				(FAULT_MOTOR_LOSS_TIME/5)								// 6秒
 
@@ -397,6 +394,25 @@ extern "C" {
 /*==============================================================================================================*/
 /*==============================================================================================================*/
 
+
+
+/*========================================== <bluetooth_thread.h> macro ==================================================*/
+/*==============================================================================================================*/
+#define BT_THREAD_TURN_ON					1
+
+#if(BT_THREAD_TURN_ON)
+#define BT_THREAD_LIFECYCLE											(200)				// ms 暂时不用
+
+//1秒周期数
+#define BT_THREAD_ONE_SECOND									(1000/BT_THREAD_LIFECYCLE)				// 1 s
+
+// 蓝牙 故障 信号判断值
+#define BT_RSSI_ERROR_VAULE										(80)
+
+
+#endif
+/*==============================================================================================================*/
+/*==============================================================================================================*/
 
 #ifdef __cplusplus
 }

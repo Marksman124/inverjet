@@ -515,12 +515,13 @@ void System_Self_Testing_Porgram(void)
 	// 屏幕
 	TM1621_BLACK_ON();
 	TM1621_Show_All();//全亮 2s
-	osDelay(2000);
+	osDelay(3000);
 	TM1621_Show_Repeat_All();//全部循环
 	
 	Lcd_System_Information();//机型码 & 拨码状态 2s
-	osDelay(2000);
+	osDelay(6000);
 	//
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
 }
 
 extern TaskHandle_t Breath_Light_TaHandle;
@@ -529,6 +530,7 @@ extern TaskHandle_t Main_TaskHandle;
 extern TaskHandle_t Key_Button_TaskHandle;
 extern TaskHandle_t Motor_TaskHandle;
 extern TaskHandle_t wifi_moduleHandle;
+extern TaskHandle_t BT_TaskHandle;
 
 void Freertos_TaskSuspend_Wifi(void)
 {
@@ -537,8 +539,9 @@ void Freertos_TaskSuspend_Wifi(void)
 	osThreadSuspend(Breath_Light_TaHandle);
 	osThreadSuspend(Rs485_Modbus_TaHandle);
 	osThreadSuspend(Main_TaskHandle);
-	//osThreadSuspend(Motor_TaskHandle);
+	osThreadSuspend(Motor_TaskHandle);
 	//osThreadSuspend(wifi_moduleHandle);
+	osThreadSuspend(BT_TaskHandle);
 }
 
 
@@ -550,9 +553,9 @@ void Freertos_TaskSuspend_RS485(void)
 	osThreadSuspend(Breath_Light_TaHandle);
 	//osThreadSuspend(Rs485_Modbus_TaHandle);
 	osThreadSuspend(Main_TaskHandle);
-	//osThreadSuspend(Motor_TaskHandle);
+	osThreadSuspend(Motor_TaskHandle);
 	osThreadSuspend(wifi_moduleHandle);
-	
+	osThreadSuspend(BT_TaskHandle);
 }
 
 
@@ -567,6 +570,7 @@ void Freertos_TaskResume_All(void)
 	osThreadResume(Main_TaskHandle);
 	osThreadResume(Motor_TaskHandle);
 	osThreadResume(wifi_moduleHandle);
+	osThreadResume(BT_TaskHandle);
 }
 
 

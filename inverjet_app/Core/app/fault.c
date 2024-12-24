@@ -223,17 +223,23 @@ void Set_Fault_Data(uint16_t type)
 
 void Clean_Comm_Test(void)
 {
-	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
-	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH, 0);
+	
+	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH, 0);
+	*p_BLE_Rssi = 0;
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485, 0);
+	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_WIFI, 0);
+	System_Wifi_State_Clean();
 }
 
 
 void Self_Testing_Check_Comm(void)
 {
-	if(BLE_Rssi > BT_RSSI_ERROR_VAULE)
-	//if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH ) != 0xAA)
+	if((*p_BLE_Rssi > BT_RSSI_ERROR_VAULE) || (*p_BLE_Rssi == 0) )
+	{
+		DEBUG_PRINT("蓝牙模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",*p_BLE_Rssi, BT_RSSI_ERROR_VAULE);
 		Set_Motor_Fault_State(E206_BT_HARDWARE);
+	}
 	else
 		ReSet_Motor_Fault_State(E206_BT_HARDWARE);
 
@@ -241,6 +247,16 @@ void Self_Testing_Check_Comm(void)
 		Set_Motor_Fault_State(E207_RS485_HARDWARE);
 	else
 		ReSet_Motor_Fault_State(E207_RS485_HARDWARE);
+	
+	if(If_System_Is_Error())
+	{
+		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
+	}
+		
+	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x0F)
+	{
+		Set_Motor_Fault_State(E006_LOCK_ROTOR);
+	}
 }
 
 //-------------------   ----------------------------

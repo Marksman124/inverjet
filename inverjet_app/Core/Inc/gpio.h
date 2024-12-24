@@ -49,8 +49,8 @@ typedef struct IO_Hardware_Info
 #define DEBUG_LED2_OFF()			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET)
 
 
-#define FAN_SWITCH_ON()				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET)
-#define FAN_SWITCH_OFF()			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET)
+#define FAN_SWITCH_ON()				HAL_GPIO_WritePin(Fan_Switch_GPIO_Port, Fan_Switch_Pin, GPIO_PIN_RESET)
+#define FAN_SWITCH_OFF()			HAL_GPIO_WritePin(Fan_Switch_GPIO_Port, Fan_Switch_Pin, GPIO_PIN_SET)
 
 /* USER CODE END Private defines */
 

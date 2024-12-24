@@ -68,12 +68,20 @@ extern "C" {
 
 
 #define OPERATION_POLES_MIX						MOTOR_RPM_MIX_OF_POLES
+
+#define	OPERATION_CALL_OUT_TIME					(62)			//	自动退出时间  1分钟
 /* Exported functions prototypes ---------------------------------------------*/
 
 extern void App_Operation_Init(void);
 	
 // 进入操作菜单
 extern void To_Operation_Menu(void);
+
+extern void Sleep_Time_Count(uint8_t no);
+
+extern void Sleep_Time_Clean(void);
+	
+extern uint8_t Check_Sleep_Time_Out(void);
 
 /* Private defines -----------------------------------------------------------*/
 

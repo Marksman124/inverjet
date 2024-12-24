@@ -63,32 +63,38 @@ void BT_Read_Data_Bit(unsigned char vaule)
 	//+EVENT:BLE_DISCONNECT
 	//char* disconnect = "+EVENT:BLE_DISCONNECT";
 	//char* rssi = "MAC:123456789000\r\nrssi:-40\r\n";
-	char rssi[24] = {0x4D, 0x41, 0x43, 0x3A, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x30, 0x30, 0x0D, 0x0A, 0x72, 0x73, 0x73, 0x69, 0x3A, 0x2D};
+//	char rssi[24] = {0x4D, 0x41, 0x43, 0x3A, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x30, 0x30, 0x0D, 0x0A, 0x72, 0x73, 0x73, 0x69, 0x3A, 0x2D};
 	//MsSerialRead(&Ms_BT_Modbus,&vaule,1);
 	if(IS_SELF_TEST_MODE())
 	{
-		BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test++] =vaule;
 		
-		if(BT_Read_Cnt_For_Test > 24)
+		//BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test++] =vaule;
+		if(vaule == '>')
 		{
-			if((BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test - 1] ==  0x0A) && (BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test - 2] == 0x0D))
-			{
-				if(BT_Read_Cnt_For_Test == 28) // 十位
-					BLE_Rssi = (BT_Read_Buffer_For_Test[24] - 0x30) * 10 + (BT_Read_Buffer_For_Test[25] - 0x30);
-				else if(BT_Read_Cnt_For_Test == 29) // 百位
-					BLE_Rssi = (BT_Read_Buffer_For_Test[24] - 0x30) * 100 + (BT_Read_Buffer_For_Test[25] - 0x30)* 10 + (BT_Read_Buffer_For_Test[26] - 0x30);
-				
-				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH, BLE_Rssi);
-			}
+			*p_BLE_Rssi = 50;
 		}
-		else
-		{
-			if(memcmp(BT_Read_Buffer_For_Test, rssi, BT_Read_Cnt_For_Test) != 0)
-			{
-				//memset(BT_Read_Buffer_For_Test,0,64);
-				BT_Read_Cnt_For_Test = 0;
-			}
-		}
+//		if(BT_Read_Cnt_For_Test > 24)
+//		{
+//			if((BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test - 1] ==  0x0A) && (BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test - 2] == 0x0D))
+//			{
+//				if(BT_Read_Cnt_For_Test == 28) // 十位
+//				{
+//					*p_BLE_Rssi = (BT_Read_Buffer_For_Test[24] - 0x30) * 10 + (BT_Read_Buffer_For_Test[25] - 0x30);
+//				}
+//				else if(BT_Read_Cnt_For_Test == 29) // 百位
+//				{
+//					*p_BLE_Rssi = (BT_Read_Buffer_For_Test[24] - 0x30) * 100 + (BT_Read_Buffer_For_Test[25] - 0x30)* 10 + (BT_Read_Buffer_For_Test[26] - 0x30);
+//				}
+//			}
+//		}
+//		else
+//		{
+//			if(memcmp(BT_Read_Buffer_For_Test, rssi, BT_Read_Cnt_For_Test) != 0)
+//			{
+//				//memset(BT_Read_Buffer_For_Test,0,64);
+//				BT_Read_Cnt_For_Test = 0;
+//			}
+//		}
 	}
 #ifdef BT_ONLINE_CONNECT_MODE
 	else if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) != 1)	//wuqingguang test
@@ -133,6 +139,8 @@ void BT_Set_MAC(void)
 	//sprintf(buff,"AT+BLENAME=inverjet\r\n");
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
 }
 
 // AT 指令 设 名称
@@ -143,6 +151,8 @@ void BT_Set_Name(void)
 	//sprintf(buff,"AT+BLENAME=inverjet\r\n");
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
 }
 
 // AT 指令 设 从机模式
@@ -153,6 +163,8 @@ void BT_Set_Mode(uint8_t data)
 	sprintf(buff,"AT+BLEMODE=%d\r\n",data);
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(6000);
 }
 // AT 指令 设 MTU
 void BT_Set_MTU(uint8_t data)
@@ -162,6 +174,8 @@ void BT_Set_MTU(uint8_t data)
 	sprintf(buff,"AT+BLEMTU=%d\r\n",data);
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
 }
 // AT 指令 设 功率
 void BT_Set_Power(uint8_t data)
@@ -171,6 +185,8 @@ void BT_Set_Power(uint8_t data)
 	sprintf(buff,"AT+BLERFPWR=%d\r\n",data);
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
 }
 
 
@@ -189,6 +205,8 @@ void BT_Set_TRANSENTER(uint8_t data)
 	
 		SerialWrite((uint8_t*)buff,strlen(buff));
 	}
+	
+	osDelay(1000);
 }
 // AT 指令 扫描
 void BT_Scan_Server(void)
@@ -198,6 +216,8 @@ void BT_Scan_Server(void)
 	sprintf(buff,"AT+BLESCAN\r\n");
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(5000);
 }
 
 // AT 指令 重启
@@ -208,6 +228,8 @@ void BT_Restar(void)
 	sprintf(buff,"AT+RST\r\n");
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(3000);
 }
 
 
@@ -217,9 +239,11 @@ void BT_Connect_TestServer(void)
 	char buff[32]={0};
 	
 	sprintf(buff,"AT+BLECONNECT=123456789000\r\n");
-	//sprintf(buff,"AT+BLECONNECT=94C960399489\r\n");
+	//sprintf(buff,"AT+BLECONNECT=123456789876\r\n");
 	//sprintf(buff,"AT+BLECONNECT=94c960ea4b2b\r\n");
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(3000);
 }
 
 // AT 指令 连接 主机
@@ -231,6 +255,8 @@ void BT_Connect_OnlineServer(void)
 	memcpy(mac, Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_BT_SERVER_MAC), 6);
 	sprintf(buff,"AT+BLECONNECT=%X%X%X\r\n",mac[0],mac[1],mac[2]);
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(3000);
 }
 
 // AT 指令 退出连接
@@ -240,6 +266,8 @@ void BT_Out_Connect(void)
 	
 	sprintf(buff,"AT+BLEDISCON\r\n");
 	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(2000);
 }
 
 // 同步状态机
@@ -277,27 +305,18 @@ void BT_Module_AT_Init(void)
 	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) == 1)	//wuqingguang test
 	{
 		BT_Set_TRANSENTER(0);
-		osDelay(500);
 		BT_Out_Connect();
-		osDelay(1000);
 		BT_Set_Mode(1);
-		osDelay(4000);
 		BT_Connect_OnlineServer();
-		osDelay(1000);
 	}
 	else
 #endif
 	{
 		BT_Set_TRANSENTER(0);
-		osDelay(500);
 		BT_Out_Connect();
-		osDelay(1000);
 		BT_Set_Mode(0);
-		osDelay(2000);
 		BT_Set_MTU(243);
-		osDelay(1000);
 		BT_Set_Power(9);
-		osDelay(1000);
 		//BT_Set_TRANSENTER(1);//进入透传
 	}
 }
@@ -308,21 +327,14 @@ void BT_Module_AT_ReInit(void)
 	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 	//osDelay(2000);
 	//不复位
-	SerialWrite((uint8_t*)"+++",3);
-	osDelay(1000);
-	
+	BT_Set_TRANSENTER(0);
 	
 	
 	BT_Set_Name();
-	osDelay(1000);
 	BT_Set_MAC();
-	osDelay(1000);
 	BT_Set_Mode(0);
-	osDelay(5000);
 	BT_Set_MTU(243);
-	osDelay(1000);
 	BT_Set_Power(9);
-	//osDelay(2000);
 }
 
 
@@ -330,15 +342,17 @@ void BT_Module_AT_ReInit(void)
 void BT_Module_AT_InTest(void)
 {
 	BT_Set_TRANSENTER(0);
-	osDelay(500);
-	//BT_Restar();
-	//osDelay(1000);
 	BT_Set_Mode(1);
-	osDelay(5000);
-	memset(BT_Read_Buffer_For_Test,0,64);
-	BT_Read_Cnt_For_Test = 0;
-	//BT_Connect_TestServer();
-	BT_Scan_Server();
+	
+	BT_Connect_TestServer();
+	//BT_Scan_Server();
+	if(*p_BLE_Rssi == 0)//
+	{
+		BT_Connect_TestServer();
+		//BT_Scan_Server();
+	}
+	BT_Set_TRANSENTER(0);
+	BT_Out_Connect();
 }
 
 
@@ -352,7 +366,7 @@ void BT_Module_AT_DoTest(void)
 void BT_Modbus_Config_Init(void)
 {
 	//初始化对象
-	MsInit(&Ms_BT_Modbus,21,1,SerialWrite);
+	MsInit(&Ms_BT_Modbus,21,10,SerialWrite);
 	//设置01寄存器的参数，不设置的话会返回无效的功能错误码
 	//MsConfigureRegister(&Ms_BT_Modbus,0x01,buff01,sizeof(buff01));
 	//MsConfigureRegister(&Ms_BT_Modbus,0x0F,buff01,sizeof(buff01));
@@ -402,14 +416,6 @@ void BT_Read_Handler(void)
 		{
 			BT_Module_AT_InTest();
 			self_test_cnt = 1;
-			//osDelay(3000);
-			//BT_Out_Connect();
-		}
-		// =================== 信号故障 
-		if(BLE_Rssi > BT_RSSI_ERROR_VAULE)
-		{
-			DEBUG_PRINT("蓝牙模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",BLE_Rssi, BT_RSSI_ERROR_VAULE);
-			Set_Motor_Fault_State(E206_BT_HARDWARE);
 		}
 	}
 	else

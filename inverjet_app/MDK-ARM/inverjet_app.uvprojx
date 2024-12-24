@@ -1122,11 +1122,6 @@
               <FilePath>..\Core\app\tm1621.c</FilePath>
             </File>
             <File>
-              <FileName>bluetooth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\app\bluetooth.c</FilePath>
-            </File>
-            <File>
               <FileName>control_interface.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\app\control_interface.c</FilePath>
@@ -1180,6 +1175,11 @@
               <FileName>wifi_thread.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Thread\wifi_thread.c</FilePath>
+            </File>
+            <File>
+              <FileName>bluetooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Thread\bluetooth.c</FilePath>
             </File>
             <File>
               <FileName>macro_definition.h</FileName>

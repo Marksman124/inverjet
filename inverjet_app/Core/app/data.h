@@ -276,8 +276,8 @@ extern uint16_t* p_Surf_Mode_Info_High_Speed;  				//	冲浪模式 -- 高速档 -- 速度
 extern uint16_t* p_Surf_Mode_Info_High_Time;  				//	冲浪模式 -- 高速档 -- 时间
 // ----------------------------------------------------------------------------------------------
 
-extern uint8_t WIFI_Rssi;
-extern uint8_t BLE_Rssi;
+extern uint16_t *p_WIFI_Rssi;
+extern uint16_t *p_BLE_Rssi;
 
 extern uint16_t* p_Analog_key_Value;							// 虚拟按键
 

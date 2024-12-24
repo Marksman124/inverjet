@@ -292,7 +292,7 @@ void Timing_Clean_Fault_State(void)
 {
 	Clean_Fault_State();
 	System_Fault_Timing_Cnt = 0;
-	System_Wifi_State_Clean();
+	//System_Wifi_State_Clean();
 }
 
 
@@ -544,12 +544,12 @@ void Pause_State_Handler(void)
 	if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 		Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 }
-// 菜单 状态基  0.5秒进一次
+// 菜单 状态基  1秒进一次
 void Operation_State_Handler(void)
 {
-	Timing_Timer_Cnt++;
+	Sleep_Time_Count(1);
 	// 3秒 闪烁
-	if(Timing_Timer_Cnt > 60)
+	if(Check_Sleep_Time_Out())
 	{
 		//保存 flash
 		Write_MbBuffer_Later();//存flash
@@ -811,7 +811,9 @@ void App_Timing_Handler(void)
 		Self_Testing_Check_Comm();
 		//To_Free_Mode(FREE_MODE_NOT_AUTO_START);
 		Arbitrarily_To_Pause();
+		Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
 		OUT_SELF_TEST_MODE();
+		
 	}
 	else
 	{

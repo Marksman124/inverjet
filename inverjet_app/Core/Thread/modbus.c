@@ -590,7 +590,16 @@ void MB_Get_Mapping_Register(void)
 	Surf_Mode_Info_Get_Mapping();
 	
 	//================= 自检模式  ================================
-	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
+	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
+	
+	//================= 信号值  ================================
+	p_BLE_Rssi = 	Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH);
+	p_WIFI_Rssi = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_WIFI);
+	
+	//================= ota 大小  ================================
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE,*(uint16_t *)BOOT_FLASH_ADDR_OTA_PACK_LEN);
+	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE,*(uint16_t *)BOOT_FLASH_ADDR_DOWNLOAD_PACK_SIZE);
+	
 }
 
 

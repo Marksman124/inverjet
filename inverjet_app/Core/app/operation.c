@@ -96,6 +96,8 @@ static uint16_t Baud_Rate_Value[OPERATION_BAUD_MAX] = {1200,2400,4800,9600};			/
 //static uint16_t Speed_Mode_Value[2] = {'r','P'};			//	转速模式	
 
 static uint32_t button_cnt=0;
+static uint32_t Sleep_Time_Cnt=0;
+
 /* Private user code ---------------------------------------------------------*/
 
 
@@ -297,6 +299,7 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 // 进入操作菜单
 void To_Operation_Menu(void)
 {
+	Sleep_Time_Clean();
 	Set_Software_Version();
 	// 操作 菜单
 	App_Operation_Init();
@@ -315,6 +318,23 @@ void To_Operation_Menu(void)
 
 /* Private function prototypes -----------------------------------------------*/
 
+void Sleep_Time_Count(uint8_t no)
+{
+	Sleep_Time_Cnt += no;
+}
+
+void Sleep_Time_Clean(void)
+{
+	Sleep_Time_Cnt = 0;
+}
+
+uint8_t Check_Sleep_Time_Out(void)
+{
+	if(Sleep_Time_Cnt > OPERATION_CALL_OUT_TIME)
+		return 1;
+	else
+		return 0;
+}
 
 /* Private user code ---------------------------------------------------------*/
 //------------------- 按键回调 ----------------------------
@@ -323,6 +343,7 @@ void To_Operation_Menu(void)
 static void on_Button_1_clicked(void)
 {
 	button_cnt = 0;
+	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_ACCELERATION)
 	{
@@ -424,6 +445,7 @@ static void on_Button_1_clicked(void)
 static void on_Button_2_clicked(void)
 {
 	button_cnt = 0;
+	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_ACCELERATION)
 	{
@@ -525,6 +547,7 @@ static void on_Button_2_clicked(void)
 static void on_Button_3_clicked(void)
 {
 	button_cnt = 0;
+	Sleep_Time_Clean();
 	
 	switch(Operation_State_Machine)
 	{
@@ -597,6 +620,7 @@ static void on_Button_3_clicked(void)
 // ④ 开机键  短按
 static void on_Button_4_Short_Press(void)
 {
+	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SUPPORT_CONTROL_METHODS, Operation_Shield_Value );
 #endif
@@ -647,6 +671,7 @@ static void on_Button_2_4_Short_Press(void)
 
 static void on_Button_1_Long_Press(void)
 {
+	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_100_TIME)
 	{
@@ -743,6 +768,7 @@ static void on_Button_1_Long_Press(void)
 
 static void on_Button_2_Long_Press(void)
 {
+	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_100_TIME)
 	{
@@ -844,6 +870,7 @@ static void on_Button_3_Long_Press(void)
 
 static void on_Button_4_Long_Press(void)
 {
+	Sleep_Time_Clean();
 	System_Power_Off();
 }
 

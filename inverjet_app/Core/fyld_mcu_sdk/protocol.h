@@ -287,7 +287,7 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //母线电压(输入)(只上报)
 //备注:
 #define DPID_MOTOR_BUS_VOLTAGE 10
-//下发实际转速(只上报)
+//下发转速(只上报)
 //备注:
 #define DPID_SEND_REALITY_SPEED 11
 //电机功率(只上报)
@@ -296,6 +296,9 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //母线电流(只上报)
 //备注:
 #define DPID_MOTOR_BUS_CURRENTE 13
+//OTA包大小(只上报)
+//备注:
+#define DPID_OTA_PACK_SIZE 15
 //系统运行时间 (调试用)(只上报)
 //备注:
 #define DPID_SYSTEM_RUNNING_TIME 16
@@ -348,13 +351,13 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
 #define DPID_SET_TRAIN_PLAN_05 35
 //自定义训练计划_01(可下发可上报)
-//备注:
+//备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
 #define DPID_CUSTOM_TRAIN_PLAN_01 36
 //自定义训练计划_02(可下发可上报)
-//备注:
+//备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
 #define DPID_CUSTOM_TRAIN_PLAN_02 37
 //自定义训练计划_03(可下发可上报)
-//备注:
+//备注:训练计划包含50段速，每段包含【uint16-速度（百分比）】+【uint16 - 时间（秒）】，总长度【2+2】+50 = 200 字节
 #define DPID_CUSTOM_TRAIN_PLAN_03 38
 //完成统计_时长(只上报)
 //备注:

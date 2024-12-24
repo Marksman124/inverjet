@@ -343,9 +343,9 @@ void Wifi_Module_Handler(void)
 			Set_Motor_Fault_State(E205_WIFI_HARDWARE);
 		}
 		// =================== wifi 信号故障 
-		if(WIFI_Rssi < WIFI_RSSI_ERROR_VAULE)
+		if(*p_WIFI_Rssi < WIFI_RSSI_ERROR_VAULE)
 		{
-			DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
+			DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",*p_WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
 			Set_Motor_Fault_State(E205_WIFI_HARDWARE);
 		}
 	}
@@ -388,13 +388,13 @@ void Wifi_DP_Data_Update(uint16_t id)
 			mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,				*p_Motor_Current);
 			break;
 		case DPID_MOTOR_REALITY_SPEED:// 实际转速
-			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed);
+			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/5);
 			break;
 		case DPID_MOTOR_BUS_VOLTAGE:// 输入电压（母线）
 			mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,				*p_Motor_Bus_Voltage);
 			break;
 		case DPID_SEND_REALITY_SPEED:// 下发转速
-			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed);
+			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/5);
 			break;
 		case DPID_MOTOR_POWER:// 当前功率
 			mcu_dp_value_update(DPID_MOTOR_POWER,							*p_Motor_Reality_Power);

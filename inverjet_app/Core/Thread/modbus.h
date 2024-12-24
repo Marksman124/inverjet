@@ -96,6 +96,11 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_SYSTEM_SELF_TEST_STATE        		( 0x60 )	//	
 #define MB_COMM_TEST_BLUETOOTH        			( 0x61 )	//	BT 		写入测试 (测试使用)
 #define MB_COMM_TEST_RS485        					( 0x62 )	//	RS485 写入测试 (测试使用)
+#define MB_COMM_TEST_WIFI        						( 0x63 )	//	WIFI 		写入测试 (测试使用)
+#define MB_COMM_TEST_KEY        						( 0x64 )	//	按键 		写入测试 (测试使用)
+// ----------------------------------------------------------------------------------------------
+#define MB_DEBUG_OTA_PAGE_SIZE		      		( 0x70 )	//	下载ota包大小
+#define MB_DEBUG_OTA_FAIL_PROGRESS		      ( 0x72 )	//	记录ota失败原因   MB_DEBUG_OTA_FAIL_PROGRESS
 // ----------------------------------------------------------------------------------------------
 #define MB_USER_FREE_MODE_SPEED		        	( 0x80 )	//	用户 自由模式 	转速
 #define MB_USER_FREE_MODE_TIME        			( 0x81 )	//								时间

@@ -69,6 +69,7 @@ osThreadId Main_TaskHandle;
 osThreadId Key_Button_TaskHandle;
 osThreadId Motor_TaskHandle;
 osThreadId wifi_moduleHandle;
+osThreadId BT_TaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -81,6 +82,7 @@ void Main_Handler(void const * argument);
 void Key_Button_Handler(void const * argument);
 void Motor_Handler(void const * argument);
 void wifi_module_Handler(void const * argument);
+void BT_Handler(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -142,7 +144,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of Breath_Light_Ta */
-  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 128);
+  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 32);
   Breath_Light_TaHandle = osThreadCreate(osThread(Breath_Light_Ta), NULL);
 
   /* definition and creation of Rs485_Modbus_Ta */
@@ -165,6 +167,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(wifi_module, wifi_module_Handler, osPriorityHigh, 0, 640);
   wifi_moduleHandle = osThreadCreate(osThread(wifi_module), NULL);
 
+  /* definition and creation of BT_Task */
+  osThreadDef(BT_Task, BT_Handler, osPriorityAboveNormal, 0, 64);
+  BT_TaskHandle = osThreadCreate(osThread(BT_Task), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -181,7 +187,7 @@ void MX_FREERTOS_Init(void) {
 void Breath_Light_Handler(void const * argument)
 {
   /* USER CODE BEGIN Breath_Light_Handler */
-	
+	osDelay(POWER_ON_WAITE_TIME_TASK);
 	App_Breath_light_Init();
   /* Infinite loop */
   while(1)
@@ -209,21 +215,14 @@ void Rs485_Modbus_Handler(void const * argument)
 	
 	Modbus_Init();
 	App_Data_Init();
-	BT_Modbus_Config_Init();
-	//osDelay(1000);
-	BT_Module_AT_Init();// 6s
 	osDelay(1000);
   /* Infinite loop */
   while(1)
   {
 		HAL_IWDG_Refresh(&hiwdg);
-
-		BT_MsTimeout();
 		
 		Modbus_Handle_Task();
-		
-		BT_Read_Handler();
-		
+				
 		if(System_is_OTA())
 		{
 			if(time_cnt++ > MODBUS_THREAD_ONE_SECOND)
@@ -255,13 +254,15 @@ void Main_Handler(void const * argument)
   /* Infinite loop */
   while(1)
   {
+		//FAN_SWITCH_ON();//≤‚ ‘”√ wuqingguang
+		
 		HAL_IWDG_Refresh(&hiwdg);
-//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);		// 1
 		App_Timing_Handler();
-//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);	// 0	
+		
+		//FAN_SWITCH_OFF();
+		
 		osDelay(THREAD_PERIOD_MAIN_TASK);
   }
-	
   /* USER CODE END Main_Handler */
 }
 
@@ -277,7 +278,7 @@ void Key_Button_Handler(void const * argument)
   /* USER CODE BEGIN Key_Button_Handler */
 
 	App_Key_Init();
-	
+	osDelay(POWER_ON_WAITE_TIME_TASK);
   /* Infinite loop */
   while(1)
   {
@@ -348,6 +349,34 @@ void wifi_module_Handler(void const * argument)
     osDelay(THREAD_PERIOD_WIFI_TASK);
   }
   /* USER CODE END wifi_module_Handler */
+}
+
+/* USER CODE BEGIN Header_BT_Handler */
+/**
+* @brief Function implementing the BT_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_BT_Handler */
+void BT_Handler(void const * argument)
+{
+  /* USER CODE BEGIN BT_Handler */
+	BT_Modbus_Config_Init();
+	osDelay(1000);
+	BT_Module_AT_Init();// 6s
+	//osDelay(1000);
+	
+  /* Infinite loop */
+  for(;;)
+  {
+		HAL_IWDG_Refresh(&hiwdg);
+		BT_MsTimeout();
+				
+		BT_Read_Handler();
+		
+		osDelay(THREAD_PERIOD_BT_TASK);
+  }
+  /* USER CODE END BT_Handler */
 }
 
 /* Private application code --------------------------------------------------*/
