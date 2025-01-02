@@ -442,7 +442,6 @@ void To_Free_Mode(uint8_t mode)
 		Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 	else
 		Special_Status_Add(SPECIAL_BIT_SKIP_INITIAL);
-	
 	Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 	
 	Set_System_State_Machine(FREE_MODE_INITIAL);
@@ -483,7 +482,6 @@ void To_Train_Mode(uint8_t num)
 		plan = 1;
 	else
 		plan = num;
-	
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 	Set_System_State_Machine(TRAINING_MODE_INITIAL);
 	Set_System_State_Mode(plan);
@@ -508,20 +506,37 @@ void System_Self_Testing_Porgram(void)
 	Buzzer_Click_Long_On(1);
 	Breath_light_Max();
 	
-	Clean_Comm_Test();
+	Clean_Comm_Test();//
 	mcu_start_wifitest();
 	
 	Led_Button_On(0);	// 按键
 	// 屏幕
 	TM1621_BLACK_ON();
-	TM1621_Show_All();//全亮 2s
+	TM1621_Show_All();//全亮 3s
+	osDelay(2000);
+	TM1621_Show_Repeat_All();//全部循环
+	
+	Lcd_System_Information();//机型码 & 拨码状态 6s
+	osDelay(2000);
+}
+
+void System_Self_Checking_Porgram(void)
+{
+	Buzzer_Click_Long_On(1);
+	Breath_light_Max();
+	
+	Clean_Comm_Test();//
+	mcu_start_wifitest();
+	
+	Led_Button_On(0);	// 按键
+	// 屏幕
+	TM1621_BLACK_ON();
+	TM1621_Show_All();//全亮 3s
 	osDelay(3000);
 	TM1621_Show_Repeat_All();//全部循环
 	
-	Lcd_System_Information();//机型码 & 拨码状态 2s
+	Lcd_System_Information();//机型码 & 拨码状态 6s
 	osDelay(6000);
-	//
-	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
 }
 
 extern TaskHandle_t Breath_Light_TaHandle;
@@ -546,6 +561,18 @@ void Freertos_TaskSuspend_Wifi(void)
 
 
 
+void Freertos_TaskSuspend_BT(void)
+{
+	// 暂停任务
+	osThreadSuspend(Key_Button_TaskHandle);
+	osThreadSuspend(Breath_Light_TaHandle);
+	osThreadSuspend(Rs485_Modbus_TaHandle);
+	osThreadSuspend(Main_TaskHandle);
+	osThreadSuspend(Motor_TaskHandle);
+	osThreadSuspend(wifi_moduleHandle);
+	//osThreadSuspend(BT_TaskHandle);
+}
+
 void Freertos_TaskSuspend_RS485(void)
 {
 	// 暂停任务
@@ -557,8 +584,6 @@ void Freertos_TaskSuspend_RS485(void)
 	osThreadSuspend(wifi_moduleHandle);
 	osThreadSuspend(BT_TaskHandle);
 }
-
-
 
 
 void Freertos_TaskResume_All(void)

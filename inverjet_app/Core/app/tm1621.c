@@ -373,7 +373,7 @@ void TM1621_Show_Repeat_All(void)
 	{
 		TM1621_Show_LCD_Test(i);
 		//Tm1621_Delay(3000*100);
-		osDelay(1100);
+		osDelay(1000);
 	}
 	
 //	for( i=0; i<TM1621_LETTER_MAX; i++)

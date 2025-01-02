@@ -131,7 +131,6 @@ static void heat_beat_check(void)
     
     if(FALSE == mcu_reset_state) {
         length = set_wifi_uart_byte(length, FALSE);
-        mcu_reset_state = TRUE;
     }else {
         length = set_wifi_uart_byte(length, TRUE);
     }
@@ -419,6 +418,7 @@ void data_handle(unsigned short offset)
     static unsigned long firm_length;                                           //MCU升级文件长度
     unsigned long dp_len;
     unsigned char firm_chan;                                                    //升级通道号9~15
+		unsigned char firm_way;                                                    	//升级方式 0-1
     unsigned char firm_flag;                                                    //升级包大小标志
 #else
     unsigned short dp_len;
@@ -462,6 +462,7 @@ void data_handle(unsigned short offset)
         case WIFI_STATE_CMD:                                    //wifi工作状态	
             wifi_work_state = wifi_data_process_buf[offset + DATA_START];
             wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, 0);
+						mcu_reset_state = TRUE;
 #ifdef WEATHER_ENABLE
             if(wifi_work_state == WIFI_CONNECTED && isWoSend == 0) { //当WIFI连接成功，打开天气数据且仅一次
                 mcu_open_weather();
@@ -521,9 +522,12 @@ void data_handle(unsigned short offset)
             firm_length |= wifi_data_process_buf[offset + DATA_START + 2];
             firm_length <<= 8;
             firm_length |= wifi_data_process_buf[offset + DATA_START + 3];
+						
             firm_chan = wifi_data_process_buf[offset + DATA_START + 4];
-
-            upgrade_package_choose(firm_chan, firm_length);
+						firm_way = wifi_data_process_buf[offset + DATA_START + 5];
+						
+            upgrade_package_choose(firm_chan, firm_way, firm_length);
+						
             firm_update_flag = UPDATE_START_CMD;
         break;
     

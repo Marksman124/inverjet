@@ -134,8 +134,10 @@ void MX_UART5_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN UART5_Init 2 */
-	HAL_UART_Receive_IT(&huart5, (uint8_t *)aRxBuffer5, 1); //该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量
-	
+	if(HAL_UART_Receive_IT(&huart5, (uint8_t *)aRxBuffer5, 1)!= HAL_OK)
+	{
+	 __HAL_UART_ENABLE_IT(&huart5, UART_IT_ERR);
+	}
   /* USER CODE END UART5_Init 2 */
 
 }
@@ -166,7 +168,10 @@ void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-	//HAL_UART_Receive_IT(&huart1, (uint8_t *)aRxBuffer1, 1);
+//	if(HAL_UART_Receive_IT(&huart1, (uint8_t *)&aRxBuffer1,1) != HAL_OK)
+//	{
+//	 __HAL_UART_ENABLE_IT(&huart1, UART_IT_ERR);
+//	}
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -197,7 +202,10 @@ void MX_USART2_UART_Init(void)
   }
   /* USER CODE BEGIN USART2_Init 2 */
 	 // __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
-    HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer2, 1); // 开始接收一个字节
+	if( HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer2, 1)!= HAL_OK)
+	{
+	 __HAL_UART_ENABLE_IT(&huart2, UART_IT_ERR);
+	}
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -622,6 +630,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if (huart->Instance == UART5) //如果是串口5
 	{
 //		__HAL_UART_CLEAR_IDLEFLAG(&huart5);
+		Usart_IRQ_CallBack(aRxBuffer5[0]);
 //		Usart_IRQ_CallBack(aRxBuffer5[0]);
 	}
 }

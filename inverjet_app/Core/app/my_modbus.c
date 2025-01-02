@@ -679,10 +679,10 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 					len = pObj->rxWriteIdx;
 					memcpy(BT_OTA_Buffer,pObj->rxBuff,len);
 					
-//					if((BT_OTA_Pack_Len + len) > BT_Pack_Len)
-//					{
-//						len =  BT_Pack_Len - BT_OTA_Pack_Len;
-//					}
+////					if((BT_OTA_Pack_Len + len) > BT_Pack_Len)
+////					{
+////						len =  BT_Pack_Len - BT_OTA_Pack_Len;
+////					}
 					_MsRxQueueUnLock(pObj);
 					taskENTER_CRITICAL();
 					write_addr = (FLASH_APP_PATCH_ADDR + BT_OTA_Pack_Len);
@@ -737,7 +737,7 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 				BT_Pack_Sum ++;
 			System_To_OTA();
 			Lcd_Show_Upgradation(BT_Pack_Sum,0);
-			Freertos_TaskSuspend_RS485();
+			Freertos_TaskSuspend_BT();
 				break;
 			case 0x02:
 				res = _MsAnalyzeCmd02(pObj);
@@ -752,10 +752,12 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 				res = _MsAnalyzeCmd05(pObj);
 				break;
 			case 0x06:
-				res = _MsAnalyzeCmd06(pObj);
+				if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL))
+					res = _MsAnalyzeCmd06(pObj);
 				break;
 			case 0x10:
-				res = _MsAnalyzeCmd10(pObj);
+				if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL))
+					res = _MsAnalyzeCmd10(pObj);
 				break;
 			case 0x0F:
 				res = _MsAnalyzeCmd0F(pObj);

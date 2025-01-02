@@ -93,9 +93,13 @@ typedef enum
 #define	THREAD_ACTIVITY_MOTOR										( 1<<4 )
 #define	THREAD_ACTIVITY_WIFI										( 1<<5 )
 
-#define IN_SELF_TEST_MODE()											(System_Self_Testing_State = 0xAA)
+#define IN_SELF_TEST_MODE()											(System_Self_Testing_State = 1)
+#define IS_SELF_TEST_MODE()											((System_Self_Testing_State > 0) ? 1:0)
+
+#define IN_CHECK_ERROR_MODE()										(System_Self_Testing_State = 0xAA)
+#define IS_CHECK_ERROR_MODE()										((System_Self_Testing_State == 0xAA) ? 1:0)
+
 #define OUT_SELF_TEST_MODE()										(System_Self_Testing_State = 0)
-#define IS_SELF_TEST_MODE()											((System_Self_Testing_State == 0xAA) ? 1:0)
 
 /* Exported functions prototypes ---------------------------------------------*/
 //================= 冲浪模式 全局 参数 ================================
@@ -146,7 +150,8 @@ extern uint8_t If_Accept_External_Control(uint8_t mode);
 extern void get_uint3_version(char * buffer);
 //------------------- 清除wifi标志 ----------------------------
 extern void System_Wifi_State_Clean(void);
-
+//------------------- 清除蓝牙标志 ----------------------------
+extern void System_BT_State_Clean(void);
 //------------------- 设置控制方式 ----------------------------
 extern void Set_Ctrl_Mode_Type(System_Ctrl_Mode_Type_enum type);
 //------------------- 获取控制方式 ----------------------------

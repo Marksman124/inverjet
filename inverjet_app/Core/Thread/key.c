@@ -135,7 +135,6 @@ void on_pushButton_clicked(void)
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
 			return;
 	
-	//Clean_Timing_Timer_Cnt();
 	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
@@ -184,7 +183,7 @@ void on_pushButton_2_clicked(void)
 	if(System_is_Power_Off())
 		return;
 	//Clean_Swimming_Distance();//清除计算距离
-	//Clean_Timing_Timer_Cnt();//清除 timing线程计时器
+	Clean_Timing_Timer_Cnt();
 	
 	if(Get_System_State_Machine() == TIMING_MODE_INITIAL)
 	{
@@ -219,7 +218,6 @@ void on_pushButton_3_clicked(void)
 	if(System_is_Power_Off())
 		return;
 	//Clean_Swimming_Distance();//清除计算距离
-	//Clean_Timing_Timer_Cnt();//清除 timing线程计时器
 		
 	if(System_Mode_Free())
 	{
@@ -245,7 +243,6 @@ void on_pushButton_3_clicked(void)
 //================================== ④ 开机键  短按
 void on_pushButton_4_Short_Press(void)
 {
-	//Clean_Timing_Timer_Cnt();
 	if(System_is_Power_Off())//关机中 执行开机
 	{
 			return;
@@ -335,7 +332,6 @@ void on_pushButton_1_Long_Press(void)
 //		if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR) == 0)
 //			Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 //	}
-	//Clean_Timing_Timer_Cnt();
 	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
@@ -598,8 +594,7 @@ void App_Key_Task(void)
 		{
 			if(IS_SELF_TEST_MODE() == 0)
 			{
-				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
-				IN_SELF_TEST_MODE();
+				IN_CHECK_ERROR_MODE();
 			}
 		}
 		
@@ -824,6 +819,7 @@ void System_Boot_Screens(void)
 //	return;
 //#endif
 ////*******************************************************
+	
 	osDelay(200);
 	//全亮 2s
 	Breath_light_Max();
@@ -844,11 +840,12 @@ void Restore_Factory_Settings(void)
 	
 	// wifi 恢复
 	
-	TM1621_Show_All();
+	//TM1621_Show_All();
 	osDelay(500);
 	TM1621_Buzzer_Off();
-	osDelay(1500);
-	System_Power_Off();
+	//osDelay(1500);
+	//System_Power_Off();
+	SysSoftReset();// 软件复位
 	// 返回 自由模式 初始状态
 	
 }
@@ -858,8 +855,6 @@ uint8_t System_To_OTA(void)
 {
 	if(Motor_is_Start())
 		return ERROR;
-	Set_System_State_Machine(OTA_UPGRADE_STATUS);
-	Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
 	
 	return SUCCESS;
 }

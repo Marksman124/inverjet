@@ -65,8 +65,9 @@ static uint32_t Chassis_TEMP_Timer_cnt= 0;	//高温 计数器
 
 uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,0x006,
 														0x101,0x102,
-														0x201,0x202,0x203,0x205,0x206,0x207,
-														0x301,0x302};
+														0x201,0x202,0x203,
+														0x301,0x302,0x303,0x304,
+														0x401};
 
 uint8_t Fault_Number_Sum = 0;	// 故障总数
 uint8_t Fault_Number_Cnt = 0;	// 当前故障
@@ -178,22 +179,21 @@ uint8_t If_System_Is_Error(void)
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
-		// 严重故障
-		if(Motor_Is_Serious_Fault(system_fault))
+		// 硬件故障
+		if(Motor_Is_Hardware_Fault(system_fault))
 		{
 			Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
 		}
-		else if((Motor_Is_Ordinary_Fault(system_fault)) &&(Motor_Is_Ordinary_Fault(*p_System_Fault_Static) == 0))
+		else if((Motor_Is_Software_Fault(system_fault)) &&(Motor_Is_Software_Fault(*p_System_Fault_Static) == 0))
 		{
 			Add_Fault_Recovery_Cnt(1);  //普通故障
 		}
 		
-		
 		//通信故障恢复
-		if(Motor_Is_Specified_Fault(*p_System_Fault_Static, E203_MOTOR_LOSS) && (Motor_Is_Specified_Fault(system_fault, E203_MOTOR_LOSS) == 0))
-		{
-			*p_System_Fault_Static &= ~E203_MOTOR_LOSS;
-		}
+//		if(Motor_Is_Specified_Fault(*p_System_Fault_Static, E203_MOTOR_LOSS) && (Motor_Is_Specified_Fault(system_fault, E203_MOTOR_LOSS) == 0))
+//		{
+//			*p_System_Fault_Static &= ~E203_MOTOR_LOSS;
+//		}
 
 		*p_System_Fault_Static |= system_fault;
 		
@@ -223,13 +223,11 @@ void Set_Fault_Data(uint16_t type)
 
 void Clean_Comm_Test(void)
 {
-	
-	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
-	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH, 0);
-	*p_BLE_Rssi = 0;
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485, 0);
-	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_WIFI, 0);
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY, 0);
+	
 	System_Wifi_State_Clean();
+	System_BT_State_Clean();
 }
 
 
@@ -238,24 +236,24 @@ void Self_Testing_Check_Comm(void)
 	if((*p_BLE_Rssi > BT_RSSI_ERROR_VAULE) || (*p_BLE_Rssi == 0) )
 	{
 		DEBUG_PRINT("蓝牙模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",*p_BLE_Rssi, BT_RSSI_ERROR_VAULE);
-		Set_Motor_Fault_State(E206_BT_HARDWARE);
+		Set_Motor_Fault_State(E302_BT_HARDWARE);
 	}
 	else
-		ReSet_Motor_Fault_State(E206_BT_HARDWARE);
+		ReSet_Motor_Fault_State(E302_BT_HARDWARE);
 
 	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) != 0xAA)
-		Set_Motor_Fault_State(E207_RS485_HARDWARE);
+		Set_Motor_Fault_State(E303_RS485_HARDWARE);
 	else
-		ReSet_Motor_Fault_State(E207_RS485_HARDWARE);
+		ReSet_Motor_Fault_State(E303_RS485_HARDWARE);
+		
+	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x0F)
+	{
+		Set_Motor_Fault_State(E304_KEY_HARDWARE);
+	}
 	
 	if(If_System_Is_Error())
 	{
 		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
-	}
-		
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x0F)
-	{
-		Set_Motor_Fault_State(E006_LOCK_ROTOR);
 	}
 }
 

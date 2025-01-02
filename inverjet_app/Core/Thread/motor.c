@@ -111,14 +111,14 @@ void App_Motor_Handler(void)
 	//通信故障计数器
 	Motor_Rx_Timer_cnt++;  //不报故障 记得删  wuqingguang 2024-09-09
 	
-	if(Motor_Timer_Cnt < 10000)
+	if(Motor_Timer_Cnt < 9999)
 		Motor_Timer_Cnt ++;
 	else
 		Motor_Timer_Cnt = 0;
 	// ===================  通讯故障
 	//******************  调试模式 **************************
 #ifndef SYSTEM_DEBUG_MODE
-	if(IS_SELF_TEST_MODE())
+	if(IS_CHECK_ERROR_MODE())
 	{
 		if(Motor_Rx_Timer_cnt > (FAULT_MOTOR_LOSS_TIME/3))
 			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//驱动板 通讯故障
@@ -507,7 +507,7 @@ void Motor_State_Analysis(void)
 	uint16_t ntc_tmp[3]={0};
 	
 	//驱动板 通讯故障 恢复
-	ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
+	//ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 
 	//
 	// 滤波后的mosfet温度
@@ -515,7 +515,6 @@ void Motor_State_Analysis(void)
 	memcpy(p_Mos_Temperature, &Temperature, 2);
 	
 	// 滤波后的电机温度 改用 软件版本
-	
 	Driver_Software_Version_Read = Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET+1];
 
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_DRIVER_SOFTWARE_VERSION_HIGH, Driver_Software_Version_Read/100);
@@ -527,6 +526,8 @@ void Motor_State_Analysis(void)
 	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]<<24 |Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET+1]<<16 |Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET+2]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET+3];
 	// 母线电压
 	*p_Motor_Bus_Voltage = Motor_State_Storage[MOTOR_ADDR_BUS_VOLTAGE_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_BUS_VOLTAGE_OFFSET+1];
+	// 母线电流  没有检测
+	*p_Motor_Bus_Current = 0;
 	// 获取电机故障
 	*p_Motor_Fault_Static = Motor_State_Storage[MOTOR_ADDR_MOTOR_FAULT_OFFSET];
 	
@@ -570,6 +571,7 @@ void Motor_State_Analysis(void)
 		{
 			result_fault = Change_Faule_To_Upper(*p_Motor_Fault_Static);
 			Set_Motor_Fault_State(result_fault);
+			Motor_Fault_Timer_cnt = 0;
 		}
 	}
 	else
@@ -603,7 +605,7 @@ void Motor_State_Analysis(void)
 
 	
 	//驱动板 通讯故障 恢复
-	ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
+	//ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 	
 	// 当前 转速
 	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]*10;
@@ -670,7 +672,7 @@ void Motor_State_Analysis(void)
 	// 输出电流 	降频
 	Check_Down_Conversion_Motor_Current(*p_Motor_Current/100);
 	// 输出功率 		降频
-	Check_Down_Conversion_Motor_Power(p_Motor_Reality_Power);
+	Check_Down_Conversion_Motor_Power(*p_Motor_Reality_Power);
 }
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 #endif
@@ -912,19 +914,19 @@ void ReSet_Motor_Fault_State(uint16_t fault_bit)
 	 Motor_Fault_State &= ~fault_bit;
 }
 
-//-------------------- 严重故障 ----------------------------
-uint8_t Motor_Is_Serious_Fault(uint16_t fault_bit)
+//-------------------- 硬件故障 ----------------------------
+uint8_t Motor_Is_Hardware_Fault(uint16_t fault_bit)
 {
-	if(fault_bit & E004_ABNORMAL_SHORT_CIRCUIT)
+	if((fault_bit & E004_ABNORMAL_SHORT_CIRCUIT)||(fault_bit & E201_TEMPERATURE_HARDWARE))
 		return 1;
 	else
 		return 0;
 }
 
-//-------------------- 一般故障 ----------------------------
-uint8_t Motor_Is_Ordinary_Fault(uint16_t fault_bit)
+//-------------------- 软件故障 ----------------------------
+uint8_t Motor_Is_Software_Fault(uint16_t fault_bit)
 {
-	uint16_t ordinary_fault_bit = E203_MOTOR_LOSS | E004_ABNORMAL_SHORT_CIRCUIT;
+	uint16_t ordinary_fault_bit = E201_TEMPERATURE_HARDWARE | E004_ABNORMAL_SHORT_CIRCUIT;
 	
 	if(fault_bit & ~ordinary_fault_bit)
 		return 1;

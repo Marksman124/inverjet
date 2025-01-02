@@ -92,7 +92,7 @@ void (*p_Operation_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 };
 
 
-static uint16_t Baud_Rate_Value[OPERATION_BAUD_MAX] = {1200,2400,4800,9600};			//	波特率	
+static uint16_t Baud_Rate_Value[OPERATION_BAUD_MAX] = {2400,4800,9600,1440};			//	波特率	
 //static uint16_t Speed_Mode_Value[2] = {'r','P'};			//	转速模式	
 
 static uint32_t button_cnt=0;
@@ -163,11 +163,11 @@ void Display_Oper_Number(uint8_t no)
 	if(no > 100)
 		no = 100;
 //-------------------- 电机状态解析 ----------------------------
-#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+//#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, GET_NUMBER_HUNDRED_DIGIT(no));
-#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
-	TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, GET_NUMBER_HUNDRED_DIGIT(no)+2);
-#endif
+//#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
+//	TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, GET_NUMBER_HUNDRED_DIGIT(no)+2);
+//#endif
 	TM1621_display_number(TM1621_COORDINATE_SPEED_HIGH, GET_NUMBER_TEN_DIGIT(no));
 	TM1621_display_number(TM1621_COORDINATE_SPEED_LOW, GET_NUMBER_ONE_DIGIT(no));
 	

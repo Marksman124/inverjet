@@ -280,6 +280,8 @@ uint8_t System_Mode_Surf(void)
 void Arbitrarily_To_Initial(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
+	Clean_Timing_Timer_Cnt();
+	
 	if(System_is_Initial())
 		return;
 	else if(System_is_Starting())
@@ -291,7 +293,6 @@ void Arbitrarily_To_Initial(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 4;
 	
-	Clean_Timing_Timer_Cnt();
 	return;
 }
 	
@@ -299,6 +300,8 @@ void Arbitrarily_To_Initial(void)
 void Arbitrarily_To_Starting(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
+	Clean_Timing_Timer_Cnt();
+	
 	if(System_is_Initial())
 		*p_System_State_Machine += 1;
 	else if(System_is_Starting())
@@ -310,7 +313,6 @@ void Arbitrarily_To_Starting(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 3;
 	
-	Clean_Timing_Timer_Cnt();
 	return;
 }
 
@@ -318,6 +320,8 @@ void Arbitrarily_To_Starting(void)
 void Arbitrarily_To_Running(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
+	Clean_Timing_Timer_Cnt();
+	
 	if(System_is_Initial())
 		*p_System_State_Machine += 2;
 	else if(System_is_Starting())
@@ -329,7 +333,6 @@ void Arbitrarily_To_Running(void)
 	else if(System_is_Stop())
 		*p_System_State_Machine -= 2;
 	
-	Clean_Timing_Timer_Cnt();
 	return;
 }
 
@@ -337,6 +340,8 @@ void Arbitrarily_To_Running(void)
 void Arbitrarily_To_Pause(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
+	Clean_Timing_Timer_Cnt();
+	
 	if(System_is_Initial())
 		*p_System_State_Machine += 3;
 	else if(System_is_Starting())
@@ -349,7 +354,6 @@ void Arbitrarily_To_Pause(void)
 		*p_System_State_Machine -= 1;
 	
 	Clean_Automatic_Shutdown_Timer();
-	Clean_Timing_Timer_Cnt();
 	return;
 }
 
@@ -357,6 +361,8 @@ void Arbitrarily_To_Pause(void)
 void Arbitrarily_To_Stop(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
+	Clean_Timing_Timer_Cnt();
+	
 	if(System_is_Initial())
 		*p_System_State_Machine += 4;
 	else if(System_is_Starting())
@@ -370,7 +376,6 @@ void Arbitrarily_To_Stop(void)
 	
 	Motor_Speed_Target_Set(0);
 	Clean_Automatic_Shutdown_Timer();
-	Clean_Timing_Timer_Cnt();
 	return;
 }
 

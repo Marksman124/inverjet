@@ -278,7 +278,7 @@ void Key_Button_Handler(void const * argument)
   /* USER CODE BEGIN Key_Button_Handler */
 
 	App_Key_Init();
-	osDelay(POWER_ON_WAITE_TIME_TASK);
+	//osDelay(POWER_ON_WAITE_TIME_TASK);
   /* Infinite loop */
   while(1)
   {

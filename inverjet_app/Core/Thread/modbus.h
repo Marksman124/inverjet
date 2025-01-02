@@ -177,9 +177,9 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_USER_TRAIN_MODE_TIME_P9_2        		( 0x423 )	//								时间
 //		.......  50
 #define MB_USER_TRAIN_MODE_SPEED_P9_50		      ( 0x482 )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P9_50        		( 0x483 )	//	
+#define MB_USER_TRAIN_MODE_TIME_P9_50        		( 0x483 )	//
 // ----------------------------------------------------------------------------------------------
-#define MB_HOLDING_BUFFER_SIZE_MAX        			( 0x500 )	//	2K 
+#define MB_HOLDING_BUFFER_SIZE_MAX        			( MB_USER_TRAIN_MODE_TIME_P7_50 )	//	2K 
 // ----------------------------------------------------------------------------------------------
 
 

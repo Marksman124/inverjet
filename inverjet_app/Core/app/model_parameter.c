@@ -30,7 +30,7 @@ uint32_t Product_Model_Ccode[MODEL_DIAL_SWITCH_NUMBER] =
 	PRODUCT_MODEL_CODE_SJ230,
 	PRODUCT_MODEL_CODE_SJ200,
 	PRODUCT_MODEL_CODE_SJ160,
-	PRODUCT_MODEL_CODE_SJ230
+	PRODUCT_MODEL_CODE_SJ100
 };
 
 
@@ -54,7 +54,11 @@ uint32_t Get_Every_1Percent_Distance_Per_Second(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_EVERY_1PERCENT_DISTANCE_PER_SECOND;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_EVERY_1PERCENT_DISTANCE_PER_SECOND;
 	}
@@ -75,7 +79,11 @@ uint32_t Get_Motor_Rpm_Speed_Max(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_RPM_SPEED_MAX;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_RPM_SPEED_MAX;
 	}
@@ -97,7 +105,11 @@ uint32_t Get_Motor_Rpm_Speed_Mix(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_RPM_SPEED_MIX;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_RPM_SPEED_MIX;
 	}
@@ -120,7 +132,11 @@ uint32_t Get_Motor_Power_Alarm_Value(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_POWER_ALARM_VALUE;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_POWER_ALARM_VALUE;
 	}
@@ -141,7 +157,11 @@ uint32_t Get_Motor_Power_Reduce_Speed(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_POWER_REDUCE_SPEED;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_POWER_REDUCE_SPEED;
 	}
@@ -162,7 +182,11 @@ uint32_t Get_Motor_Power_Restore_Speed(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_POWER_RESTORE_SPEED;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_POWER_RESTORE_SPEED;
 	}
@@ -186,7 +210,11 @@ uint32_t Get_Motor_Current_Alarm_Value(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_CURRENT_ALARM_VALUE;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_CURRENT_ALARM_VALUE;
 	}
@@ -207,7 +235,11 @@ uint32_t Get_Motor_Current_Reduce_Speed(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_CURRENT_REDUCE_SPEED;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_CURRENT_REDUCE_SPEED;
 	}
@@ -228,7 +260,11 @@ uint32_t Get_Motor_Current_Restore_Speed(void)
 	
 	code = Get_Model_Code_Num();
 
-	if(PRODUCT_MODEL_CODE_SJ160 == code)
+	if(PRODUCT_MODEL_CODE_SJ100 == code)
+	{
+		return SJ100_MOTOR_CURRENT_RESTORE_SPEED;
+	}
+	else if(PRODUCT_MODEL_CODE_SJ160 == code)
 	{
 		return SJ160_MOTOR_CURRENT_RESTORE_SPEED;
 	}

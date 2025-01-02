@@ -236,6 +236,10 @@ void WIFI_Update_State_Upload(void)
 //		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_STATUS); 			// 状态机
 //		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_SPEED); 				// 当前速度
 //		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_TIME); 				// 当前时间
+		
+		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_01);			// 驱动板 NTC 温度 01
+		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_02);			// 驱动板 NTC 温度 01
+		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_03);			// 驱动板 NTC 温度 01
 	}
 	
 	Upload_Timer_Cnt++;
@@ -330,7 +334,7 @@ void Wifi_Module_Handler(void)
 	
 	wifi_uart_service();
 	
-	if(IS_SELF_TEST_MODE())
+	if(IS_CHECK_ERROR_MODE())
 	{
 		// ===================  通讯故障
 		if(get_mcu_reset_state() == FALSE)
@@ -340,13 +344,13 @@ void Wifi_Module_Handler(void)
 		
 		if(WIFI_Rx_Timer_cnt > FAULT_WIFI_LOST_TIME)
 		{
-			Set_Motor_Fault_State(E205_WIFI_HARDWARE);
+			Set_Motor_Fault_State(E301_WIFI_HARDWARE);
 		}
 		// =================== wifi 信号故障 
 		if(*p_WIFI_Rssi < WIFI_RSSI_ERROR_VAULE)
 		{
 			DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",*p_WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
-			Set_Motor_Fault_State(E205_WIFI_HARDWARE);
+			Set_Motor_Fault_State(E301_WIFI_HARDWARE);
 		}
 	}
 	
@@ -484,15 +488,26 @@ void Wifi_DP_Data_Update(uint16_t id)
 		//========== 自定义计划  =============
 		//*********************************
 		case DPID_CUSTOM_TRAIN_PLAN_01:// 当前自定义训练计划_01
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,	(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P6_1),	TRAINING_MODE_PERIOD_MAX*4);
+			mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,	(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P6_1),	TRAINING_MODE_PERIOD_MAX*4);
 			break;
 		case DPID_CUSTOM_TRAIN_PLAN_02:// 当前自定义训练计划_02
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,	(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P7_1),	TRAINING_MODE_PERIOD_MAX*4);
+			mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,	(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P7_1),	TRAINING_MODE_PERIOD_MAX*4);
 			break;
-		case DPID_CUSTOM_TRAIN_PLAN_03:// 当前自定义训练计划_03
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,	(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P8_1),	TRAINING_MODE_PERIOD_MAX*4);
+		//case DPID_CUSTOM_TRAIN_PLAN_03:// 当前自定义训练计划_03
+			//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,	(unsigned char *)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P8_1),	TRAINING_MODE_PERIOD_MAX*4);
+			//break;
+		//*********************************
+		//========== 详细温度参数  =============
+		//*********************************
+		case DPID_DRIVE_NTC_TEMP_01:// 驱动板 NTC 温度——01
+			mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_01,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_01));
 			break;
-		
+		case DPID_DRIVE_NTC_TEMP_02:// 驱动板 NTC 温度——02
+			mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_02,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_02));
+			break;
+		case DPID_DRIVE_NTC_TEMP_03:// 驱动板 NTC 温度——03
+			mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_03,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_03));
+			break;
 		default:
 			break;
 	}

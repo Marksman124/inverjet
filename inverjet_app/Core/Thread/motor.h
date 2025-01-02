@@ -92,7 +92,7 @@ extern "C" {
 
 
 //驱动板故障 标志位
-#define MOTOR_FAULT_SIGN_BIT						(E102_TEMPERATURE_AMBIENT | E205_WIFI_HARDWARE | E206_BT_HARDWARE | E207_RS485_HARDWARE)
+#define MOTOR_FAULT_SIGN_BIT						(E102_TEMPERATURE_AMBIENT | E301_WIFI_HARDWARE | E302_BT_HARDWARE | E303_RS485_HARDWARE | E304_KEY_HARDWARE)
 #define CLEAN_MOTOR_FAULT(n)						(n &= MOTOR_FAULT_SIGN_BIT)
 
 #define	MOTOR_PROTOCOL_HEADER_OFFSET						3
@@ -247,10 +247,10 @@ uint16_t Get_Motor_Fault_State(void);
 void Set_Motor_Fault_State(uint16_t fault_bit);
 //-------------------- 清除电机故障状态 ----------------------------
 void ReSet_Motor_Fault_State(uint16_t fault_bit);
-//-------------------- 严重故障 ----------------------------
-uint8_t Motor_Is_Serious_Fault(uint16_t fault_bit);
-//-------------------- 一般故障 ----------------------------
-uint8_t Motor_Is_Ordinary_Fault(uint16_t fault_bit);
+//-------------------- 硬件故障 ----------------------------
+uint8_t Motor_Is_Hardware_Fault(uint16_t fault_bit);
+//-------------------- 软件故障 ----------------------------
+uint8_t Motor_Is_Software_Fault(uint16_t fault_bit);
 //-------------------- 指定故障 ----------------------------
 uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit);
 

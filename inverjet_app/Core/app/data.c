@@ -193,7 +193,7 @@ uint8_t Check_Data_Init(void)
 	if(result == 1)
 	{
 		*p_Local_Address 					= MODBUS_LOCAL_ADDRESS;
-		*p_Baud_Rate 							= MODBUS_BAUDRATE_DEFAULT;
+		//*p_Baud_Rate 							= MODBUS_BAUDRATE_DEFAULT;
 		*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// 电机级数		5
 		*p_Support_Control_Methods 	= 0;			//	控制方式	
 	}
@@ -591,7 +591,11 @@ void System_Wifi_State_Clean(void)
 {
 	*p_WIFI_Rssi = 0xFF;
 }
-	
+//------------------- 清除蓝牙标志 ----------------------------
+void System_BT_State_Clean(void)
+{
+	*p_BLE_Rssi = 0;
+}
 extern void LCD_Refresh_Restore(void);
 
 //------------------- 设置控制方式 ----------------------------

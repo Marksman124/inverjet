@@ -124,6 +124,9 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_FINISH_STATISTICS_TIME, DP_TYPE_VALUE},
     {DPID_FINISH_STATISTICS_SEED, DP_TYPE_VALUE},
     {DPID_FINISH_STATISTICS_DISTANCE, DP_TYPE_VALUE},
+    {DPID_DRIVE_NTC_TEMP_01, DP_TYPE_VALUE},
+    {DPID_DRIVE_NTC_TEMP_02, DP_TYPE_VALUE},
+    {DPID_DRIVE_NTC_TEMP_03, DP_TYPE_VALUE},
     
 };
 
@@ -214,7 +217,9 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,当前完成统计_游泳强度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,当前完成统计_距离); //VALUE型数据上报;
     
-
+    mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_01,当前驱动板NTC温度_01); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_02,当前驱动板NTC温度_02); //VALUE型数据上报;
+		mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_03,当前驱动板NTC温度_03); //VALUE型数据上报;
     */	
 		mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,				Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
 		mcu_dp_value_update(DPID_PREPARATION_TIME,				*p_Preparation_Time_BIT); 			// 准备时间(APP管理,本地只负责保存)
@@ -258,6 +263,10 @@ void all_data_update(void)
 		mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 			// 当前完成统计_时长
     mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 			// 当前完成统计_游泳强度
     mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); 	// 当前完成统计_距离
+		
+		//mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_01,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_01)); //VALUE型数据上报;
+		//mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_02,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_02)); //VALUE型数据上报;
+		//mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_03,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_03)); //VALUE型数据上报;
 
 }
 
@@ -937,13 +946,12 @@ unsigned char get_download_cmd_total(void)
  * @return Null
  * @note   MCU需要自行实现该功能
  */
-void upgrade_package_choose(unsigned char chan, unsigned long package_sz)
+void upgrade_package_choose(unsigned char chan, unsigned char way, unsigned long package_sz)
 {
 	//#error "请自行实现请自行实现升级包大小选择代码,完成后请删除该行"
 	unsigned short send_len = 0;
-	if(System_To_OTA() == SUCCESS)
+	if((way == 1) || (System_To_OTA() == SUCCESS))
 	{
-		
 		send_len = set_wifi_uart_byte(send_len, PACKAGE_SIZE);
 		wifi_uart_write_frame(UPDATE_START_CMD, MCU_TX_VER, send_len);
 		
@@ -951,6 +959,9 @@ void upgrade_package_choose(unsigned char chan, unsigned long package_sz)
 		if(package_sz % 1024)
 			pack_sum ++;
 				
+		Set_System_State_Machine(OTA_UPGRADE_STATUS);
+		Data_Set_Current_Speed(0);//注意,需要在切完运行状态后再设置速度,如"暂停"
+	
 		Out_Of_Upgradation();
 		Lcd_Show_Upgradation(pack_sum,0);
 		Ota_Chan = chan;//bootloader

@@ -65,36 +65,12 @@ void BT_Read_Data_Bit(unsigned char vaule)
 	//char* rssi = "MAC:123456789000\r\nrssi:-40\r\n";
 //	char rssi[24] = {0x4D, 0x41, 0x43, 0x3A, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x30, 0x30, 0x0D, 0x0A, 0x72, 0x73, 0x73, 0x69, 0x3A, 0x2D};
 	//MsSerialRead(&Ms_BT_Modbus,&vaule,1);
-	if(IS_SELF_TEST_MODE())
+	if(IS_CHECK_ERROR_MODE())
 	{
-		
-		//BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test++] =vaule;
 		if(vaule == '>')
 		{
 			*p_BLE_Rssi = 50;
 		}
-//		if(BT_Read_Cnt_For_Test > 24)
-//		{
-//			if((BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test - 1] ==  0x0A) && (BT_Read_Buffer_For_Test[BT_Read_Cnt_For_Test - 2] == 0x0D))
-//			{
-//				if(BT_Read_Cnt_For_Test == 28) // 十位
-//				{
-//					*p_BLE_Rssi = (BT_Read_Buffer_For_Test[24] - 0x30) * 10 + (BT_Read_Buffer_For_Test[25] - 0x30);
-//				}
-//				else if(BT_Read_Cnt_For_Test == 29) // 百位
-//				{
-//					*p_BLE_Rssi = (BT_Read_Buffer_For_Test[24] - 0x30) * 100 + (BT_Read_Buffer_For_Test[25] - 0x30)* 10 + (BT_Read_Buffer_For_Test[26] - 0x30);
-//				}
-//			}
-//		}
-//		else
-//		{
-//			if(memcmp(BT_Read_Buffer_For_Test, rssi, BT_Read_Cnt_For_Test) != 0)
-//			{
-//				//memset(BT_Read_Buffer_For_Test,0,64);
-//				BT_Read_Cnt_For_Test = 0;
-//			}
-//		}
 	}
 #ifdef BT_ONLINE_CONNECT_MODE
 	else if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) != 1)	//wuqingguang test
@@ -126,8 +102,22 @@ void BT_Read_Data_Bit(unsigned char vaule)
 //接收中断调用
 void Usart_IRQ_CallBack(uint8_t data)
 {
-	BT_Uart_Read_Buffer = data;
-	MsSerialRead(&Ms_BT_Modbus,&BT_Uart_Read_Buffer,1);
+	if(IS_CHECK_ERROR_MODE())
+	{
+		if(data == '>')
+		{
+			*p_BLE_Rssi = 50;
+		}
+	}
+#ifdef BT_ONLINE_CONNECT_MODE
+	else if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) != 1)	//wuqingguang test
+#else
+	else
+#endif
+	{
+		BT_Uart_Read_Buffer = data;
+		MsSerialRead(&Ms_BT_Modbus,&BT_Uart_Read_Buffer,1);
+	}
 }
 
 
@@ -366,7 +356,7 @@ void BT_Module_AT_DoTest(void)
 void BT_Modbus_Config_Init(void)
 {
 	//初始化对象
-	MsInit(&Ms_BT_Modbus,21,10,SerialWrite);
+	MsInit(&Ms_BT_Modbus,21,1,SerialWrite);
 	//设置01寄存器的参数，不设置的话会返回无效的功能错误码
 	//MsConfigureRegister(&Ms_BT_Modbus,0x01,buff01,sizeof(buff01));
 	//MsConfigureRegister(&Ms_BT_Modbus,0x0F,buff01,sizeof(buff01));
@@ -410,7 +400,7 @@ void BT_Read_Handler(void)
 	static uint8_t BT_Thread_Task_Cnt=0;
 	static uint16_t static_machine_buff[4];
 #endif
-	if(IS_SELF_TEST_MODE())
+	if(IS_CHECK_ERROR_MODE())
 	{
 		if(self_test_cnt == 0)
 		{
@@ -462,13 +452,16 @@ void BT_Distribution_Halder(void)
 	if(BT_Halder_cnt == 0)
 		SerialWrite((uint8_t*)"+++",3);
 	else if(BT_Halder_cnt == 2)
-		BT_Set_Name();
+		SerialWrite((uint8_t*)"AT+BLENAME=inverjet\r\n",strlen("AT+BLENAME=inverjet\r\n"));
+		//BT_Set_Name();
 	//else if(BT_Halder_cnt == 4)
 		//BT_Set_MAC();
 	else if(BT_Halder_cnt == 9)
-		BT_Set_Mode(0);
+		SerialWrite((uint8_t*)"AT+BLEMODE=%d\r\n",strlen("AT+BLEMODE=%d\r\n"));
+		//BT_Set_Mode(0);
 	else if(BT_Halder_cnt == 16)
-		BT_Set_MTU(243);
+		SerialWrite((uint8_t*)"AT+BLEMTU=%d\r\n",strlen("AT+BLEMTU=%d\r\n"));
+		//BT_Set_MTU(243);
 	
 	BT_Halder_cnt ++;
 }

@@ -404,7 +404,8 @@ void UART5_IRQHandler(void)
 	if((UART5->SR&UART_FLAG_RXNE) != 0)
 	{
 		//Res=USART2->DR;
-			BT_Read_Data_Bit(UART5->DR);
+		//BT_Read_Data_Bit(UART5->DR);
+		Usart_IRQ_CallBack(UART5->DR);
 	}
   /* USER CODE END UART5_IRQn 0 */
   //HAL_UART_IRQHandler(&huart5);

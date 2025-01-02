@@ -46,9 +46,11 @@ typedef enum
 	FAULT_BIT_09_TEMPERATURE_HARDWARE,					// 温度 (硬件故障)						E201
 	FAULT_BIT_10_DRIVE_BOARD,										// 驱动板 异常								E202
 	FAULT_BIT_11_DRIVE_LOSS,										// 驱动板 通信故障						E203
-	FAULT_BIT_12_WIFI_HARDWARE,									// WIFI 模组 (硬件故障)			E205
-	FAULT_BIT_13_BT_HARDWARE,										// BT 模组 (硬件故障)				E206
-	FAULT_BIT_14_RS485_HARDWARE,								// RS485 模组 (硬件故障)			E207
+	
+	FAULT_BIT_12_WIFI_HARDWARE,									// WIFI 模组 (硬件故障)			E301
+	FAULT_BIT_13_BT_HARDWARE,										// BT 模组 (硬件故障)				E302
+	FAULT_BIT_14_RS485_HARDWARE,								// RS485 模组 (硬件故障)			E303
+	FAULT_BIT_15_KEY_HARDWARE,									// 按键	(硬件故障)						E304
 	
 } FAULT_STATE_BIT_E;
 
@@ -70,9 +72,10 @@ typedef enum
 #define E201_TEMPERATURE_HARDWARE					(1 << FAULT_BIT_09_TEMPERATURE_HARDWARE)
 #define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)
 #define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)
-#define E205_WIFI_HARDWARE								(1 << FAULT_BIT_12_WIFI_HARDWARE)
-#define E206_BT_HARDWARE									(1 << FAULT_BIT_13_BT_HARDWARE)
-#define E207_RS485_HARDWARE								(1 << FAULT_BIT_14_RS485_HARDWARE)
+#define E301_WIFI_HARDWARE								(1 << FAULT_BIT_12_WIFI_HARDWARE)
+#define E302_BT_HARDWARE									(1 << FAULT_BIT_13_BT_HARDWARE)
+#define E303_RS485_HARDWARE								(1 << FAULT_BIT_14_RS485_HARDWARE)
+#define E304_KEY_HARDWARE									(1 << FAULT_BIT_15_KEY_HARDWARE)
 
 //-------------- 按键组合响应 总数 -------------------
 #define CALL_OUT_NUMBER_MAX						8

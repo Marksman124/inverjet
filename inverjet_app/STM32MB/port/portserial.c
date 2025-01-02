@@ -94,7 +94,10 @@ xMBPortSerialGetByte( CHAR * pucByte )
      * by the protocol stack after pxMBFrameCBByteReceived( ) has been called.
      */
     if(HAL_UART_Receive (p_huart_mb ,(uint8_t *)pucByte,1,0x01) != HAL_OK )//添加接收一位代码
+		{
+			__HAL_UART_ENABLE_IT(p_huart_mb, UART_IT_ERR);
 			return FALSE ;
+		}
 		else
 		{
 			return TRUE;

@@ -368,6 +368,15 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //完成统计_距离(只上报)
 //备注:
 #define DPID_FINISH_STATISTICS_DISTANCE 42
+//驱动板NTC温度_01(只上报)
+//备注:
+#define DPID_DRIVE_NTC_TEMP_01 50
+//驱动板NTC温度_02(只上报)
+//备注:
+#define DPID_DRIVE_NTC_TEMP_02 51
+//驱动板NTC温度_03(只上报)
+//备注:
+#define DPID_DRIVE_NTC_TEMP_03 52
 
 
 
@@ -419,7 +428,7 @@ unsigned char get_download_cmd_total(void);
  * @return Null
  * @note   MCU需要自行实现该功能
  */
-void upgrade_package_choose(unsigned char chan, unsigned long package_sz);
+void upgrade_package_choose(unsigned char chan, unsigned char way, unsigned long package_sz);
 
 /**
  * @brief  MCU进入固件升级模式

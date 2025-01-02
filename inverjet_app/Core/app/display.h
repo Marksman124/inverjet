@@ -130,12 +130,17 @@ extern void To_Train_Mode(uint8_t num);
 //	вт╡Б
 extern void System_Self_Testing_Porgram(void);
 
+extern void System_Self_Checking_Porgram(void);
+
 
 extern void Freertos_TaskSuspend_Wifi(void);
 
 extern void Freertos_TaskResume_All(void);
 
+extern void Freertos_TaskSuspend_BT(void);
+
 extern void Freertos_TaskSuspend_RS485(void);
+
 /* Private defines -----------------------------------------------------------*/
 
 extern uint8_t LCD_Show_Bit;

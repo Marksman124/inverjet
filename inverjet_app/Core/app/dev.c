@@ -25,7 +25,7 @@ uint16_t* p_Software_Version_low;				//	软件版本 低
 
 //与上位机modbus
 uint16_t* p_Baud_Rate;							//	波特率
-uint32_t Modbus_BaudRate_Table[] = 	{1200,2400,4800,9600,19200,115200};
+uint32_t Modbus_BaudRate_Table[] = 	{2400,4800,9600,14400};
 #define MODBUS_BAUDRATE_TABLE_LEN		(sizeof(Modbus_BaudRate_Table)/sizeof(Modbus_BaudRate_Table[0]))
 
 
@@ -41,7 +41,7 @@ uint32_t Dev_BaudRate_Get(uint8_t usart_num)
 	else if(usart_num == MODBUS_USART)	// modbus
 	{
 		// 先写死 115200 wuqingguang
-		//if( (*p_Baud_Rate >= MODBUS_BAUDRATE_TABLE_LEN) || (*p_Baud_Rate == 0) )
+		if(*p_Baud_Rate >= MODBUS_BAUDRATE_TABLE_LEN)
 		{
 			*p_Baud_Rate = MODBUS_BAUDRATE_DEFAULT;	// 默认 9600
 		}
@@ -110,7 +110,8 @@ void Set_Local_Address(uint16_t addr)
 {
 	*p_Local_Address = addr;
 	// 写flash
-	MB_Flash_Buffer_Write();
+	Write_MbBuffer_Later();
+		//MB_Flash_Buffer_Write();
 }
 
 void Set_Baud_Rate(uint16_t rate)
@@ -118,7 +119,8 @@ void Set_Baud_Rate(uint16_t rate)
 	*p_Baud_Rate = rate;
 	// 写flash
 	//STMFLASH_Write(USER_FLASH_ADDR_BAUD_RATE, p_Baud_Rate, 1);
-	MB_Flash_Buffer_Write();
+	Write_MbBuffer_Later();
+		//MB_Flash_Buffer_Write();
 }
 
 void Set_Software_Version(void)
@@ -127,7 +129,8 @@ void Set_Software_Version(void)
 	
 	
 	// 写flash
-	MB_Flash_Buffer_Write();
+	Write_MbBuffer_Later();
+		//MB_Flash_Buffer_Write();
 }
  
 

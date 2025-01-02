@@ -79,7 +79,6 @@ void App_Timing_Init(void)
 	all_data_update();		// wifi …œ¥´
 	
 	System_Power_Off();
-	Clean_Comm_Test();
 }
 
 void Clean_Timing_Timer_Cnt(void)
@@ -112,14 +111,16 @@ void Speed_Save_Flash(Operating_Parameters op_node,uint8_t system_state)
 	{
 		p_OP_Timing_Mode->speed = op_node.speed;
 		p_OP_Timing_Mode->time = op_node.time;
-		MB_Flash_Buffer_Write();
+		Write_MbBuffer_Later();
+		//MB_Flash_Buffer_Write();
 		//STMFLASH_Write(FLASH_APP_PARAM_ADDR+(MB_USER_TIME_MODE_SPEED*2), (uint16_t *)p_OP_Timing_Mode, 2 );// REG_HOLDING_NREGS
 	}
 	else if(system_state == FREE_MODE_INITIAL)
 	{
 		p_OP_Free_Mode->speed = op_node.speed;
 		p_OP_Free_Mode->time = op_node.time;
-		MB_Flash_Buffer_Write();
+		Write_MbBuffer_Later();
+		//MB_Flash_Buffer_Write();
 		//STMFLASH_Write(FLASH_APP_PARAM_ADDR+(MB_USER_FREE_MODE_SPEED*2), (uint16_t *)p_OP_Free_Mode, 2 );// REG_HOLDING_NREGS
 	}
 }
@@ -316,7 +317,7 @@ void Fault_State_Handler(void)
 	}
 	else if(System_is_Error())//π ’œ 2minª÷∏¥ ∑«Õ®—∂π ’œ
 	{
-		if((If_Fault_Recovery_Max()==0)&&(*p_System_Fault_Static != E203_MOTOR_LOSS))
+		if(If_Fault_Recovery_Max()==0)//&&(*p_System_Fault_Static != E203_MOTOR_LOSS))
 		{
 			if(( System_Fault_Timing_Cnt == 0)||(System_Fault_Timing_Cnt > Timing_Half_Second_Cnt))
 			{
@@ -618,7 +619,7 @@ void Initial_State_Handler(void)
 		// 3√Î …¡À∏
 		if(Timing_Timer_Cnt < 2)
 		{
-			if((Timing_Timer_Cnt % 2) == 1)
+			if(Timing_Timer_Cnt == 1)
 			{
 				LCD_Refresh_Set(1);
 				Lcd_Speed_Off();
@@ -805,15 +806,21 @@ void App_Timing_Handler(void)
 	
 	if(IS_SELF_TEST_MODE())
 	{
-		System_Self_Testing_Porgram();
+		if(IS_CHECK_ERROR_MODE())
+			System_Self_Checking_Porgram();
+		else
+			System_Self_Testing_Porgram();
 		//System_Power_Off();
 		System_Power_On();
-		Self_Testing_Check_Comm();
+		
+		if(IS_CHECK_ERROR_MODE())
+			Self_Testing_Check_Comm();
+		
 		//To_Free_Mode(FREE_MODE_NOT_AUTO_START);
 		Arbitrarily_To_Pause();
-		Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
-		OUT_SELF_TEST_MODE();
 		
+		Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+		OUT_SELF_TEST_MODE();
 	}
 	else
 	{

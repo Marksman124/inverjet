@@ -367,7 +367,7 @@ void Modbus_Init(void)
 	{
 		*p_Local_Address = MODBUS_LOCAL_ADDRESS;	// 默认 0xAA
 	}
-	eMBInit( MB_RTU, *p_Local_Address, 0, 115200, MB_PAR_ODD);//初始化modbus，走modbusRTU，从站地址为0xAA，串口为2。
+	eMBInit( MB_RTU, *p_Local_Address, 0, Dev_BaudRate_Get(MODBUS_USART), MB_PAR_ODD);//初始化modbus，走modbusRTU，从站地址为0xAA，串口为2。
 	eMBEnable(  );//使能modbus
 	
 }
@@ -398,9 +398,10 @@ void Modbus_Buffer_Init(void)
 
 void MB_Flash_Buffer_Write(void)
 {
+	taskENTER_CRITICAL();
 	//扇区是2048， 整个 usRegHoldingBuf 一起写
 	STMFLASH_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
-	
+	taskEXIT_CRITICAL();
 	//Eeprom_I2C_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
 }
 
@@ -540,10 +541,10 @@ void MB_Get_Mapping_Register(void)
 	//电机 实际 功率
 	p_Motor_Reality_Power = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_REALITY_POWER);
 	
-	
 	//母线 电压
 	p_Motor_Bus_Voltage = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_VOLTAGE);
-	
+	//母线 电流
+	p_Motor_Bus_Current = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_CURRENT);
 
 	//--------------------------- 系统属性
 	// 状态机
@@ -588,9 +589,6 @@ void MB_Get_Mapping_Register(void)
 
 	//================= 冲浪模式 全局 参数 ================================
 	Surf_Mode_Info_Get_Mapping();
-	
-	//================= 自检模式  ================================
-	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE,0);
 	
 	//================= 信号值  ================================
 	p_BLE_Rssi = 	Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH);

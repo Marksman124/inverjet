@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.1.9"					//严重故障直接锁机
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.1"					//限流: (80,65,65)     (82,68,65)
 
 /**
 ******************************************************************************
@@ -98,7 +98,7 @@ extern "C" {
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
-#define LIGHT_BRIGHTNESS_MAX					(100)		// 最大亮度  0~500
+#define LIGHT_BRIGHTNESS_MAX					(300)		// 最大亮度  0~500
 #else
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
 #define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// 最大亮度  0~500
@@ -142,9 +142,9 @@ extern "C" {
 /* 蜂鸣器 音量  50最大  ------------------------------------------------------------*/
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
-#define BUZZER_FREQUENCY					0
+#define BUZZER_FREQUENCY					3
 #else
-#define BUZZER_FREQUENCY					5					// wuqingguang	50
+#define BUZZER_FREQUENCY					50					// wuqingguang	50
 #endif
 //*******************************************************
 
@@ -203,7 +203,7 @@ extern "C" {
 //-------------- 故障 去抖时间 -------------------
 #define MOTOR_CHECK_FAULT_TIMER								(3-1)
 //-------------- 故障自恢复 -------------------
-#define SYSTEM_FAULT_TIME_CALLOUT							(10*TIMING_THREAD_ONE_SECOND)				// 120 s   12s  wuqingguang  10
+#define SYSTEM_FAULT_TIME_CALLOUT							(30*TIMING_THREAD_ONE_SECOND)				// 30 s    wuqingguang 
 #define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
 #define SYSTEM_FAULT_RECOVERY_TIME						(3600*TIMING_THREAD_ONE_SECOND)				// 1 小时内  3600 s
 //-------------- 自动关机 -------------------
@@ -401,7 +401,7 @@ extern "C" {
 #define BT_THREAD_TURN_ON					1
 
 #if(BT_THREAD_TURN_ON)
-#define BT_THREAD_LIFECYCLE											(200)				// ms 暂时不用
+#define BT_THREAD_LIFECYCLE											(40)				// ms 暂时不用
 
 //1秒周期数
 #define BT_THREAD_ONE_SECOND									(1000/BT_THREAD_LIFECYCLE)				// 1 s
