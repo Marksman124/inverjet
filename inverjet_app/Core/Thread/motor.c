@@ -116,17 +116,20 @@ void App_Motor_Handler(void)
 	else
 		Motor_Timer_Cnt = 0;
 	// ===================  通讯故障
-	//******************  调试模式 **************************
 #ifndef SYSTEM_DEBUG_MODE
 	if(IS_CHECK_ERROR_MODE())
 	{
 		if(Motor_Rx_Timer_cnt > (FAULT_MOTOR_LOSS_TIME/3))
+		{
 			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//驱动板 通讯故障
+		}
 	}
 	else
 	{
 		if(Motor_Rx_Timer_cnt > FAULT_MOTOR_LOSS_TIME)
+		{
 			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//驱动板 通讯故障
+		}
 	}
 #endif
 	// ===================  尝试重启串口

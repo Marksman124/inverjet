@@ -671,6 +671,12 @@ static void on_Button_2_4_Short_Press(void)
 
 static void on_Button_1_Long_Press(void)
 {
+	static uint8_t Button_1_delay_cnt = 0;
+	//刷太快了  20ms
+	if(Button_1_delay_cnt++ < 10)
+		return;
+	Button_1_delay_cnt = 0;
+			
 	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_100_TIME)
@@ -768,6 +774,12 @@ static void on_Button_1_Long_Press(void)
 
 static void on_Button_2_Long_Press(void)
 {
+	static uint8_t Button_2_delay_cnt = 0;
+	//刷太快了  20ms
+	if(Button_2_delay_cnt++ < 10)
+		return;
+	Button_2_delay_cnt = 0;
+	
 	Sleep_Time_Clean();
 #ifdef OPERATION_P5_ACCELERATION
 	if(Operation_State_Machine == OPERATION_P5_100_TIME)

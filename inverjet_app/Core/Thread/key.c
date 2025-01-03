@@ -321,6 +321,12 @@ void on_pushButton_2_4_Short_Press(void)
 //================================== ¢Ù µµÎ»¼ü
 void on_pushButton_1_Long_Press(void)
 {
+	static uint8_t pushButton_1_delay_cnt = 0;
+	//Ë¢Ì«¿ìÁË  20ms
+	if(pushButton_1_delay_cnt++ < 10)
+		return;
+	pushButton_1_delay_cnt = 0;
+	
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop())
 			return;
 	if(PMode_Now == 5)//³åÀË
@@ -339,7 +345,7 @@ void on_pushButton_1_Long_Press(void)
 		if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
 		else
-			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
 
 		Arbitrarily_To_Initial();
 		//Lcd_Show();
