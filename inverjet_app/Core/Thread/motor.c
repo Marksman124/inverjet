@@ -136,9 +136,9 @@ void App_Motor_Handler(void)
 	if( ((Motor_Rx_Timer_cnt % FAULT_MOTOR_TRY_RESTAR_TIME)==0) && (Motor_Rx_Timer_cnt >= FAULT_MOTOR_TRY_RESTAR_TIME))
 	{
 		DEBUG_PRINT("[ERROR]\t驱动板通讯故障 cnt:\t%d\t重启串口\n",Motor_Rx_Timer_cnt);
+		Motor_Rx_Timer_cnt = 0;
 		Motor_Usart_Restar();
 	}
-	
 #if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	//*********************************************************************************************
@@ -491,11 +491,9 @@ uint8_t CRC8_ADD(uint8_t *ptr, uint16_t len)
     {
         crc = (crc + *ptr++);
     }
-#ifdef SYSTEM_DEBUG_MODE
-    return(crc);
-#else
+
 		return(~crc);
-#endif
+
 }
 
 //-------------------- 电机状态解析 ----------------------------
@@ -950,7 +948,7 @@ uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit)
 void Motor_UART_Send(uint8_t* p_buff, uint8_t len)
 {
 #ifdef MOTOR_MODULE_HUART
-	HAL_UART_Transmit(p_huart_motor, p_buff, len, 0xFFFF);
+	HAL_UART_Transmit(p_huart_motor, p_buff, len, 100);
 	
 #endif
 }

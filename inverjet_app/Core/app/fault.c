@@ -523,7 +523,6 @@ static void on_Fault_Button_4_Long_Press(void)
 	if(If_Fault_Recovery_Max()==1)
 		return;
 		//System_Power_Off();
-	Add_Fault_Recovery_Cnt(1);
 	CallOut_Fault_State();
 	System_Power_Off();
 }

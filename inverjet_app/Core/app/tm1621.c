@@ -57,7 +57,6 @@
 #endif
 //*******************************************************
 
-
 /* Private variables ---------------------------------------------------------*/
 
 uint8_t Lcd_ram[SCREEN_NUMBER_MAX]={0};
@@ -128,7 +127,7 @@ uint8_t Lcd_Letter_table_2[TM1621_LETTER_MAX][2] = {
 	{0x31,'u'} // u
 };
 
-
+static uint8_t TM1621_Buzzer_value = 0;
 
 //extern TIM_HandleTypeDef htim3;
 /* Private user code ---------------------------------------------------------*/
@@ -420,9 +419,14 @@ void TM1621_Show_Off(void)
 // µ÷½Ú·¶Î§ : 1 - 100
 void Buzzer_IO_PwmOut(uint16_t pul)
 {
+	if(TM1621_Buzzer_value == pul)
+		return;
+			
 	HAL_TIM_PWM_Stop_IT(&htim3, TIM_CHANNEL_3);
 	__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_3, pul);//pul
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+	
+	TM1621_Buzzer_value = pul;
 }
 
 /*
@@ -433,7 +437,7 @@ TM1621_Show_Off
 ******************************************************************************
 */ 
 void TM1621_Buzzer_Off(void)
-{	
+{
 	Buzzer_IO_PwmOut(0);
 	//TM1621_Write_CMD(TONEOFF);
 }

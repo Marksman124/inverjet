@@ -112,7 +112,7 @@ void Set_Debug_Protocol_Mode(uint8_t mode)
 	Debug_Send_Buffer[4] = Debug_Protocol_Mode;
 	
 #ifdef DEBUG_USART
-	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, 5,0xFFFF); //将收到的信息发送出去
+	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, 5,50); //将收到的信息发送出去
 	//HAL_UART_Transmit_IT(p_huart_debug, Debug_Send_Buffer, 5); //将收到的信息发送出去
 #endif
 }
@@ -128,7 +128,7 @@ void UART_Send_Debug(uint8_t * p_buff, uint8_t len)
 	//Debug_Send_Buffer[0] = cmd;
 	memcpy(Debug_Send_Buffer, p_buff, len);
 	// 转发至串口  用于调试
-	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, len,0xFFFF); //将收到的信息发送出去
+	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, len,50); //将收到的信息发送出去
 	//HAL_UART_Transmit_IT(p_huart_debug, (uint8_t *)Debug_Send_Buffer, len+1);//使用DMA发送数据
 
 #else

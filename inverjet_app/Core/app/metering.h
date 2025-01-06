@@ -32,10 +32,10 @@ extern "C" {
 /*------------------- IO define ----------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
 
-#define RS48501_RE_Pin GPIO_PIN_8
-#define RS48501_RE_GPIO_Port GPIOA
-#define RS48504_RE_Pin GPIO_PIN_12
-#define RS48504_RE_GPIO_Port GPIOA
+//#define RS48501_RE_Pin GPIO_PIN_8
+//#define RS48501_RE_GPIO_Port GPIOA
+//#define RS48504_RE_Pin GPIO_PIN_12
+//#define RS48504_RE_GPIO_Port GPIOA
 
 
 #if (METERING_MODULE_HUART == 1)

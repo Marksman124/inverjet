@@ -673,7 +673,7 @@ static void on_Button_1_Long_Press(void)
 {
 	static uint8_t Button_1_delay_cnt = 0;
 	//刷太快了  20ms
-	if(Button_1_delay_cnt++ < 10)
+	if(Button_1_delay_cnt++ < KEY_LONG_PRESS_STEP)
 		return;
 	Button_1_delay_cnt = 0;
 			
@@ -776,7 +776,7 @@ static void on_Button_2_Long_Press(void)
 {
 	static uint8_t Button_2_delay_cnt = 0;
 	//刷太快了  20ms
-	if(Button_2_delay_cnt++ < 10)
+	if(Button_2_delay_cnt++ < KEY_LONG_PRESS_STEP)
 		return;
 	Button_2_delay_cnt = 0;
 	

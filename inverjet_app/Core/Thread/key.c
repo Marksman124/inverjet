@@ -323,7 +323,7 @@ void on_pushButton_1_Long_Press(void)
 {
 	static uint8_t pushButton_1_delay_cnt = 0;
 	//刷太快了  20ms
-	if(pushButton_1_delay_cnt++ < 10)
+	if(pushButton_1_delay_cnt++ < KEY_LONG_PRESS_STEP)
 		return;
 	pushButton_1_delay_cnt = 0;
 	
@@ -364,14 +364,14 @@ void on_pushButton_3_Long_Press(void)
 //================================== ④ 开机键  短按
 void on_pushButton_4_Long_Press(void)
 {
+	Buzzer_Click_Long_On(1);
+	
 	if(System_is_Power_Off())//关机中 执行开机
 	{
-			Buzzer_Click_Long_On(1);
 			System_Power_On();
 	}
 	else
 	{
-		Buzzer_Click_Long_On(1);
     System_Power_Off();
 	}
 	
@@ -546,7 +546,7 @@ void Buzzer_Click_Handler(void)
 		{
 			TM1621_Buzzer_Click();
 		}
-		else if(Key_Buzzer_cnt > (KEY_BUZZER_TIME+2))
+		else if(Key_Buzzer_cnt > KEY_BUZZER_TIME)
 		{
 			if(Key_Buzzer_Type == 0)
 			{
@@ -555,7 +555,7 @@ void Buzzer_Click_Handler(void)
 			}
 			else if(Key_Buzzer_Type == 1)
 			{
-				if(Key_Buzzer_cnt > (KEY_BUZZER_TIME_LONG+2))
+				if(Key_Buzzer_cnt > KEY_BUZZER_TIME_LONG)
 				{
 					TM1621_Buzzer_Off();
 					Key_Buzzer_cnt = 0;
@@ -564,7 +564,7 @@ void Buzzer_Click_Handler(void)
 			}
 			else if(Key_Buzzer_Type == 2)
 			{
-				if(Key_Buzzer_cnt > (KEY_BUZZER_TIME_LONG_32+2))
+				if(Key_Buzzer_cnt > KEY_BUZZER_TIME_LONG_32)
 				{
 					TM1621_Buzzer_Off();
 					Key_Buzzer_cnt = 0;
@@ -575,6 +575,8 @@ void Buzzer_Click_Handler(void)
 		
 		if(Key_Buzzer_cnt > 0)
 			Key_Buzzer_cnt++;
+		else
+			TM1621_Buzzer_Off();
 }
 
 

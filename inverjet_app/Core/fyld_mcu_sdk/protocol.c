@@ -143,7 +143,7 @@ const DOWNLOAD_CMD_S download_cmd[] =
 void uart_transmit_output(unsigned char value)
 {
     //#error "请将MCU串口发送函数填入该函数,并删除该行"
-    HAL_UART_Transmit(&huart2, &value, 1, 0xFFFF);
+    HAL_UART_Transmit(&huart2, &value, 1, 5);
 /*
     //Example:
     extern void Uart_PutChar(unsigned char value);
@@ -950,7 +950,7 @@ void upgrade_package_choose(unsigned char chan, unsigned char way, unsigned long
 {
 	//#error "请自行实现请自行实现升级包大小选择代码,完成后请删除该行"
 	unsigned short send_len = 0;
-	if((way == 1) || (System_To_OTA() == SUCCESS))
+	if((way == OTA_WAY_APP_CONFIRM) || (System_To_OTA() == SUCCESS))
 	{
 		send_len = set_wifi_uart_byte(send_len, PACKAGE_SIZE);
 		wifi_uart_write_frame(UPDATE_START_CMD, MCU_TX_VER, send_len);

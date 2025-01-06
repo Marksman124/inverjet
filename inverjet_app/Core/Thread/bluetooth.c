@@ -48,13 +48,13 @@ static uint16_t BT_Halder_cnt = 0;
 //串口发送接口
 void SerialWrite(unsigned char *buff,int length)
 {
-	HAL_UART_Transmit(&huart5,buff,length,0xFFFF);
+	HAL_UART_Transmit(&huart5,buff,length,200);
 }
 
 //-------------------- 发送 ----------------------------
 void BT_UART_Send(uint8_t* p_buff, uint8_t len)
 {
-	HAL_UART_Transmit(&huart5, p_buff, len, 0xFFFF);
+	HAL_UART_Transmit(&huart5, p_buff, len, 200);
 }
 //串口接收接口
 void BT_Read_Data_Bit(unsigned char vaule)

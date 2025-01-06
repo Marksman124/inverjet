@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.1"					//限流: (80,65,65)     (82,68,65)
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.2"					//限流: (80,65,65)     (82,68,65)
 
 /**
 ******************************************************************************
@@ -136,19 +136,21 @@ extern "C" {
 #define KEY_MULTIPLE_CLICKS_MAX				8						// 8次
 #define KEY_MULTIPLE_CLICKS_TIME			5000				// 5秒内
 //-------------- 蜂鸣器 长度 -------------------
-#define KEY_BUZZER_TIME								((200/KEY_THREAD_LIFECYCLE)-2)					//周期  KEY_THREAD_LIFECYCLE 倍数
-#define KEY_BUZZER_TIME_LONG					((400/KEY_THREAD_LIFECYCLE)-2)					//周期  KEY_THREAD_LIFECYCLE 倍数
-#define KEY_BUZZER_TIME_LONG_32				((800/KEY_THREAD_LIFECYCLE)-2)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME								(200/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME_LONG					(400/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME_LONG_32				(800/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
 /* 蜂鸣器 音量  50最大  ------------------------------------------------------------*/
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					3
 #else
-#define BUZZER_FREQUENCY					50					// wuqingguang	50
+#define BUZZER_FREQUENCY					2					// wuqingguang	50
 #endif
 //*******************************************************
 
 #define KEY_VALUE_SHAKE_TIME					(1)		//去抖动 次数
+
+#define KEY_LONG_PRESS_STEP						(5)		// 长按 步进
 
 //屏幕背光 pwm 控制 
 //#define LCD_BACK_LIGHT_PWM_CTRL							1
@@ -389,6 +391,8 @@ extern "C" {
 // 结束统计 上传 最低时间 -- 低于 1min 不计入统计  单位(秒)
 #define WIFI_STATISTICE_UPLOAD_MINIMUM_TIME										(60)
 
+// app确认 方式
+#define OTA_WAY_APP_CONFIRM									(2)
 
 #endif
 /*==============================================================================================================*/

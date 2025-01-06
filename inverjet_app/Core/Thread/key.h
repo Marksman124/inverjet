@@ -62,8 +62,9 @@ typedef struct IO_Hardware_Pin
 //-------------- 蜂鸣器 长度 -------------------
 //******************  调试模式 **************************
 //-------------- 蜂鸣器 长度 -------------------
-#define KEY_BUZZER_TIME								(8)					//周期  KEY_THREAD_LIFECYCLE 倍数
-#define KEY_BUZZER_TIME_LONG					(16)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME								(200/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME_LONG					(400/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME_LONG_32				(800/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
 
 
 #endif
