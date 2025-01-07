@@ -134,9 +134,7 @@ void on_pushButton_clicked(void)
 {
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
 			return;
-	
-	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
-	
+		
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
 		if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
@@ -338,7 +336,6 @@ void on_pushButton_1_Long_Press(void)
 //		if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR) == 0)
 //			Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 //	}
-	Set_Temp_Slow_Down_Speed(0);//设置速度后重新计算
 	
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
@@ -800,6 +797,8 @@ void System_Power_Off(void)
 	//Clean_Swimming_Distance();//清除计算距离
 	//清除故障状态
 	Timing_Clean_Fault_State();
+	//清除降频状态
+	Down_Conversion_State_Clean();
 	//清除计数器
 	//Clean_Fault_Recovery_Cnt();
 	//to 关机模式

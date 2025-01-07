@@ -528,9 +528,6 @@ void Data_Set_Current_Speed(uint8_t speed)
 	
 	*p_OP_ShowNow_Speed = speed;	
 	Motor_Speed_Target_Set(speed);
-	
-	//if(System_is_Running())
-		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);
 }
 
 //------------------- 设置 当前 时间 ----------------------------

@@ -51,7 +51,8 @@ static uint32_t Automatic_Shutdown_Timing_Cnt=0;				// 自动关机 计时器
 static uint32_t Temp_Slow_Down_Timing_Cnt= 0;		//计时器
 
 static uint8_t Temp_Slow_Down_State=0;//			高温降速 标志  bit 1 :mos  bit 2 机箱温度
-static uint8_t Temp_Slow_Down_Speed=0;//			高温降速 速度  百分比
+static uint8_t Temp_Slow_Down_Speed_Old=0;//			高温降速 速度  百分比
+static uint8_t Temp_Slow_Down_Speed_Now=0;//			高温降速 速度  百分比
 
 //  刷新屏幕
 static uint8_t LCD_Refresh_State= 0;
@@ -419,6 +420,7 @@ void Running_State_Handler(void)
 				{
 					Period_Now ++;
 					Data_Set_Current_Speed(p_OP_PMode[Get_System_State_Mode()-1][Period_Now].speed);//注意,需要在切完运行状态后再设置速度,如"暂停"
+					Down_Conversion_State_Update();		// 更新 降频状态
 				}
 			}
 		}
@@ -431,8 +433,11 @@ void Running_State_Handler(void)
 		{
 			Change_Speed_Timing_Cnt = 0;
 			Special_Status_Delete(SPECIAL_BIT_SPEED_CHANGE);
-			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);
+			Down_Conversion_State_Update();		// 更新 降频状态
+			if(*p_OP_ShowNow_Speed != Motor_Speed_Target_Get())
+				Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+		
 		}
 	}
 	// 转速达到目标值
@@ -450,16 +455,28 @@ void Running_State_Handler(void)
 		Temp_Slow_Down_Timing_Cnt ++;
 		if(( Temp_Slow_Down_Timing_Cnt == 1 ) ||((Temp_Slow_Down_Timing_Cnt % TIME_SLOW_DOWN_TIME)==0))
 		{
-			if( Temp_Slow_Down_Timing_Cnt == 1 )
-				slow_down_speed = TIME_SLOW_DOWN_SPEED_01;
-			else
-				slow_down_speed = TIME_SLOW_DOWN_SPEED_02;
-			
-			if( Motor_Speed_Target_Get()  >= (slow_down_speed + TIME_SLOW_DOWN_SPEED_MIX))
+			if( Temp_Slow_Down_Timing_Cnt == 1 )//刚进
 			{
-				Temp_Slow_Down_Speed += slow_down_speed;
-				Data_Set_Current_Speed(Motor_Speed_Target_Get() - slow_down_speed);
+				Temp_Slow_Down_Speed_Old = Motor_Speed_Target_Get();
+				Temp_Slow_Down_Speed_Now = Temp_Slow_Down_Speed_Old;
+				slow_down_speed = TIME_SLOW_DOWN_SPEED_01;
 			}
+			else
+			{
+				slow_down_speed = TIME_SLOW_DOWN_SPEED_02;
+			}
+			
+			if( Temp_Slow_Down_Speed_Now  >= (slow_down_speed + TIME_SLOW_DOWN_SPEED_MIX))
+			{
+				Temp_Slow_Down_Speed_Now -= slow_down_speed;
+				Data_Set_Current_Speed(Temp_Slow_Down_Speed_Now);
+			}
+			else
+			{
+				Temp_Slow_Down_Speed_Now = TIME_SLOW_DOWN_SPEED_MIX;
+				Data_Set_Current_Speed(Temp_Slow_Down_Speed_Now); 
+			}
+				
 		}
 		
 	}
@@ -504,8 +521,8 @@ void Running_State_Handler(void)
 		if(Temp_Slow_Down_Timing_Cnt > 0)
 		{
 			LCD_Refresh_Set(0);
-			Data_Set_Current_Speed(Motor_Speed_Target_Get() + Temp_Slow_Down_Speed);
-			Temp_Slow_Down_Speed = 0;
+			Data_Set_Current_Speed(Temp_Slow_Down_Speed_Old);
+			Temp_Slow_Down_Speed_Now = Temp_Slow_Down_Speed_Old;
 			Temp_Slow_Down_Timing_Cnt = 0;//可提前退出
 		}
 	}
@@ -651,9 +668,9 @@ void Initial_State_Handler(void)
 				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 				
 				//保存
-				
 				Lcd_Show();
 				Arbitrarily_To_Running();
+				Down_Conversion_State_Update();		// 更新 降频状态
 			}
 	//		else
 	//		{
@@ -856,18 +873,6 @@ uint8_t Get_Temp_Slow_Down_State(void)
 	return Temp_Slow_Down_State;
 }
 
-//-------------------- 设置高温降速 速度 下降的速度 ----------------------------
-void Set_Temp_Slow_Down_Speed(uint8_t vaule)
-{
-	Temp_Slow_Down_Speed = vaule;
-}
-
-//-------------------- 获取高温降速 速度 ----------------------------
-uint8_t Get_Temp_Slow_Down_Speed(void)
-{
-	return Temp_Slow_Down_Speed;
-}
-
 //-------------------- 清除故障恢复计数器 ----------------------------
 void Clean_Fault_Recovery_Cnt(void)
 {
@@ -903,4 +908,54 @@ void Clean_Change_Speed_Timer(void)
 {
 	 Change_Speed_Timing_Cnt = 0;
 }
+
+//-------------------- 降频 状态恢复   ----------------------------
+void Down_Conversion_State_Clean(void)
+{
+	// 计数器 清零
+	Down_Conversion_Cnt_Clea();
+	
+	// 降速
+	Temp_Slow_Down_Timing_Cnt= 0;		//计时器
+	Temp_Slow_Down_Speed_Old=0;//			高温降速 速度  百分比
+	Temp_Slow_Down_Speed_Now=0;//			高温降速 速度  百分比
+	
+	Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
+}
+
+//-------------------- 降频 状态更新   ----------------------------
+void Down_Conversion_State_Update(void)
+{
+	uint8_t offset=0;
+	
+	//降频
+	if(Get_Temp_Slow_Down_State())
+	{
+		Temp_Slow_Down_Speed_Old = *p_OP_ShowNow_Speed;
+		if( Temp_Slow_Down_Timing_Cnt <= 1 )//刚进
+		{
+			Temp_Slow_Down_Speed_Now = Temp_Slow_Down_Speed_Old;
+		}
+		else
+		{
+			if(*p_OP_ShowNow_Speed < Temp_Slow_Down_Speed_Now)
+				Temp_Slow_Down_Speed_Now = *p_OP_ShowNow_Speed;
+		}
+		
+		if(Temp_Slow_Down_Speed_Now != Motor_Speed_Target_Get())
+			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);
+		
+		*p_OP_ShowNow_Speed = Temp_Slow_Down_Speed_Now;
+		Motor_Speed_Target_Set(Temp_Slow_Down_Speed_Now);
+		
+		//减速界面 2秒1刷
+		if(Temp_Slow_Down_Timing_Cnt > 1)
+		{
+			offset = Temp_Slow_Down_Timing_Cnt % 4;
+			Temp_Slow_Down_Timing_Cnt = (Temp_Slow_Down_Timing_Cnt + 1 - offset);
+			LCD_Refresh_Set(1);
+		}
+	}
+}
+
 

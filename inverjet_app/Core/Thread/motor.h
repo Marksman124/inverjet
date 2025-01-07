@@ -238,7 +238,7 @@ extern void Check_Down_Conversion_Motor_Power(uint16_t power);
 //-------------------- µçÁ÷½µÆµ   ----------------------------
 extern void Check_Down_Conversion_Motor_Current(uint32_t Current);
 //-------------------- ½µÆµ ×´Ì¬»Ö¸´   ----------------------------
-extern void Down_Conversion_State_Clea(void);
+extern void Down_Conversion_Cnt_Clea(void);
 
 //-------------------- »ñÈ¡µç»ú¹ÊÕÏ×´Ì¬ ----------------------------
 uint16_t Get_Motor_Fault_State(void);

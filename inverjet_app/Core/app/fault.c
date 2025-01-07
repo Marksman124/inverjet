@@ -304,6 +304,7 @@ void Fault_Number_Update(void)
 // 进入故障界面
 void To_Fault_Menu(void)
 {
+	
 	*p_System_State_Machine_Memory = Get_System_State_Machine();
 	*p_PMode_Now_Memory = Get_System_State_Mode();
 	*p_OP_ShowNow_Speed_Memory = *p_OP_ShowNow_Speed;

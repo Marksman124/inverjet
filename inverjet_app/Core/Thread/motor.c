@@ -136,7 +136,6 @@ void App_Motor_Handler(void)
 	if( ((Motor_Rx_Timer_cnt % FAULT_MOTOR_TRY_RESTAR_TIME)==0) && (Motor_Rx_Timer_cnt >= FAULT_MOTOR_TRY_RESTAR_TIME))
 	{
 		DEBUG_PRINT("[ERROR]\t驱动板通讯故障 cnt:\t%d\t重启串口\n",Motor_Rx_Timer_cnt);
-		Motor_Rx_Timer_cnt = 0;
 		Motor_Usart_Restar();
 	}
 #if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
@@ -884,16 +883,14 @@ void Check_Down_Conversion_Motor_Current(uint32_t Current)
 	}
 }
 
-//-------------------- 降频 状态恢复   ----------------------------
-void Down_Conversion_State_Clea(void)
+//-------------------- 降频 计数器清零   ----------------------------
+void Down_Conversion_Cnt_Clea(void)
 {
 	// 计数器 清零
 	Motor_Fault_Timer_cnt = 0;			// 故障计数器
 	Motor_TEMP_Timer_cnt = 0;				// 高温 计数器
 	Motor_Current_Timer_cnt = 0;		// 过流 计数器
 	Motor_Power_Timer_cnt = 0;			// 功率 计数器
-	
-	Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
 }
 
 //-------------------- 获取电机故障状态 ----------------------------

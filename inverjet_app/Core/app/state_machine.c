@@ -55,7 +55,7 @@ void Check_Mode_Change(uint16_t machine)
 		Clean_Automatic_Shutdown_Timer();	// 清除 自动关机计时器
 		Clean_Timing_Timer_Cnt();					// 清除运行(timing) 计时器
 		//Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
-		Down_Conversion_State_Clea();		// 清除 降频状态
+		//Down_Conversion_State_Update();		// 清除 降频状态
 		
 		//	切换模式时
 		if(Is_Change_System_Mode(machine))
@@ -114,7 +114,7 @@ uint8_t Set_System_State_Mode(uint8_t val)
 	{
 		Set_Pmode_Period_Now(0);
 		Finish_Statistics_Upload();			// 上传<统计数据>
-		Down_Conversion_State_Clea();		// 清除 降频状态
+		//Down_Conversion_State_Update();		// 清除 降频状态
 		Clean_Timing_Timer_Cnt();				// 清除运行(timing) 计时器
 	}
 	

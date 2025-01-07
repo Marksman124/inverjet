@@ -452,6 +452,7 @@ void To_Free_Mode(uint8_t mode)
 	*p_OP_ShowNow_Speed = p_OP_ShowLater->speed;
 	*p_OP_ShowNow_Time  = p_OP_ShowLater->time;
 	
+	
 	LCD_Show_Bit |= STATUS_BIT_PERCENTAGE;
 	Lcd_Show();
 }
@@ -493,9 +494,8 @@ void To_Train_Mode(uint8_t num)
 	*p_OP_ShowNow_Speed = p_OP_PMode[plan-1][0].speed;
 	*p_OP_ShowNow_Time = 0;
 	
+	
 	LCD_Show_Bit |= STATUS_BIT_PERCENTAGE;
-	
-	
 	Lcd_Show();
 }
 

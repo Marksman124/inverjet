@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.2"					//限流: (80,65,65)     (82,68,65)
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.2"
 
 /**
 ******************************************************************************
@@ -144,7 +144,7 @@ extern "C" {
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					3
 #else
-#define BUZZER_FREQUENCY					2					// wuqingguang	50
+#define BUZZER_FREQUENCY					50					// wuqingguang	50
 #endif
 //*******************************************************
 
@@ -340,7 +340,7 @@ extern "C" {
 //通讯故障 报警时间
 #define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒  wuqingguang   30000
 //通讯故障 尝试重启 时间
-#define FAULT_MOTOR_TRY_RESTAR_TIME				(FAULT_MOTOR_LOSS_TIME/5)								// 6秒
+#define FAULT_MOTOR_TRY_RESTAR_TIME				(6000/(MOTOR_THREAD_LIFECYCLE))								// 6秒
 
 /*------------------- IO define ----------------------------------------------*/
 #define	MOTOR_MODULE_HUART				DRIVER_USART		//

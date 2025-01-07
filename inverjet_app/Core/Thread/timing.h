@@ -98,10 +98,7 @@ extern void App_Timing_Handler(void);
 void Set_Temp_Slow_Down_State(uint8_t vaule);
 //-------------------- 获取高温降速模式 ----------------------------
 uint8_t Get_Temp_Slow_Down_State(void);
-//-------------------- 设置高温降速 速度 下降的速度 ----------------------------
-void Set_Temp_Slow_Down_Speed(uint8_t vaule);
-//-------------------- 获取高温降速 速度 ----------------------------
-uint8_t Get_Temp_Slow_Down_Speed(void);
+
 // 清除 故障 状态基
 void Timing_Clean_Fault_State(void);
 // 退出 故障 状态
@@ -117,7 +114,10 @@ uint8_t If_Fault_Recovery_Max(void);
 void Clean_Automatic_Shutdown_Timer(void);
 //-------------------- 清除 更改速度计时器 ----------------------------
 void Clean_Change_Speed_Timer(void);
-
+//-------------------- 降频 状态恢复   ----------------------------
+void Down_Conversion_State_Clean(void);
+//-------------------- 降频 状态更新   ----------------------------
+void Down_Conversion_State_Update(void);
 
 /* Private defines -----------------------------------------------------------*/
 
