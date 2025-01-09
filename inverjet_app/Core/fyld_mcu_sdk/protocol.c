@@ -325,12 +325,8 @@ static unsigned char dp_download_system_working_mode_handle(const unsigned char 
 
     system_working_mode = mcu_get_dp_download_enum(value,length);
 	
-		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
-		{
-			Set_System_State_Mode(system_working_mode);
-			
-			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-		}
+		System_Para_Set_PMode(system_working_mode,CTRL_FROM_WIFI);
+
     //There should be a report after processing the DP
     ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE, Get_System_State_Mode());
     if(ret == SUCCESS)
@@ -354,27 +350,8 @@ static unsigned char dp_download_system_working_status_handle(const unsigned cha
 
     system_working_status = mcu_get_dp_download_enum(value,length);
 	
-		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
-		{
-			if(system_working_status <= TRAINING_MODE_STOP)
-			{
-				
-				//	切换模式时
-				if(Is_Change_System_Mode(system_working_status))
-				{
-					Set_System_State_Machine(system_working_status);
-					Check_OP_All();		// 确保参数合法
-				}
-				else
-				{
-					Set_System_State_Machine(system_working_status);
-					OP_Update_Mode();
-				}
-				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-				//Check_OP_All();		// 确保参数合法
-				//Update_OP_All();
-			}
-		}
+		System_Para_Set_Status(system_working_status, CTRL_FROM_WIFI);
+	
     //There should be a report after processing the DP
     ret = mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS, Get_System_State_Machine());
     if(ret == SUCCESS)
@@ -400,23 +377,7 @@ static unsigned char dp_download_motor_current_speed_handle(const unsigned char 
     /*
     //VALUE type data processing
     */
-		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
-		{
-			if((motor_current_speed < MOTOR_PERCENT_SPEED_MIX)&&(motor_current_speed > 0))
-				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
-			else if(motor_current_speed > MOTOR_PERCENT_SPEED_MAX)
-				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
-			else
-				*p_OP_ShowNow_Speed = motor_current_speed;
-			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-			// 保存
-			Update_OP_Speed();
-			
-			if(Motor_is_Start())
-			{
-				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
-			}
-		}
+		System_Para_Set_Speed(motor_current_speed, CTRL_FROM_WIFI);
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,*p_OP_ShowNow_Speed);
     if(ret == SUCCESS)
@@ -442,17 +403,8 @@ static unsigned char dp_download_motor_current_time_handle(const unsigned char v
     /*
     //VALUE type data processing
     */
-		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
-		{
-			if(motor_current_time >= MOTOR_TIME_SHOW_MAX)
-				motor_current_time = MOTOR_TIME_SHOW_MAX - 1;
-			
-			*p_OP_ShowNow_Time = motor_current_time;
-			Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
-			
-			// 保存
-			Update_OP_Time();
-		}
+		System_Para_Set_Time(motor_current_time, CTRL_FROM_WIFI);
+
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,*p_OP_ShowNow_Time);
     if(ret == SUCCESS)

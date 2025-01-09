@@ -130,6 +130,7 @@ static xMBFunctionHandler xFuncHandlers[MB_FUNC_HANDLERS_MAX] =
 #endif
 };
 
+
 /* ----------------------- Start implementation -----------------------------*/
 eMBErrorCode
 eMBInit(eMBMode eMode, UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity)
@@ -416,3 +417,13 @@ eMBPoll(void)
     }
     return MB_ENOERR;
 }
+
+void MB_Node_Address_Set(UCHAR addr)
+{
+	if((addr ==0) || (addr >=0xFF))
+		return;
+	
+	ucMBAddress = addr;
+}
+
+

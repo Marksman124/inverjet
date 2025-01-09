@@ -463,7 +463,10 @@ void BT_Distribution_Halder(void)
 		SerialWrite((uint8_t*)"AT+BLEMTU=%d\r\n",strlen("AT+BLEMTU=%d\r\n"));
 		//BT_Set_MTU(243);
 	
-	BT_Halder_cnt ++;
+	if(BT_Halder_cnt < 9999)
+		BT_Halder_cnt ++;
+	else
+		BT_Halder_cnt = 0;
 }
 
 //------------------- 联网处理 0.5秒进一次----------------------------
@@ -476,6 +479,9 @@ void BT_Online_Connect_Halder(void)
 	else if(BT_Halder_cnt == 16)
 		BT_Connect_OnlineServer();
 	
-	BT_Halder_cnt ++;
+	if(BT_Halder_cnt < 9999)
+		BT_Halder_cnt ++;
+	else
+		BT_Halder_cnt = 0;
 }
 

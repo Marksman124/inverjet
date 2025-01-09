@@ -415,7 +415,9 @@ eMBErrorCode
 eMBRegFileCB( UCHAR * pucRegBuffer, USHORT fileNumber, USHORT fileLength,
                  eMBRegisterMode eMode );
 								 
-								 
+void MB_Node_Address_Set(UCHAR addr);
+
+
 #ifdef __cplusplus
 PR_END_EXTERN_C
 #endif

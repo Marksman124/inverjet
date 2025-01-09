@@ -12,7 +12,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "state_machine.h"
 #include "timing.h"
-
+#include "key.h"
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -463,8 +463,103 @@ uint8_t Special_Status_Get(uint8_t num)
 	return (Special_Status_Bit & num);
 }
 
+//------------------- 运行参数设置接口 ----------------------------
+// 是否接收控制
+uint8_t System_Para_External_Control(System_Ctrl_Mode_Type_enum ctrler)
+{
+	switch(ctrler)
+	{
+		case CTRL_FROM_KEY:				//	按键
+			return 1;
+		case CTRL_FROM_WIFI:						//	wifi
+			if(If_Accept_External_Control(BLOCK_WIFI_CONTROL) == 0)
+				return 0;
+			break;
+		case CTRL_FROM_BT:							//	蓝牙
+			if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL) == 0)
+				return 0;
+			break;
+		case CTRL_FROM_RS485:					//	modbus 485	
+			if(If_Accept_External_Control(BLOCK_MODBUS_CONTROL) == 0)
+				return 0;
+			break;
+	}
+	return 1;
+}
 
+// 模式
+void System_Para_Set_PMode(uint16_t pmode, System_Ctrl_Mode_Type_enum ctrler)
+{
+	if(System_Para_External_Control(ctrler))
+	{
+		Set_System_State_Mode(pmode);
+		
+		Set_Ctrl_Mode_Type(ctrler);//标记控制来源
+	}
+}
 
+// 状态机
+void System_Para_Set_Status(uint16_t status, System_Ctrl_Mode_Type_enum ctrler)
+{
+	if(System_Para_External_Control(ctrler))
+	{
+		if(status <= TRAINING_MODE_STOP)
+		{
+			//	切换模式时
+			if(Is_Change_System_Mode(status))
+			{
+				Set_System_State_Machine(status);
+				Check_OP_All();		// 确保参数合法
+			}
+			else
+			{
+				Set_System_State_Machine(status);
+				OP_Update_Mode();
+			}
+			if(status == POWER_OFF_STATUS)
+				System_Power_Off();
+			Set_Ctrl_Mode_Type(ctrler);//标记控制来源
+		}
+	}
+}
+
+// 速度
+void System_Para_Set_Speed(uint16_t speed, System_Ctrl_Mode_Type_enum ctrler)
+{
+	if(System_Para_External_Control(ctrler))
+	{
+		if((speed < MOTOR_PERCENT_SPEED_MIX)&&(speed > 0))
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+		else if(speed > MOTOR_PERCENT_SPEED_MAX)
+			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
+		else
+			*p_OP_ShowNow_Speed = speed;
+		Set_Ctrl_Mode_Type(ctrler);//标记控制来源
+		// 保存
+		Update_OP_Speed();
+		
+		if(Motor_is_Start())
+		{
+			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
+		}
+	}
+}
+
+// 时间
+void System_Para_Set_Time(uint16_t time, System_Ctrl_Mode_Type_enum ctrler)
+{
+	if(System_Para_External_Control(ctrler))
+	{
+		if(time >= MOTOR_TIME_SHOW_MAX)
+			time = MOTOR_TIME_SHOW_MAX - 1;
+		
+		*p_OP_ShowNow_Time = time;
+		Set_Ctrl_Mode_Type(ctrler);//标记控制来源
+		
+		// 保存
+		Update_OP_Time();
+	}
+}
 
 
 

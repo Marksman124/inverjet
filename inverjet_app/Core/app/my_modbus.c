@@ -541,19 +541,21 @@ MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 	
 	if(addr == MB_SYSTEM_WORKING_MODE) //	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
 	{
-		if(Get_System_State_Mode() > 0)//P模式
-		{
-			Set_Pmode_Period_Now(0);
-		}
+		System_Para_Set_PMode(pObj->reg06Ptr[addr], CTRL_FROM_BT);
 	}
 	else if(addr == MB_SYSTEM_WORKING_STATUS)
 	{
-		if(System_is_Power_Off())//状态机
-		{
-			System_Power_Off();
-		}
+		System_Para_Set_Status(pObj->reg06Ptr[addr], CTRL_FROM_BT);
 	}
-	
+	else if(addr == MB_MOTOR_CURRENT_SPEED)
+	{
+		System_Para_Set_Speed(pObj->reg06Ptr[addr], CTRL_FROM_BT);
+	}
+	else if(addr == MB_MOTOR_CURRENT_TIME)
+	{
+		System_Para_Set_Time(pObj->reg06Ptr[addr], CTRL_FROM_BT);
+	}
+
 	pObj->txBuff[0] = pObj->rxBuff[0];
 	pObj->txBuff[1] = pObj->rxBuff[1];
 	pObj->txBuff[2] = pObj->rxBuff[2];
@@ -753,11 +755,19 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 				break;
 			case 0x06:
 				if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL))
+				{
 					res = _MsAnalyzeCmd06(pObj);
+					//保存
+					Write_MbBuffer_Later();
+				}
 				break;
 			case 0x10:
 				if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL))
+				{
 					res = _MsAnalyzeCmd10(pObj);
+					//保存
+					Write_MbBuffer_Later();
+				}
 				break;
 			case 0x0F:
 				res = _MsAnalyzeCmd0F(pObj);

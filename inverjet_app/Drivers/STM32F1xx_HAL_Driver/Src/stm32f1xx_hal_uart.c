@@ -255,8 +255,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-#include "debug_protocol.h"	///////////////////////	|?§?????ìo? ??????ì2
-#include "motor.h"	///////////////////////	?y???ê?è??? ??????ì2
+#include "debug_protocol.h"	///////////////////////	|??ì?????¨?o? ??????¨?2
+#include "motor.h"	///////////////////////	?y???¨o?¨¨??? ??????¨?2
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
   */
@@ -2642,7 +2642,7 @@ __weak void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
   * @brief  UART error callbacks.
   * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
   *                the configuration information for the specified UART module.
-  * @retval None
+  * @retval None wuqingguang
   */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
@@ -2655,18 +2655,18 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 			if (huart->Instance == USART3)
 			{
 				__HAL_UART_CLEAR_IDLEFLAG(huart);
-				//HAL_UART_DMAStop(&huart3); //  停止DMA传输，防止
+				//HAL_UART_DMAStop(&huart3); //  í￡?1DMA′?ê?￡?·à?1
 				Motor_Usart_Restar();
 				//memset(Motor_DMABuff,0,MOTOR_RS485_RX_BUFF_SIZE);
 				//HAL_UART_Receive_DMA(huart,Motor_DMABuff,MOTOR_RS485_RX_BUFF_SIZE);
-				//HAL_UARTEx_ReceiveToIdle_DMA(huart, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // 接收完毕后重启
+				//HAL_UARTEx_ReceiveToIdle_DMA(huart, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // ?óê?íê±?oó????
 			}
 			else if (huart->Instance == UART4)
 			{
 				memset(Debug_Read_Buffer,0,DEBUG_PROTOCOL_RX_MAX);
 				__HAL_UART_CLEAR_IDLEFLAG(huart);
 				//HAL_UART_Receive_DMA(huart,Debug_Read_Buffer,DEBUG_PROTOCOL_RX_MAX);
-				HAL_UARTEx_ReceiveToIdle_DMA(huart, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // 接收完毕后重启
+				HAL_UARTEx_ReceiveToIdle_DMA(huart, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // ?óê?íê±?oó????
 
 			}
 			else

@@ -144,11 +144,11 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of Breath_Light_Ta */
-  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 32);
+  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 128);
   Breath_Light_TaHandle = osThreadCreate(osThread(Breath_Light_Ta), NULL);
 
   /* definition and creation of Rs485_Modbus_Ta */
-  osThreadDef(Rs485_Modbus_Ta, Rs485_Modbus_Handler, osPriorityAboveNormal, 0, 128);
+  osThreadDef(Rs485_Modbus_Ta, Rs485_Modbus_Handler, osPriorityHigh, 0, 128);
   Rs485_Modbus_TaHandle = osThreadCreate(osThread(Rs485_Modbus_Ta), NULL);
 
   /* definition and creation of Main_Task */
@@ -254,14 +254,14 @@ void Main_Handler(void const * argument)
   /* Infinite loop */
   while(1)
   {
-		//FAN_SWITCH_ON();//≤‚ ‘”√ wuqingguang
+		FAN_SWITCH_ON();//≤‚ ‘”√ wuqingguang
 		
 		HAL_IWDG_Refresh(&hiwdg);
 		App_Timing_Handler();
-		
-		//FAN_SWITCH_OFF();
-		
+				
 		osDelay(THREAD_PERIOD_MAIN_TASK);
+		
+		FAN_SWITCH_OFF();
   }
   /* USER CODE END Main_Handler */
 }

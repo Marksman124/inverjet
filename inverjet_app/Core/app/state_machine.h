@@ -21,6 +21,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
 #include "macro_definition.h"				// 统一宏定义
+
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -71,6 +72,19 @@ typedef enum
 	SYSTEM_MODE_TRAIN_P4,				//	
 	SYSTEM_MODE_TRAIN_P5,				//	冲浪
 } SYSTEM_MODE_NUM_E;
+
+
+//*********************************
+//========== 控制源 =============
+//*********************************
+typedef enum 
+{
+	CTRL_FROM_KEY = 0,				//	按键
+	CTRL_FROM_WIFI,						//	wifi
+	CTRL_FROM_BT,							//	蓝牙
+	CTRL_FROM_RS485,					//	modbus 485	
+} System_Ctrl_Mode_Type_enum;
+
 
 /* Exported constants --------------------------------------------------------*/
 
@@ -169,6 +183,16 @@ extern void Special_Status_Delete(uint8_t num);
 // 获取 特别状态 标志
 extern uint8_t Special_Status_Get(uint8_t num);
 
+//------------------- 运行参数设置接口 ----------------------------
+// 模式
+extern void System_Para_Set_PMode(uint16_t pmode, System_Ctrl_Mode_Type_enum ctrler);
+// 状态机
+extern void System_Para_Set_Status(uint16_t status, System_Ctrl_Mode_Type_enum ctrler);
+// 速度
+extern void System_Para_Set_Speed(uint16_t speed, System_Ctrl_Mode_Type_enum ctrler);
+// 时间
+extern void System_Para_Set_Time(uint16_t time, System_Ctrl_Mode_Type_enum ctrler);
+	
 /* Private defines -----------------------------------------------------------*/
 extern uint8_t Special_Status_Bit;
 

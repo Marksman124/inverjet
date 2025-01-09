@@ -74,7 +74,7 @@ static uint16_t Operation_Motor_Poles = 0;		//	电机极数
 static uint16_t Operation_Speed_Mode = 0;			//	转速方式  0：转速   1：功率	
 //static uint16_t Operation_Breath_Light_Max = 0;		//	光圈亮度	
 // 发送缓冲区
-uint8_t operation_send_buffer[24] = {0};
+//uint8_t operation_send_buffer[24] = {0};
 
 
 // 短按 槽函数
@@ -251,7 +251,6 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 	}
 	//背光
 	TM1621_BLACK_ON();
-	taskENTER_CRITICAL();
 	
 	// sum
 	Display_Oper_Number(type);
@@ -287,7 +286,6 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
 	
 	TM1621_LCD_Redraw();
-	taskEXIT_CRITICAL();
 	return;
 }
 

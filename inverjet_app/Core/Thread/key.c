@@ -325,11 +325,8 @@ void on_pushButton_1_Long_Press(void)
 		return;
 	pushButton_1_delay_cnt = 0;
 	
-	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop())
+	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
 			return;
-	if(PMode_Now == 5)//冲浪
-			return;
-	
 //	if(Key_Long_Press_cnt[0] == KEY_LONG_PRESS_TIME_2S)
 //	{
 //		//长按可设 高精度转速
@@ -631,7 +628,7 @@ void App_Key_Task(void)
 						p_Funtion_Long_Press[i]();
 				}
 			}
-			else
+			else if(Key_IO_Hardware == 0)
 			{
 				if(Key_IO_Old == Key_IO_Ordering_Value[i])//已经按下
 				{
@@ -668,6 +665,10 @@ void App_Key_Task(void)
 				}
 				else
 					Key_Long_Press_cnt[i] = 0;
+			}
+			else
+			{
+				Key_Long_Press_cnt[i] = 0;
 			}
 		}
 		
@@ -815,6 +816,9 @@ void System_Power_Off(void)
 	
 	//退出100档位模式
 	Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
+	
+	// 存储flash
+	Write_MbBuffer_Now();
 }
 
 //	开机画面
@@ -835,7 +839,7 @@ void System_Boot_Screens(void)
 	//机型码 & 拨码状态 2s
 	Lcd_System_Information();
 	osDelay(2000);
-	Breath_light_Off();
+	//Breath_light_Off();
 }
 
 //	恢复出厂设置

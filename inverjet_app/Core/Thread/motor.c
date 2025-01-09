@@ -47,8 +47,6 @@ uint8_t Motor_Speed_Target = 0;
 
 static uint16_t Motor_Timer_Cnt=0;
 
-uint8_t Motor_Heartbeat_Cnt=0;
-
 
 //uint16_t* p_Speed_Mode; 
 

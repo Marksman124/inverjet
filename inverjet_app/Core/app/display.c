@@ -301,12 +301,10 @@ void Lcd_Show(void)
 	TM1621_BLACK_ON();
 	
 	LCD_Refresh_Restore();//恢复刷新
-	taskENTER_CRITICAL();
 	//
 	Lcd_Display(*p_OP_ShowNow_Speed, *p_OP_ShowNow_Time, LCD_Show_Bit,Get_System_State_Mode());
 	
 	TM1621_LCD_Redraw();
-	taskEXIT_CRITICAL();
 }
 
 /***********************************************************************
@@ -322,7 +320,6 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 	TM1621_BLACK_ON();
 	
 
-	taskENTER_CRITICAL();
 	//当前包
 	//schedule = (num*100)/sum;
 	
@@ -346,7 +343,6 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 	TM1621_display_Letter(TM1621_COORDINATE_SEC_LOW,   	'A');
 
 	TM1621_LCD_Redraw();
-	taskEXIT_CRITICAL();
 }
 
 // 机型码 & 拨码
@@ -390,16 +386,13 @@ void Lcd_Speed_Off(void)
 	//背光 关
 	//TM1621_BLACK_OFF()
 	//
-	taskENTER_CRITICAL();
 	Lcd_No_Speed(*p_OP_ShowNow_Time, LCD_Show_Bit,Get_System_State_Mode());
 	TM1621_LCD_Redraw();
-	taskEXIT_CRITICAL();
 }
 
 // 降速 界面 2秒1刷
 void Lcd_Show_Slow_Down(uint8_t value)
 {
-	taskENTER_CRITICAL();
 	
 	TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, 0);
 	TM1621_display_Letter(TM1621_COORDINATE_SPEED_HIGH, 'A');
@@ -409,7 +402,6 @@ void Lcd_Show_Slow_Down(uint8_t value)
 	Display_Show_Sec(GET_TIME_SECOND_DIGIT(*p_OP_ShowNow_Time));
 	
 	TM1621_LCD_Redraw();
-	taskEXIT_CRITICAL();
 }
 
 

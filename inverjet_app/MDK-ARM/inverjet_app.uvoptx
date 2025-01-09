@@ -153,64 +153,54 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_State</ItemText>
+          <ItemText>read_cnt,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_Speed_Old,0x0A</ItemText>
+          <ItemText>usRcvBufferPos,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_Speed_Now,0x0A</ItemText>
+          <ItemText>ucRTUBuf</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_Timing_Cnt</ItemText>
+          <ItemText>Light_AdSample</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_PMode_Now</ItemText>
+          <ItemText>Light_Brightness</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>machine</ItemText>
+          <ItemText>Light_Brightness_cmp</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_OP_ShowNow_Speed</ItemText>
+          <ItemText>pwm_buffer02</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Motor_Speed_Target</ItemText>
+          <ItemText>pwm_buffer01</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_Timing_Cnt</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>LCD_Refresh_State</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Motor_Rx_Timer_cnt</ItemText>
+          <ItemText>\\inverjet_app\../Core/Thread/Breath_light.c\pwm_buffer02</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>0x08007804</ItemText>
+          <ItemText>0x20003A0C</ItemText>
           <AccSizeX>1</AccSizeX>
         </Mm>
       </MemoryWindow1>

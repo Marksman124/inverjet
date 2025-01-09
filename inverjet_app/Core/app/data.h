@@ -37,17 +37,9 @@ typedef struct Operating_Parameters
 	uint16_t time;
 }Operating_Parameters;
 
-typedef enum 
-{
-	CTRL_FROM_KEY = 0,				//	按键
-	CTRL_FROM_WIFI,						//	wifi
-	CTRL_FROM_BT,							//	蓝牙
-	CTRL_FROM_RS485,					//	modbus 485	
-} System_Ctrl_Mode_Type_enum;
-
 
 // 降频 类型
-typedef enum 
+typedef enum
 {
 	MOTOR_DOWN_CONVERSION_NO = 0,						//	无
 	MOTOR_DOWN_CONVERSION_MOS_TEMPER,				//	mos 高温

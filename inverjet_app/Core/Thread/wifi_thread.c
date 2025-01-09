@@ -242,7 +242,11 @@ void WIFI_Update_State_Upload(void)
 		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_03);			// Çý¶¯°å NTC ÎÂ¶È 01
 	}
 	
-	Upload_Timer_Cnt++;
+	if(Upload_Timer_Cnt < 9999)
+		Upload_Timer_Cnt ++;
+	else
+		Upload_Timer_Cnt = 0;
+	
 	//State_Upload_Cnt = 0;
 }
 

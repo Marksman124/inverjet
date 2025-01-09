@@ -54,7 +54,7 @@ void on_Fault_Button_2_4_Long_Press(void);
 
 /* Private typedef -----------------------------------------------------------*/
 
-static uint32_t Chassis_TEMP_Timer_cnt= 0;	//高温 计数器
+static uint32_t Chassis_TEMP_Timer_cnt= 0;	//高温报警去抖 计数器
 
 /* Private define ------------------------------------------------------------*/
 
@@ -423,7 +423,6 @@ void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 	//背光
 	TM1621_BLACK_ON();
 	
-	taskENTER_CRITICAL();
 	// sum
 	Display_Show_Sum(sum);
 	Display_Show_Number(now);
@@ -437,7 +436,6 @@ void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
 	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
 	
-	taskEXIT_CRITICAL();
 	return;
 }
 

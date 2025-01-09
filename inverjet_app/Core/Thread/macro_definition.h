@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.2"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.2.3"
 
 /**
 ******************************************************************************
@@ -45,7 +45,7 @@ extern "C" {
 ******************************************************************************
 */
 
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
@@ -98,20 +98,21 @@ extern "C" {
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
-#define LIGHT_BRIGHTNESS_MAX					(300)		// 最大亮度  0~500
+#define LIGHT_BRIGHTNESS_MAX					(500)		// 最大亮度  0~500
 #else
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
 #define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// 最大亮度  0~500
 #endif
 //*******************************************************
+#define AD_SAMPLE_MAX   		    4000                        // AD采样最大值
 //档位
-#define BREATH_LIGHT_GEAR_POSITION						(1000/BREATH_LIGHT_THREAD_LIFECYCLE)				// 档位 50
+#define BREATH_LIGHT_GEAR_POSITION						(AD_SAMPLE_MAX/(1000/BREATH_LIGHT_THREAD_LIFECYCLE))				// 档位 50
 //步进
 #define LIGHT_BRIGHTNESS_STEP									((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION)
 
 //---------- 暂停下 5秒周期
 //档位
-#define BREATH_LIGHT_GEAR_POSITION_LOW				(2500/BREATH_LIGHT_THREAD_LIFECYCLE)				// 档位 75
+#define BREATH_LIGHT_GEAR_POSITION_LOW				(AD_SAMPLE_MAX/(2500/BREATH_LIGHT_THREAD_LIFECYCLE))				// 档位 125
 //步进
 #define LIGHT_BRIGHTNESS_STEP_LOW							((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION_LOW)
 

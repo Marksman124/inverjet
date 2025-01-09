@@ -14,5 +14,8 @@ Run #2：
 script：
 
 Run #1：
+fromelf --bin --output=.\output\inverjet_app.bin .\output\inverjet_app.axf
 
+
+Run #2：
 ..\Tools\after_build_script.exe

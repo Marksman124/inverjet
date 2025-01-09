@@ -69,7 +69,7 @@ HoldingCallOut( USHORT usAddress )
 	
 	if(usAddress == MB_SLAVE_NODE_ADDRESS) // 从机地址
 	{
-		Modbus_Init();
+		MB_Node_Address_Set(*p_Local_Address);
 	}
 	else if(usAddress == MB_SLAVE_BAUD_RATE) // 设置波特率
 	{
@@ -87,52 +87,20 @@ HoldingCallOut( USHORT usAddress )
 	}
 	else if(usAddress == MB_SYSTEM_WORKING_MODE) //	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
 	{
-		if(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE] > 0)//P模式
-		{
-			Set_Pmode_Period_Now(0);
-		}
-		if(usRegHoldingBuf[MB_SYSTEM_WORKING_STATUS] == 0)//状态机
-		{
-			System_Power_Off();
-		}
-		if(Motor_is_Start())
-		{
-			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
-		}
-		else
-		{
-			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
-		}
-		//Ctrl_Set_System_Mode(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE]);
-		Set_Ctrl_Mode_Type(CTRL_FROM_RS485);//标记控制来源
+		System_Para_Set_PMode(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE], CTRL_FROM_RS485);
 	}
-	else if(usAddress == MB_MOTOR_CURRENT_SPEED) //	系统工作模式  高位::0：P1\2\3  低位:0：自由:1：定时:2：训练
+	else if(usAddress == MB_SYSTEM_WORKING_STATUS) //	状态机
 	{
-		if(Motor_is_Start())
-		{
-			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
-		}
-		else
-		{
-			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
-		}
-		Set_Ctrl_Mode_Type(CTRL_FROM_RS485);//标记控制来源
+		System_Para_Set_Status(usRegHoldingBuf[MB_SYSTEM_WORKING_STATUS], CTRL_FROM_RS485);
 	}
-//	else if(usAddress == MB_SYSTEM_WORKING_STATUS) //	系统工作状态  0:暂停,   1:暂停恢复,   2:重新开始,  3:结束
-//	{
-//		//Ctrl_Set_System_Status(usRegHoldingBuf[MB_SYSTEM_WORKING_STATUS]);
-//	}
-//	else if(usAddress == MB_MOTOR_CURRENT_SPEED) //	当前转速 (临时有效)
-//	{
-//		Ctrl_Set_Motor_Current_Speed(usRegHoldingBuf[MB_MOTOR_CURRENT_SPEED]);
-//	}
-//	else if(usAddress == MB_MOTOR_CURRENT_TIME) ///	当前时间 (临时有效)
-//	{
-//		Ctrl_Set_Motor_Current_Time(usRegHoldingBuf[MB_MOTOR_CURRENT_TIME]);
-//	}
-	
-	//扇区是2048， 整个 usRegHoldingBuf 一起写
-	//STMFLASH_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
+	else if(usAddress == MB_MOTOR_CURRENT_SPEED)
+	{
+		System_Para_Set_Speed(usRegHoldingBuf[MB_MOTOR_CURRENT_SPEED], CTRL_FROM_RS485);
+	}
+	else if(usAddress == MB_MOTOR_CURRENT_TIME)
+	{
+		System_Para_Set_Time(usRegHoldingBuf[MB_MOTOR_CURRENT_TIME], CTRL_FROM_RS485);
+	}
 }
 
 
@@ -146,7 +114,6 @@ eMBRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 	
     if( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS )
     {
-			taskENTER_CRITICAL();
         //iRegIndex = ( int )( usAddress - usRegInputStart );
 				iRegIndex = ( int )( usAddress );
         while( usNRegs > 0 )
@@ -156,7 +123,6 @@ eMBRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs )
 					iRegIndex++;
 					usNRegs--;
         }
-				taskEXIT_CRITICAL();
     }
     else
     {
@@ -181,7 +147,6 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
         switch ( eMode )
         {
         case MB_REG_READ:
-					taskENTER_CRITICAL();
             while( usNRegs > 0 )
             {
 							*pucRegBuffer++ = ( unsigned char )( usRegHoldingBuf[iRegIndex] >> 8 );
@@ -189,13 +154,11 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
               iRegIndex++;
               usNRegs--;
             }
-						taskEXIT_CRITICAL();
             break;
 
         case MB_REG_WRITE:
 						if(If_Accept_External_Control(BLOCK_MODBUS_CONTROL))
 						{
-							taskENTER_CRITICAL();
 							while( usNRegs > 0 )
 							{
 								//状态机
@@ -212,11 +175,12 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
 								iRegIndex++;
 								usNRegs--;
 							}
-							taskEXIT_CRITICAL();
 							if(Check_Need_CallOut(usAddress))
 							{
 								HoldingCallOut(usAddress);
 							}
+							//保存
+							Write_MbBuffer_Later();
 						}
 						break;
         }
@@ -363,7 +327,7 @@ eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
 void Modbus_Init(void)
 {
 	// 先写死 0xAA  wuqingguang
-	//if( (*p_Local_Address >= 0xFF) || (*p_Local_Address == 0) )
+	if( (*p_Local_Address >= 0xFF) || (*p_Local_Address == 0) )
 	{
 		*p_Local_Address = MODBUS_LOCAL_ADDRESS;	// 默认 0xAA
 	}
@@ -474,15 +438,12 @@ void Set_DataAddr_Value(UCHAR ucFunctionCode, USHORT addr, uint16_t value)
 
 void Set_DataValue_U32(UCHAR ucFunctionCode, USHORT addr, uint32_t value)
 {
-	//taskENTER_CRITICAL();
 	Set_DataAddr_Value( ucFunctionCode, addr, value>>16 );
 	Set_DataAddr_Value( ucFunctionCode, addr+1, value&0xFFFF );
-	//taskEXIT_CRITICAL();
 }
 
 void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8_t len)
 {
-	//taskENTER_CRITICAL();
 	if(ucFunctionCode == MB_FUNC_READ_HOLDING_REGISTER)
 	{
 		memcpy(&usRegHoldingBuf[addr], p_data, len);
@@ -491,7 +452,6 @@ void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8
 	{
 		memcpy(&usRegInputBuf[addr], p_data, len);
 	}
-	//taskEXIT_CRITICAL();
 }
 
 

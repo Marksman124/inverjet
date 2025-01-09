@@ -56,7 +56,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define REG_FILE_NUMBER_END 								( 0xFFFF )
 #define REG_FILE_LENTH_MAX 									( 0x77 )
 
-#define MODBUS_RESTART_TIMEOUT 							( 10 )					// 100MS * N
+#define MODBUS_RESTART_TIMEOUT 							( 10 * MODBUS_THREAD_ONE_SECOND)					// 100MS * N
 
 
 // 03 Holding

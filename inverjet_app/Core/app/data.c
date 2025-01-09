@@ -117,8 +117,8 @@ uint16_t* p_Analog_key_Value;					// 虚拟按键
 
 uint8_t System_PowerUp_Finish = 0;
 
-uint8_t MB_Buffer_Write_Timer = 0;
-uint8_t MB_Buffer_Write_Cnt = 0;
+uint16_t MB_Buffer_Write_Timer = 0;
+uint16_t MB_Buffer_Write_Cnt = 0;
 
 //================= 调试使用  时间 ================================
 
@@ -300,7 +300,7 @@ void MB_Write_Timer_CallOut(void)
 	if(MB_Buffer_Write_Timer > 0)
 	{
 		MB_Buffer_Write_Timer ++;
-		if((MB_Buffer_Write_Timer > 10)||(MB_Buffer_Write_Cnt > 10))
+		if((MB_Buffer_Write_Timer > 60000)||(MB_Buffer_Write_Cnt > 60000))
 		{
 			MB_Flash_Buffer_Write();
 			MB_Buffer_Write_Timer = 0;

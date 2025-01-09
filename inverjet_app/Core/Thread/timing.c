@@ -40,19 +40,19 @@ static uint32_t Timing_Half_Second_Cnt = 0;
 static uint32_t WIFI_Distribution_Timing_Cnt=0;		// wifi状态图标 计时器
 static uint32_t BT_Distribution_Timing_Cnt=0;			// 蓝牙状态图标 计时器
 static uint32_t System_Fault_Timing_Cnt=0;				// 故障恢复 计时器
-static uint8_t System_Fault_Recovery_Cnt=0;				// 故障恢复次数 计数器
-static uint8_t Fault_Recovery_Timing_Cnt=0;				// 故障恢复次数 计时器
-
-static uint8_t Change_Speed_Timing_Cnt = 0;				// 更改速度 3秒后开始动作 计时器
+static uint32_t Fault_Recovery_Timing_Cnt=0;			// 故障恢复次数 计时器		1小时
 
 static uint32_t Automatic_Shutdown_Timing_Cnt=0;				// 自动关机 计时器
+
+static uint8_t System_Fault_Recovery_Cnt=0;				// 故障恢复次数 计数器
+static uint8_t Change_Speed_Timing_Cnt = 0;				// 更改速度 3秒后开始动作 计时器
 
 //  高温 降速
 static uint32_t Temp_Slow_Down_Timing_Cnt= 0;		//计时器
 
-static uint8_t Temp_Slow_Down_State=0;//			高温降速 标志  bit 1 :mos  bit 2 机箱温度
-static uint8_t Temp_Slow_Down_Speed_Old=0;//			高温降速 速度  百分比
-static uint8_t Temp_Slow_Down_Speed_Now=0;//			高温降速 速度  百分比
+static uint8_t Temp_Slow_Down_State=0;					//	高温降速 标志  bit 1 :mos  bit 2 机箱温度
+static uint8_t Temp_Slow_Down_Speed_Old=0;			//	高温降速 速度  百分比
+static uint8_t Temp_Slow_Down_Speed_Now=0;			//	高温降速 速度  百分比
 
 //  刷新屏幕
 static uint8_t LCD_Refresh_State= 0;
@@ -80,6 +80,7 @@ void App_Timing_Init(void)
 	all_data_update();		// wifi 上传
 	
 	System_Power_Off();
+	//System_Power_On();//wuqingguang 上电改为开机 自启动测试使用
 }
 
 void Clean_Timing_Timer_Cnt(void)
@@ -690,16 +691,22 @@ void Initial_State_Handler(void)
 // 定时任务主线程
 void App_Timing_Task(void)
 {
+	//static uint8_t Make_up_time_difference = 0;
+	
 	Timing_Thread_Task_Cnt++;
 	
 	WIFI_State_Handler();
 	BT_State_Handler();
 	
-	if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND) //半秒
+	if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND)//半秒
 	{
 		Timing_Thread_Task_Cnt = 0;
 		Timing_Half_Second_Cnt ++;
-
+//		if(Make_up_time_difference++ > 3)
+//		{
+//			Timing_Thread_Task_Cnt ++;
+//			Make_up_time_difference = 0;
+//		}
 		static uint8_t half_second_state=0;
 		if(half_second_state == 1)
 		{

@@ -12,6 +12,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "Breath_light.h"
 #include "main.h"
+#include <math.h>
 
 /* Private includes ----------------------------------------------------------*/
 
@@ -26,9 +27,11 @@ TIM_HandleTypeDef* p_htim_breath_light = &htim2;
 
 /* Private variables ---------------------------------------------------------*/
 
-uint16_t Light_Brightness = 0;
+double  Light_Brightness = 0;
 
-uint16_t Light_Brightness_cmp = 0;
+double  Light_AdSample = 0;
+
+double  Light_Brightness_cmp = 0;
 
 uint8_t Breath_light_direction=0; // 方向  亮 灭
 
@@ -50,18 +53,30 @@ void App_Breath_light_Init(void)
 }
 
 
-//------------------- 主循环 ----------------------------
+// 输入AD采样值，返回对应的PWM值
+double  get_PwmDuty(double  AD_Sample)
+{
+	double pwm=0;
+	
+	
+	pwm = LIGHT_BRIGHTNESS_MAX*pow(((double)AD_Sample/AD_SAMPLE_MAX),2.4);
+		
+	return pwm;
+}
 
+//------------------- 主循环 ----------------------------
 void App_Breath_light_Handler(void)
 {
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_BREATH_LIGHT);
+	
+	Light_Brightness = get_PwmDuty(Light_AdSample);
 	
 	if( Light_Brightness_cmp != Light_Brightness )
 	{
 		if(Light_Brightness > LIGHT_BRIGHTNESS_MAX)
 			Light_Brightness = LIGHT_BRIGHTNESS_MAX;
 		{
-			Breath_light_PwmOut(Light_Brightness);
+			Breath_light_PwmOut((uint16_t)Light_Brightness);
 			Light_Brightness_cmp = Light_Brightness;
 		}
 	}
@@ -70,22 +85,25 @@ void App_Breath_light_Handler(void)
 	{
 		if(Breath_light_direction == 0)
 		{
-			if(Light_Brightness < LIGHT_BRIGHTNESS_MAX)
-				Light_Brightness += (LIGHT_BRIGHTNESS_STEP);
-			else
-				Breath_light_direction = 1;
-		}
-		else
-		{
-			if(Light_Brightness > LIGHT_BRIGHTNESS_MIX)
+			if(Light_AdSample < AD_SAMPLE_MAX)
 			{
-				if( Light_Brightness > (LIGHT_BRIGHTNESS_STEP) )
-					Light_Brightness -= (LIGHT_BRIGHTNESS_STEP);
-				else
-					Light_Brightness = LIGHT_BRIGHTNESS_MIX;
+				Light_AdSample += BREATH_LIGHT_GEAR_POSITION;
 			}
 			else
 			{
+				Light_AdSample = AD_SAMPLE_MAX;
+				Breath_light_direction = 1;
+			}
+		}
+		else
+		{
+			if(Light_AdSample > 0)
+			{
+				Light_AdSample -= BREATH_LIGHT_GEAR_POSITION;
+			}
+			else
+			{
+				Light_AdSample = 0;
 				Breath_light_direction = 0;
 			}
 		}
@@ -94,51 +112,50 @@ void App_Breath_light_Handler(void)
 	{
 		if(Breath_light_direction == 0)
 		{
-			if(Light_Brightness < LIGHT_BRIGHTNESS_MAX)
-				Light_Brightness += (LIGHT_BRIGHTNESS_STEP_LOW);
-			else
-				Breath_light_direction = 1;
-		}
-		else
-		{
-			if(Light_Brightness > LIGHT_BRIGHTNESS_MIX)
+			if(Light_AdSample < AD_SAMPLE_MAX)
 			{
-				if( Light_Brightness > (LIGHT_BRIGHTNESS_STEP_LOW) )
-					Light_Brightness -= (LIGHT_BRIGHTNESS_STEP_LOW);
-				else
-					Light_Brightness = LIGHT_BRIGHTNESS_MIX;
+				Light_AdSample += BREATH_LIGHT_GEAR_POSITION_LOW;
 			}
 			else
 			{
+				Light_AdSample = AD_SAMPLE_MAX;
+				Breath_light_direction = 1;
+			}
+		}
+		else
+		{
+			if(Light_AdSample > 0)
+			{
+				Light_AdSample -= BREATH_LIGHT_GEAR_POSITION_LOW;
+			}
+			else
+			{
+				Light_AdSample = 0;
 				Breath_light_direction = 0;
 			}
 		}
 	}
 	else if(System_is_Power_Off())	// 关机
 	{
-		if(Light_Brightness > LIGHT_BRIGHTNESS_MIX)
+		if(Light_AdSample > 0)
 		{
-			if( Light_Brightness > ( LIGHT_BRIGHTNESS_STEP_LOW) )
-				Light_Brightness -= ( LIGHT_BRIGHTNESS_STEP_LOW);
-			else
-				Light_Brightness = LIGHT_BRIGHTNESS_MIX;
+			Light_AdSample -= BREATH_LIGHT_GEAR_POSITION_LOW;
+		}
+		else
+		{
+			Light_AdSample = 0;
+			Breath_light_direction = 0;
 		}
 	}
 	else
 	{
-		if(Light_Brightness < LIGHT_BRIGHTNESS_MAX)
+		if(Light_AdSample < AD_SAMPLE_MAX)
 		{
-			if((LIGHT_BRIGHTNESS_MAX - Light_Brightness) > (LIGHT_BRIGHTNESS_STEP_LOW))
-				Light_Brightness += (LIGHT_BRIGHTNESS_STEP_LOW);
-			else
-				Light_Brightness = LIGHT_BRIGHTNESS_MAX;
+			Light_AdSample += BREATH_LIGHT_GEAR_POSITION_LOW;
 		}
 		else
 		{
-			if((Light_Brightness - LIGHT_BRIGHTNESS_MAX) > (LIGHT_BRIGHTNESS_STEP_LOW))
-				Light_Brightness -= (LIGHT_BRIGHTNESS_STEP_LOW);
-			else
-				Light_Brightness = LIGHT_BRIGHTNESS_MAX;
+			Light_AdSample = AD_SAMPLE_MAX;
 		}
 	}
 }
