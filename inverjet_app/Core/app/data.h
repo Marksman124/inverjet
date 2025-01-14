@@ -298,6 +298,15 @@ extern uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
 
 extern uint16_t* p_Thread_Activity_Sign;					//	线程 活动 标志位
 
+extern uint32_t* p_Wifi_Timing_Value;							// 校时	
+extern uint32_t* p_Wifi_Timing_Value_Old;				//
+
+extern uint16_t* p_Check_Timing_Add_More;				//
+
+extern uint16_t* p_Check_Timing_Minus_More;				//
+
+extern uint16_t* p_Check_Timing_Error_Cnt;				// wifi模块 校时错误计数器
+
 #ifdef __cplusplus
 }
 #endif

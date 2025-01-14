@@ -547,6 +547,11 @@ void MB_Get_Mapping_Register(void)
 	
 	p_Thread_Activity_Sign 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_THREAD_ACTIVITY_SGIN);			//	线程 活动 标志位
 
+	p_Wifi_Timing_Value = 			(uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_WIFI_TIMING_VALUE);						//	wifi 系统时间
+	p_Wifi_Timing_Value_Old = 	(uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_WIFI_TIMING_VALUE_OLD);				//	wifi 系统时间
+	p_Check_Timing_Add_More = 	Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_CHECK_TIMING_ADD_MORE);
+	p_Check_Timing_Minus_More = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_CHECK_TIMING_MINUS_MORE);				//
+	p_Check_Timing_Error_Cnt = 	Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_CHECK_TIMING_ERROR_CNT);				//
 	//================= 冲浪模式 全局 参数 ================================
 	Surf_Mode_Info_Get_Mapping();
 	

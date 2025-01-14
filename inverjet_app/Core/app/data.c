@@ -138,8 +138,14 @@ uint16_t* p_Preparation_Time_BIT;						//	准备时间 Bit: 定时模式 P1-P6
 
 uint16_t* p_Thread_Activity_Sign;					//	线程 活动 标志位
 
+uint32_t* p_Wifi_Timing_Value;						// wifi 系统时间	
+uint32_t* p_Wifi_Timing_Value_Old;				// 上一次时间
 
+uint16_t* p_Check_Timing_Add_More;				// 走慢了,补时
 
+uint16_t* p_Check_Timing_Minus_More;			// 走块了, 减时
+
+uint16_t* p_Check_Timing_Error_Cnt;				// wifi模块 校时错误计数器
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -300,7 +306,7 @@ void MB_Write_Timer_CallOut(void)
 	if(MB_Buffer_Write_Timer > 0)
 	{
 		MB_Buffer_Write_Timer ++;
-		if((MB_Buffer_Write_Timer > 60000)||(MB_Buffer_Write_Cnt > 60000))
+		if((MB_Buffer_Write_Timer > 240)||(MB_Buffer_Write_Cnt > 240)) // 240:1min   60000:25min
 		{
 			MB_Flash_Buffer_Write();
 			MB_Buffer_Write_Timer = 0;
@@ -392,7 +398,9 @@ extern void Clean_Automatic_Shutdown_Timer(void);
 
 void OP_Update_Mode(void)
 {
-	if(System_is_Stop())
+	if(System_is_Power_Off())
+		System_Power_Off();
+	else if(System_is_Stop())
 	{
 		if(System_Mode_Train())
 			*p_OP_ShowNow_Speed = p_OP_PMode[Get_System_State_Mode()-1][0].speed;

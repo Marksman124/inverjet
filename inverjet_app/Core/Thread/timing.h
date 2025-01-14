@@ -88,6 +88,12 @@ typedef enum
 
 extern void App_Timing_Init(void);
 
+extern void System_Check_Timer_Update(void);
+
+extern void System_Check_Timer_Clean(void);
+
+extern void Use_Wifi_Timing_Check(void);
+
 extern void Clean_Timing_Timer_Cnt(void);
 // 获取刷新标志
 extern void LCD_Refresh_Restore(void);

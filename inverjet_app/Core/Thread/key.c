@@ -785,7 +785,8 @@ void System_Power_On(void)
 	To_Free_Mode(FREE_MODE_AUTO_START);			// ui
 	
 	Led_Button_On(0x0F);	// 按键
-		
+	
+	//System_Check_Timer_Update();
 	// 后台定时器
 	//BlackGround_Task_On();
 }

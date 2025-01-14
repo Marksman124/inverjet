@@ -241,7 +241,7 @@ void Self_Testing_Check_Comm(void)
 	else
 		ReSet_Motor_Fault_State(E302_BT_HARDWARE);
 
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) != 0xAA)
+	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) != 0x0A)
 		Set_Motor_Fault_State(E303_RS485_HARDWARE);
 	else
 		ReSet_Motor_Fault_State(E303_RS485_HARDWARE);

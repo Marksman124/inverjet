@@ -65,7 +65,6 @@ static uint32_t Old_Chemical_Equipment_Cnt =0;
 #endif
 /* Private function prototypes -----------------------------------------------*/
 
-
 /* Private user code ---------------------------------------------------------*/
 
 // 硬件 & 驱动
@@ -81,6 +80,61 @@ void App_Timing_Init(void)
 	
 	System_Power_Off();
 	//System_Power_On();//wuqingguang 上电改为开机 自启动测试使用
+}
+
+static uint32_t wifi_timing_old = 0;
+
+void System_Check_Timer_Clean(void)
+{	
+	wifi_timing_old = 0;
+	*p_Wifi_Timing_Value_Old = 0xFFFFFF;
+	*p_Check_Timing_Add_More = 0;
+	*p_Check_Timing_Minus_More = 0;
+}
+
+void Use_Wifi_Timing_Check(void)
+{
+	if((*p_Wifi_Timing_Value > 86400) || (*p_Check_Timing_Error_Cnt > 10))
+		return;
+		
+	if(*p_Wifi_Timing_Value == wifi_timing_old)
+	{
+		*p_Check_Timing_Error_Cnt += 1;
+	}
+	else
+	{
+		if(wifi_timing_old == 0)
+			wifi_timing_old = *p_Wifi_Timing_Value;
+		*p_Check_Timing_Error_Cnt = 0;
+	}
+	
+	if((*p_Wifi_Timing_Value_Old > 86400) || ((*p_Wifi_Timing_Value - *p_Wifi_Timing_Value_Old) > 2))
+	{
+		*p_Wifi_Timing_Value_Old = *p_Wifi_Timing_Value;
+		return;
+	}
+	
+	if(*p_Wifi_Timing_Value_Old >= *p_Wifi_Timing_Value)  //走快了
+	{
+		Timing_Thread_Task_Cnt --;
+		*p_Check_Timing_Minus_More += 1;
+		*p_Check_Timing_Add_More = 0;
+	}
+	else if((*p_Wifi_Timing_Value - *p_Wifi_Timing_Value_Old) > 1) //走慢了
+	{
+		Timing_Thread_Task_Cnt ++;
+		*p_Check_Timing_Add_More += 1;
+		if(*p_Check_Timing_Add_More > 40)
+			Timing_Thread_Task_Cnt ++;
+		*p_Check_Timing_Minus_More = 0;
+	}
+	else
+	{
+		*p_Check_Timing_Add_More = 0;
+		*p_Check_Timing_Minus_More = 0;
+	}
+	
+	*p_Wifi_Timing_Value_Old += 1;
 }
 
 void Clean_Timing_Timer_Cnt(void)
@@ -353,6 +407,7 @@ void Fault_State_Handler(void)
 // 软启动 状态基  1秒进一次
 void Starting_State_Handler(void)
 {
+	System_Check_Timer_Clean();
 	Arbitrarily_To_Running();
 	return;
 	
@@ -580,6 +635,8 @@ void Operation_State_Handler(void)
 // 停止 状态基  1秒进一次
 void Stop_State_Handler(void)
 {
+	if(Timing_Timer_Cnt == 0)
+		Finish_Statistics_Upload();			// 上传<统计数据>
 	Timing_Timer_Cnt++;
 	// 3秒 闪烁
 	if(Timing_Timer_Cnt < 4)
@@ -690,8 +747,8 @@ void Initial_State_Handler(void)
 
 // 定时任务主线程
 void App_Timing_Task(void)
-{
-	//static uint8_t Make_up_time_difference = 0;
+{	
+	static uint8_t half_second_state=0;
 	
 	Timing_Thread_Task_Cnt++;
 	
@@ -702,19 +759,16 @@ void App_Timing_Task(void)
 	{
 		Timing_Thread_Task_Cnt = 0;
 		Timing_Half_Second_Cnt ++;
-//		if(Make_up_time_difference++ > 3)
-//		{
-//			Timing_Thread_Task_Cnt ++;
-//			Make_up_time_difference = 0;
-//		}
-		static uint8_t half_second_state=0;
+		
 		if(half_second_state == 1)
 		{
 			half_second_state = 0;
 			*p_System_Runing_Second_Cnt += 1;			// 运行时间
 			*p_No_Operation_Second_Cnt += 1;			// 无操作时间
 			*p_System_Startup_Second_Cnt += 1;		// 休眠时间
-
+				
+			mcu_get_system_time();	//读时间
+			
 			if((Fault_Recovery_Timing_Cnt > 0) && ((Timing_Half_Second_Cnt - Fault_Recovery_Timing_Cnt) > SYSTEM_FAULT_RECOVERY_TIME))
 			{
 				DEBUG_PRINT("故障恢复计时超过1小时,清除计数器:\t%d\n",System_Fault_Recovery_Cnt);
@@ -758,6 +812,10 @@ void App_Timing_Task(void)
 		else
 		{
 			half_second_state = 1;
+			
+			//检查校时
+			Use_Wifi_Timing_Check();
+			
 			if(Motor_is_Start()==0)
 			{
 				// 时间 : 闪烁  半秒
@@ -779,7 +837,7 @@ void App_Timing_Task(void)
 					Timing_Clean_Fault_State();
 					Lcd_Show();
 				}
-				
+					
 				if(System_is_Initial())
 				{
 					Initial_State_Handler();

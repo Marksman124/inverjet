@@ -234,6 +234,12 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_NO_OPERATION_TIME        				( 0x52 )							//	（2字节）无人操作时间
 #define MB_SYSTEM_SLEEP_TIME        				( 0x54 )							//	（2字节）休眠时间
 #define MB_THREAD_ACTIVITY_SGIN		      		( 0x56 )							//	线程 活动 标志位
+#define MB_WIFI_TIMING_VALUE		      			( 0x57 )							//	（2字节）校时
+#define MB_WIFI_TIMING_VALUE_OLD		      	( 0x59 )							//	比较时间
+
+#define MB_CHECK_TIMING_ADD_MORE		      	( 0x5B )							//	加
+#define MB_CHECK_TIMING_MINUS_MORE		      ( 0x5C )							//	减
+#define MB_CHECK_TIMING_ERROR_CNT		      	( 0x5D )							//	错误计数器
 // ----------------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------------

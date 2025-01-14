@@ -115,7 +115,7 @@ MCU自处理:
 mcu_write_rtctime内部有#err提示,完成函数后请删除该#err
 mcu在wifi模块正确联网后可调用mcu_get_system_time()函数发起校时功能
 ******************************************************************************/
-//#define         SUPPORT_MCU_RTC_CHECK                //开启校时功能
+#define         SUPPORT_MCU_RTC_CHECK                //开启校时功能
 
 /******************************************************************************
                       6:MCU是否需要支持wifi功能测试
@@ -326,6 +326,9 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //当前时间(可下发可上报)
 //备注:
 #define DPID_MOTOR_CURRENT_TIME 24
+//模式+状态+速度+时间(只下发)
+//备注:(8字节)  uint16_t 模式 + uint16_t 状态机 + uint16_t 速度+ uint16_t 时间
+#define DPID_MODE_STATUS_SPEED_TIME 27
 //自由模式默认速度(可下发可上报)
 //备注:
 #define DPID_FREE_MODE_SPEEN 28

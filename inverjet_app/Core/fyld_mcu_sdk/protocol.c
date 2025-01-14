@@ -105,11 +105,13 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_SYSTEM_RUNNING_TIME, DP_TYPE_VALUE},
     {DPID_NO_OPERATION_TIME, DP_TYPE_VALUE},
     {DPID_SYSTEM_STARTUP_TIME, DP_TYPE_VALUE},
+    {DPID_THREAD_ACTIVITY_SIGN, DP_TYPE_VALUE},
+    {DPID_SYSTEM_STATUS_MODE, DP_TYPE_RAW},
     {DPID_SYSTEM_WORKING_MODE, DP_TYPE_ENUM},
     {DPID_SYSTEM_WORKING_STATUS, DP_TYPE_ENUM},
     {DPID_MOTOR_CURRENT_SPEED, DP_TYPE_VALUE},
     {DPID_MOTOR_CURRENT_TIME, DP_TYPE_VALUE},
-    {DPID_SYSTEM_STATUS_MODE, DP_TYPE_RAW},
+    {DPID_MODE_STATUS_SPEED_TIME, DP_TYPE_RAW},
     {DPID_FREE_MODE_SPEEN, DP_TYPE_VALUE},
     {DPID_TIMING_MODE_SPEEN, DP_TYPE_VALUE},
     {DPID_TIMING_MODE_TIME, DP_TYPE_VALUE},
@@ -189,7 +191,7 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,当前电机电流(输出)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,当前电机实际转速); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,当前母线电压(输入)); //VALUE型数据上报;
-    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,当前下发实际转速); //VALUE型数据上报;
+    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,当前下发转速); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_POWER,当前电机功率); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,当前母线电流); //VALUE型数据上报;
     mcu_dp_value_update(DPID_OTA_PACK_SIZE,当前OTA包大小); //VALUE型数据上报;
@@ -197,11 +199,12 @@ void all_data_update(void)
     mcu_dp_value_update(DPID_NO_OPERATION_TIME,当前无操作时间 (调试用)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,当前启动时间 (调试用)); //VALUE型数据上报;
     mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,当前线程活动标准); //VALUE型数据上报;
+    mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,当前模式+状态指针,当前模式+状态数据长度); //RAW型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,当前工作模式); //枚举型数据上报;
     mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,当前系统状态机); //枚举型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,当前当前转速); //VALUE型数据上报;
     mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,当前当前时间); //VALUE型数据上报;
-    mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,当前模式+状态指针,当前模式+状态数据长度); //RAW型数据上报;
+    mcu_dp_raw_update(DPID_MODE_STATUS_SPEED_TIME,当前模式+状态+速度+时间指针,当前模式+状态+速度+时间数据长度); //RAW型数据上报;
     mcu_dp_value_update(DPID_FREE_MODE_SPEEN,当前自由模式默认速度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,当前定时模式默认速度); //VALUE型数据上报;
     mcu_dp_value_update(DPID_TIMING_MODE_TIME,当前定时模式默认时间); //VALUE型数据上报;
@@ -304,6 +307,54 @@ static unsigned char dp_download_preparation_time_handle(const unsigned char val
 		}
     //There should be a report after processing the DP
     ret = mcu_dp_value_update(DPID_PREPARATION_TIME,*p_Preparation_Time_BIT);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_system_status_mode_handle
+功能描述 : 针对DPID_SYSTEM_STATUS_MODE的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_system_status_mode_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为RAW
+    unsigned char ret;
+		unsigned char system_working_mode;
+		unsigned char system_working_status;
+    /*
+    //RAW type data processing
+    */
+		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
+		{
+			system_working_mode = value[0] | value[1]<<8;
+			system_working_status = value[2] | value[3]<<8;
+			
+			Set_System_State_Mode(system_working_mode);
+			
+			if(system_working_status <= TRAINING_MODE_STOP)
+			{
+				//	切换模式时
+				if(Is_Change_System_Mode(system_working_status))
+				{
+					Set_System_State_Machine(system_working_status);
+					Check_OP_All();		// 确保参数合法
+				}
+				else
+				{
+					Set_System_State_Machine(system_working_status);
+					OP_Update_Mode();
+				}
+				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
+			}
+		}
+    //There should be a report after processing the DP
+    //ret = mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,value,length);
+		ret = mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now,	4);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -413,48 +464,57 @@ static unsigned char dp_download_motor_current_time_handle(const unsigned char v
         return ERROR;
 }
 /*****************************************************************************
-函数名称 : dp_download_system_status_mode_handle
-功能描述 : 针对DPID_SYSTEM_STATUS_MODE的处理函数
+函数名称 : dp_download_mode_status_speed_time_handle
+功能描述 : 针对DPID_MODE_STATUS_SPEED_TIME的处理函数
 输入参数 : value:数据源数据
         : length:数据长度
 返回参数 : 成功返回:SUCCESS/失败返回:ERROR
 使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
 *****************************************************************************/
-static unsigned char dp_download_system_status_mode_handle(const unsigned char value[], unsigned short length)
+static unsigned char dp_download_mode_status_speed_time_handle(const unsigned char value[], unsigned short length)
 {
     //示例:当前DP类型为RAW
     unsigned char ret;
-		unsigned char system_working_mode;
-		unsigned char system_working_status;
+		unsigned short system_working_mode;
+		unsigned short system_working_status;
+		unsigned short system_working_speed;
+		unsigned short system_working_time;
     /*
     //RAW type data processing
     */
 		if(If_Accept_External_Control(BLOCK_WIFI_CONTROL))
 		{
-			system_working_mode = value[0] | value[1]<<8;
+			system_working_mode 	= value[0] | value[1]<<8;
 			system_working_status = value[2] | value[3]<<8;
-			
-			Set_System_State_Mode(system_working_mode);
+			system_working_speed 	= value[4] | value[5]<<8;
+			system_working_time 	= value[6] | value[7]<<8;
 			
 			if(system_working_status <= TRAINING_MODE_STOP)
 			{
-				//	切换模式时
-				if(Is_Change_System_Mode(system_working_status))
-				{
-					Set_System_State_Machine(system_working_status);
-					Check_OP_All();		// 确保参数合法
-				}
+				Set_System_State_Machine(system_working_status);
+				
+				Set_System_State_Mode(system_working_mode);
+				
+				if((system_working_speed < MOTOR_PERCENT_SPEED_MIX)&&(system_working_speed > 0))
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+				else if(system_working_speed > MOTOR_PERCENT_SPEED_MAX)
+					*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
 				else
+					*p_OP_ShowNow_Speed = system_working_speed;
+			
+				if(system_working_time >= MOTOR_TIME_SHOW_MAX)
+					system_working_time = MOTOR_TIME_SHOW_MAX - 1;
+				*p_OP_ShowNow_Time = system_working_time;
+				
+				if(System_is_Power_Off())
 				{
-					Set_System_State_Machine(system_working_status);
-					OP_Update_Mode();
+					System_Power_Off();
 				}
 				Set_Ctrl_Mode_Type(CTRL_FROM_WIFI);//标记控制来源
 			}
 		}
     //There should be a report after processing the DP
-    //ret = mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,value,length);
-		ret = mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,(unsigned char *)p_PMode_Now,	4);
+    ret = mcu_dp_raw_update(DPID_MODE_STATUS_SPEED_TIME,value,length);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -799,6 +859,10 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
             //预备时间（标志位）处理函数
             ret = dp_download_preparation_time_handle(value,length);
         break;
+        case DPID_SYSTEM_STATUS_MODE:
+            //模式+状态处理函数
+            ret = dp_download_system_status_mode_handle(value,length);
+        break;
         case DPID_SYSTEM_WORKING_MODE:
             //工作模式处理函数
             ret = dp_download_system_working_mode_handle(value,length);
@@ -815,9 +879,9 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
             //当前时间处理函数
             ret = dp_download_motor_current_time_handle(value,length);
         break;
-        case DPID_SYSTEM_STATUS_MODE:
-            //模式+状态处理函数
-            ret = dp_download_system_status_mode_handle(value,length);
+        case DPID_MODE_STATUS_SPEED_TIME:
+            //模式+状态+速度+时间处理函数
+            ret = dp_download_mode_status_speed_time_handle(value,length);
         break;
         case DPID_FREE_MODE_SPEEN:
             //自由模式默认速度处理函数
@@ -987,7 +1051,7 @@ unsigned char mcu_firm_update_handle(const unsigned char value[],unsigned long p
  */
 void mcu_get_greentime(unsigned char time[])
 {
-    #error "请自行完成相关代码,并删除该行"
+    //#error "请自行完成相关代码,并删除该行"
     /*
     time[0] 为是否获取时间成功标志，为 0 表示失败，为 1表示成功
     time[1] 为年份，0x00 表示 2000 年
@@ -999,7 +1063,7 @@ void mcu_get_greentime(unsigned char time[])
     */
     if(time[0] == 1) {
         //正确接收到wifi模块返回的格林数据
-        
+        *p_Wifi_Timing_Value = time[6];  //要秒就好
     }else {
         //获取格林时间出错,有可能是当前wifi模块未联网
     }
@@ -1015,7 +1079,7 @@ void mcu_get_greentime(unsigned char time[])
  */
 void mcu_write_rtctime(unsigned char time[])
 {
-    #error "请自行完成RTC时钟写入代码,并删除该行"
+    //#error "请自行完成RTC时钟写入代码,并删除该行"
     /*
     Time[0] 为是否获取时间成功标志，为 0 表示失败，为 1表示成功
     Time[1] 为年份，0x00 表示 2000 年
@@ -1028,7 +1092,7 @@ void mcu_write_rtctime(unsigned char time[])
    */
     if(time[0] == 1) {
         //正确接收到wifi模块返回的本地时钟数据
-     
+     *p_Wifi_Timing_Value = time[6] + time[5]*60 + time[4]*60*60;  //要秒就好
     }else {
         //获取本地时钟数据出错,有可能是当前wifi模块未联网
     }

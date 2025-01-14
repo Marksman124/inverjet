@@ -27,11 +27,11 @@ TIM_HandleTypeDef* p_htim_breath_light = &htim2;
 
 /* Private variables ---------------------------------------------------------*/
 
-double  Light_Brightness = 0;
+uint16_t  Light_Brightness = 0;
+
+uint16_t  Light_Brightness_cmp = 0;
 
 double  Light_AdSample = 0;
-
-double  Light_Brightness_cmp = 0;
 
 uint8_t Breath_light_direction=0; // 方向  亮 灭
 
@@ -52,16 +52,21 @@ void App_Breath_light_Init(void)
 	DEBUG_LED2_OFF();
 }
 
+//uint16_t pwm_out_01[110]={0};
+//uint16_t pwm_out_02[260]={0};
+//uint16_t offset_cnt=0;
 
 // 输入AD采样值，返回对应的PWM值
-double  get_PwmDuty(double  AD_Sample)
+uint16_t get_PwmDuty(double  AD_Sample)
 {
 	double pwm=0;
 	
+	pwm = LIGHT_BRIGHTNESS_MAX*pow(((double)AD_Sample/AD_SAMPLE_MAX),2.2);
 	
-	pwm = LIGHT_BRIGHTNESS_MAX*pow(((double)AD_Sample/AD_SAMPLE_MAX),2.4);
-		
-	return pwm;
+	if(pwm > LIGHT_BRIGHTNESS_MAX)
+			pwm = LIGHT_BRIGHTNESS_MAX;
+	
+	return (uint16_t)pwm;
 }
 
 //------------------- 主循环 ----------------------------
@@ -73,12 +78,8 @@ void App_Breath_light_Handler(void)
 	
 	if( Light_Brightness_cmp != Light_Brightness )
 	{
-		if(Light_Brightness > LIGHT_BRIGHTNESS_MAX)
-			Light_Brightness = LIGHT_BRIGHTNESS_MAX;
-		{
-			Breath_light_PwmOut((uint16_t)Light_Brightness);
-			Light_Brightness_cmp = Light_Brightness;
-		}
+			Breath_light_PwmOut(Light_Brightness);
+			Light_Brightness_cmp = Light_Brightness;	
 	}
 	
 	if(System_is_Starting() || ((System_is_Running()||System_is_Error()) && Special_Status_Get(SPECIAL_BIT_SKIP_STARTING)))	// 软启动
@@ -107,6 +108,9 @@ void App_Breath_light_Handler(void)
 				Breath_light_direction = 0;
 			}
 		}
+//		Light_Brightness = get_PwmDuty(Light_AdSample);
+//		offset_cnt = Light_AdSample/40;
+//		pwm_out_01[offset_cnt] = Light_Brightness;
 	}
 	else if(System_is_Pause())	// 暂停
 	{
@@ -134,6 +138,9 @@ void App_Breath_light_Handler(void)
 				Breath_light_direction = 0;
 			}
 		}
+//		Light_Brightness = get_PwmDuty(Light_AdSample);
+//		offset_cnt = Light_AdSample/16;
+//		pwm_out_02[offset_cnt] = Light_Brightness;
 	}
 	else if(System_is_Power_Off())	// 关机
 	{

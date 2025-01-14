@@ -516,8 +516,7 @@ void System_Para_Set_Status(uint16_t status, System_Ctrl_Mode_Type_enum ctrler)
 				Set_System_State_Machine(status);
 				OP_Update_Mode();
 			}
-			if(status == POWER_OFF_STATUS)
-				System_Power_Off();
+			
 			Set_Ctrl_Mode_Type(ctrler);//标记控制来源
 		}
 	}

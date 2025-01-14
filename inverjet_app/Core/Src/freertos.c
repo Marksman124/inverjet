@@ -41,7 +41,8 @@
 
 #include "macro_definition.h"				// 统一宏定义
 #include "wifi_thread.h"				// wifi模组
-#include "mcu_api.h"						// wifi模组
+#include "wifi.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -144,7 +145,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of Breath_Light_Ta */
-  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityNormal, 0, 128);
+  osThreadDef(Breath_Light_Ta, Breath_Light_Handler, osPriorityLow, 0, 128);
   Breath_Light_TaHandle = osThreadCreate(osThread(Breath_Light_Ta), NULL);
 
   /* definition and creation of Rs485_Modbus_Ta */
@@ -250,15 +251,18 @@ void Main_Handler(void const * argument)
 
 	Set_Software_Version();
 	App_Timing_Init();		//5s
+	mcu_get_system_time();
+	osDelay(20);
+	System_Check_Timer_Clean();
 	//osDelay(POWER_ON_WAITE_TIME_TASK);
   /* Infinite loop */
   while(1)
-  {
-		FAN_SWITCH_ON();//测试用 wuqingguang
-		
+  {		
 		HAL_IWDG_Refresh(&hiwdg);
 		App_Timing_Handler();
-				
+		
+		FAN_SWITCH_ON();//测试用 wuqingguang
+		
 		osDelay(THREAD_PERIOD_MAIN_TASK);
 		
 		FAN_SWITCH_OFF();

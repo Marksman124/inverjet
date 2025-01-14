@@ -153,54 +153,49 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>read_cnt,0x0A</ItemText>
+          <ItemText>p_Wifi_Timing_Value_Old</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>usRcvBufferPos,0x0A</ItemText>
+          <ItemText>p_Wifi_Timing_Value</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ucRTUBuf</ItemText>
+          <ItemText>p_Check_Timing_Error_Cnt</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Light_AdSample</ItemText>
+          <ItemText>p_Check_Timing_Minus_More</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Light_Brightness</ItemText>
+          <ItemText>p_Check_Timing_Add_More</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Light_Brightness_cmp</ItemText>
+          <ItemText>wifi_timing_old</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pwm_buffer02</ItemText>
+          <ItemText>check_timer_cnt</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pwm_buffer01</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>\\inverjet_app\../Core/Thread/Breath_light.c\pwm_buffer02</ItemText>
+          <ItemText>usRegHoldingBuf</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>0x20003A0C</ItemText>
+          <ItemText>0x20004516</ItemText>
           <AccSizeX>1</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -278,7 +273,7 @@
 
   <Group>
     <GroupName>Application/User/Core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
