@@ -304,6 +304,8 @@ extern void Surf_Mode_Info_Get_Mapping(void);
 
 extern void MB_Get_Mapping_Register(void);
 
+extern void MB_HoldBuffer_Temp_Clean(void);
+
 extern void MB_InputBuffer_Init(void);
 
 

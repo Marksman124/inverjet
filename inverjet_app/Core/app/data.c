@@ -118,7 +118,6 @@ uint16_t* p_Analog_key_Value;					// 虚拟按键
 uint8_t System_PowerUp_Finish = 0;
 
 uint16_t MB_Buffer_Write_Timer = 0;
-uint16_t MB_Buffer_Write_Cnt = 0;
 
 //================= 调试使用  时间 ================================
 
@@ -173,10 +172,7 @@ uint8_t Check_Data_Init(void)
 	uint8_t x=0,y=0;
 	uint8_t result = 0;
 	
-	*p_System_Runing_Second_Cnt = 0; 		//运行 时间
-	*p_No_Operation_Second_Cnt = 0;			//无人操作 时间
-	*p_System_Startup_Second_Cnt = 0;		// 启动 时间
-	*p_Analog_key_Value = 0;						//虚拟按键
+	//MB_HoldBuffer_Temp_Clean();
 	
 	if(Is_Speed_Legal(p_OP_Free_Mode->speed) == 0)
 	{
@@ -233,9 +229,6 @@ uint8_t Check_Data_Init(void)
 }
 
 
-//extern void MB_Get_Mapping_Register(void);
-//extern void MB_InputBuffer_Init(void);
-
 // 初始化
 void App_Data_Init(void)
 {
@@ -247,6 +240,7 @@ void App_Data_Init(void)
 	// 检查各模式 属性
 	if(Check_Data_Init())
 	{
+		//App_Data_ReInit();
 		Write_MbBuffer_Now();
 	}
 	// 屏幕初始化
@@ -306,11 +300,10 @@ void MB_Write_Timer_CallOut(void)
 	if(MB_Buffer_Write_Timer > 0)
 	{
 		MB_Buffer_Write_Timer ++;
-		if((MB_Buffer_Write_Timer > 240)||(MB_Buffer_Write_Cnt > 240)) // 240:1min   60000:25min
+		if(MB_Buffer_Write_Timer > 20) // 20:5s   60000:25min
 		{
 			MB_Flash_Buffer_Write();
 			MB_Buffer_Write_Timer = 0;
-			MB_Buffer_Write_Cnt = 0;
 		}
 	}
 }
@@ -320,8 +313,6 @@ void MB_Write_Timer_CallOut(void)
 uint8_t Write_MbBuffer_Later(void)
 {
 	MB_Buffer_Write_Timer = 1;
-	MB_Buffer_Write_Cnt ++;
-
 	return 1;
 }
 
@@ -331,7 +322,6 @@ uint8_t Write_MbBuffer_Now(void)
 {
 	MB_Flash_Buffer_Write();
 	MB_Buffer_Write_Timer = 0;
-	MB_Buffer_Write_Cnt = 0;
 
 	return 1;
 }
@@ -661,7 +651,6 @@ void Finish_Statistics_Clean( void )
 void Finish_Statistics_Upload( void )
 {
 	WIFI_Finish_Statistics_Upload();
-	Finish_Statistics_Clean();
 }
 
 

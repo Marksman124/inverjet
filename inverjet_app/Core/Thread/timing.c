@@ -766,9 +766,7 @@ void App_Timing_Task(void)
 			*p_System_Runing_Second_Cnt += 1;			// 运行时间
 			*p_No_Operation_Second_Cnt += 1;			// 无操作时间
 			*p_System_Startup_Second_Cnt += 1;		// 休眠时间
-				
-			mcu_get_system_time();	//读时间
-			
+							
 			if((Fault_Recovery_Timing_Cnt > 0) && ((Timing_Half_Second_Cnt - Fault_Recovery_Timing_Cnt) > SYSTEM_FAULT_RECOVERY_TIME))
 			{
 				DEBUG_PRINT("故障恢复计时超过1小时,清除计数器:\t%d\n",System_Fault_Recovery_Cnt);
@@ -824,11 +822,14 @@ void App_Timing_Task(void)
 				TM1621_LCD_Redraw();
 			}
 			//故障检测
+//-----------------  展示样机 -------------------------
+#ifndef SYSTEM_SHOW_MODEL_MACHINE
 			if(If_System_Is_Error())
 			{
 				Fault_State_Handler();
 			}
 			else
+#endif
 			{
 				System_Fault_Timing_Cnt = 0;
 				
@@ -902,6 +903,7 @@ void App_Timing_Handler(void)
 		Arbitrarily_To_Pause();
 		
 		Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+		Write_MbBuffer_Now();
 		OUT_SELF_TEST_MODE();
 	}
 	else

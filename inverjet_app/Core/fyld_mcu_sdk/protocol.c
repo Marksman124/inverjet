@@ -224,48 +224,55 @@ void all_data_update(void)
 		mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_02,当前驱动板NTC温度_02); //VALUE型数据上报;
 		mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_03,当前驱动板NTC温度_03); //VALUE型数据上报;
     */	
-		mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,				Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
+		
 		mcu_dp_value_update(DPID_PREPARATION_TIME,				*p_Preparation_Time_BIT); 			// 准备时间(APP管理,本地只负责保存)
 		mcu_dp_value_update(DPID_DEVICE_ERROR_CODE,				*p_Motor_Fault_Static); 				// 驱动板故障
     mcu_dp_fault_update(DPID_GET_SYSTEM_FAULT_STATUS,	*p_System_Fault_Static); 				// 系统 故障型数据上报
     mcu_dp_value_update(DPID_GET_MOS_TEMPERATURE,			*p_Mos_Temperature); 						// MOS温度
     mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,			*p_Box_Temperature); 						// 机箱温度
     mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,				*p_Motor_Current); 							// 输出电流（电机)
-    mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/5); 				// 实际转速;
+    mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/5); 			// 实际转速;
     mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,				*p_Motor_Bus_Voltage); 					// 输入电压（母线）;
-    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/5); 				// 下发转速;
+    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/5); 			// 下发转速;
     mcu_dp_value_update(DPID_MOTOR_POWER,							*p_Motor_Reality_Power); 				// 当前功率;
     mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,			*p_Motor_Bus_Current); 					// 输入电流（母线）;
-		mcu_dp_value_update(DPID_OTA_PACK_SIZE,						Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE)); // ota 包大小
-    mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,			*p_System_Runing_Second_Cnt); 	// 运行时间;
-    mcu_dp_value_update(DPID_NO_OPERATION_TIME,				*p_No_Operation_Second_Cnt);		// 无操作时间;
-    mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,			*p_System_Startup_Second_Cnt);	// 启动 时间;
-    
-		mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,		*p_Thread_Activity_Sign);						//线程活动标志;
 		
-		mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,			Get_System_State_Mode());				// 工作模式;
-    mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,		Get_System_State_Machine());		// 状态机;
-    mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,			*p_OP_ShowNow_Speed);						// 当前速度;
-    mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,			*p_OP_ShowNow_Time);						// 当前时间;
+    mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,				(unsigned char *)p_PMode_Now,	4);		// 合并上传;
+		mcu_dp_enum_update(DPID_SYSTEM_WORKING_MODE,			Get_System_State_Mode());						// 工作模式;
+		mcu_dp_enum_update(DPID_SYSTEM_WORKING_STATUS,		Get_System_State_Machine());				// 状态机;
+		mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,			*p_OP_ShowNow_Speed);								// 当前速度;
+		mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,			*p_OP_ShowNow_Time);								// 当前时间;
+			
+			mcu_dp_value_update(DPID_FREE_MODE_SPEEN,					p_OP_Free_Mode->speed);					// 自由模式 速度;
+			mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,				p_OP_Timing_Mode->speed);				// 定时模式 速度;
+			mcu_dp_value_update(DPID_TIMING_MODE_TIME,				p_OP_Timing_Mode->time);				// 定时模式 时间;
+			
+		static uint8_t Check_GetIn_Once=0;
+		//只进一次
+		if(Check_GetIn_Once == 0)
+		{
+			Check_GetIn_Once = 1;
+			mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,				Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
+			
+			mcu_dp_value_update(DPID_OTA_PACK_SIZE,						Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE)); // ota 包大小
+			mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,			*p_System_Runing_Second_Cnt); 	// 运行时间;
+			mcu_dp_value_update(DPID_NO_OPERATION_TIME,				*p_No_Operation_Second_Cnt);		// 无操作时间;
+			mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,			*p_System_Startup_Second_Cnt);	// 启动 时间;
+			//mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,		*p_Thread_Activity_Sign);						//线程活动标志;
 
-		mcu_dp_raw_update(DPID_SYSTEM_STATUS_MODE,				(unsigned char *)p_PMode_Now,	4);				// 合并上传;
-		
-		mcu_dp_value_update(DPID_FREE_MODE_SPEEN,					p_OP_Free_Mode->speed);					// 自由模式 速度;
-    mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,				p_OP_Timing_Mode->speed);				// 定时模式 速度;
-    mcu_dp_value_update(DPID_TIMING_MODE_TIME,				p_OP_Timing_Mode->time);				// 定时模式 时间;
-    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,			(unsigned char *)p_OP_PMode[0],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P1
-    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,			(unsigned char *)p_OP_PMode[1],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P2
-    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,			(unsigned char *)p_OP_PMode[2],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P3
-    mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,			(unsigned char *)p_OP_PMode[3],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P4
-    //mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,	(unsigned char *)p_OP_PMode[4],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P5
+			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,			(unsigned char *)p_OP_PMode[0],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P1
+			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,			(unsigned char *)p_OP_PMode[1],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P2
+			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,			(unsigned char *)p_OP_PMode[2],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P3
+			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,			(unsigned char *)p_OP_PMode[3],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P4
+			//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,	(unsigned char *)p_OP_PMode[4],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P5
 
-		//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,(unsigned char *),TRAINING_MODE_PERIOD_MAX*4); // 自定义训练计划_01;
-    //mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,当前自定义训练计划_02指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_02;
-    //mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,当前自定义训练计划_03指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_03;
-    
-		mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 			// 当前完成统计_时长
-    mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 			// 当前完成统计_游泳强度
-    mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); 	// 当前完成统计_距离
+			//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,(unsigned char *),TRAINING_MODE_PERIOD_MAX*4); // 自定义训练计划_01;
+			//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,当前自定义训练计划_02指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_02;
+			//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,当前自定义训练计划_03指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_03;
+		}
+		//mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 			// 当前完成统计_时长
+    //mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 			// 当前完成统计_游泳强度
+    //mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); 	// 当前完成统计_距离
 		
 		//mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_01,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_01)); //VALUE型数据上报;
 		//mcu_dp_value_update(DPID_DRIVE_NTC_TEMP_02,Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_02)); //VALUE型数据上报;

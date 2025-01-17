@@ -565,6 +565,10 @@ void MB_Get_Mapping_Register(void)
 	
 }
 
+void MB_HoldBuffer_Temp_Clean(void)
+{
+	memset(&usRegHoldingBuf[MB_ANALOG_KEY_VALUE],0, (MB_DEBUG_OTA_FAIL_PROGRESS-MB_ANALOG_KEY_VALUE)*2 );
+}
 
 void MB_InputBuffer_Init(void)
 {

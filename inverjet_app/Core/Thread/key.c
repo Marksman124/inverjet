@@ -597,6 +597,8 @@ void App_Key_Task(void)
 			if(IS_SELF_TEST_MODE() == 0)
 			{
 				IN_CHECK_ERROR_MODE();
+				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+				Write_MbBuffer_Now();
 			}
 		}
 		

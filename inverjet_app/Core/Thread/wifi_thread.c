@@ -31,6 +31,7 @@
 
 static WIFI_STATE_MODE_E WIFI_State_Machine = WIFI_NO_CONNECT;
 
+static uint8_t Upload_Finish_Data=0;
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -111,7 +112,15 @@ void WIFI_Update_State_Upload(void)
 		
 	static uint16_t Upload_Timer_Cnt = 0;							// 上传时间 计时器
 	//static uint8_t Upload_Debounce_Cnt = 0;						// 上传时间 计时器
-	
+	//------------------- 统计上传	----------------------------
+	if(Upload_Finish_Data == 1)
+	{
+		Upload_Finish_Data = 0;
+		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_TIME); 		//	完成统计 --> 时长
+		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
+		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
+		Finish_Statistics_Clean();
+	}
 	//------------------- 故障上传 ----------------------------
 	if(Wifi_Motor_Fault_Static != *p_Motor_Fault_Static)
 	{
@@ -156,6 +165,7 @@ void WIFI_Update_State_Upload(void)
 	//*********************************
 	if((Upload_Timer_Cnt % WIFI_DATE_UPLOAD_TIME_NORMAL)==0)
 	{
+		mcu_get_system_time();	//读时间
 		//------------------- Debug 数据  ----------------------------
 		memcpy(&box_temperature, p_Box_Temperature, 2);
 		if(Wifi_Box_Temperature != box_temperature)
@@ -261,22 +271,14 @@ void WIFI_Finish_Statistics_Upload( void )
 	if(*p_Finish_Statistics_Time >= WIFI_STATISTICE_UPLOAD_MINIMUM_TIME)
 	{
 		DEBUG_PRINT("\n上传统计数据:\t时长:\t%d\t强度:\t%d\t距离:\t%d\t\n",*p_Finish_Statistics_Time,*p_Finish_Statistics_Speed,*p_Finish_Statistics_Distance);
-		taskENTER_CRITICAL();
-		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_TIME); 		//	完成统计 --> 时长
-		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
-		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
-		taskEXIT_CRITICAL();
+
 	}
 	else
 	{
 		DEBUG_PRINT("\n统计时间低于3分钟，上传 %d\n",* p_Finish_Statistics_Time);
-		taskENTER_CRITICAL();
 		Finish_Statistics_Clean();
-		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_TIME); 		//	完成统计 --> 时长
-		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_SEED); 		//	完成统计 --> 强度
-		Wifi_DP_Data_Update(DPID_FINISH_STATISTICS_DISTANCE); //	完成统计 --> 游泳距离
-		taskEXIT_CRITICAL();
 	}
+	Upload_Finish_Data = 1;
 }
 
 

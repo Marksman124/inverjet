@@ -384,8 +384,8 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 		else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS 过热 05
 			change_fault = E101_TEMPERATURE_MOS;
 
-		//else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
-			//change_fault = E205_VOLTAGE_AMBIENT;
+		else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- 缺相 传感器
+			change_fault = 0;//E205_VOLTAGE_AMBIENT;
 		
 		else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS 传感器故障 39
 			change_fault = E201_TEMPERATURE_HARDWARE;
@@ -901,7 +901,12 @@ uint16_t Get_Motor_Fault_State(void)
 //-------------------- 设置电机故障状态 ----------------------------
 void Set_Motor_Fault_State(uint16_t fault_bit)
 {
+	//-----------------  展示样机 -------------------------
+#ifdef SYSTEM_SHOW_MODEL_MACHINE
+		Motor_Fault_State = 0;
+#else
 	 Motor_Fault_State |= fault_bit;
+#endif
 }
 
 //-------------------- 清除电机故障状态 ----------------------------

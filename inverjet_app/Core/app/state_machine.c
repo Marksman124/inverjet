@@ -71,7 +71,12 @@ uint8_t Set_System_State_Machine(uint8_t val)
 {
 	if(val >= SYSTEM_STATE_END) //溢出
 		return 0;
-		
+//-----------------  展示样机 -------------------------
+#ifdef SYSTEM_SHOW_MODEL_MACHINE
+	if(val == ERROR_DISPLAY_STATUS)
+		return 0;
+#endif
+	
 	Check_Mode_Change(val);
 	
 	*p_System_State_Machine = val;
