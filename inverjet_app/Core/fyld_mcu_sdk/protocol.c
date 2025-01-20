@@ -247,11 +247,11 @@ void all_data_update(void)
 			mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,				p_OP_Timing_Mode->speed);				// 定时模式 速度;
 			mcu_dp_value_update(DPID_TIMING_MODE_TIME,				p_OP_Timing_Mode->time);				// 定时模式 时间;
 			
-		static uint8_t Check_GetIn_Once=0;
+		//static uint8_t Check_GetIn_Once=0;
 		//只进一次
-		if(Check_GetIn_Once == 0)
+		//if(Check_GetIn_Once == 0)
 		{
-			Check_GetIn_Once = 1;
+			//Check_GetIn_Once = 1;
 			mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,				Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
 			
 			mcu_dp_value_update(DPID_OTA_PACK_SIZE,						Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE)); // ota 包大小
