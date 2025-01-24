@@ -260,12 +260,9 @@ void Main_Handler(void const * argument)
   {		
 		HAL_IWDG_Refresh(&hiwdg);
 		App_Timing_Handler();
-		
-		FAN_SWITCH_ON();//≤‚ ‘”√ wuqingguang
-		
+				
 		osDelay(THREAD_PERIOD_MAIN_TASK);
 		
-		FAN_SWITCH_OFF();
   }
   /* USER CODE END Main_Handler */
 }

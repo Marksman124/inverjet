@@ -145,6 +145,8 @@ uint16_t* p_Check_Timing_Add_More;				// 走慢了,补时
 uint16_t* p_Check_Timing_Minus_More;			// 走块了, 减时
 
 uint16_t* p_Check_Timing_Error_Cnt;				// wifi模块 校时错误计数器
+
+uint16_t* p_Wifi_DP_Upload_Level;					// wifi模块 dp点上报等级
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -420,11 +422,10 @@ void OP_Update_Mode(void)
 		}
 		else if(System_Mode_Train())
 		{
-			if((p_OP_ShowLater->speed < MOTOR_PERCENT_SPEED_MIX)||(p_OP_ShowLater->speed > MOTOR_PERCENT_SPEED_MAX))
+			//if((p_OP_ShowLater->speed < MOTOR_PERCENT_SPEED_MIX)||(p_OP_ShowLater->speed > MOTOR_PERCENT_SPEED_MAX))
 				*p_OP_ShowNow_Speed = p_OP_PMode[Get_System_State_Mode()-1][Period_Now].speed;
-			else
-				*p_OP_ShowNow_Speed = p_OP_ShowLater->speed ;
-			
+			//else
+				//*p_OP_ShowNow_Speed = p_OP_ShowLater->speed ;
 		}
 	}
 	
@@ -471,7 +472,6 @@ void Check_OP_All(void)
 			
 			if(System_is_Stop() == 0)
 				*p_OP_ShowNow_Time = 0;
-
 		}
 		
 		if(Motor_is_Start())

@@ -15,7 +15,6 @@
 #include "data.h"
 #include "timing.h"
 #include "display.h"
-#include "Breath_light.h"
 #include "debug_protocol.h"
 #include "wifi.h"
 /* Private includes ----------------------------------------------------------*/
@@ -29,21 +28,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 
-#define KEY_IO_NUMBER_MAX			4
-
-//------------------- 按键 & 引脚 ----------------------------
-#define KEY_SPEED_IO_PORT			GPIOC
-#define KEY_SPEED_IO_PIN			GPIO_PIN_7
-
-#define KEY_TIME_IO_PORT			GPIOC
-#define KEY_TIME_IO_PIN				GPIO_PIN_8
-
-#define KEY_TRAIN_IO_PORT			GPIOC
-#define KEY_TRAIN_IO_PIN			GPIO_PIN_9
-
-#define KEY_POWER_IO_PORT			GPIOA
-#define KEY_POWER_IO_PIN			GPIO_PIN_8
-
+#define KEY_IO_NUMBER_MAX			7
 
 //------------------- led & 引脚 ----------------------------
 #define LED_SPEED_IO_PORT			GPIOC
@@ -62,10 +47,13 @@
 
 // 按键对应 引脚
 IO_Hardware_Pin Key_Gpio_Pin_Array[KEY_IO_NUMBER_MAX] = {
-	{ KEY_SPEED_IO_PORT, KEY_SPEED_IO_PIN }, 
-	{ KEY_TIME_IO_PORT, 	KEY_TIME_IO_PIN }, 
-	{ KEY_TRAIN_IO_PORT, KEY_TRAIN_IO_PIN }, 
-	{ KEY_POWER_IO_PORT, KEY_POWER_IO_PIN }
+	{ Key_Speed_GPIO_Port, 	Key_Speed_Pin }, 
+	{ Key_Time_GPIO_Port, 	Key_Time_Pin }, 
+	{ Key_Mode_GPIO_Port, 	Key_Mode_Pin }, 
+	{ Key_Power_GPIO_Port, 	Key_Power_Pin }, 
+	{ DI_Key_Power_GPIO_Port, DI_Key_Power_Pin },
+	{ DI_Key_Up_GPIO_Port, 		DI_Key_Up_Pin },
+	{ DI_Key_Down_GPIO_Port, 	DI_Key_Down_Pin }
 };
 
 // 按键灯对应 引脚
@@ -78,6 +66,9 @@ uint8_t Key_IO_Ordering_Value[KEY_CALL_OUT_NUMBER_MAX]={
 	KEY_VALUE_BIT_BUTTON_1|KEY_VALUE_BIT_BUTTON_3,
 	KEY_VALUE_BIT_BUTTON_2|KEY_VALUE_BIT_BUTTON_3,
 	KEY_VALUE_BIT_BUTTON_2|KEY_VALUE_BIT_BUTTON_4,
+	KEY_VALUE_BIT_BUTTON_5,
+	KEY_VALUE_BIT_BUTTON_6,
+	KEY_VALUE_BIT_BUTTON_7,
 };
 
 // 短按 槽函数
@@ -85,6 +76,9 @@ void (*p_Funtion_Button[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_pushButton_clicked,  on_pushButton_2_clicked,  on_pushButton_3_clicked,  on_pushButton_4_Short_Press,
 	on_pushButton_1_2_Short_Press, on_pushButton_1_3_Short_Press, 
 	on_pushButton_2_3_Short_Press, on_pushButton_2_4_Short_Press,
+	on_pushButton_4_Long_Press,
+	on_pushButton_4_Long_Press,//on_DiButton_Add_clicked,
+	on_pushButton_4_Long_Press,//on_DiButton_Minus_clicked,
 };
 
 // 长按 槽函数
@@ -92,12 +86,16 @@ void (*p_Funtion_Long_Press[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_pushButton_1_Long_Press,  on_pushButton_2_Long_Press,  on_pushButton_3_Long_Press,  on_pushButton_4_Long_Press,
 	on_pushButton_1_2_Long_Press, on_pushButton_1_3_Long_Press,
 	on_pushButton_2_3_Long_Press, on_pushButton_2_4_Long_Press,
+	on_pushButton_NULL_Press,
+	on_pushButton_NULL_Press,  
+	on_pushButton_NULL_Press,
 };
 
 // 各槽 长按判断 时长
 uint32_t Key_Long_Press_Confirm_Value[KEY_CALL_OUT_NUMBER_MAX]={
 	KEY_LONG_PRESS_TIME_1S, KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S,
 	KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,
+	KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,
 };
 
 
@@ -118,8 +116,6 @@ uint32_t Key_Long_Press_cnt[KEY_CALL_OUT_NUMBER_MAX]={0};	// 长按 计数器
 
 uint8_t System_Self_Testing_State;
 
-uint8_t Key_Buzzer_cnt = 0; //蜂鸣器计时
-uint8_t Key_Buzzer_Type = 0;	//蜂鸣器长短 类型
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -309,8 +305,63 @@ void on_pushButton_2_4_Short_Press(void)
 	//To_Operation_Menu();
 }
 
-
-
+/**********************************************************************************************
+*
+*						按键回调    短按  拓展键
+*
+**********************************************************************************************/
+//==================================  +  键
+void on_DiButton_Add_clicked(void)
+{
+	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
+			return;
+	
+	if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MAX)
+	{	
+		if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
+			*p_OP_ShowNow_Speed += (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
+		else
+			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
+	}
+	else
+		*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
+	
+	if(Motor_is_Start())
+	{
+		Special_Status_Add(SPECIAL_BIT_SPEED_CHANGE);
+		Clean_Change_Speed_Timer();
+	}
+	else
+		Arbitrarily_To_Initial();
+	
+	Update_OP_Speed();
+}
+//==================================   - 键
+void on_DiButton_Minus_clicked(void)
+{
+	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
+			return;
+	
+	if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MIX)
+	{
+		if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
+			*p_OP_ShowNow_Speed -= (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
+		else
+			*p_OP_ShowNow_Speed -= KEY_SPEED_INCREASE_20_GEAR;
+	}
+	else
+		*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+	
+	if(Motor_is_Start())
+	{
+		Special_Status_Add(SPECIAL_BIT_SPEED_CHANGE);
+		Clean_Change_Speed_Timer();
+	}
+	else
+		Arbitrarily_To_Initial();
+	
+	Update_OP_Speed();
+}
 /**********************************************************************************************
 *
 *						按键回调    长按
@@ -372,7 +423,10 @@ void on_pushButton_4_Long_Press(void)
 	//Key_Long_Press_cnt[3] = 0;
 	
 }
-
+//================================== 空键
+void on_pushButton_NULL_Press(void)
+{
+}
 //================================== ① + ②  组合键
 //   wifi配对
 void on_pushButton_1_2_Long_Press(void)
@@ -514,65 +568,6 @@ void Special_Button_Rules(uint8_t key_value)
 	Key_Multiple_Clicks_cnt ++;
 }
 
-void Buzzer_Click_On(void)
-{
-	if(System_is_Power_Off())
-		return;
-	
-	Key_Buzzer_cnt = 1;
-	Key_Buzzer_Type = 0;
-}
-
-
-void Buzzer_Click_Long_On(uint8_t type)
-{
-	Key_Buzzer_Type = type;
-	Key_Buzzer_cnt = 1;
-}
-
-void Buzzer_Click_Handler(void)
-{
-	if(Key_Buzzer_cnt == 1)
-		{
-			TM1621_Buzzer_Off();
-		}
-		else if(Key_Buzzer_cnt == 2)
-		{
-			TM1621_Buzzer_Click();
-		}
-		else if(Key_Buzzer_cnt > KEY_BUZZER_TIME)
-		{
-			if(Key_Buzzer_Type == 0)
-			{
-				TM1621_Buzzer_Off();
-				Key_Buzzer_cnt = 0;
-			}
-			else if(Key_Buzzer_Type == 1)
-			{
-				if(Key_Buzzer_cnt > KEY_BUZZER_TIME_LONG)
-				{
-					TM1621_Buzzer_Off();
-					Key_Buzzer_cnt = 0;
-					Key_Buzzer_Type = 0;
-				}
-			}
-			else if(Key_Buzzer_Type == 2)
-			{
-				if(Key_Buzzer_cnt > KEY_BUZZER_TIME_LONG_32)
-				{
-					TM1621_Buzzer_Off();
-					Key_Buzzer_cnt = 0;
-					Key_Buzzer_Type = 0;
-				}
-			}
-		}
-		
-		if(Key_Buzzer_cnt > 0)
-			Key_Buzzer_cnt++;
-		else
-			TM1621_Buzzer_Off();
-}
-
 
 // 按键主循环任务
 //  20 ms
@@ -592,15 +587,15 @@ void App_Key_Task(void)
 			TM1621_Set_light_Mode(1);
 		}
 		
-		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE) == 0xAA )
-		{
-			if(IS_SELF_TEST_MODE() == 0)
-			{
-				IN_CHECK_ERROR_MODE();
-				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
-				Write_MbBuffer_Now();
-			}
-		}
+//		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE) == 0xAA )
+//		{
+//			if(IS_SELF_TEST_MODE() == 0)
+//			{
+//				IN_CHECK_ERROR_MODE();
+//				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+//				Write_MbBuffer_Now();
+//			}
+//		}
 		
 		for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
 		{
@@ -718,8 +713,6 @@ void App_Key_Handler(void)
 		{
 			if(++io_shake_cnt >= KEY_VALUE_SHAKE_TIME)
 			{
-				Buzzer_Click_Handler();
-				
 				//自测模式
 				if(IS_SELF_TEST_MODE())
 				{
@@ -758,14 +751,18 @@ uint8_t Key_Get_IO_Input(void)
 	for(i=0; i<KEY_IO_NUMBER_MAX; i++) // KEY_IO_NUMBER_MAX
 	{
 		read_io = HAL_GPIO_ReadPin(Key_Gpio_Pin_Array[i].port, Key_Gpio_Pin_Array[i].pin);
-		if(read_io == 0)//低有效
-			result |= (1<<i);
+		
+		if(i < 4)
+		{
+			if(read_io == 0)
+				result |= (1<<i);
+		}
+		else
+		{
+			if(read_io == 1)
+				result |= (1<<i);
+		}
 	}
-	
-//	if(System_is_Power_Off())
-//	{
-//		result &= KEY_VALUE_BIT_BUTTON_4;
-//	}
 	
 	return result;
 }

@@ -24,7 +24,7 @@ extern "C" {
 #include "gpio.h"
 #include "usart.h"				// 串口
 #include "timing.h"				// 后台定时器
-
+#include "Breath_light.h"
 #include "operation.h"		// 操作 菜单
 #include "fault.h"				// 故障 菜单
 
@@ -70,13 +70,16 @@ typedef struct IO_Hardware_Pin
 #endif
 
 //-------------- 按键组合响应 总数 -------------------
-#define KEY_CALL_OUT_NUMBER_MAX						8
+#define KEY_CALL_OUT_NUMBER_MAX						11
 
 #define KEY_VALUE_BIT_BUTTON_1						0x01
 #define KEY_VALUE_BIT_BUTTON_2						0x02
 #define KEY_VALUE_BIT_BUTTON_3						0x04
 #define KEY_VALUE_BIT_BUTTON_4						0x08
 
+#define KEY_VALUE_BIT_BUTTON_5						0x10
+#define KEY_VALUE_BIT_BUTTON_6						0x20
+#define KEY_VALUE_BIT_BUTTON_7						0x40
 /* Exported functions prototypes ---------------------------------------------*/
 
 //------------------- 按键回调 ----------------------------
@@ -97,6 +100,17 @@ extern void on_pushButton_1_3_Short_Press(void);
 extern void on_pushButton_2_3_Short_Press(void);
 // ② + ④  组合键  短按
 extern void on_pushButton_2_4_Short_Press(void);
+
+/**********************************************************************************************
+*
+*						按键回调    短按  拓展键
+*
+**********************************************************************************************/
+//==================================  +  键
+void on_DiButton_Add_clicked(void);
+//==================================   - 键
+void on_DiButton_Minus_clicked(void);
+
 //--------------- 长按 -----------------------
 // 长按
 extern void on_pushButton_1_Long_Press(void);
@@ -108,6 +122,8 @@ extern void on_pushButton_1_3_Long_Press(void);
 extern void on_pushButton_2_3_Long_Press(void);
 extern void on_pushButton_2_4_Long_Press(void);
 
+
+extern void on_pushButton_NULL_Press(void);
 //------------------- 硬件 & 驱动 ----------------------------
 // 初始化
 extern void App_Key_Init(void);
@@ -118,11 +134,6 @@ extern void App_Key_Handler(void);
 // 获取按键
 extern uint8_t Key_Get_IO_Input(void);
 //------------------- 功能接口 ----------------------------
-
-extern void Buzzer_Click_On(void);
-
-extern void Buzzer_Click_Long_On(uint8_t type);
-
 //	开机 进入自由模式
 extern void System_Power_On(void);
 //	关机

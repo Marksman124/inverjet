@@ -125,6 +125,8 @@ void Error_Handler(void);
 #define SPI1_CS_GPIO_Port GPIOB
 #define CS_Pin GPIO_PIN_12
 #define CS_GPIO_Port GPIOB
+#define DI_Key_Power_Pin GPIO_PIN_13
+#define DI_Key_Power_GPIO_Port GPIOB
 #define WR_Pin GPIO_PIN_14
 #define WR_GPIO_Port GPIOB
 #define DATA_Pin GPIO_PIN_15
@@ -139,14 +141,22 @@ void Error_Handler(void);
 #define Key_Mode_GPIO_Port GPIOC
 #define Key_Power_Pin GPIO_PIN_8
 #define Key_Power_GPIO_Port GPIOA
-#define Fan_Switch_Pin GPIO_PIN_12
-#define Fan_Switch_GPIO_Port GPIOA
+#define DI_Key_Up_Pin GPIO_PIN_11
+#define DI_Key_Up_GPIO_Port GPIOA
+#define DI_Key_Down_Pin GPIO_PIN_12
+#define DI_Key_Down_GPIO_Port GPIOA
 #define LCD_BackLight_Pin GPIO_PIN_15
 #define LCD_BackLight_GPIO_Port GPIOA
+#define Main_RS485_EN_Pin GPIO_PIN_3
+#define Main_RS485_EN_GPIO_Port GPIOB
 #define Debug_Led_02_Pin GPIO_PIN_4
 #define Debug_Led_02_GPIO_Port GPIOB
 #define Debug_Led_01_Pin GPIO_PIN_5
 #define Debug_Led_01_GPIO_Port GPIOB
+#define Debug_IO_01_Pin GPIO_PIN_8
+#define Debug_IO_01_GPIO_Port GPIOB
+#define Debug_IO_02_Pin GPIO_PIN_9
+#define Debug_IO_02_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

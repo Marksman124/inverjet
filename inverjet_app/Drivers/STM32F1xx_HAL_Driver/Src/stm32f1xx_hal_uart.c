@@ -255,8 +255,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-#include "debug_protocol.h"	///////////////////////	|??¨¬?????¡§?o? ??????¡§?2
-#include "motor.h"	///////////////////////	?y???¡§o?¡§¡§??? ??????¡§?2
+#include "debug_protocol.h"	///////////////////////	|????¨¬????????¡§??o? ????????¡§??2
+#include "motor.h"	///////////////////////	?y?????¡§?o???¡§???¡§???? ????????¡§??2
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
   */
@@ -2655,18 +2655,18 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 			if (huart->Instance == USART3)
 			{
 				__HAL_UART_CLEAR_IDLEFLAG(huart);
-				//HAL_UART_DMAStop(&huart3); //  ¨ª¡ê?1DMA¡ä?¨º?¡ê?¡¤¨¤?1
+				//HAL_UART_DMAStop(&huart3); //  ??¨¬a??¡ìo?1DMA?????¨¬o???¡ìo???¡§¡§??¨¬?¡§¡§?1
 				Motor_Usart_Restar();
 				//memset(Motor_DMABuff,0,MOTOR_RS485_RX_BUFF_SIZE);
 				//HAL_UART_Receive_DMA(huart,Motor_DMABuff,MOTOR_RS485_RX_BUFF_SIZE);
-				//HAL_UARTEx_ReceiveToIdle_DMA(huart, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // ?¨®¨º?¨ª¨º¡À?o¨®????
+				//HAL_UARTEx_ReceiveToIdle_DMA(huart, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // ???¨¬???¨¬o???¨¬a??¨¬o??¡ì?¨¨?o??¨¬?????
 			}
 			else if (huart->Instance == UART4)
 			{
 				memset(Debug_Read_Buffer,0,DEBUG_PROTOCOL_RX_MAX);
 				__HAL_UART_CLEAR_IDLEFLAG(huart);
 				//HAL_UART_Receive_DMA(huart,Debug_Read_Buffer,DEBUG_PROTOCOL_RX_MAX);
-				HAL_UARTEx_ReceiveToIdle_DMA(huart, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // ?¨®¨º?¨ª¨º¡À?o¨®????
+				HAL_UARTEx_ReceiveToIdle_DMA(huart, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // ???¨¬???¨¬o???¨¬a??¨¬o??¡ì?¨¨?o??¨¬?????
 
 			}
 			else

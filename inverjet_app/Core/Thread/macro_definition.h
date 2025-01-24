@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.0"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.1"
 
 /**
 ******************************************************************************
@@ -45,11 +45,11 @@ extern "C" {
 ******************************************************************************
 */
 
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令	
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
-//#define BT_ONLINE_CONNECT_MODE					1	// 蓝牙联网模式
+#define BT_ONLINE_CONNECT_MODE					1	// 蓝牙联网模式
 //#define SYSTEM_SHOW_MODEL_MACHINE				1	// 展示样机  (不报故障)
 
 //***************************************************************************
@@ -118,6 +118,17 @@ extern "C" {
 //步进
 #define LIGHT_BRIGHTNESS_STEP_LOW							((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION_LOW)
 
+//-------------- 蜂鸣器 长度 -------------------
+#define KEY_BUZZER_TIME								(200/BREATH_LIGHT_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME_LONG					(400/BREATH_LIGHT_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+#define KEY_BUZZER_TIME_LONG_32				(800/BREATH_LIGHT_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
+/* 蜂鸣器 音量  50最大  ------------------------------------------------------------*/
+//******************  调试模式 **************************
+#ifdef SYSTEM_DEBUG_MODE
+#define BUZZER_FREQUENCY					3
+#else
+#define BUZZER_FREQUENCY					50					// wuqingguang	50
+#endif
 
 #endif
 /*==============================================================================================================*/
@@ -138,17 +149,7 @@ extern "C" {
 //-------------- 特殊按键  -------------------
 #define KEY_MULTIPLE_CLICKS_MAX				8						// 8次
 #define KEY_MULTIPLE_CLICKS_TIME			5000				// 5秒内
-//-------------- 蜂鸣器 长度 -------------------
-#define KEY_BUZZER_TIME								(200/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
-#define KEY_BUZZER_TIME_LONG					(400/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
-#define KEY_BUZZER_TIME_LONG_32				(800/KEY_THREAD_LIFECYCLE)					//周期  KEY_THREAD_LIFECYCLE 倍数
-/* 蜂鸣器 音量  50最大  ------------------------------------------------------------*/
-//******************  调试模式 **************************
-#ifdef SYSTEM_DEBUG_MODE
-#define BUZZER_FREQUENCY					3
-#else
-#define BUZZER_FREQUENCY					50					// wuqingguang	50
-#endif
+
 //*******************************************************
 
 #define KEY_VALUE_SHAKE_TIME					(1)		//去抖动 次数

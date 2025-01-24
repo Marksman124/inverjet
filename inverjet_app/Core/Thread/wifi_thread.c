@@ -110,8 +110,8 @@ void WIFI_Update_State_Upload(void)
 	short int box_temperature = 0;
 	short int mos_temperature = 0;
 		
-	static uint16_t Upload_Timer_Cnt = 0;							// 上传时间 计时器
-	//static uint8_t Upload_Debounce_Cnt = 0;						// 上传时间 计时器
+	static uint16_t Upload_Timer_Cnt = 0;						// 上传时间 计时器
+	static uint8_t Upload_Second_Cnt = 0;						// 上传时间 秒
 	//------------------- 统计上传	----------------------------
 	if(Upload_Finish_Data == 1)
 	{
@@ -227,37 +227,36 @@ void WIFI_Update_State_Upload(void)
 			Wifi_DP_Data_Update(DPID_TIMING_MODE_TIME); 				// 定时模式 时间
 			Wifi_OP_Time_Mode_Time = p_OP_Timing_Mode->time;
 		}
-	}
-	//*********************************
-	//===== 不重要数据 10s 上传   ======
-	//*********************************
-	if((Upload_Timer_Cnt % WIFI_DATE_UPLOAD_TIME)==0)
-	{
-		// debug 用
-		Wifi_DP_Data_Update(DPID_SYSTEM_RUNNING_TIME); 		// 运行时间;
-		Wifi_DP_Data_Update(DPID_NO_OPERATION_TIME); 			// 无操作时间;
-		Wifi_DP_Data_Update(DPID_SYSTEM_STARTUP_TIME); 		// 启动时间;
-		Wifi_DP_Data_Update(DPID_THREAD_ACTIVITY_SIGN); 	//线程活动标志;
 		
-		// 怕不同步 补发一次
-		if(Wifi_System_Fault_Static == 0)
-			Wifi_DP_Data_Update(DPID_GET_SYSTEM_FAULT_STATUS); 	// 系统 故障型数据上报
-//		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_MODE);  			// 工作模式
-//		Wifi_DP_Data_Update(DPID_SYSTEM_WORKING_STATUS); 			// 状态机
-//		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_SPEED); 				// 当前速度
-//		Wifi_DP_Data_Update(DPID_MOTOR_CURRENT_TIME); 				// 当前时间
+		//*********************************
+		//===== 不重要数据 10s 上传   ======
+		//*********************************
+		if((*p_Wifi_DP_Upload_Level & 0xFF) > 0x80)
+		{
+			if((Upload_Second_Cnt % (*p_Wifi_DP_Upload_Level & 0x7F))==0)
+			{
+				// debug 用
+				Wifi_DP_Data_Update(DPID_SYSTEM_RUNNING_TIME); 		// 运行时间;
+				Wifi_DP_Data_Update(DPID_NO_OPERATION_TIME); 			// 无操作时间;
+				Wifi_DP_Data_Update(DPID_SYSTEM_STARTUP_TIME); 		// 启动时间;
+				Wifi_DP_Data_Update(DPID_THREAD_ACTIVITY_SIGN); 	// 线程活动标志;
+				
+				Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_01);			// 驱动板 NTC 温度 01
+				Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_02);			// 驱动板 NTC 温度 01
+				Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_03);			// 驱动板 NTC 温度 01
+			}
+		}
 		
-		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_01);			// 驱动板 NTC 温度 01
-		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_02);			// 驱动板 NTC 温度 01
-		Wifi_DP_Data_Update(DPID_DRIVE_NTC_TEMP_03);			// 驱动板 NTC 温度 01
+		if(Upload_Second_Cnt < 99)
+			Upload_Second_Cnt ++;
+		else
+			Upload_Second_Cnt = 0;
 	}
 	
 	if(Upload_Timer_Cnt < 9999)
 		Upload_Timer_Cnt ++;
 	else
 		Upload_Timer_Cnt = 0;
-	
-	//State_Upload_Cnt = 0;
 }
 
 

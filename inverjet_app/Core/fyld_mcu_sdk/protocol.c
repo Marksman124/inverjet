@@ -129,6 +129,7 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {DPID_DRIVE_NTC_TEMP_01, DP_TYPE_VALUE},
     {DPID_DRIVE_NTC_TEMP_02, DP_TYPE_VALUE},
     {DPID_DRIVE_NTC_TEMP_03, DP_TYPE_VALUE},
+    {DPID_WIFI_DP_UPLOAD_LEVEL, DP_TYPE_VALUE},
     
 };
 
@@ -243,33 +244,29 @@ void all_data_update(void)
 		mcu_dp_value_update(DPID_MOTOR_CURRENT_SPEED,			*p_OP_ShowNow_Speed);								// 当前速度;
 		mcu_dp_value_update(DPID_MOTOR_CURRENT_TIME,			*p_OP_ShowNow_Time);								// 当前时间;
 			
-			mcu_dp_value_update(DPID_FREE_MODE_SPEEN,					p_OP_Free_Mode->speed);					// 自由模式 速度;
-			mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,				p_OP_Timing_Mode->speed);				// 定时模式 速度;
-			mcu_dp_value_update(DPID_TIMING_MODE_TIME,				p_OP_Timing_Mode->time);				// 定时模式 时间;
-			
-		//static uint8_t Check_GetIn_Once=0;
-		//只进一次
-		//if(Check_GetIn_Once == 0)
-		{
-			//Check_GetIn_Once = 1;
-			mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,				Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
-			
-			mcu_dp_value_update(DPID_OTA_PACK_SIZE,						Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE)); // ota 包大小
-			mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,			*p_System_Runing_Second_Cnt); 	// 运行时间;
-			mcu_dp_value_update(DPID_NO_OPERATION_TIME,				*p_No_Operation_Second_Cnt);		// 无操作时间;
-			mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,			*p_System_Startup_Second_Cnt);	// 启动 时间;
-			//mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,		*p_Thread_Activity_Sign);						//线程活动标志;
+		mcu_dp_value_update(DPID_FREE_MODE_SPEEN,					p_OP_Free_Mode->speed);					// 自由模式 速度;
+		mcu_dp_value_update(DPID_TIMING_MODE_SPEEN,				p_OP_Timing_Mode->speed);				// 定时模式 速度;
+		mcu_dp_value_update(DPID_TIMING_MODE_TIME,				p_OP_Timing_Mode->time);				// 定时模式 时间;
+		
+		
+		mcu_dp_enum_update(DPID_INVERJET_MODEL_NO,				Get_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE));	//	机型码); //枚举型数据上报;
+		
+		mcu_dp_value_update(DPID_OTA_PACK_SIZE,						Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE)); // ota 包大小
+		mcu_dp_value_update(DPID_SYSTEM_RUNNING_TIME,			*p_System_Runing_Second_Cnt); 	// 运行时间;
+		mcu_dp_value_update(DPID_NO_OPERATION_TIME,				*p_No_Operation_Second_Cnt);		// 无操作时间;
+		mcu_dp_value_update(DPID_SYSTEM_STARTUP_TIME,			*p_System_Startup_Second_Cnt);	// 启动 时间;
+		//mcu_dp_value_update(DPID_THREAD_ACTIVITY_SIGN,		*p_Thread_Activity_Sign);						//线程活动标志;
 
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,			(unsigned char *)p_OP_PMode[0],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P1
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,			(unsigned char *)p_OP_PMode[1],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P2
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,			(unsigned char *)p_OP_PMode[2],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P3
-			mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,			(unsigned char *)p_OP_PMode[3],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P4
-			//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,	(unsigned char *)p_OP_PMode[4],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P5
+		mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_01,			(unsigned char *)p_OP_PMode[0],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P1
+		mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_02,			(unsigned char *)p_OP_PMode[1],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P2
+		mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_03,			(unsigned char *)p_OP_PMode[2],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P3
+		mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_04,			(unsigned char *)p_OP_PMode[3],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P4
+		//mcu_dp_raw_update(DPID_SET_TRAIN_PLAN_05,	(unsigned char *)p_OP_PMode[4],	TRAINING_MODE_PERIOD_MAX*4); // 训练计划 P5
 
-			//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,(unsigned char *),TRAINING_MODE_PERIOD_MAX*4); // 自定义训练计划_01;
-			//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,当前自定义训练计划_02指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_02;
-			//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,当前自定义训练计划_03指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_03;
-		}
+		//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_01,(unsigned char *),TRAINING_MODE_PERIOD_MAX*4); // 自定义训练计划_01;
+		//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_02,当前自定义训练计划_02指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_02;
+		//mcu_dp_raw_update(DPID_CUSTOM_TRAIN_PLAN_03,当前自定义训练计划_03指针,TRAINING_MODE_PERIOD_MAX*4); //自定义训练计划_03;
+	
 		//mcu_dp_value_update(DPID_FINISH_STATISTICS_TIME,			*p_Finish_Statistics_Time); 			// 当前完成统计_时长
     //mcu_dp_value_update(DPID_FINISH_STATISTICS_SEED,			*p_Finish_Statistics_Speed); 			// 当前完成统计_游泳强度
     //mcu_dp_value_update(DPID_FINISH_STATISTICS_DISTANCE,	*p_Finish_Statistics_Distance); 	// 当前完成统计_距离
@@ -834,6 +831,34 @@ static unsigned char dp_download_custom_train_plan_03_handle(const unsigned char
     else
         return ERROR;
 }
+/*****************************************************************************
+函数名称 : dp_download_wifi_dp_upload_level_handle
+功能描述 : 针对DPID_WIFI_DP_UPLOAD_LEVEL的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_wifi_dp_upload_level_handle(const unsigned char value[], unsigned short length)
+{
+    //示例:当前DP类型为VALUE
+    unsigned char ret;
+    unsigned long wifi_dp_upload_level;
+
+    wifi_dp_upload_level = mcu_get_dp_download_value(value,length);
+    /*
+    //VALUE type data processing
+
+    */
+		*p_Wifi_DP_Upload_Level = wifi_dp_upload_level;
+	
+    //There should be a report after processing the DP
+    ret = mcu_dp_value_update(DPID_WIFI_DP_UPLOAD_LEVEL,wifi_dp_upload_level);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
 
 
 
@@ -933,6 +958,10 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
         case DPID_CUSTOM_TRAIN_PLAN_03:
             //自定义训练计划_03处理函数
             ret = dp_download_custom_train_plan_03_handle(value,length);
+        break;
+        case DPID_WIFI_DP_UPLOAD_LEVEL:
+            //上传等级处理函数
+            ret = dp_download_wifi_dp_upload_level_handle(value,length);
         break;
 
         

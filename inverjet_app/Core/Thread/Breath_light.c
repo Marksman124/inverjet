@@ -35,6 +35,9 @@ double  Light_AdSample = 0;
 
 uint8_t Breath_light_direction=0; // ·½Ïò  ÁÁ Ãð
 
+uint8_t Key_Buzzer_cnt = 0; //·äÃùÆ÷¼ÆÊ±
+uint8_t Key_Buzzer_Type = 0;	//·äÃùÆ÷³¤¶Ì ÀàÐÍ
+
 /* Private function prototypes -----------------------------------------------*/
 
 void Breath_light_PwmOut(uint16_t pul);
@@ -73,6 +76,8 @@ uint16_t get_PwmDuty(double  AD_Sample)
 void App_Breath_light_Handler(void)
 {
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_BREATH_LIGHT);
+	
+	Buzzer_Click_Handler();
 	
 	Light_Brightness = get_PwmDuty(Light_AdSample);
 	
@@ -189,4 +194,62 @@ void Breath_light_Off(void)
 	Breath_light_PwmOut(0);
 }
 
+//------------------- ·äÃùÆ÷ ----------------------------
+void Buzzer_Click_On(void)
+{
+	if(System_is_Power_Off())
+		return;
+	
+	Key_Buzzer_cnt = 1;
+	Key_Buzzer_Type = 0;
+}
 
+
+void Buzzer_Click_Long_On(uint8_t type)
+{
+	Key_Buzzer_Type = type;
+	Key_Buzzer_cnt = 1;
+}
+
+void Buzzer_Click_Handler(void)
+{
+	if(Key_Buzzer_cnt == 1)
+		{
+			TM1621_Buzzer_Off();
+		}
+		else if(Key_Buzzer_cnt == 2)
+		{
+			TM1621_Buzzer_Click();
+		}
+		else if(Key_Buzzer_cnt > KEY_BUZZER_TIME)
+		{
+			if(Key_Buzzer_Type == 0)
+			{
+				TM1621_Buzzer_Off();
+				Key_Buzzer_cnt = 0;
+			}
+			else if(Key_Buzzer_Type == 1)
+			{
+				if(Key_Buzzer_cnt > KEY_BUZZER_TIME_LONG)
+				{
+					TM1621_Buzzer_Off();
+					Key_Buzzer_cnt = 0;
+					Key_Buzzer_Type = 0;
+				}
+			}
+			else if(Key_Buzzer_Type == 2)
+			{
+				if(Key_Buzzer_cnt > KEY_BUZZER_TIME_LONG_32)
+				{
+					TM1621_Buzzer_Off();
+					Key_Buzzer_cnt = 0;
+					Key_Buzzer_Type = 0;
+				}
+			}
+		}
+		
+		if(Key_Buzzer_cnt > 0)
+			Key_Buzzer_cnt++;
+		else
+			TM1621_Buzzer_Off();
+}

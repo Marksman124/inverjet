@@ -30,6 +30,16 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
+// 蜂鸣器长度
+typedef enum
+{
+	NO_BUZZER_TIME = 0,				//	无
+	CLICK_BUZZER_TIME,				//	点击
+	LONG_BUZZER_TIME,					//	长按
+	DOUBLE_LONG_BUZZER_TIME,	//	超长按
+} Buzzer_Time_Type_enum;
+
+
 /* Exported constants --------------------------------------------------------*/
 
 
@@ -51,6 +61,13 @@ extern void App_Breath_light_Handler(void);
 void Breath_light_Max(void);
 
 void Breath_light_Off(void);
+//------------------- 蜂鸣器 ----------------------------
+
+void Buzzer_Click_On(void);
+
+void Buzzer_Click_Long_On(uint8_t type);
+
+void Buzzer_Click_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
 

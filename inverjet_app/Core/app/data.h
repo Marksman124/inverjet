@@ -307,6 +307,8 @@ extern uint16_t* p_Check_Timing_Minus_More;				//
 
 extern uint16_t* p_Check_Timing_Error_Cnt;				// wifi模块 校时错误计数器
 
+extern uint16_t* p_Wifi_DP_Upload_Level;					// wifi模块 dp点上报等级
+
 #ifdef __cplusplus
 }
 #endif

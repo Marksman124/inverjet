@@ -380,6 +380,11 @@ BLE_test_result内部有#err提示,完成函数后请删除该#err
 //驱动板NTC温度_03(只上报)
 //备注:
 #define DPID_DRIVE_NTC_TEMP_03 52
+//上传等级(可下发可上报)
+//备注:dp 16-19，dp 50-53 上传等级 
+//0x80开启上传，
+//上传间隔&0x7F 秒
+#define DPID_WIFI_DP_UPLOAD_LEVEL 53
 
 
 

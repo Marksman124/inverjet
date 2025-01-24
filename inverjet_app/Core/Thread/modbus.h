@@ -64,7 +64,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_SLAVE_NODE_ADDRESS								( 0x00 )	//	从机节点地址
 #define MB_SLAVE_BAUD_RATE             			( 0x01 )	//	波特率
 #define MB_SUPPORT_CONTROL_METHODS          ( 0x02 )	//	0:可控;1：屏蔽  // 1bit：蓝牙; 2bit：Modbus-RS485; 3bit：wifi;
-
+#define MB_WIFI_DP_UPLOAD_LEVEL          		( 0x03 )	//	WIFI  dp点上传等级
 #define MB_MOTOR_POLE_NUMBER  							( 0x04 )	//	电机磁极数
 #define MB_MOTOR_SPEED_MODE  								( 0x05 )	//	转速 方式
 #define MB_MOTOR_BREATH_LIGHT_MAX  					( 0x06 )	//	光圈亮度
@@ -216,10 +216,6 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 
 // ----------------------------------------------------------------------------------------------
 #define MB_SYSTEM_LAST_KEY_VALUE        					( 0x35 )					//	最后一次按键
-//#define MB_SYSTEM_LAST_KEY_MODE        			( MB_SYSTEM_LAST_KEY_VALUE + 1 )					//	最后一次 模式
-//#define MB_SYSTEM_LAST_KEY_STATUS        		( MB_SYSTEM_LAST_KEY_MODE + 1 )						//	最后一次 状态
-//#define MB_SYSTEM_LAST_KEY_SPEED        		( MB_SYSTEM_LAST_KEY_STATUS + 1 )					//	最后一次 速度
-//#define MB_SYSTEM_LAST_KEY_TIME        			( MB_SYSTEM_LAST_KEY_SPEED + 1 )					//	最后一次 时间
 #define MB_MOSFET_TEMPERATURE_01					        ( 0x36 )					//	mos 	温度  01
 #define MB_MOSFET_TEMPERATURE_02					        ( 0x37 )					//	mos 	温度  02
 #define MB_MOSFET_TEMPERATURE_03					        ( 0x38 )					//	mos 	温度  03
@@ -235,8 +231,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_SYSTEM_SLEEP_TIME        				( 0x54 )							//	（2字节）休眠时间
 #define MB_THREAD_ACTIVITY_SGIN		      		( 0x56 )							//	线程 活动 标志位
 #define MB_WIFI_TIMING_VALUE		      			( 0x57 )							//	（2字节）校时
-#define MB_WIFI_TIMING_VALUE_OLD		      	( 0x59 )							//	比较时间
-
+#define MB_WIFI_TIMING_VALUE_OLD		      	( 0x59 )							//	（2字节）比较时间
 #define MB_CHECK_TIMING_ADD_MORE		      	( 0x5B )							//	加
 #define MB_CHECK_TIMING_MINUS_MORE		      ( 0x5C )							//	减
 #define MB_CHECK_TIMING_ERROR_CNT		      	( 0x5D )							//	错误计数器

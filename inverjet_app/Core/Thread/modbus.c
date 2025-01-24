@@ -29,7 +29,7 @@ USHORT   usRegInputBuf[REG_INPUT_NREGS+1] = {0};
 
 USHORT		MB_Data_Addr_Need_CallOut[] = {
 	MB_SLAVE_NODE_ADDRESS,MB_SLAVE_BAUD_RATE,
-	MB_SYSTEM_WORKING_MODE,MB_SYSTEM_WORKING_STATUS,MB_MOTOR_CURRENT_SPEED,
+	MB_SYSTEM_WORKING_MODE,MB_SYSTEM_WORKING_STATUS,MB_MOTOR_CURRENT_SPEED,MB_SYSTEM_SELF_TEST_STATE,
 	//MB_MOTOR_CURRENT_SPEED,MB_MOTOR_CURRENT_TIME,
 };
 
@@ -100,6 +100,18 @@ HoldingCallOut( USHORT usAddress )
 	else if(usAddress == MB_MOTOR_CURRENT_TIME)
 	{
 		System_Para_Set_Time(usRegHoldingBuf[MB_MOTOR_CURRENT_TIME], CTRL_FROM_RS485);
+	}
+	else if(usAddress == MB_SYSTEM_SELF_TEST_STATE)
+	{
+		if(usRegHoldingBuf[MB_SYSTEM_SELF_TEST_STATE] == 0xAA )
+		{
+			if(IS_SELF_TEST_MODE() == 0)
+			{
+				IN_CHECK_ERROR_MODE();
+				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+				//Write_MbBuffer_Now();
+			}
+		}
 	}
 }
 
@@ -562,6 +574,8 @@ void MB_Get_Mapping_Register(void)
 	//================= ota 大小  ================================
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE,*(uint16_t *)BOOT_FLASH_ADDR_OTA_PACK_LEN);
 	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE,*(uint16_t *)BOOT_FLASH_ADDR_DOWNLOAD_PACK_SIZE);
+	//================= 信号值  ================================
+	p_Wifi_DP_Upload_Level = 	Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_WIFI_DP_UPLOAD_LEVEL);
 	
 }
 
