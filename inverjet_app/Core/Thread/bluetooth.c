@@ -72,11 +72,7 @@ void BT_Read_Data_Bit(unsigned char vaule)
 			*p_BLE_Rssi = 50;
 		}
 	}
-#ifdef BT_ONLINE_CONNECT_MODE
-	else if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) != 1)	//wuqingguang test
-#else
 	else
-#endif
 	{
 		if(Ms_BT_Modbus.rxWriteLock)
 		{
@@ -109,11 +105,7 @@ void Usart_IRQ_CallBack(uint8_t data)
 			*p_BLE_Rssi = 50;
 		}
 	}
-#ifdef BT_ONLINE_CONNECT_MODE
-	else if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) != 1)	//wuqingguang test
-#else
 	else
-#endif
 	{
 		BT_Uart_Read_Buffer = data;
 		MsSerialRead(&Ms_BT_Modbus,&BT_Uart_Read_Buffer,1);
@@ -236,18 +228,6 @@ void BT_Connect_TestServer(void)
 	osDelay(3000);
 }
 
-// AT 指令 连接 主机
-void BT_Connect_OnlineServer(void)
-{
-	char buff[32]={0};
-	uint16_t mac[3];
-	
-	memcpy(mac, Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_BT_SERVER_MAC), 6);
-	sprintf(buff,"AT+BLECONNECT=%X%X%X\r\n",mac[0],mac[1],mac[2]);
-	SerialWrite((uint8_t*)buff,strlen(buff));
-	
-	osDelay(3000);
-}
 
 // AT 指令 退出连接
 void BT_Out_Connect(void)
@@ -261,54 +241,42 @@ void BT_Out_Connect(void)
 }
 
 // 同步状态机
-void BT_State_Machine_Update(void)
-{
-	uint8_t buff[32]={0x15, 0x10, 0x00, 0x21, 0x00, 0x04, 0x08};
-	uint16_t crc_calculate;
-	//memcpy(&buff[7],p_System_State_Machine, 8 );
+//void BT_State_Machine_Update(void)
+//{
+//	uint8_t buff[32]={0x15, 0x10, 0x00, 0x21, 0x00, 0x04, 0x08};
+//	uint16_t crc_calculate;
+//	//memcpy(&buff[7],p_System_State_Machine, 8 );
 
-	buff[7] = *p_PMode_Now >> 8;
-	buff[8] = *p_PMode_Now & 0xFF;
-	
-	buff[9] = *p_System_State_Machine >> 8;
-	buff[10] = *p_System_State_Machine & 0xFF;
-	
-	buff[11] = *p_OP_ShowNow_Speed >> 8;
-	buff[12] = *p_OP_ShowNow_Speed & 0xFF;
-	
-	buff[13] = *p_OP_ShowNow_Time >> 8;
-	buff[14] = *p_OP_ShowNow_Time & 0xFF;
-	
-	
-	crc_calculate = usMBCRC16( buff, 15);
-	buff[15] = (crc_calculate & 0xFF);
-	buff[16] = (crc_calculate >> 8);
+//	buff[7] = *p_PMode_Now >> 8;
+//	buff[8] = *p_PMode_Now & 0xFF;
+//	
+//	buff[9] = *p_System_State_Machine >> 8;
+//	buff[10] = *p_System_State_Machine & 0xFF;
+//	
+//	buff[11] = *p_OP_ShowNow_Speed >> 8;
+//	buff[12] = *p_OP_ShowNow_Speed & 0xFF;
+//	
+//	buff[13] = *p_OP_ShowNow_Time >> 8;
+//	buff[14] = *p_OP_ShowNow_Time & 0xFF;
+//	
+//	
+//	crc_calculate = usMBCRC16( buff, 15);
+//	buff[15] = (crc_calculate & 0xFF);
+//	buff[16] = (crc_calculate >> 8);
 
-	BT_UART_Send(buff,17);
-}
+//	BT_UART_Send(buff,17);
+//}
 
 
 //
 void BT_Module_AT_Init(void)
 {
-#ifdef BT_ONLINE_CONNECT_MODE
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) == 1)	//wuqingguang test
-	{
-		BT_Set_TRANSENTER(0);
-		BT_Out_Connect();
-		BT_Set_Mode(1);
-		BT_Connect_OnlineServer();
-	}
-	else
-#endif
-	{
-		BT_Set_TRANSENTER(0);
-		BT_Out_Connect();
-		BT_Set_Mode(0);
-		BT_Set_MTU(243);
-		BT_Set_Power(9);
-		//BT_Set_TRANSENTER(1);//进入透传
-	}
+	BT_Set_TRANSENTER(0);
+	BT_Out_Connect();
+	BT_Set_Mode(0);
+	BT_Set_MTU(243);
+	BT_Set_Power(9);
+	//BT_Set_TRANSENTER(1);//进入透传
 }
 //
 void BT_Module_AT_ReInit(void)
@@ -396,10 +364,6 @@ void BT_Read_Handler(void)
 {
 	static uint8_t self_test_cnt=0;
 	
-#ifdef BT_ONLINE_CONNECT_MODE
-	static uint8_t BT_Thread_Task_Cnt=0;
-	static uint16_t static_machine_buff[4];
-#endif
 	if(IS_CHECK_ERROR_MODE())
 	{
 		if(self_test_cnt == 0)
@@ -417,17 +381,6 @@ void BT_Read_Handler(void)
 		}
 		MsProcess(&Ms_BT_Modbus);
 	}
-#ifdef BT_ONLINE_CONNECT_MODE
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_ONLINE_MODE ) == 1)	//wuqingguang test
-	{
-		if((BT_Thread_Task_Cnt ++ > 125) || (memcmp(static_machine_buff, p_System_State_Machine, 6) != 0))  // 40ms 进一次
-		{
-			BT_Thread_Task_Cnt = 0;
-			BT_State_Machine_Update();
-			memcpy(static_machine_buff, p_System_State_Machine, 8);
-		}
-	}
-#endif
 }
 
 //------------------- 进入配网 ----------------------------
@@ -470,18 +423,18 @@ void BT_Distribution_Halder(void)
 }
 
 //------------------- 联网处理 0.5秒进一次----------------------------
-void BT_Online_Connect_Halder(void)
-{
-	if(BT_Halder_cnt == 0)
-		SerialWrite((uint8_t*)"+++",3);
-	else if(BT_Halder_cnt == 2)
-		BT_Set_Mode(1);
-	else if(BT_Halder_cnt == 16)
-		BT_Connect_OnlineServer();
-	
-	if(BT_Halder_cnt < 9999)
-		BT_Halder_cnt ++;
-	else
-		BT_Halder_cnt = 0;
-}
+//void BT_Online_Connect_Halder(void)
+//{
+//	if(BT_Halder_cnt == 0)
+//		SerialWrite((uint8_t*)"+++",3);
+//	else if(BT_Halder_cnt == 2)
+//		BT_Set_Mode(1);
+//	else if(BT_Halder_cnt == 16)
+//		BT_Connect_OnlineServer();
+//	
+//	if(BT_Halder_cnt < 9999)
+//		BT_Halder_cnt ++;
+//	else
+//		BT_Halder_cnt = 0;
+//}
 

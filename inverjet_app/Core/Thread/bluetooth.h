@@ -80,9 +80,6 @@ extern void BT_Module_AT_Init(void);
 //重新初始化
 extern void BT_Module_AT_ReInit(void);
 
-// AT 指令 连接 主机
-extern void BT_Connect_OnlineServer(void);
-
 //------------------- 蓝牙 进入工装 ----------------------------
 extern void BT_Module_AT_InTest(void);
 //------------------- 蓝牙 持续测试 ----------------------------

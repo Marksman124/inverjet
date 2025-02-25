@@ -18,6 +18,8 @@
 #include "ntc_3950.h"
 #include "timing.h"
 #include "wifi.h"
+#include "down_conversion.h"
+
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -53,8 +55,6 @@ void on_Fault_Button_2_3_Long_Press(void);
 void on_Fault_Button_2_4_Long_Press(void);
 
 /* Private typedef -----------------------------------------------------------*/
-
-static uint32_t Chassis_TEMP_Timer_cnt= 0;	//∏ﬂŒ¬±®æØ»•∂∂ º∆ ˝∆˜
 
 /* Private define ------------------------------------------------------------*/
 
@@ -111,7 +111,9 @@ uint8_t Fault_Check_Status_Legal(uint16_t parameter)
 // ºÏ≤‚π ’œ
 uint8_t If_System_Is_Error(void)
 {
-	float Temperature;
+	static uint8_t fault_timer_cnt=0;
+	
+	 float Temperature;
 	//uint8_t motor_fault=0;
 	uint16_t system_fault=0;
 	uint16_t vaule;
@@ -142,40 +144,18 @@ uint8_t If_System_Is_Error(void)
 		DEBUG_PRINT("ª˙œ‰Œ¬∂»£∫%0.3f °„C \n",Temperature);
 		memcpy(p_Box_Temperature, &vaule, 2);
 	}
-	
-	// ª˙œ‰ Œ¬∂»
+	Check_Down_Conversion_BOX_Temperature((*p_Box_Temperature)/10);
+
 	if(Temperature == -100)
 	{
-		//¥´∏–∆˜π ’œ
-		system_fault |= E201_TEMPERATURE_HARDWARE;
+		if(fault_timer_cnt++ > 100)
+			Set_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
 	}
-	else if(Temperature >= AMBIENT_TEMP_ALARM_VALUE)
+	else
 	{
-		//±®æØ Õ£ª˙
-		system_fault |= E102_TEMPERATURE_AMBIENT;
+		ReSet_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
+		fault_timer_cnt = 0;
 	}
-	else if(Temperature >= AMBIENT_TEMP_REDUCE_SPEED)
-	{
-		if(Chassis_TEMP_Timer_cnt < CHASSIS_TEMP_TIMER_MAX)
-			Chassis_TEMP_Timer_cnt ++;
-		else
-		{
-			//‘§æØ ΩµÀŸ
-			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_NO)
-				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_BOX_TEMPER);
-		}
-	}
-	else if(Temperature <= AMBIENT_TEMP_RESTORE_SPEED)
-	{
-		if(Chassis_TEMP_Timer_cnt > 0)
-			Chassis_TEMP_Timer_cnt = 0;
-		else
-		{
-			if(Get_Temp_Slow_Down_State() == MOTOR_DOWN_CONVERSION_BOX_TEMPER)
-				Set_Temp_Slow_Down_State(MOTOR_DOWN_CONVERSION_NO);
-		}
-	}
-
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
@@ -225,6 +205,7 @@ void Clean_Comm_Test(void)
 {
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485, 0);
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY, 0);
+	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH, 0);
 	
 	System_Wifi_State_Clean();
 	System_BT_State_Clean();
@@ -241,15 +222,15 @@ void Self_Testing_Check_Comm(void)
 	else
 		ReSet_Motor_Fault_State(E302_BT_HARDWARE);
 
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) != 0x0A)
-		Set_Motor_Fault_State(E303_RS485_HARDWARE);
-	else
-		ReSet_Motor_Fault_State(E303_RS485_HARDWARE);
-		
-	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x0F)
+	if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) == 0xAA)
 	{
-		Set_Motor_Fault_State(E304_KEY_HARDWARE);
+		ReSet_Motor_Fault_State(E303_RS485_HARDWARE);
+		ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 	}
+	else if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485 ) == 0x0A)
+		Set_Motor_Fault_State(E203_MOTOR_LOSS);
+	else
+		Set_Motor_Fault_State(E303_RS485_HARDWARE);
 	
 	if(If_System_Is_Error())
 	{
@@ -307,7 +288,10 @@ void To_Fault_Menu(void)
 	
 	*p_System_State_Machine_Memory = Get_System_State_Machine();
 	*p_PMode_Now_Memory = Get_System_State_Mode();
-	*p_OP_ShowNow_Speed_Memory = *p_OP_ShowNow_Speed;
+	if(Get_Down_Conversion_Speed_Old())
+		*p_OP_ShowNow_Speed_Memory = Get_Down_Conversion_Speed_Old();
+	else
+		*p_OP_ShowNow_Speed_Memory = *p_OP_ShowNow_Speed;
 	*p_OP_ShowNow_Time_Memory = *p_OP_ShowNow_Time;
 	
 	// π ’œ ≤Àµ•

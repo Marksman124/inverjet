@@ -51,8 +51,11 @@ typedef struct IO_Hardware_Info
 #define DEBUG_IO_01_ON()			HAL_GPIO_WritePin(Debug_IO_01_GPIO_Port, Debug_IO_01_Pin, GPIO_PIN_RESET)
 #define DEBUG_IO_01_OFF()			HAL_GPIO_WritePin(Debug_IO_01_GPIO_Port, Debug_IO_01_Pin, GPIO_PIN_SET)
 
-#define DEBUG_IO_02_ON()			HAL_GPIO_WritePin(Debug_IO_02_GPIO_Port, Debug_IO_02_Pin, GPIO_PIN_RESET)
-#define DEBUG_IO_02_OFF()			HAL_GPIO_WritePin(Debug_IO_02_GPIO_Port, Debug_IO_02_Pin, GPIO_PIN_SET)
+//#define DEBUG_IO_02_ON()			HAL_GPIO_WritePin(Debug_IO_02_GPIO_Port, Debug_IO_02_Pin, GPIO_PIN_RESET)
+//#define DEBUG_IO_02_OFF()			HAL_GPIO_WritePin(Debug_IO_02_GPIO_Port, Debug_IO_02_Pin, GPIO_PIN_SET)
+
+#define DEBUG_IO_02_ON()			HAL_GPIO_WritePin(DI_Key_Down_GPIO_Port, DI_Key_Down_Pin, GPIO_PIN_RESET)
+#define DEBUG_IO_02_OFF()			HAL_GPIO_WritePin(DI_Key_Down_GPIO_Port, DI_Key_Down_Pin, GPIO_PIN_SET)
 
 //#define FAN_SWITCH_ON()				HAL_GPIO_WritePin(Fan_Switch_GPIO_Port, Fan_Switch_Pin, GPIO_PIN_RESET)
 //#define FAN_SWITCH_OFF()			HAL_GPIO_WritePin(Fan_Switch_GPIO_Port, Fan_Switch_Pin, GPIO_PIN_SET)

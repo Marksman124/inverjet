@@ -247,7 +247,7 @@ void WIFI_Update_State_Upload(void)
 			}
 		}
 		
-		if(Upload_Second_Cnt < 99)
+		if(Upload_Second_Cnt < 0x7F)
 			Upload_Second_Cnt ++;
 		else
 			Upload_Second_Cnt = 0;
@@ -327,6 +327,8 @@ void WIFI_Get_Work_State(void)
 void wifi_Module_Init(void)
 {
 	wifi_protocol_init();
+	
+	all_data_update();		// wifi 上传
 }
 
 // 按键主循环任务
@@ -357,6 +359,8 @@ void Wifi_Module_Handler(void)
 			DEBUG_PRINT("wifi模组故障: 信号强度 %d dBm   ( 合格: %d dBm)\n",*p_WIFI_Rssi, WIFI_RSSI_ERROR_VAULE);
 			Set_Motor_Fault_State(E301_WIFI_HARDWARE);
 		}
+		else
+			ReSet_Motor_Fault_State(E301_WIFI_HARDWARE);
 	}
 	
 	if(System_is_OTA() == 0)
@@ -397,13 +401,13 @@ void Wifi_DP_Data_Update(uint16_t id)
 			mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,				*p_Motor_Current);
 			break;
 		case DPID_MOTOR_REALITY_SPEED:// 实际转速
-			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/5);
+			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/MOTOR_POLE_NUMBER);
 			break;
 		case DPID_MOTOR_BUS_VOLTAGE:// 输入电压（母线）
 			mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,				*p_Motor_Bus_Voltage);
 			break;
 		case DPID_SEND_REALITY_SPEED:// 下发转速
-			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/5);
+			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/MOTOR_POLE_NUMBER);
 			break;
 		case DPID_MOTOR_POWER:// 当前功率
 			mcu_dp_value_update(DPID_MOTOR_POWER,							*p_Motor_Reality_Power);

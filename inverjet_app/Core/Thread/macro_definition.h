@@ -37,21 +37,19 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.1"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.5"
 
 /**
 ******************************************************************************
 * 系统宏定义
 ******************************************************************************
 */
-
-#define SYSTEM_DEBUG_MODE								1	// 调试模式
+//#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令	
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
-#define BT_ONLINE_CONNECT_MODE					1	// 蓝牙联网模式
 //#define SYSTEM_SHOW_MODEL_MACHINE				1	// 展示样机  (不报故障)
-
+//#define SYSTEM_DRIVER_BOARD_TOOL				1	// 驱动板工装 ||  厂内模式
 //***************************************************************************
 
 //******************  驱动板 型号选择 ****************************************
@@ -100,7 +98,7 @@ extern "C" {
 //******************  调试模式 **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
-#define LIGHT_BRIGHTNESS_MAX					(500)		// 最大亮度  0~500
+#define LIGHT_BRIGHTNESS_MAX					(50)		// 最大亮度  0~500
 #else
 #define LIGHT_BRIGHTNESS_MIX					(0)			// 最低亮度  
 #define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// 最大亮度  0~500
@@ -218,7 +216,7 @@ extern "C" {
 #endif
 
 //-------------- 降频 去抖时间 -------------------
-#define MOTOR_DOWN_CONVERSION_TIMER									(10-1)			
+#define MOTOR_DOWN_CONVERSION_TIMER									(10-1)
 //-------------- 降速检查时间 -------------------
 #define TIME_SLOW_DOWN_TIME													(120)		//2 min  120*2 个周期,与线程周期相关
 //-------------- 降速 档位 -------------------
@@ -260,6 +258,9 @@ extern "C" {
 
 #define MOTOR_THREAD_LIFECYCLE						(20)				// 任务生命周期 50ms
 
+//-------------- 1秒周期数 -------------------
+#define MOTOR_THREAD_ONE_SECOND			(1000/MOTOR_THREAD_LIFECYCLE)
+
 // 命令 周期 200ms 
 #define MOTOR_POLLING_PERIOD							(200/MOTOR_THREAD_LIFECYCLE)
 
@@ -274,8 +275,7 @@ extern "C" {
 // 驱动状态检验   电机电流 报警时间  ------------------
 //#define MOTOR_CANNOT_START_TIME						(5000 / MOTOR_POLLING_PERIOD / MOTOR_THREAD_LIFECYCLE)		// wuqingguang
 // 驱动状态检验   电机转速 报警时间  ------------------
-//#define MOTOR_SPEED_ERROR_TIME						(5000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)			// wuqingguang
-
+//#define MOTOR_SPEED_ERROR_TIME						(10000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)			// wuqingguang
 
 //*****************************************************************************
 //电机极数
@@ -307,7 +307,7 @@ extern "C" {
 #endif
 #ifdef MOTOR_SPEED_ERROR_TIME
 //电机转速误差范围
-#define	MOTOR_SPEED_VIBRATION_RANGE					(100*MOTOR_POLE_NUMBER)				//乘以电机极数
+#define	MOTOR_SPEED_VIBRATION_RANGE					(10)				//百分比
 #endif
 
 //电机加速度
@@ -315,6 +315,7 @@ extern "C" {
 
 //电机 最低实际启动速度 (百分比)
 #define	MOTOR_ACTUAL_SPEED_MIN										(20)
+
 //*********************************************************************************************
 //-------------------------------------------------------------------------------------------------
 
@@ -339,12 +340,20 @@ extern "C" {
 //*********************************************************************************************
 
 //-------------------------------------------------------------------------------------------------
+#ifdef SYSTEM_DRIVER_BOARD_TOOL
+
+//通讯故障 报警时间
+#define FAULT_MOTOR_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 秒
+
+#else
 
 //通讯故障 报警时间
 #define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 秒  wuqingguang   30000
-//通讯故障 尝试重启 时间
-#define FAULT_MOTOR_TRY_RESTAR_TIME				(6000/(MOTOR_THREAD_LIFECYCLE))								// 6秒
 
+#endif
+
+//通讯故障 尝试重启 时间
+#define FAULT_MOTOR_TRY_RESTAR_TIME				(6000/(MOTOR_THREAD_LIFECYCLE))				// 6秒
 /*------------------- IO define ----------------------------------------------*/
 #define	MOTOR_MODULE_HUART				DRIVER_USART		//
 

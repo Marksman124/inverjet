@@ -208,7 +208,7 @@ float Get_External_Temp(void)
 
 		if((adc <= FAULT_NTC_ADC_MIX) || (adc >= FAULT_NTC_ADC_MAX))
 		{
-			if(Temperature_Fault_Cnt ++ > 10)
+			if(Temperature_Fault_Cnt ++ > 3)
 			{
 				return -100;
 			}
@@ -218,7 +218,9 @@ float Get_External_Temp(void)
 			Temperature_Fault_Cnt = 0;
 		}
 		Temperature = Get_Tempture(adc);
-	
+	if(IS_SELF_TEST_MODE())
+		return -100;
+	else
 	return Temperature;
 }
 	

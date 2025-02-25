@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dev.h"
+#include "down_conversion.h"
+
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -156,7 +158,6 @@ uint16_t* p_Wifi_DP_Upload_Level;					// wifi模块 dp点上报等级
 // 初始化 冲浪模式 参数
 void Surf_Mode_Info_Data_Init(void)
 {
-	
 	//================= 冲浪模式 全局 参数 ================================
 	// ----------------------------------------------------------------------------------------------
 	*p_Surf_Mode_Info_Acceleration	=	2;  			//	冲浪模式 -- 加速度
@@ -258,7 +259,6 @@ void App_Data_Init(void)
 // 恢复 初始化
 void App_Data_ReInit(void)
 {
-	
 	memset(p_Local_Address,0,REG_HOLDING_NREGS*2);
 	
 	*p_Local_Address 					= MODBUS_LOCAL_ADDRESS;
@@ -279,6 +279,9 @@ void App_Data_ReInit(void)
 
 	//================= 冲浪模式 全局 参数 ================================
 	Surf_Mode_Info_Data_Init();
+	//================= 电机 参数 ================================
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_DRIVE_MODE, MOTOR_DRIVE_MODE_POLES);	// 厂内模式
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_MODEL_CODE, MOTOR_MODEL_CODE_POLES);	// 电机型号
 	
 	memcpy(&p_OP_PMode[0][0], &OP_Init_PMode[0][0], sizeof(OP_Init_PMode[0]));
 	memcpy(&p_OP_PMode[1][0], &OP_Init_PMode[1][0], sizeof(OP_Init_PMode[1]));
@@ -286,6 +289,11 @@ void App_Data_ReInit(void)
 	memcpy(&p_OP_PMode[3][0], &OP_Init_PMode[3][0], sizeof(OP_Init_PMode[3]));
 	memcpy(&p_OP_PMode[4][0], &OP_Init_PMode[4][0], sizeof(OP_Init_PMode[4]));
 	
+	uint8_t buffer[46]={0x02,0x29,0x90,0x00,0x00,0x93,0x44,0x00,0x00,0x00,0x86,0x00,0x00,0x25,0xF6,0x00,0x00,0x16,0x4E,0x00,0x00,
+		0x05,0x44,0x00,0x00,0x0E,0xBE,0x01,0xD3,0xFC,0xB0,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x64,0x00,0x00,0x00,0xC8,0x14,0x53,0x03};
+		
+	memcpy((uint8_t*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_TEST_CMD_BUFFER), buffer, 46);
+		
 	//存储  存一个 还是 扇区存
 	Write_MbBuffer_Now();
 }
@@ -525,6 +533,15 @@ void Data_Set_Current_Speed(uint8_t speed)
 		return;
 	
 	*p_OP_ShowNow_Speed = speed;	
+	
+	if(Get_Temp_Slow_Down_State())
+	{
+		if(speed > Get_Down_Conversion_Speed_Now())
+		{
+			*p_OP_ShowNow_Speed = Get_Down_Conversion_Speed_Now();
+		}
+	}
+	
 	Motor_Speed_Target_Set(speed);
 }
 

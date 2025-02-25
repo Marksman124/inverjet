@@ -68,9 +68,13 @@ typedef enum
 #define TIME_LEGAL_MIN						20
 #define TIME_LEGAL_MAX						MOTOR_TIME_SHOW_MAX
 
+//------------------- 电机参数 ----------------------------
 #define	MOTOR_RPM_NUMBER_OF_POLES								5		//电机级数 默认值
 #define	MOTOR_RPM_MIX_OF_POLES									1		//电机级数 合法最小值
 #define	MOTOR_RPM_MAX_OF_POLES									8		//电机级数 合法最大值
+
+#define	MOTOR_DRIVE_MODE_POLES								0x01	//厂内模式 默认值
+#define	MOTOR_MODEL_CODE_POLES								0xB1	//电机型号 默认值
 
 //------------------- 屏蔽控制 ----------------------------
 #define	BLOCK_BLUETOOTH_CONTROL									1		// 屏蔽 蓝牙 控制

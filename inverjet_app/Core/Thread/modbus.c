@@ -108,7 +108,7 @@ HoldingCallOut( USHORT usAddress )
 			if(IS_SELF_TEST_MODE() == 0)
 			{
 				IN_CHECK_ERROR_MODE();
-				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
+				usRegHoldingBuf[MB_SYSTEM_SELF_TEST_STATE] = 0;
 				//Write_MbBuffer_Now();
 			}
 		}
@@ -184,13 +184,19 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
 									usRegHoldingBuf[iRegIndex] = *pucRegBuffer++ << 8;
 									usRegHoldingBuf[iRegIndex] |= *pucRegBuffer++;
 								}
+								
+								if(Check_Need_CallOut(iRegIndex))
+								{
+									HoldingCallOut(iRegIndex);
+								}
+								
 								iRegIndex++;
 								usNRegs--;
 							}
-							if(Check_Need_CallOut(usAddress))
-							{
-								HoldingCallOut(usAddress);
-							}
+//							if(Check_Need_CallOut(usAddress))
+//							{
+//								HoldingCallOut(usAddress);
+//							}
 							//±£´æ
 							Write_MbBuffer_Later();
 						}

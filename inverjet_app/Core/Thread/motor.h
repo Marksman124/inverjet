@@ -92,7 +92,7 @@ extern "C" {
 
 
 //驱动板故障 标志位
-#define MOTOR_FAULT_SIGN_BIT						(E102_TEMPERATURE_AMBIENT | E301_WIFI_HARDWARE | E302_BT_HARDWARE | E303_RS485_HARDWARE | E304_KEY_HARDWARE)
+#define MOTOR_FAULT_SIGN_BIT						(E102_TEMPERATURE_AMBIENT | E301_WIFI_HARDWARE | E302_BT_HARDWARE | E303_RS485_HARDWARE)
 #define CLEAN_MOTOR_FAULT(n)						(n &= MOTOR_FAULT_SIGN_BIT)
 
 #define	MOTOR_PROTOCOL_HEADER_OFFSET						3
@@ -105,6 +105,7 @@ extern "C" {
 #define	MOTOR_ADDR_BUS_VOLTAGE_OFFSET						26
 
 #define	MOTOR_ADDR_MOTOR_FAULT_OFFSET						52
+#define	MOTOR_ADDR_MOTOR_MODE_OFFSET						53
 #define	MOTOR_ADDR_NTC1_TEMP_OFFSET							58
 #define	MOTOR_ADDR_NTC2_TEMP_OFFSET							60
 #define	MOTOR_ADDR_NTC3_TEMP_OFFSET							62
@@ -187,7 +188,7 @@ extern "C" {
 #define	MOTOR_ADDR_MOTOR_FAULT_OFFSET							9
 
 
-
+//=== 故障位 1
 #define MOTOR_FAULT_BUS_VOLTAGE_UNDER					0x1
 #define MOTOR_FAULT_BUS_CURRENT_OVER					0x2
 #define MOTOR_FAULT_SAMPLE_ERROR							0x4
@@ -196,6 +197,8 @@ extern "C" {
 #define MOTOR_FAULT_STARTUP_FAILED						0x20
 #define MOTOR_FAULT_TIME_OUT									0x40
 #define MOTOR_FAULT_CRC_ERROR									0x80
+
+//=== 故障位 2
 #define MOTOR_FAULT_OUTPUT_OVERCURRENT				0x100
 #define MOTOR_FAULT_LACK_PHASE								0x200
 
@@ -207,6 +210,8 @@ void Metering_Receive_Init(void);
 void Motor_Usart_Restar(void);
 // 清除故障
 void Clean_Motor_OffLine_Timer(void);
+//------------------- 1秒执行  ----------------------------
+void Motor_Function_In_One_Second(void);
 //------------------- 主循环函数  ----------------------------
 void App_Motor_Handler(void);
 	
@@ -231,15 +236,6 @@ extern void Drive_Status_Inspection_Motor_Speed(void);
 //-------------------- 驱动状态检验   电机电流 ----------------------------
 extern void Drive_Status_Inspection_Motor_Current(void);
 
-//-------------------- 高温降速  mos ----------------------------
-extern void Check_Down_Conversion_MOS_Temperature(short int Temperature);
-//-------------------- 功率降频   ----------------------------
-extern void Check_Down_Conversion_Motor_Power(uint16_t power);
-//-------------------- 电流降频   ----------------------------
-extern void Check_Down_Conversion_Motor_Current(uint32_t Current);
-//-------------------- 降频 状态恢复   ----------------------------
-extern void Down_Conversion_Cnt_Clea(void);
-
 //-------------------- 获取电机故障状态 ----------------------------
 uint16_t Get_Motor_Fault_State(void);
 
@@ -260,6 +256,8 @@ extern void Motor_Speed_Send(uint32_t speed_rpm);
 extern void Motor_Heartbeat_Send(void);
 //-------------------- 读寄存器 ----------------------------
 extern void Motor_Read_Register(void);
+//-------------------- 下发测试模式 ----------------------------
+extern void Motor_GetIn_TestMode(void);
 
 /*-------------------- 收发处理 ----------------------------------------------*/
 void Motor_State_Analysis(void);

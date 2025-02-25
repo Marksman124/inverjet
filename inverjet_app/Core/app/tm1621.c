@@ -441,7 +441,7 @@ void TM1621_Buzzer_Off(void)
 {
 	Buzzer_IO_PwmOut(0);
 	//TM1621_Write_CMD(TONEOFF);
-	DEBUG_IO_02_OFF();
+	//DEBUG_IO_02_OFF();
 }
 /*
 ******************************************************************************
@@ -454,7 +454,7 @@ void TM1621_Buzzer_On(void)
 {	
 	Buzzer_IO_PwmOut(BUZZER_FREQUENCY);
 	//TM1621_Write_CMD(TONEON);
-	DEBUG_IO_02_ON();
+	//DEBUG_IO_02_ON();
 }
 
 void TM1621_Buzzer_Delay(uint16_t ms)

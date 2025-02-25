@@ -21,6 +21,7 @@
 
 #include "wifi.h"
 #include "iap.h"
+#include "usart.h"
 
 extern const DOWNLOAD_CMD_S download_cmd[];
 
@@ -116,8 +117,7 @@ void wifi_uart_write_frame(unsigned char fr_type, unsigned char fr_ver, unsigned
     len += PROTOCOL_HEAD;
     check_sum = get_check_sum((unsigned char *)wifi_uart_tx_buf, len - 1);
     wifi_uart_tx_buf[len - 1] = check_sum;
-    
-    wifi_uart_write_data((unsigned char *)wifi_uart_tx_buf, len);
+		wifi_uart_write_data((unsigned char *)wifi_uart_tx_buf, len);
 }
 
 /**

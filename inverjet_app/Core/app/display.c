@@ -348,11 +348,25 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 // 机型码 & 拨码
 void Lcd_System_Information(void)
 {
+	//uint16_t Dial_Switch_Test = 0;
+	
 	//背光
 	TM1621_BLACK_ON();
 	
 	//	拨码开关
 	System_Dial_Switch = Gpio_Get_Dial_Switch();
+//	Dial_Switch_Test = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH);
+//	if(System_Dial_Switch == 0)
+//	{
+//		Dial_Switch_Test |= 1;
+//		Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH, Dial_Switch_Test);
+//	}
+//	else if(System_Dial_Switch == 0xF)
+//	{
+//		Dial_Switch_Test |= 0x08;
+//		Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH, Dial_Switch_Test);
+//	}
+	
 	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH,  GET_NUMBER_TEN_DIGIT(System_Dial_Switch));
 	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  GET_NUMBER_ONE_DIGIT(System_Dial_Switch));
 	

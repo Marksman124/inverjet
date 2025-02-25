@@ -100,11 +100,6 @@ extern void LCD_Refresh_Restore(void);
 // 定时任务主线程
 extern void App_Timing_Handler(void);
 
-//-------------------- 设置高温降速模式 0:关   1开 ----------------------------
-void Set_Temp_Slow_Down_State(uint8_t vaule);
-//-------------------- 获取高温降速模式 ----------------------------
-uint8_t Get_Temp_Slow_Down_State(void);
-
 // 清除 故障 状态基
 void Timing_Clean_Fault_State(void);
 // 退出 故障 状态
@@ -120,10 +115,9 @@ uint8_t If_Fault_Recovery_Max(void);
 void Clean_Automatic_Shutdown_Timer(void);
 //-------------------- 清除 更改速度计时器 ----------------------------
 void Clean_Change_Speed_Timer(void);
-//-------------------- 降频 状态恢复   ----------------------------
-void Down_Conversion_State_Clean(void);
-//-------------------- 降频 状态更新   ----------------------------
-void Down_Conversion_State_Update(void);
+
+//-------------------- 清除 降频刷新计时器 ----------------------------
+void Clean_Temp_Slow_Down_Timer(void);
 
 /* Private defines -----------------------------------------------------------*/
 

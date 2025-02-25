@@ -68,6 +68,8 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_MOTOR_POLE_NUMBER  							( 0x04 )	//	电机磁极数
 #define MB_MOTOR_SPEED_MODE  								( 0x05 )	//	转速 方式
 #define MB_MOTOR_BREATH_LIGHT_MAX  					( 0x06 )	//	光圈亮度
+#define MB_MOTOR_DRIVE_MODE        					( 0x07 )	//	驱动板模式
+#define MB_MOTOR_MODEL_CODE        					( 0x08 )	//	电机型号
 // ----------------------------------------------------------------------------------------------
 //====================== 冲浪模式 全局 参数 ======================================================
 #define MB_SURF_MODE_INFO_ACCELERATION  			( 0x10 )	//	冲浪模式 -- 加速度
@@ -90,14 +92,14 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 // ----------------------------------------------------------------------------------------------
 #define MB_ANALOG_KEY_VALUE        					( 0x40 )	//	虚拟按键 (一次有效)
 // ----------------------------------------------------------------------------------------------
-#define MB_BT_ONLINE_MODE        						( 0x50 )	//	蓝牙 联机模式 0 主  1 从
-#define MB_BT_SERVER_MAC        						( 0x51 )	//	蓝牙 关联主机 MAC
+
 // ----------------------------------------------------------------------------------------------
 #define MB_SYSTEM_SELF_TEST_STATE        		( 0x60 )	//	
 #define MB_COMM_TEST_BLUETOOTH        			( 0x61 )	//	BT 		写入测试 (测试使用)
 #define MB_COMM_TEST_RS485        					( 0x62 )	//	RS485 写入测试 (测试使用)
 #define MB_COMM_TEST_WIFI        						( 0x63 )	//	WIFI 		写入测试 (测试使用)
 #define MB_COMM_TEST_KEY        						( 0x64 )	//	按键 		写入测试 (测试使用)
+//#define MB_COMM_TEST_DIAL_SWITCH        		( 0x65 )	//	拨码 		写入测试 (测试使用)
 // ----------------------------------------------------------------------------------------------
 #define MB_DEBUG_OTA_PAGE_SIZE		      		( 0x70 )	//	下载ota包大小
 #define MB_DEBUG_OTA_FAIL_PROGRESS		      ( 0x72 )	//	记录ota失败原因   MB_DEBUG_OTA_FAIL_PROGRESS
@@ -161,7 +163,10 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_USER_TRAIN_MODE_TIME_P7_2        		( 0x35B )	//								时间
 //		.......  50
 #define MB_USER_TRAIN_MODE_SPEED_P7_50		      ( 0x3BA )	//	用户 训练模式 	转速
-#define MB_USER_TRAIN_MODE_TIME_P7_50        		( 0x3BB )	//			
+#define MB_USER_TRAIN_MODE_TIME_P7_50        		( 0x3BB )	//
+
+#define MB_MOTOR_TEST_CMD_BUFFER		      			( 0x3E8 )	//	测试模式 下发数据
+#define MB_MOTOR_TEST_CMD_BUFFER_END        		( 0x3FF )	//
 // ----------------------------------------------------------------------------------------------
 #define MB_USER_TRAIN_MODE_SPEED_P8_1		        ( 0x3BC )	//	用户 训练模式 	转速
 #define MB_USER_TRAIN_MODE_TIME_P8_1        		( 0x3BD )	//								时间

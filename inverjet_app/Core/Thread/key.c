@@ -17,6 +17,8 @@
 #include "display.h"
 #include "debug_protocol.h"
 #include "wifi.h"
+#include "down_conversion.h"
+
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -28,7 +30,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 
-#define KEY_IO_NUMBER_MAX			7
+#define KEY_IO_NUMBER_MAX			7		//wuqingguang
 
 //------------------- led & 引脚 ----------------------------
 #define LED_SPEED_IO_PORT			GPIOC
@@ -45,7 +47,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-// 按键对应 引脚
+// 按键对应 引脚    //wuqingguang
 IO_Hardware_Pin Key_Gpio_Pin_Array[KEY_IO_NUMBER_MAX] = {
 	{ Key_Speed_GPIO_Port, 	Key_Speed_Pin }, 
 	{ Key_Time_GPIO_Port, 	Key_Time_Pin }, 
@@ -133,11 +135,21 @@ void on_pushButton_clicked(void)
 		
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
-		if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
-			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+		if(Get_Temp_Slow_Down_State())
+		{
+			//Clean_Temp_Slow_Down_Timer();
+			if(*p_OP_ShowNow_Speed >= Get_Down_Conversion_Speed_Now())
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+			else
+				*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
+		}
 		else
-			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
-		
+		{
+			if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+			else
+				*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
+		}
 		if(Motor_is_Start())
 		{
 			Special_Status_Add(SPECIAL_BIT_SPEED_CHANGE);
@@ -151,13 +163,24 @@ void on_pushButton_clicked(void)
 	}
 	else
 	{
-		if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
-			*p_OP_ShowNow_Speed += (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
+		if(Get_Temp_Slow_Down_State())
+		{
+			//Clean_Temp_Slow_Down_Timer();
+			if((*p_OP_ShowNow_Speed + KEY_SPEED_INCREASE_20_GEAR) >= Get_Down_Conversion_Speed_Now())
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+			else
+				*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
+		}
 		else
-			*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
-		
-		if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
-			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+		{
+			if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
+				*p_OP_ShowNow_Speed += (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
+			else
+				*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
+			
+			if(*p_OP_ShowNow_Speed > MOTOR_PERCENT_SPEED_MAX)
+				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
+		}
 		if(Motor_is_Start())
 		{
 			Special_Status_Add(SPECIAL_BIT_SPEED_CHANGE);
@@ -484,7 +507,6 @@ void on_pushButton_2_4_Long_Press(void)
 void App_Key_Init(void)
 {
 	Led_Button_On(0x0F);	// 按键
-	Buzzer_Click_Long_On(1);// 开机长响
 	
 //	System_Boot_Screens();
 //	System_Power_Off();
@@ -574,8 +596,8 @@ void Special_Button_Rules(uint8_t key_value)
 void App_Key_Task(void)
 {
 	//static uint8_t self_test_cnt=0;
-		
-	uint8_t i;	
+	uint8_t i;
+	uint8_t key_value_now = 0;
 	Key_Handler_Timer ++;
 	
 	if(System_PowerUp_Finish == 0)
@@ -586,16 +608,6 @@ void App_Key_Task(void)
 		{
 			TM1621_Set_light_Mode(1);
 		}
-		
-//		if(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_SELF_TEST_STATE) == 0xAA )
-//		{
-//			if(IS_SELF_TEST_MODE() == 0)
-//			{
-//				IN_CHECK_ERROR_MODE();
-//				Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SYSTEM_SELF_TEST_STATE, 0);
-//				Write_MbBuffer_Now();
-//			}
-//		}
 		
 		for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
 		{
@@ -625,9 +637,10 @@ void App_Key_Task(void)
 						p_Funtion_Long_Press[i]();
 				}
 			}
-			else if(Key_IO_Hardware == 0)
+			else
 			{
-				if(Key_IO_Old == Key_IO_Ordering_Value[i])//已经按下
+				key_value_now = (Key_IO_Old & ~Key_IO_Hardware);
+				if(key_value_now == Key_IO_Ordering_Value[i])//已经按下
 				{
 					if(Key_Long_Press_cnt[i] >= KEY_LONG_PRESS_TIME_2S)//
 					{
@@ -663,10 +676,6 @@ void App_Key_Task(void)
 				else
 					Key_Long_Press_cnt[i] = 0;
 			}
-			else
-			{
-				Key_Long_Press_cnt[i] = 0;
-			}
 		}
 		
 		Key_IO_Old = Key_IO_Hardware;
@@ -695,9 +704,7 @@ void App_Key_Handler(void)
 					Key_Long_Press_cnt[i] = KEY_LONG_PRESS_TIME_2S-1;
 				}
 			}
-			
 		}
-		
 		else
 		{
 			Key_IO_Hardware = *p_Analog_key_Value;
@@ -752,16 +759,8 @@ uint8_t Key_Get_IO_Input(void)
 	{
 		read_io = HAL_GPIO_ReadPin(Key_Gpio_Pin_Array[i].port, Key_Gpio_Pin_Array[i].pin);
 		
-		if(i < 4)
-		{
-			if(read_io == 0)
-				result |= (1<<i);
-		}
-		else
-		{
-			if(read_io == 1)
-				result |= (1<<i);
-		}
+		if(read_io == 0)
+			result |= (1<<i);
 	}
 	
 	return result;
@@ -799,7 +798,7 @@ void System_Power_Off(void)
 	//清除故障状态
 	Timing_Clean_Fault_State();
 	//清除降频状态
-	Down_Conversion_State_Clean();
+	Clean_All_Down_Conversion_Status();
 	//清除计数器
 	//Clean_Fault_Recovery_Cnt();
 	//to 关机模式
@@ -833,9 +832,13 @@ void System_Boot_Screens(void)
 	
 	osDelay(200);
 	//全亮 2s
+	//Buzzer_Click_Long_On(1);// 开机长响
 	Breath_light_Max();
+	TM1621_Buzzer_On();
 	TM1621_Show_All();
-	osDelay(2000);
+	osDelay(500);
+	TM1621_Buzzer_Off();
+	osDelay(1600);
 	//机型码 & 拨码状态 2s
 	Lcd_System_Information();
 	osDelay(2000);
