@@ -116,7 +116,7 @@ uint8_t If_System_Is_Error(void)
 	 float Temperature;
 	//uint8_t motor_fault=0;
 	uint16_t system_fault=0;
-	uint16_t vaule;
+	int16_t vaule;
 		
 	if(System_is_Operation())//≤Àµ•
 		return 0;
@@ -142,7 +142,8 @@ uint8_t If_System_Is_Error(void)
 	if(*p_Box_Temperature != vaule)
 	{
 		DEBUG_PRINT("ª˙œ‰Œ¬∂»£∫%0.3f °„C \n",Temperature);
-		memcpy(p_Box_Temperature, &vaule, 2);
+		//memcpy(p_Box_Temperature, &vaule, 2);
+		*p_Box_Temperature = vaule;
 	}
 	Check_Down_Conversion_BOX_Temperature((*p_Box_Temperature)/10);
 

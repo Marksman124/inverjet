@@ -248,7 +248,7 @@ extern uint16_t* p_Motor_Fault_Static;						// 故障状态		驱动板
 extern uint32_t* p_Motor_Reality_Speed;					// 电机 实际 转速
 extern uint32_t* p_Motor_Reality_Power;					// 电机 实际 功率
 
-extern uint16_t* p_Mos_Temperature;							// mos 温度
+extern int16_t* p_Mos_Temperature;							// mos 温度
 extern uint32_t* p_Motor_Current;								// 电机 电流		输出
 extern uint16_t* p_Motor_Bus_Voltage;						// 母线 电压		输入
 extern uint16_t* p_Motor_Bus_Current;						// 母线 电流  	输入
@@ -257,7 +257,7 @@ extern uint16_t* p_Motor_Bus_Current;						// 母线 电流  	输入
 //--------------------------- 整机信息
 //==========================================================
 extern uint16_t* p_System_Fault_Static;					// 故障状态		整机
-extern uint16_t* p_Box_Temperature;							// 电箱 温度
+extern int16_t* p_Box_Temperature;							// 电箱 温度
 extern uint32_t* p_Send_Reality_Speed;					// 下发 实际 转速
 
 

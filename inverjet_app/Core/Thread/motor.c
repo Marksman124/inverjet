@@ -624,8 +624,8 @@ void AQPED002_Motor_State_Analysis(void)
 	//
 	// 滤波后的mosfet温度
 	Temperature = Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_OFFSET+1];
-	memcpy(p_Mos_Temperature, &Temperature, 2);
-	
+	//memcpy(p_Mos_Temperature, &Temperature, 2);
+	*p_Mos_Temperature = Temperature;
 	// 滤波后的电机温度 改用 软件版本
 	Driver_Software_Version_Read = Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET+1];
 
@@ -735,7 +735,7 @@ void TEMP001_Motor_State_Analysis(void)
 {
 	//static uint32_t Rx_cnt= 0;
 	uint16_t result_fault=0;
-	uint16_t Temperature=0;
+	int16_t Temperature=0;
 	Motor_Rx_Timer_cnt = 0;
 	static uint16_t ntc_tmp[3]={0};
 
