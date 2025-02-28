@@ -44,7 +44,7 @@ extern "C" {
 * 系统宏定义
 ******************************************************************************
 */
-//#define SYSTEM_DEBUG_MODE								1	// 调试模式
+#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
 //#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令	
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
@@ -53,12 +53,12 @@ extern "C" {
 //***************************************************************************
 
 //******************  驱动板 型号选择 ****************************************
-#define MOTOR_DEVICE_HARDWARE_AQPED002					(1)			//	郭工 版
-#define MOTOR_DEVICE_HARDWARE_TEMP001						(2)			//	蓝工 版
+#define MOTOR_DEVICE_HARDWARE_AQPED002					(0)			//	郭工 版
+#define MOTOR_DEVICE_HARDWARE_TEMP001						(1)			//	蓝工 版
 
 //***************************************************************************
 
-#define MOTOR_DEVICE_PROTOCOL_VERSION						(MOTOR_DEVICE_HARDWARE_AQPED002)				// 驱动协议版本
+#define MOTOR_DEVICE_PROTOCOL_VERSION						Get_Motor_Device_Protocol_Version()				// 驱动协议版本
 
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
@@ -279,11 +279,8 @@ extern "C" {
 
 //*****************************************************************************
 //电机极数
-#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+
 #define	MOTOR_POLE_NUMBER									(5)
-#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
-#define	MOTOR_POLE_NUMBER									(1)
-#endif
 //*****************************************************************************
 
 //-------------------------------------------------------------------------------------------------

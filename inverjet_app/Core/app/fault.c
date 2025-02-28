@@ -159,12 +159,7 @@ uint8_t If_System_Is_Error(void)
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
-		// 硬件故障
-		if(Motor_Is_Hardware_Fault(system_fault))
-		{
-			Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
-		}
-		else if((Motor_Is_Software_Fault(system_fault)) &&(Motor_Is_Software_Fault(*p_System_Fault_Static) == 0))
+		if((system_fault >0) &&((*p_System_Fault_Static) == 0))
 		{
 			Add_Fault_Recovery_Cnt(1);  //普通故障
 		}
@@ -314,6 +309,17 @@ void To_Fault_Menu(void)
 // 故障界面 更新
 void Update_Fault_Menu(void)
 {
+	static uint8_t timer_cnt=0;
+	
+	if(++timer_cnt > 2)
+	{
+		timer_cnt = 0;
+		if(Fault_Number_Cnt < Fault_Number_Sum)
+			Fault_Number_Cnt ++;
+		else
+			Fault_Number_Cnt = 1;
+	}
+	
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
@@ -403,6 +409,7 @@ void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 	{
 			return ;
 	}
+
 	Fault_Number_Update();
 	//背光
 	TM1621_BLACK_ON();
@@ -502,9 +509,11 @@ static void on_Fault_Button_3_Long_Press(void)
 
 
 static void on_Fault_Button_4_Long_Press(void)
-{
-	if(If_Fault_Recovery_Max()==1)
-		return;
+{	
+//	if(If_Fault_Recovery_Max()==1)
+//	{
+//		return;
+//	}
 		//System_Power_Off();
 	CallOut_Fault_State();
 	System_Power_Off();

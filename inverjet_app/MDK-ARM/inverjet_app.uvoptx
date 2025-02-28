@@ -148,122 +148,105 @@
           <Name>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512 -FS08000000 -FL080000 -FP0($$Device:STM32F103RC$Flash\STM32F10x_512.FLM))</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>800</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134284554</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Core\Thread\motor.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\inverjet_app\../Core/Thread/motor.c\800</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>791</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134284516</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Core\Thread\motor.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\inverjet_app\../Core/Thread/motor.c\791</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Down_Conversion_Type</ItemText>
+          <ItemText>p_Motor_Fault_Static</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temperature_Mos_Old</ItemText>
+          <ItemText>result_fault</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temperature_Mos_Now</ItemText>
+          <ItemText>System_Fault_Timing_Cnt</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Down_Conversion_Rate</ItemText>
+          <ItemText>System_Fault_Recovery_Cnt</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>local_timer_cnt</ItemText>
+          <ItemText>Temperature_Mos_Now</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Current_Fault_To_Stop_Timer</ItemText>
+          <ItemText>Motor_Fault_State</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temperature_Fault_To_Stop_Timer</ItemText>
+          <ItemText>fault_bit</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_Speed_Old</ItemText>
+          <ItemText>Temperature_Fault_To_Stop_Timer</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Temp_Slow_Down_Speed_Now</ItemText>
+          <ItemText>Motor_Fault_Timer_cnt</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Current_Motor_Now</ItemText>
+          <ItemText>Motor_ReStart_Cnt</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_Motor_Current</ItemText>
+          <ItemText>result_fault</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Out_Current_Array_cnt</ItemText>
+          <ItemText>p_Motor_Fault_Static</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_OP_ShowNow_Speed</ItemText>
-        </Ww>
-        <Ww>
-          <count>13</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>p_OP_ShowNow_Speed_Memory</ItemText>
-        </Ww>
-        <Ww>
-          <count>14</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Down_Conversion_Time</ItemText>
-        </Ww>
-        <Ww>
-          <count>15</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Down_Conversion_Time</ItemText>
-        </Ww>
-        <Ww>
-          <count>16</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>local_timer_cnt</ItemText>
-        </Ww>
-        <Ww>
-          <count>17</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Mos_Temperature_Array</ItemText>
-        </Ww>
-        <Ww>
-          <count>18</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Temperature_Mos_Now</ItemText>
-        </Ww>
-        <Ww>
-          <count>19</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Mos_Temperature_Array_cnt</ItemText>
-        </Ww>
-        <Ww>
-          <count>20</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>p_OP_ShowNow_Speed</ItemText>
-        </Ww>
-        <Ww>
-          <count>21</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>usRegHoldingBuf</ItemText>
-        </Ww>
-        <Ww>
-          <count>22</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>usRegInputBuf</ItemText>
+          <ItemText>Motor_State_Storage</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

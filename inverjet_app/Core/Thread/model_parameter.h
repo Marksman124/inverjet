@@ -75,10 +75,10 @@ extern "C" {
 //*********************************************************************************************
 //-------------------------------------------------------------------------------------------------
 //-------------- 输出电流 报警值 70 A -------------------
-#define MOTOR_CURRENT_ALARM_VALUE									(70)		//
+#define MOTOR_CURRENT_ALARM_VALUE									(68)		//
 //-------------- 输出电流 降速 60 A -------------------
-#define MOTOR_CURRENT_REDUCE_SPEED								(60)		// 降档 电流
-#define MOTOR_CURRENT_RESTORE_SPEED								(55)		// 恢复 电流
+#define MOTOR_CURRENT_REDUCE_SPEED								(63)		// 降档 电流
+#define MOTOR_CURRENT_RESTORE_SPEED								(58)		// 恢复 电流
 //*********************************************************************************************
 
 
@@ -121,9 +121,9 @@ extern "C" {
 //====== < 700 >  < 1012 >   < 1324 >   < 1637 >   < 1950 > =============================== 1.1.7 以前
 //====== < 700 >  < 1000 >   < 1300 >   < 1600 >   < 1900 > =============================== 1.1.8
 //最大转速 100%
-#define	SJ230_MOTOR_RPM_SPEED_MAX								(1900*MOTOR_POLE_NUMBER)		// 9750
+#define	SJ230_MOTOR_RPM_SPEED_MAX								(1900)		// 9750
 //最低转速 100%
-#define	SJ230_MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)			// 3500
+#define	SJ230_MOTOR_RPM_SPEED_MIX								(700)			// 3500
 
 // 功率 降频
 //*********************************************************************************************
@@ -158,9 +158,9 @@ extern "C" {
 
 //====== < 700 >  < 950 >   < 1200 >   < 1450 >   < 1700 > =============================== 
 //最大转速 100%
-#define	SJ200_MOTOR_RPM_SPEED_MAX								(1700*MOTOR_POLE_NUMBER)
+#define	SJ200_MOTOR_RPM_SPEED_MAX								(1700)
 //最低转速 100%
-#define	SJ200_MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
+#define	SJ200_MOTOR_RPM_SPEED_MIX								(700)
 
 // 功率 降频
 //*********************************************************************************************
@@ -195,9 +195,9 @@ extern "C" {
 
 //====== < 700 >  < 892 >   < 1084 >   < 1277 >   < 1470 > =============================== 
 //最大转速 100%
-#define	SJ160_MOTOR_RPM_SPEED_MAX								(1470*MOTOR_POLE_NUMBER)
+#define	SJ160_MOTOR_RPM_SPEED_MAX								(1470)
 //最低转速 100%
-#define	SJ160_MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
+#define	SJ160_MOTOR_RPM_SPEED_MIX								(700)
 
 // 功率 降频
 //*********************************************************************************************
@@ -232,9 +232,9 @@ extern "C" {
 
 //====== < 700 >  < 820 >   < 940 >   < 1060 >   < 1180 > =============================== 
 //最大转速 100%
-#define	SJ100_MOTOR_RPM_SPEED_MAX								(1180*MOTOR_POLE_NUMBER)
+#define	SJ100_MOTOR_RPM_SPEED_MAX								(1180)
 //最低转速 100%
-#define	SJ100_MOTOR_RPM_SPEED_MIX								(700*MOTOR_POLE_NUMBER)
+#define	SJ100_MOTOR_RPM_SPEED_MIX								(700)
 
 // 功率 降频
 //*********************************************************************************************

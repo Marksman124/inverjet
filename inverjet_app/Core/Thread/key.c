@@ -780,7 +780,10 @@ void System_Power_On(void)
 		Write_MbBuffer_Now();
 	}
 	//	×´Ì¬
-	To_Free_Mode(FREE_MODE_AUTO_START);			// ui
+	if(If_Fault_Recovery_Max())
+		To_Fault_Menu();
+	else
+		To_Free_Mode(FREE_MODE_AUTO_START);			// ui
 	
 	Led_Button_On(0x0F);	// °´¼ü
 	

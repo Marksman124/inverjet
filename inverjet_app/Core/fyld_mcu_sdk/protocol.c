@@ -235,9 +235,9 @@ DEBUG_IO_02_OFF(); // 需要 1.4s
     mcu_dp_value_update(DPID_GET_BOX_TEMPERATURE,			*p_Box_Temperature); 						// 机箱温度
 		//osDelay(THREAD_PERIOD_WIFI_TASK);		// 退出
     mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,				*p_Motor_Current); 							// 输出电流（电机)
-    mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/MOTOR_POLE_NUMBER); 			// 实际转速;
+    mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed); 			// 实际转速;
     mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,				*p_Motor_Bus_Voltage); 					// 输入电压（母线）;
-    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/MOTOR_POLE_NUMBER); 			// 下发转速;
+    mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed); 			// 下发转速;
     mcu_dp_value_update(DPID_MOTOR_POWER,							*p_Motor_Reality_Power); 				// 当前功率;
 		//osDelay(THREAD_PERIOD_WIFI_TASK);		// 退出
     mcu_dp_value_update(DPID_MOTOR_BUS_CURRENTE,			*p_Motor_Bus_Current); 					// 输入电流（母线）;

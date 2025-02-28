@@ -53,11 +53,10 @@ uint32_t Dev_BaudRate_Get(uint8_t usart_num)
 	}
 	else if(usart_num == DRIVER_USART)	// 驱动板
 	{
-#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
-		return 115200;//115200
-#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
-		return 2400;
-#endif
+		if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
+			return 115200;//115200
+		else
+			return 2400;
 	}
 	else if(usart_num == BLUETOOTH_USART)	// 蓝牙
 	{
@@ -223,6 +222,13 @@ uint8_t Dev_Is_Control_Methods(uint16_t bit)
 	
 }
 
-
+// 获取驱动板型号
+uint8_t Get_Motor_Device_Protocol_Version(void)
+{
+	if(Gpio_Get_Dial_Switch()&0x08)
+		return 1;
+	else
+		return 0;
+}
 
 

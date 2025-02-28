@@ -555,7 +555,7 @@ MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 	{
 		System_Para_Set_Time(pObj->reg06Ptr[addr], CTRL_FROM_BT);
 	}
-	
+
 	pObj->txBuff[0] = pObj->rxBuff[0];
 	pObj->txBuff[1] = pObj->rxBuff[1];
 	pObj->txBuff[2] = pObj->rxBuff[2];

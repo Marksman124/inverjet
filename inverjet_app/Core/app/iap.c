@@ -59,7 +59,6 @@ void iap_load_app(uint32_t appxaddr)
 }		 
 
 
-//Œ¥—È÷§
 uint8_t Check_Pack_CRC(void)
 {
 	uint32_t len_sum=0;

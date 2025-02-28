@@ -39,10 +39,14 @@ uint32_t Product_Model_Ccode[MODEL_DIAL_SWITCH_NUMBER] =
 //------------------- 获取机型码 ----------------------------
 uint32_t Get_Model_Code_Num(void)
 {
+	uint8_t dial_bit=0;
+	
 	System_Dial_Switch = Gpio_Get_Dial_Switch();
 	
-	if(System_Dial_Switch < MODEL_DIAL_SWITCH_NUMBER)
-		return Product_Model_Ccode[System_Dial_Switch];
+	dial_bit = System_Dial_Switch & (MODEL_DIAL_SWITCH_NUMBER-1);
+	
+	if(dial_bit < MODEL_DIAL_SWITCH_NUMBER)
+		return Product_Model_Ccode[dial_bit];
 	else
 		return PRODUCT_MODEL_CODE_SJ230;
 }

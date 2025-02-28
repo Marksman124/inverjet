@@ -401,13 +401,13 @@ void Wifi_DP_Data_Update(uint16_t id)
 			mcu_dp_value_update(DPID_GET_MOTOR_CURRENT,				*p_Motor_Current);
 			break;
 		case DPID_MOTOR_REALITY_SPEED:// 实际转速
-			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed/MOTOR_POLE_NUMBER);
+			mcu_dp_value_update(DPID_MOTOR_REALITY_SPEED,			*p_Motor_Reality_Speed);
 			break;
 		case DPID_MOTOR_BUS_VOLTAGE:// 输入电压（母线）
 			mcu_dp_value_update(DPID_MOTOR_BUS_VOLTAGE,				*p_Motor_Bus_Voltage);
 			break;
 		case DPID_SEND_REALITY_SPEED:// 下发转速
-			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed/MOTOR_POLE_NUMBER);
+			mcu_dp_value_update(DPID_SEND_REALITY_SPEED,			*p_Send_Reality_Speed);
 			break;
 		case DPID_MOTOR_POWER:// 当前功率
 			mcu_dp_value_update(DPID_MOTOR_POWER,							*p_Motor_Reality_Power);

@@ -49,7 +49,8 @@ extern void Disable_Usart_Receiver(uint8_t no);
 extern void Dev_Check_Control_Methods( void );
 // 检查是否屏蔽 1:屏蔽 0:正常
 extern uint8_t Dev_Is_Control_Methods(uint16_t bit);
-
+// 获取驱动板型号
+extern uint8_t Get_Motor_Device_Protocol_Version(void);
 
 #ifdef __cplusplus
 }

@@ -326,6 +326,9 @@ void BT_State_Handler(void)
 // 清除 故障 状态基
 void Timing_Clean_Fault_State(void)
 {
+	if(If_Fault_Recovery_Max())
+		return;
+	
 	Clean_Fault_State();
 	System_Fault_Timing_Cnt = 0;
 	//System_Wifi_State_Clean();
@@ -362,7 +365,7 @@ void Fault_State_Handler(void)
 			//超时 故障 恢复
 			if( (Timing_Half_Second_Cnt - System_Fault_Timing_Cnt) > SYSTEM_FAULT_TIME_CALLOUT)
 			{
-				if(IS_SELF_TEST_MODE() == 0)
+				if((IS_SELF_TEST_MODE() == 0)&&( *p_Motor_Fault_Static == 0))
 				{
 					CallOut_Fault_State();
 				}
@@ -660,7 +663,7 @@ void Initial_State_Handler(void)
 
 // 定时任务主线程
 void App_Timing_Task(void)
-{	
+{
 	static uint8_t half_second_state=0;
 	
 	Timing_Thread_Task_Cnt++;
@@ -725,6 +728,8 @@ void App_Timing_Task(void)
 		else
 		{
 			half_second_state = 1;
+			if(System_is_Power_Off())
+				return;
 			
 			//检查校时
 			Use_Wifi_Timing_Check();
