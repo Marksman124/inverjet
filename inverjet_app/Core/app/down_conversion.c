@@ -362,7 +362,7 @@ void Check_Fault_to_Stop(void)
 		if(Temperature_Fault_To_Stop_Timer >= DOWN_CONVERSION_RATE_LOW)	//2·ÖÖÓ
 		{
 			Temp_Slow_Down_Speed_Now = Motor_Speed_Target_Get();
-			if(Temp_Slow_Down_Speed_Now > 80)
+			if(Temp_Slow_Down_Speed_Now >= 80)
 			{
 				Down_Conversion_Set_Speed(Temp_Slow_Down_Speed_Now/2);
 				Temperature_Fault_To_Stop_Timer = 0;

@@ -90,7 +90,9 @@ void (*p_Fault_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Fault_Button_2_3_Long_Press, on_Fault_Button_2_4_Long_Press,
 };
 
+static uint8_t E102_Fault_Timer_Cnt=0;
 
+static uint8_t Automatic_Polling_Timer_Cnt=0;
 /* Private user code ---------------------------------------------------------*/
 
 
@@ -111,7 +113,7 @@ uint8_t Fault_Check_Status_Legal(uint16_t parameter)
 // 检测故障
 uint8_t If_System_Is_Error(void)
 {
-	static uint8_t fault_timer_cnt=0;
+	
 	
 	 float Temperature;
 	//uint8_t motor_fault=0;
@@ -121,24 +123,12 @@ uint8_t If_System_Is_Error(void)
 	if(System_is_Operation())//菜单
 		return 0;
 			
-	//电机故障  含驱动板通讯故障
-	system_fault = Get_Motor_Fault_State();
 	//添加本地故障  新增功能 
 
 	// 检查本地故障
-#ifdef UART_DEBUG_SEND_CTRL
-	if( Chassis_Temperature_Debug > 0)
-	{
-		Temperature = (float)Chassis_Temperature_Debug;
-	}
-	else
-	{
-		Temperature = Get_External_Temp();
-	}
-#else
 	Temperature = Get_External_Temp();
 	vaule = Temperature * 10;
-#endif
+
 	if(*p_Box_Temperature != vaule)
 	{
 		DEBUG_PRINT("机箱温度：%0.3f °C \n",Temperature);
@@ -149,14 +139,17 @@ uint8_t If_System_Is_Error(void)
 
 	if(Temperature == -100)
 	{
-		if(fault_timer_cnt++ > 100)
+		if(E102_Fault_Timer_Cnt++ > 10)
 			Set_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
 	}
 	else
 	{
 		ReSet_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
-		fault_timer_cnt = 0;
+		E102_Fault_Timer_Cnt = 0;
 	}
+	
+	//电机故障  含驱动板通讯故障
+	system_fault = Get_Motor_Fault_State();
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
@@ -201,7 +194,7 @@ void Clean_Comm_Test(void)
 {
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_RS485, 0);
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY, 0);
-	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH, 0);
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH, 0);
 	
 	System_Wifi_State_Clean();
 	System_BT_State_Clean();
@@ -309,12 +302,10 @@ void To_Fault_Menu(void)
 }
 // 故障界面 更新
 void Update_Fault_Menu(void)
-{
-	static uint8_t timer_cnt=0;
-	
-	if(++timer_cnt > 2)
+{	
+	if(++Automatic_Polling_Timer_Cnt > 2)
 	{
-		timer_cnt = 0;
+		Automatic_Polling_Timer_Cnt = 0;
 		if(Fault_Number_Cnt < Fault_Number_Sum)
 			Fault_Number_Cnt ++;
 		else
@@ -331,6 +322,7 @@ void Clean_Fault_State(void)
 	*p_System_Fault_Static = 0;
 	Fault_Number_Sum = 0;
 	Fault_Number_Cnt = 0;
+	E102_Fault_Timer_Cnt = 0;
 	
 	Set_System_State_Machine(*p_System_State_Machine_Memory);
 	Set_System_State_Mode(*p_PMode_Now_Memory);
@@ -441,7 +433,7 @@ static void on_Fault_Button_1_clicked(void)
 		Fault_Number_Cnt ++;
 	else
 		Fault_Number_Cnt = 1;
-	
+	Automatic_Polling_Timer_Cnt = 0;
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
@@ -452,7 +444,7 @@ static void on_Fault_Button_2_clicked(void)
 		Fault_Number_Cnt --;
 	else
 		Fault_Number_Cnt = Fault_Number_Sum;
-	
+	Automatic_Polling_Timer_Cnt = 0;
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 

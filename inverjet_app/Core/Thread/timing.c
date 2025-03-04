@@ -816,7 +816,7 @@ void App_Timing_Handler(void)
 			System_Self_Checking_Porgram();
 		else
 			System_Self_Testing_Porgram();
-		while(Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x7F) //|| (Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH) != 0x09))
+		while((Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x7F) || (Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH) != 0x09))
 		{
 			Lcd_System_Information();//»úÐÍÂë & ²¦Âë×´Ì¬ 6s
 			If_System_Is_Error();

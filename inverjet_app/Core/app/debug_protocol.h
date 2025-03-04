@@ -29,10 +29,6 @@ extern uint8_t debug_buffer[DEBUG_PROTOCOL_TX_MAX];
 
 extern uint8_t Debug_Read_Buffer[DEBUG_PROTOCOL_RX_MAX];
 
-#ifdef UART_DEBUG_SEND_CTRL
-extern uint8_t Chassis_Temperature_Debug;
-#endif
-	
 extern uint32_t Print_Flag_Position;
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -40,8 +36,6 @@ extern uint32_t Print_Flag_Position;
 void Add_Ctrl_Log(void);
 
 void UART_Send_Debug(uint8_t * p_buff, uint8_t len);
-
-void To_Debug_Protocol_Analysis(uint8_t len);
 
 void Debug_Protocol_Init(void);
 // ÷ÿ∆Ù

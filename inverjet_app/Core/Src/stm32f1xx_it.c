@@ -329,27 +329,13 @@ void TIM5_IRQHandler(void)
 void UART4_IRQHandler(void)
 {
   /* USER CODE BEGIN UART4_IRQn 0 */
-#if MODBUS_USART == 4
-	if(__HAL_UART_GET_IT_SOURCE(&huart4, UART_IT_RXNE)!= RESET) 
-		{
-			prvvUARTRxISR();//接收中断
-		}
-
-	if(__HAL_UART_GET_IT_SOURCE(&huart4, UART_IT_TXE)!= RESET) 
-		{
-			prvvUARTTxReadyISR();//发送中断
-		}
-	
-  HAL_NVIC_ClearPendingIRQ(UART4_IRQn);
-#elif (DEBUG_USART == 4)
-#ifdef UART_DEBUG_SEND_CTRL
 	uint8_t temp=0;
 	if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_IDLE) != RESET))//如果是接收完成中断，idle标志被置位
 	{
 		__HAL_UART_CLEAR_IDLEFLAG(&huart4);//清除标志位
 		HAL_UART_DMAStop(&huart4); //  停止DMA传输，防止
 		temp  =  __HAL_DMA_GET_COUNTER(huart4.hdmarx);// 获取DMA中未传输的数据个数   
-		To_Debug_Protocol_Analysis(DEBUG_PROTOCOL_RX_MAX - temp);
+		//To_Debug_Protocol_Analysis(DEBUG_PROTOCOL_RX_MAX - temp);
 		
 		memset(Debug_Read_Buffer,0,DEBUG_PROTOCOL_RX_MAX);    				//清空缓存区
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart4, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // 接收完毕后重启
@@ -359,8 +345,7 @@ void UART4_IRQHandler(void)
   /* USER CODE END UART4_IRQn 0 */
   HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
-#endif
-#endif
+
   /* USER CODE END UART4_IRQn 1 */
 }
 

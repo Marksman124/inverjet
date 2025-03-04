@@ -588,7 +588,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		{
 			flag = 1;
 			*p_Analog_key_Value = USART3_RX_BUF[0];
-			//To_Debug_Protocol_Analysis(USART3_RX_BUF, USART3_RX_STA & 0x3fff);
 			memset(USART3_RX_BUF, 0, USART3_RX_STA & 0x3fff);
 			USART3_RX_STA = 0;
 		}

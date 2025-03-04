@@ -221,7 +221,7 @@ float Get_External_Temp(void)
 	if(IS_SELF_TEST_MODE())
 		return -100;
 	else
-	return Temperature;
+		return Temperature;
 }
 	
 //------------------- »ñÈ¡wifi×´Ì¬»ú ----------------------------

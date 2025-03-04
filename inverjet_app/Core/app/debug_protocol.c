@@ -23,9 +23,7 @@ UART_HandleTypeDef* p_huart_debug = &huart4;		 //调试串口 UART句柄
 UART_HandleTypeDef* p_huart_debug = &huart5;
 #endif
 
-#ifdef UART_DEBUG_SEND_CTRL
-uint8_t Chassis_Temperature_Debug=0;
-#endif
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -137,53 +135,16 @@ void UART_Send_Debug(uint8_t * p_buff, uint8_t len)
 }
 
 
-//
-void To_Debug_Protocol_Analysis(uint8_t len)
-{
-#ifdef UART_DEBUG_SEND_CTRL
-
-	//UART_Send_Debug(Debug_Read_Buffer, len);
-	
-	if(Debug_Read_Buffer[0] < MOTOR_PROTOCOL_ADDR_MAX)
-	{
-		Motor_State_Storage[Debug_Read_Buffer[0]] = Debug_Read_Buffer[1];
-		//*p_System_Fault_Static = Debug_Read_Buffer[1];
-		Motor_State_Analysis();
-	}
-	else if(Debug_Read_Buffer[0] == 0xF1)//机箱温度
-	{
-		Chassis_Temperature_Debug = Debug_Read_Buffer[1];
-	}
-//	else if(Debug_Read_Buffer[0] == 0xF2)//wifi
-//	{
-//		WIFI_Set_Machine_State(Debug_Read_Buffer[1]);
-//	}
-//	else if(Debug_Read_Buffer[0] == 0xF3)//蓝牙
-//	{
-//		BT_Set_Machine_State(Debug_Read_Buffer[1]);
-//	}
-//	else if(Debug_Read_Buffer[0] == 0xFF)//打印标志位 u32
-//	{
-//		Print_Flag_Position = Debug_Read_Buffer[1]<<24 | Debug_Read_Buffer[2]<<16 | Debug_Read_Buffer[3]<<8 | Debug_Read_Buffer[4];
-//	}
-	
-	return;
-#endif
-}
-
 
 // 初始化
 void Debug_Protocol_Init(void)
 {
-	
-#ifdef UART_DEBUG_SEND_CTRL
-
 	__HAL_UART_ENABLE_IT(p_huart_debug, UART_IT_IDLE);//使能idle中断
 	__HAL_UART_ENABLE_IT(p_huart_debug, UART_IT_ERR);//
 	
   HAL_UARTEx_ReceiveToIdle_DMA(p_huart_debug,Debug_Read_Buffer,DEBUG_PROTOCOL_RX_MAX);//打开串口DMA接收
 	__HAL_DMA_DISABLE_IT(&hdma_uart4_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
-#endif
+
 }
 
 // 重启

@@ -231,12 +231,13 @@ void App_Motor_Handler(void)
 		// ===================  设置转速
 		if((Motor_Timer_Cnt % MOTOR_POLLING_PERIOD)==MOTOR_COMMAND_CYCLE)
 		{
-			
-			if((Motor_Mode_Register != 2)&&(System_Dial_Switch == 15))
+#ifdef SYSTEM_DRIVER_BOARD_TOOL
+			if(Motor_Mode_Register != 2)//&&(System_Dial_Switch == 15))
 			{
 				Motor_GetIn_TestMode();
 			}
 			else
+#endif
 			{
 				//设置转速
 				Motor_Speed_Update();
@@ -646,13 +647,13 @@ void AQPED002_Motor_State_Analysis(void)
 	
 	// 获取电机模式状态
 	Motor_Mode_Register = Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET]<<24 |Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET+1]<<16 |Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET+2]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET+3];
-#ifdef SYSTEM_DRIVER_BOARD_TOOL
-	if(Motor_Mode_Register == 0)
-	{
+//#ifdef SYSTEM_DRIVER_BOARD_TOOL
+	//if(Motor_Mode_Register == 0)
+	//{
 		//驱动板插针故障
-		Set_Motor_Fault_State(E401_MOTOR_MODEL_HARDWARE);
-	}
-#endif
+		//Set_Motor_Fault_State(E401_MOTOR_MODEL_HARDWARE);
+	//}
+//#endif
 	// 10KNTC温度1 2 3
 	ntc_tmp[0] = Motor_State_Storage[MOTOR_ADDR_NTC1_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC1_TEMP_OFFSET+1];
 	ntc_tmp[1] = Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET+1];
@@ -1067,10 +1068,10 @@ void Motor_Speed_Send(uint32_t speed_rpm)
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 		uint8_t buffer[10]={0x02,0x05,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x03};
 		uint16_t crc_value=0;
-		
+#ifdef SYSTEM_DRIVER_BOARD_TOOL
 		if(Motor_Mode_Register == 2)
 			buffer[2] = 0x91;
-		
+#endif
 		buffer[3] = rpm>>24;
 		buffer[4] = rpm>>16;
 		buffer[5] = rpm>>8;
@@ -1128,19 +1129,23 @@ void Motor_Read_Register(void)
 //-------------------- 下发测试参数 ( 测试 )----------------------------
 void Motor_GetIn_TestMode(void)
 {
-	uint8_t buffer_temp[46]={0x02,0x29,0x90,0x00,0x00,0x93,0x44,0x00,0x00,0x00,0x86,0x00,0x00,0x25,0xF6,0x00,0x00,0x16,0x4E,0x00,0x00,
-		0x05,0x44,0x00,0x00,0x0E,0xBE,0x01,0xD3,0xFC,0xB0,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x64,0x00,0x00,0x00,0xC8,0x14,0x53,0x03};
+#define	MOTOR_TESTMODE_MSG_SIZEOF						( 54 )
+	//uint8_t buffer_temp[MOTOR_TESTMODE_MSG_SIZEOF]={0x02,0x29,0x90,0x00,0x00,0x93,0x44,0x00,0x00,0x00,0x86,0x00,0x00,0x25,0xF6,0x00,0x00,0x16,0x4E,0x00,0x00,
+		//0x05,0x44,0x00,0x00,0x0E,0xBE,0x01,0xD3,0xFC,0xB0,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x64,0x00,0x00,0x00,0xC8,0x14,0x53,0x03};
 		
-	uint8_t buffer[46] = {0};
+	uint8_t buffer_temp[MOTOR_TESTMODE_MSG_SIZEOF]={0x02,0x31,0x90,0x00,0x00,0x66,0x08,0x00,0x00,0x00,0xAE,0x00,0x00,0x32,0x8C,0x00,0x00,0x17,0xE9,0x00,0x00,0x06,0xD5,0x00,0x00,0x0A,
+		0x34,01,0x97,0x41,0xD0,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x1E,0x00,0x00,0x00,0xC8,0x00,0x00,0x06,0x40,0x00,0x00,0x00,0x00,0x71,0x25,0x03}; 
+	
+	uint8_t buffer[MOTOR_TESTMODE_MSG_SIZEOF] = {0};
 		
-	memcpy(buffer, (uint8_t*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_MOTOR_TEST_CMD_BUFFER),46);
+	memcpy(buffer, (uint8_t*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_MOTOR_TEST_CMD_BUFFER),MOTOR_TESTMODE_MSG_SIZEOF);
 		
-	if((buffer[0] != 0x02)||(buffer[1] != 0x29)||(buffer[2] != 0x90)||(buffer[45] != 0x03))
+	if((buffer[0] != buffer_temp[0])||(buffer[1] != buffer_temp[1])||(buffer[2] != buffer_temp[2])||(buffer[MOTOR_TESTMODE_MSG_SIZEOF-1] != buffer_temp[MOTOR_TESTMODE_MSG_SIZEOF-1]))
 	{
-		memcpy(buffer, buffer_temp,46);
+		memcpy(buffer, buffer_temp,MOTOR_TESTMODE_MSG_SIZEOF);
 	}
 	
-	Motor_UART_Send(buffer, 46);
+	Motor_UART_Send(buffer, MOTOR_TESTMODE_MSG_SIZEOF);
 }
 
 //-------------------- 检查电机电流 ----------------------------

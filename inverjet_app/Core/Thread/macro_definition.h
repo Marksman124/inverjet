@@ -37,16 +37,15 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.5"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.6"
 
 /**
 ******************************************************************************
 * 系统宏定义
 ******************************************************************************
 */
-#define SYSTEM_DEBUG_MODE								1	// 调试模式
+//#define SYSTEM_DEBUG_MODE								1	// 调试模式
 //#define UART_PRINTF_LOG									1	// 打印日志
-//#define UART_DEBUG_SEND_CTRL						1	// 通过 调试串口 发送指令	
 //#define SYSTEM_LONG_RUNNING_MODE				1	// 老化模式
 //#define SYSTEM_SHOW_MODEL_MACHINE				1	// 展示样机  (不报故障)
 //#define SYSTEM_DRIVER_BOARD_TOOL				1	// 驱动板工装 ||  厂内模式
