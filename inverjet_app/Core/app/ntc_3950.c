@@ -218,9 +218,7 @@ float Get_External_Temp(void)
 			Temperature_Fault_Cnt = 0;
 		}
 		Temperature = Get_Tempture(adc);
-	if(IS_SELF_TEST_MODE())
-		return -100;
-	else
+
 		return Temperature;
 }
 	

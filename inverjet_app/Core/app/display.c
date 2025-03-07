@@ -252,8 +252,11 @@ void Lcd_Off(void)
 {
 	//±³¹â
 	TM1621_BLACK_OFF();
-	
 	TM1621_Show_Off();
+	
+	//TM1621_Show_Off();
+	//Lcd_Display_Symbol( LCD_Show_Bit & LCD_SYMBOL_FOT_FAULT);
+ 	//TM1621_LCD_Redraw();
 }
 
 

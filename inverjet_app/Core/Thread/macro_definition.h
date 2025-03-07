@@ -37,7 +37,7 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 
 // 软件版本
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.6"
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.7"
 
 /**
 ******************************************************************************
@@ -204,7 +204,7 @@ extern "C" {
 #define WIFI_DISTRIBUTION_TIME_CALLOUT				(60*TIMING_THREAD_ONE_SECOND)				// 60 s
 #define BT_DISTRIBUTION_TIME_CALLOUT					(60*TIMING_THREAD_ONE_SECOND)				// 60 s
 //-------------- 故障 去抖时间 -------------------
-#define MOTOR_CHECK_FAULT_TIMER								(3-1)
+#define MOTOR_CHECK_FAULT_TIMER								(2-1)
 //-------------- 故障自恢复 -------------------
 #define SYSTEM_FAULT_TIME_CALLOUT							(30*TIMING_THREAD_ONE_SECOND)				// 30 s    wuqingguang 
 #define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 次故障
@@ -220,7 +220,7 @@ extern "C" {
 #define TIME_SLOW_DOWN_TIME													(120)		//2 min  120*2 个周期,与线程周期相关
 //-------------- 降速 档位 -------------------
 #define TIME_SLOW_DOWN_SPEED_01											(10)		//第一档 降速
-#define TIME_SLOW_DOWN_SPEED_02											(5)			//第二档 降速
+#define TIME_SLOW_DOWN_SPEED_02											(1)			//第二档 降速
 //-------------- 降速 最低速度 -------------------
 #define TIME_SLOW_DOWN_SPEED_MIX										(20)		//最低降到 20%
 #define TIME_SLOW_DOWN_SPEED_MAX										(100)		//恢复速度最高恢复到 100%

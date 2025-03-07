@@ -355,7 +355,7 @@ void Fault_State_Handler(void)
 	}
 	else if(System_is_Error())//¹ÊÕÏ 2min»Ö¸´ ·ÇÍ¨Ñ¶¹ÊÕÏ
 	{
-		if(If_Fault_Recovery_Max()==0)//&&(*p_System_Fault_Static != E203_MOTOR_LOSS))
+		if(If_Fault_Recovery_Max()==0)
 		{
 			if(( System_Fault_Timing_Cnt == 0)||(System_Fault_Timing_Cnt > Timing_Half_Second_Cnt))
 			{
@@ -365,7 +365,7 @@ void Fault_State_Handler(void)
 			//³¬Ê± ¹ÊÕÏ »Ö¸´
 			if( (Timing_Half_Second_Cnt - System_Fault_Timing_Cnt) > SYSTEM_FAULT_TIME_CALLOUT)
 			{
-				if((IS_SELF_TEST_MODE() == 0)&&( *p_Motor_Fault_Static == 0))
+				if( *p_Motor_Fault_Static == 0)
 				{
 					CallOut_Fault_State();
 				}
@@ -729,7 +729,11 @@ void App_Timing_Task(void)
 		{
 			half_second_state = 1;
 			if(System_is_Power_Off())
+			{
+				//if(LCD_Refresh_Get() == 0)
+					//Lcd_Show();
 				return;
+			}
 			
 			//¼ì²éÐ£Ê±
 			Use_Wifi_Timing_Check();
@@ -816,7 +820,7 @@ void App_Timing_Handler(void)
 			System_Self_Checking_Porgram();
 		else
 			System_Self_Testing_Porgram();
-		while((Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x7F) || (Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH) != 0x09))
+		while((Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x0F) || (Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH) != 0x09))
 		{
 			Lcd_System_Information();//»úÐÍÂë & ²¦Âë×´Ì¬ 6s
 			If_System_Is_Error();

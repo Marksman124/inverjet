@@ -329,7 +329,7 @@ void TIM5_IRQHandler(void)
 void UART4_IRQHandler(void)
 {
   /* USER CODE BEGIN UART4_IRQn 0 */
-	uint8_t temp=0;
+/*	uint8_t temp=0;
 	if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_IDLE) != RESET))//如果是接收完成中断，idle标志被置位
 	{
 		__HAL_UART_CLEAR_IDLEFLAG(&huart4);//清除标志位
@@ -341,9 +341,9 @@ void UART4_IRQHandler(void)
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart4, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // 接收完毕后重启
 		__HAL_DMA_DISABLE_IT(&hdma_uart4_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
 		
-	 }
+	 }*/
   /* USER CODE END UART4_IRQn 0 */
-  HAL_UART_IRQHandler(&huart4);
+  //HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
 
   /* USER CODE END UART4_IRQn 1 */

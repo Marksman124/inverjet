@@ -79,8 +79,8 @@ void (*p_Funtion_Button[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_pushButton_1_2_Short_Press, on_pushButton_1_3_Short_Press, 
 	on_pushButton_2_3_Short_Press, on_pushButton_2_4_Short_Press,
 	on_pushButton_4_Long_Press,
-	on_pushButton_4_Long_Press,//on_DiButton_Add_clicked,
-	on_pushButton_4_Long_Press,//on_DiButton_Minus_clicked,
+	on_DiButton_Add_clicked,
+	on_DiButton_Minus_clicked,
 };
 
 // 长按 槽函数
@@ -135,7 +135,7 @@ void on_pushButton_clicked(void)
 		
 	if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR))
 	{
-		if(Get_Temp_Slow_Down_State())
+		/*if(Get_Temp_Slow_Down_State())
 		{
 			//Clean_Temp_Slow_Down_Timer();
 			if(*p_OP_ShowNow_Speed >= Get_Down_Conversion_Speed_Now())
@@ -143,7 +143,7 @@ void on_pushButton_clicked(void)
 			else
 				*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_100_GEAR;
 		}
-		else
+		else*/
 		{
 			if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MAX)
 				*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
@@ -163,7 +163,7 @@ void on_pushButton_clicked(void)
 	}
 	else
 	{
-		if(Get_Temp_Slow_Down_State())
+/*		if(Get_Temp_Slow_Down_State())
 		{
 			//Clean_Temp_Slow_Down_Timer();
 			if((*p_OP_ShowNow_Speed + KEY_SPEED_INCREASE_20_GEAR) >= Get_Down_Conversion_Speed_Now())
@@ -171,7 +171,7 @@ void on_pushButton_clicked(void)
 			else
 				*p_OP_ShowNow_Speed += KEY_SPEED_INCREASE_20_GEAR;
 		}
-		else
+		else*/
 		{
 			if((*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX) != 0)
 				*p_OP_ShowNow_Speed += (MOTOR_PERCENT_SPEED_MIX-(*p_OP_ShowNow_Speed % MOTOR_PERCENT_SPEED_MIX));
@@ -851,15 +851,19 @@ void System_Boot_Screens(void)
 //	恢复出厂设置
 void Restore_Factory_Settings(void)
 {
-	TM1621_Buzzer_Click();
+/*	TM1621_Buzzer_Click();
+	Breath_light_Max();
+	TM1621_BLACK_ON();
+	TM1621_Show_All();//全亮 3s*/
+	
 	// data 恢复
 	App_Data_ReInit();
 	
 	// wifi 恢复
 	
 	//TM1621_Show_All();
-	osDelay(500);
-	TM1621_Buzzer_Off();
+	//osDelay(500);
+	//TM1621_Buzzer_Off();
 	//osDelay(1500);
 	//System_Power_Off();
 	SysSoftReset();// 软件复位

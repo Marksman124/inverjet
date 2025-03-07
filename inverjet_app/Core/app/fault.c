@@ -113,8 +113,6 @@ uint8_t Fault_Check_Status_Legal(uint16_t parameter)
 // ¼ì²â¹ÊÕÏ
 uint8_t If_System_Is_Error(void)
 {
-	
-	
 	 float Temperature;
 	//uint8_t motor_fault=0;
 	uint16_t system_fault=0;
@@ -139,13 +137,17 @@ uint8_t If_System_Is_Error(void)
 
 	if(Temperature == -100)
 	{
-		if(E102_Fault_Timer_Cnt++ > 10)
+		if(E102_Fault_Timer_Cnt > 10)
 			Set_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
+		else
+			E102_Fault_Timer_Cnt++;
 	}
 	else
 	{
-		ReSet_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
-		E102_Fault_Timer_Cnt = 0;
+		if(E102_Fault_Timer_Cnt < 1)
+			ReSet_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
+		else
+			E102_Fault_Timer_Cnt --;
 	}
 	
 	//µç»ú¹ÊÕÏ  º¬Çý¶¯°åÍ¨Ñ¶¹ÊÕÏ
@@ -153,25 +155,23 @@ uint8_t If_System_Is_Error(void)
 	
 	if(*p_System_Fault_Static != system_fault)
 	{
-		if((system_fault >0) &&((*p_System_Fault_Static) == 0))
+		if(system_fault >0)
 		{
-			Add_Fault_Recovery_Cnt(1);  //ÆÕÍ¨¹ÊÕÏ
+			if(Motor_Is_Software_Fault(system_fault))
+			{
+				if((Motor_Is_Software_Fault(*p_System_Fault_Static)==0) || (*p_System_Fault_Static == 0))
+					Add_Fault_Recovery_Cnt(1);  //ÆÕÍ¨¹ÊÕÏ
+			}
 		}
-		
-		//Í¨ÐÅ¹ÊÕÏ»Ö¸´
-//		if(Motor_Is_Specified_Fault(*p_System_Fault_Static, E203_MOTOR_LOSS) && (Motor_Is_Specified_Fault(system_fault, E203_MOTOR_LOSS) == 0))
-//		{
-//			*p_System_Fault_Static &= ~E203_MOTOR_LOSS;
-//		}
 
-		*p_System_Fault_Static |= system_fault;
+		*p_System_Fault_Static = system_fault;
 		
 		//********  ¹ÊÕÏ×Ô¶¯»Ö¸´    *********************
 		// Í¨Ñ¶¹ÊÕÏ ¿ÉÁ¢¿Ì»Ö¸´
-		if(*p_System_Fault_Static == 0 )
+		/*if(*p_System_Fault_Static == 0 )
 		{
 			CallOut_Fault_State();
-		}
+		}*/
 	}
 
 	
@@ -303,7 +303,7 @@ void To_Fault_Menu(void)
 // ¹ÊÕÏ½çÃæ ¸üÐÂ
 void Update_Fault_Menu(void)
 {	
-	if(++Automatic_Polling_Timer_Cnt > 2)
+	if(++Automatic_Polling_Timer_Cnt > 4)//5
 	{
 		Automatic_Polling_Timer_Cnt = 0;
 		if(Fault_Number_Cnt < Fault_Number_Sum)

@@ -165,8 +165,6 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 #define MB_USER_TRAIN_MODE_SPEED_P7_50		      ( 0x3BA )	//	用户 训练模式 	转速
 #define MB_USER_TRAIN_MODE_TIME_P7_50        		( 0x3BB )	//
 
-#define MB_MOTOR_TEST_CMD_BUFFER		      			( 0x3E8 )	//	测试模式 下发数据
-#define MB_MOTOR_TEST_CMD_BUFFER_END        		( 0x3FF )	//
 // ----------------------------------------------------------------------------------------------
 #define MB_USER_TRAIN_MODE_SPEED_P8_1		        ( 0x3BC )	//	用户 训练模式 	转速
 #define MB_USER_TRAIN_MODE_TIME_P8_1        		( 0x3BD )	//								时间

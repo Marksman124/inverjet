@@ -155,18 +155,15 @@ void Do_Down_Conversion_interface(void)
 {
 	// 第一次进
 	if(Down_Conversion_Time == 0)
+	{
 		Temp_Slow_Down_Speed_Old = Motor_Speed_Target_Get();
-	
-//	if(Down_Conversion_Time == 0)
-//	{
-//		Temp_Slow_Down_Speed_Old = Motor_Speed_Target_Get();
-//		if((Temp_Slow_Down_Speed_Old - TIME_SLOW_DOWN_SPEED_01) >= TIME_SLOW_DOWN_SPEED_MIX)
-//			Down_Conversion_Set_Speed(Temp_Slow_Down_Speed_Old - TIME_SLOW_DOWN_SPEED_01);
-//		else
-//			Down_Conversion_Set_Speed(TIME_SLOW_DOWN_SPEED_MIX);
-//		Down_Conversion_Time ++;
-//	}
-//	else
+		if((Temp_Slow_Down_Speed_Old - TIME_SLOW_DOWN_SPEED_01) >= TIME_SLOW_DOWN_SPEED_MIX)
+			Down_Conversion_Set_Speed(Temp_Slow_Down_Speed_Old - TIME_SLOW_DOWN_SPEED_01);
+		else
+			Down_Conversion_Set_Speed(TIME_SLOW_DOWN_SPEED_MIX);
+		Down_Conversion_Time ++;
+	}
+	else
 	{
 		Temp_Slow_Down_Speed_Now = Motor_Speed_Target_Get();
 		if(Temp_Slow_Down_Speed_Now > TIME_SLOW_DOWN_SPEED_MIX)
@@ -199,34 +196,23 @@ void Check_Down_Conversion_Rate(void)
 	Down_Conversion_Rate_enum		rate_box_temper  = Down_Conversion_Rate_Off;
 	Down_Conversion_Rate_enum		rate_out_current = Down_Conversion_Rate_Off;
 	
-	if(Temperature_Mos_Now >= MOS_TEMP_REDUCE_SPEED+3)
-		rate_mos_temper = Down_Conversion_Rate_Realtime;
-	else if(Temperature_Mos_Now >= MOS_TEMP_REDUCE_SPEED+2)
-		rate_mos_temper = Down_Conversion_Rate_High;
-	else if(Temperature_Mos_Now >= MOS_TEMP_REDUCE_SPEED+1)
-		rate_mos_temper = Down_Conversion_Rate_Normal;		
+	if(Temperature_Mos_Now >= MOS_TEMP_REDUCE_SPEED+2)
+		rate_mos_temper = Down_Conversion_Rate_High;		
 	else if(Temperature_Mos_Now >= MOS_TEMP_REDUCE_SPEED)
 		rate_mos_temper = Down_Conversion_Rate_Low;
 	else
 		rate_mos_temper = Down_Conversion_Rate_Off;
 
-	if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED+3)
-		rate_box_temper = Down_Conversion_Rate_Realtime;
-	else if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED+2)
+	if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED+2)
 		rate_box_temper = Down_Conversion_Rate_High;
-	else if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED+1)
-		rate_box_temper = Down_Conversion_Rate_Normal;		
 	else if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED)
 		rate_box_temper = Down_Conversion_Rate_Low;
 	else
 		rate_box_temper = Down_Conversion_Rate_Off;
 	
-	if(Current_Motor_Now >= MOTOR_CURRENT_REDUCE_SPEED+3)
-		rate_out_current = Down_Conversion_Rate_Realtime;
-	else if(Current_Motor_Now >= MOTOR_CURRENT_REDUCE_SPEED+2)
+	
+	if(Current_Motor_Now >= MOTOR_CURRENT_REDUCE_SPEED+2)
 		rate_out_current = Down_Conversion_Rate_High;
-	else if(Current_Motor_Now >= MOTOR_CURRENT_REDUCE_SPEED+1)
-		rate_out_current = Down_Conversion_Rate_Normal;		
 	else if(Current_Motor_Now >= MOTOR_CURRENT_REDUCE_SPEED)
 		rate_out_current = Down_Conversion_Rate_Low;
 	else
@@ -395,6 +381,7 @@ void Do_Down_Conversion_Rebound(uint8_t time)
 		if(Temp_Slow_Down_Speed_Now < Temp_Slow_Down_Speed_Old)
 		{
 			Down_Conversion_Set_Speed(++Temp_Slow_Down_Speed_Now);
+			Rebound_timer_cnt = 0;
 		}
 		else
 		{

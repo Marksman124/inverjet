@@ -42,9 +42,9 @@ typedef enum
 
 /* Exported macro ------------------------------------------------------------*/
 
-#define WIFI_DISTRIBUTION_BLINK_TIME				3				// 1500ms  ∞Î√Î
+#define WIFI_DISTRIBUTION_BLINK_TIME				3				// 1500ms  (∞Î√Î)
 
-#define WIFI_ERROR_BLINK_TIME								10				// 250ms		25ms
+#define WIFI_ERROR_BLINK_TIME								10				// 250ms		(25ms)
 
 
 #define WIFI_DISTRIBUTION_TIME_OUT				180				// 3 min

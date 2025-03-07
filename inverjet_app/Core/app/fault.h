@@ -132,7 +132,7 @@ typedef enum
 #define RECOVERY_ATTEMPT_TIME							30
 
 
-
+#define ORDINARY_FAULT_BIT  				(E001_BUS_VOLTAGE_ABNORMAL | E201_TEMPERATURE_HARDWARE | E203_MOTOR_LOSS)
 //extern uint8_t Fault_Recovery_Attempt_cnt;				//
 
 /* Exported functions prototypes ---------------------------------------------*/

@@ -28,7 +28,7 @@ uint16_t* p_Baud_Rate;							//	波特率
 uint32_t Modbus_BaudRate_Table[] = 	{2400,4800,9600,14400};
 #define MODBUS_BAUDRATE_TABLE_LEN		(sizeof(Modbus_BaudRate_Table)/sizeof(Modbus_BaudRate_Table[0]))
 
-
+uint8_t System_Motor_Device_Version = 0;
 
 uint32_t Dev_BaudRate_Get(uint8_t usart_num)
 {
@@ -83,6 +83,8 @@ void Dev_Information_Init(void)
 	
 	// 屏蔽 控制方式
 	p_Support_Control_Methods = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SUPPORT_CONTROL_METHODS);
+	
+	Set_Motor_Device_Protocol_Version();
 }
 
 
@@ -222,13 +224,24 @@ uint8_t Dev_Is_Control_Methods(uint16_t bit)
 	
 }
 
+// 驱动板型号
+void Set_Motor_Device_Protocol_Version(void)
+{
+	if(IS_SELF_TEST_MODE())
+		System_Motor_Device_Version = MOTOR_DEVICE_HARDWARE_AQPED002;
+	else
+	{
+		if(Gpio_Get_Dial_Switch()&0x08)
+			System_Motor_Device_Version = MOTOR_DEVICE_HARDWARE_TEMP001;
+		else
+			System_Motor_Device_Version = MOTOR_DEVICE_HARDWARE_AQPED002;
+	}
+}
+
 // 获取驱动板型号
 uint8_t Get_Motor_Device_Protocol_Version(void)
 {
-	if(Gpio_Get_Dial_Switch()&0x08)
-		return 1;
-	else
-		return 0;
+	return System_Motor_Device_Version;
 }
 
 
