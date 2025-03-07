@@ -277,9 +277,16 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 		Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
 	}
 	
-	sprintf(show_mapping,"%02d%02d%04d",0,type,num);
-	show_mapping[0] = 0xFF;
-	show_mapping[1] = 0xFF;
+	if(type == OPERATION_DISPLAY_VERSION)
+	{
+		sprintf(show_mapping,"%02d%02d%04d",(*p_Software_Version_low)&0xFF,type,num);
+	}
+	else
+	{
+		sprintf(show_mapping,"%02d%02d%04d",0,type,num);
+		show_mapping[0] = 0xFF;
+		show_mapping[1] = 0xFF;
+	}
 	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
 	
 	TM1621_LCD_Redraw();
