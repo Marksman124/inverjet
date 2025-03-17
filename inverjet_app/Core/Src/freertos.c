@@ -37,10 +37,10 @@
 #include "timing.h"
 #include "key.h"
 #include "motor.h"
-#include "debug_protocol.h"	///////////////////////	´®¿Úµ÷ÊÔ
+#include "debug_protocol.h"	///////////////////////	ä¸²å£è°ƒè¯•
 
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
-#include "wifi_thread.h"				// wifiÄ£×é
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
+#include "wifi_thread.h"				// wifiæ¨¡ç»„
 #include "wifi.h"
 
 /* USER CODE END Includes */

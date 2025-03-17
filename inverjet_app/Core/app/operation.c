@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				operation.c
-* @brief			²Ù×÷Ä£¿é ÓÃÓÚÒş²Ø²Ù×÷ µ¥¶À³öÀ´±ãÓÚÆÁ±Î\É¾³ı
+* @brief			æ“ä½œæ¨¡å— ç”¨äºéšè—æ“ä½œ å•ç‹¬å‡ºæ¥ä¾¿äºå±è”½\åˆ é™¤
 *
 * @author			WQG
 * @versions		v1.0
@@ -14,7 +14,7 @@
 #include "tm1621.h"
 #include "key.h"
 #include "stdio.h"
-#include "wifi.h"					// wifi Ä£×é
+#include "wifi.h"					// wifi æ¨¡ç»„
 
 /* Private includes ----------------------------------------------------------*/
 
@@ -22,25 +22,25 @@
 
 /* Private function prototypes -----------------------------------------------*/
 
-//------------------- °´¼ü»Øµ÷ ----------------------------
-//--------------- ¶Ì°´ -----------------------
-// ¢Ù ÉÏ
+//------------------- æŒ‰é”®å›è°ƒ ----------------------------
+//--------------- çŸ­æŒ‰ -----------------------
+// â‘  ä¸Š
 void on_Button_1_clicked(void);
-// ¢Ú ÏÂ
+// â‘¡ ä¸‹
 void on_Button_2_clicked(void);
-// ¢Û È·ÈÏ
+// â‘¢ ç¡®è®¤
 void on_Button_3_clicked(void);
-// ¢Ü È¡Ïû
+// â‘£ å–æ¶ˆ
 void on_Button_4_Short_Press(void);
 void on_Button_1_2_Short_Press(void);
-// ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 80¼¶ or 5¼¶
+// â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 80çº§ or 5çº§
 void on_Button_1_3_Short_Press(void);
-// ¢Ú + ¢Û  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘¢  ç»„åˆé”®  çŸ­æŒ‰
 void on_Button_2_3_Short_Press(void);
-// ¢Ú + ¢Ü  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘£  ç»„åˆé”®  çŸ­æŒ‰
 void on_Button_2_4_Short_Press(void);
-//--------------- ³¤°´ -----------------------
-// ³¤°´
+//--------------- é•¿æŒ‰ -----------------------
+// é•¿æŒ‰
 void on_Button_1_Long_Press(void);
 void on_Button_2_Long_Press(void);
 void on_Button_3_Long_Press(void);
@@ -55,36 +55,36 @@ void on_Button_2_4_Long_Press(void);
 
 /* Private define ------------------------------------------------------------*/
 
-UART_HandleTypeDef* p_huart_operation = &huart3;		 //µ÷ÊÔ´®¿Ú UART¾ä±ú
+UART_HandleTypeDef* p_huart_operation = &huart3;		 //è°ƒè¯•ä¸²å£ UARTå¥æŸ„
 
 /* Private macro -------------------------------------------------------------*/
 
 
 /* Private variables ---------------------------------------------------------*/
 
-static uint8_t Operation_State_Machine = 0;		//	×´Ì¬»ú	
+static uint8_t Operation_State_Machine = 0;		//	çŠ¶æ€æœº	
 
-static uint8_t Operation_Menu_Value = 0;			//	²Ëµ¥Öµ	
+static uint8_t Operation_Menu_Value = 0;			//	èœå•å€¼	
 
 
-static uint16_t Operation_Addr_Value = 0;			//	µØÖ·	
-static uint16_t Operation_Baud_Rate = 0;			//	²¨ÌØÂÊ	
-static uint16_t Operation_Shield_Value = 0;		//	¿ØÖÆ·½Ê½	
-static uint16_t Operation_Motor_Poles = 0;		//	µç»ú¼«Êı	
-static uint16_t Operation_Speed_Mode = 0;			//	×ªËÙ·½Ê½  0£º×ªËÙ   1£º¹¦ÂÊ	
-//static uint16_t Operation_Breath_Light_Max = 0;		//	¹âÈ¦ÁÁ¶È	
-// ·¢ËÍ»º³åÇø
+static uint16_t Operation_Addr_Value = 0;			//	åœ°å€	
+static uint16_t Operation_Baud_Rate = 0;			//	æ³¢ç‰¹ç‡	
+static uint16_t Operation_Shield_Value = 0;		//	æ§åˆ¶æ–¹å¼	
+static uint16_t Operation_Motor_Poles = 0;		//	ç”µæœºææ•°	
+static uint16_t Operation_Speed_Mode = 0;			//	è½¬é€Ÿæ–¹å¼  0ï¼šè½¬é€Ÿ   1ï¼šåŠŸç‡	
+//static uint16_t Operation_Breath_Light_Max = 0;		//	å…‰åœˆäº®åº¦	
+// å‘é€ç¼“å†²åŒº
 //uint8_t operation_send_buffer[24] = {0};
 
 
-// ¶Ì°´ ²Ûº¯Êı
+// çŸ­æŒ‰ æ§½å‡½æ•°
 void (*p_Operation_Button[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Button_1_clicked,  on_Button_2_clicked,  on_Button_3_clicked,  on_Button_4_Short_Press,
 	on_Button_1_2_Short_Press, on_Button_1_3_Short_Press,
 	on_Button_2_3_Short_Press, on_Button_2_4_Short_Press,
 };
 
-// ³¤°´ ²Ûº¯Êı
+// é•¿æŒ‰ æ§½å‡½æ•°
 void (*p_Operation_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Button_1_Long_Press,  on_Button_2_Long_Press,  on_Button_3_Long_Press,  on_Button_4_Long_Press,
 	on_Button_1_2_Long_Press, on_Button_1_3_Long_Press,
@@ -92,8 +92,8 @@ void (*p_Operation_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 };
 
 
-static uint16_t Baud_Rate_Value[OPERATION_BAUD_MAX] = {2400,4800,9600,1440};			//	²¨ÌØÂÊ	
-//static uint16_t Speed_Mode_Value[2] = {'r','P'};			//	×ªËÙÄ£Ê½	
+static uint16_t Baud_Rate_Value[OPERATION_BAUD_MAX] = {2400,4800,9600,1440};			//	æ³¢ç‰¹ç‡	
+//static uint16_t Speed_Mode_Value[2] = {'r','P'};			//	è½¬é€Ÿæ¨¡å¼	
 
 static uint32_t button_cnt=0;
 static uint32_t Sleep_Time_Cnt=0;
@@ -101,11 +101,11 @@ static uint32_t Sleep_Time_Cnt=0;
 /* Private user code ---------------------------------------------------------*/
 
 
-//²âÊÔÓÃ
+//æµ‹è¯•ç”¨
 extern TIM_HandleTypeDef htim1;
 
 
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 void App_Operation_Init(void)
 {
 	Operation_Addr_Value = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SLAVE_NODE_ADDRESS );
@@ -150,19 +150,19 @@ void App_Operation_Init(void)
 //	while(__HAL_TIM_GET_COUNTER(&htim1) < mdelay);
 //}
 
-//------------------- ÏÔÊ¾ÆÁ & ½Ó¿Ú ----------------------------
+//------------------- æ˜¾ç¤ºå± & æ¥å£ ----------------------------
 /*
 ******************************************************************************
 Display_Show_Number	
 
-ÏÔÊ¾µ±Ç°¹ÊÕÏ±àºÅ£¬ 0-100
+æ˜¾ç¤ºå½“å‰æ•…éšœç¼–å·ï¼Œ 0-100
 ******************************************************************************
 */  
 void Display_Oper_Number(uint8_t no)
 {
 	if(no > 100)
 		no = 100;
-//-------------------- µç»ú×´Ì¬½âÎö ----------------------------
+//-------------------- ç”µæœºçŠ¶æ€è§£æ ----------------------------
 	TM1621_Show_Symbol(TM1621_COORDINATE_SPEED_HUNDRED, GET_NUMBER_HUNDRED_DIGIT(no));
 	
 	TM1621_display_number(TM1621_COORDINATE_SPEED_HIGH, GET_NUMBER_TEN_DIGIT(no));
@@ -175,7 +175,7 @@ void Display_Oper_Number(uint8_t no)
 ******************************************************************************
 Display_Show_FaultCode
 
-ÏÔÊ¾²ÎÊıÖµ
+æ˜¾ç¤ºå‚æ•°å€¼
 ******************************************************************************
 */  
 void Display_Oper_value(uint16_t value)
@@ -191,7 +191,7 @@ void Display_Oper_value(uint16_t value)
 ******************************************************************************
 Display_Show_FaultCode
 
-ÏÔÊ¾ ×ÖÄ¸
+æ˜¾ç¤º å­—æ¯
 ******************************************************************************
 */  
 void Display_Oper_Letter(uint8_t value)
@@ -209,7 +209,7 @@ void Display_Oper_Letter(uint8_t value)
 ******************************************************************************
 Display_Show_Sum
 
-Òş²ØÄ£Ê½
+éšè—æ¨¡å¼
 ******************************************************************************
 */  
 void Display_Mode_Hide(void)
@@ -224,7 +224,7 @@ void Display_Mode_Hide(void)
 ******************************************************************************
 Display_Mode_Show
 
-ÏÔÊ¾Ä£Ê½
+æ˜¾ç¤ºæ¨¡å¼
 ******************************************************************************
 */  
 void Display_Mode_Show(uint8_t sum)
@@ -234,7 +234,7 @@ void Display_Mode_Show(uint8_t sum)
 }
 
 /***********************************************************************
-*		ÏÔÊ¾ º¯Êı×ÜÈë¿Ú
+*		æ˜¾ç¤º å‡½æ•°æ€»å…¥å£
 *
 *
 ***********************************************************************/
@@ -246,13 +246,13 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 	{
 			return ;
 	}
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_ON();
 	
 	// sum
 	Display_Oper_Number(type);
 #ifdef OPERATION_SPEED_MODE
-	//×ÖÄ¸
+	//å­—æ¯
 	if(type == OPERATION_SPEED_MODE)
 		Display_Oper_Letter(num);
 	else
@@ -260,7 +260,7 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 		Display_Oper_value(num);
 	
 	
-	//°æ±¾ºÅÏÔÊ¾Ğ¡Êıµã
+	//ç‰ˆæœ¬å·æ˜¾ç¤ºå°æ•°ç‚¹
 	if((type == OPERATION_DISPLAY_VERSION) || (type == OPERATION_DEIVES_VERSION))
 	{
 		if(type == OPERATION_DISPLAY_VERSION)
@@ -296,23 +296,23 @@ void Lcd_Show_Operation(uint8_t type, uint16_t num)
 
 
 
-//------------------- ÇĞ»»Ä£Ê½  ----------------------------
+//------------------- åˆ‡æ¢æ¨¡å¼  ----------------------------
 
-// ½øÈë²Ù×÷²Ëµ¥
+// è¿›å…¥æ“ä½œèœå•
 void To_Operation_Menu(void)
 {
 	Sleep_Time_Clean();
 	Set_Software_Version();
-	// ²Ù×÷ ²Ëµ¥
+	// æ“ä½œ èœå•
 	App_Operation_Init();
-	//¹¦ÄÜÔİÍ£, µç»ú¹Ø±Õ
+	//åŠŸèƒ½æš‚åœ, ç”µæœºå…³é—­
 	Set_System_State_Machine(OPERATION_MENU_STATUS);
 #ifdef OPERATION_P5_ACCELERATION
-	Operation_State_Machine = OPERATION_P5_ACCELERATION;			//	×´Ì¬»ú	
-  Operation_Menu_Value = *p_Surf_Mode_Info_Acceleration;		//	²Ëµ¥Öµ	
+	Operation_State_Machine = OPERATION_P5_ACCELERATION;			//	çŠ¶æ€æœº	
+  Operation_Menu_Value = *p_Surf_Mode_Info_Acceleration;		//	èœå•å€¼	
 #else
-	Operation_State_Machine = OPERATION_ADDR_SET;		//	×´Ì¬»ú	
-  Operation_Menu_Value = Operation_Addr_Value;		//	²Ëµ¥Öµ	
+	Operation_State_Machine = OPERATION_ADDR_SET;		//	çŠ¶æ€æœº	
+  Operation_Menu_Value = Operation_Addr_Value;		//	èœå•å€¼	
 #endif
 	Lcd_Show_Operation( Operation_State_Machine, Operation_Menu_Value);
 	
@@ -339,9 +339,9 @@ uint8_t Check_Sleep_Time_Out(void)
 }
 
 /* Private user code ---------------------------------------------------------*/
-//------------------- °´¼ü»Øµ÷ ----------------------------
+//------------------- æŒ‰é”®å›è°ƒ ----------------------------
 
-// ¢Ù µµÎ»¼ü
+// â‘  æ¡£ä½é”®
 static void on_Button_1_clicked(void)
 {
 	button_cnt = 0;
@@ -375,7 +375,7 @@ static void on_Button_1_clicked(void)
 		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Low_Time);
 	}
 #endif
-	//------- µØÖ·
+	//------- åœ°å€
 	if(Operation_State_Machine == OPERATION_ADDR_SET)
 	{
 		if(Operation_Addr_Value < MODBUS_LOCAL_ADDRESS_MAX)
@@ -385,7 +385,7 @@ static void on_Button_1_clicked(void)
 		
 		Lcd_Show_Operation( Operation_State_Machine, Operation_Addr_Value);
 	}
-	//------- ²¨ÌØÂÊ
+	//------- æ³¢ç‰¹ç‡
 	else if(Operation_State_Machine == OPERATION_BAUD_RATE)
 	{
 		if(Operation_Baud_Rate < (OPERATION_BAUD_MAX-1))
@@ -395,7 +395,7 @@ static void on_Button_1_clicked(void)
 		
 		Lcd_Show_Operation( Operation_State_Machine, Baud_Rate_Value[Operation_Baud_Rate]);
 	}
-	//------- ×ªËÙÄ£Ê½
+	//------- è½¬é€Ÿæ¨¡å¼
 #ifdef OPERATION_SPEED_MODE
 	else if(Operation_State_Machine == OPERATION_SPEED_MODE)
 	{
@@ -408,7 +408,7 @@ static void on_Button_1_clicked(void)
 	}
 #endif
 #ifdef OPERATION_MOTOR_POLES
-	//------- µç»ú ¼«Êı
+	//------- ç”µæœº ææ•°
 	else if(Operation_State_Machine == OPERATION_MOTOR_POLES)
 	{
 		if(Operation_Motor_Poles < OPERATION_POLES_MAX)
@@ -419,7 +419,7 @@ static void on_Button_1_clicked(void)
 		Lcd_Show_Operation( Operation_State_Machine, Operation_Motor_Poles);
 	}
 #endif
-	//------- ÆÁ±Î ·½Ê½
+	//------- å±è”½ æ–¹å¼
 	else if(Operation_State_Machine == OPERATION_SHIELD_MENU)
 	{
 		if(Operation_Shield_Value < OPERATION_SHIELD_MAX)
@@ -430,7 +430,7 @@ static void on_Button_1_clicked(void)
 		Lcd_Show_Operation( Operation_State_Machine, Operation_Shield_Value);
 	}
 #ifdef OPERATION_BREATH_LIGHT_MAX
-	//------- ¹âÈ¦ÁÁ¶È
+	//------- å…‰åœˆäº®åº¦
 	if(Operation_State_Machine == OPERATION_BREATH_LIGHT_MAX)
 	{
 		if(Operation_Breath_Light_Max < 500)
@@ -443,7 +443,7 @@ static void on_Button_1_clicked(void)
 #endif
 }
 
-// ¢Ú Ê±¼ä¼ü
+// â‘¡ æ—¶é—´é”®
 static void on_Button_2_clicked(void)
 {
 	button_cnt = 0;
@@ -477,7 +477,7 @@ static void on_Button_2_clicked(void)
 		Lcd_Show_Operation( Operation_State_Machine, *p_Surf_Mode_Info_Low_Time);
 	}
 #endif
-	//------- µØÖ·
+	//------- åœ°å€
 	if(Operation_State_Machine == OPERATION_ADDR_SET)
 	{
 		if(Operation_Addr_Value > MODBUS_LOCAL_ADDRESS_MIX)
@@ -487,7 +487,7 @@ static void on_Button_2_clicked(void)
 		
 		Lcd_Show_Operation( Operation_State_Machine, Operation_Addr_Value);
 	}
-	//------- ²¨ÌØÂÊ
+	//------- æ³¢ç‰¹ç‡
 	else if(Operation_State_Machine == OPERATION_BAUD_RATE)
 	{
 		if(Operation_Baud_Rate > 0)
@@ -497,7 +497,7 @@ static void on_Button_2_clicked(void)
 		
 		Lcd_Show_Operation( Operation_State_Machine, Baud_Rate_Value[Operation_Baud_Rate]);
 	}
-	//------- ×ªËÙ Ä£Ê½
+	//------- è½¬é€Ÿ æ¨¡å¼
 #ifdef OPERATION_SPEED_MODE
 	else if(Operation_State_Machine == OPERATION_SPEED_MODE)
 	{
@@ -510,7 +510,7 @@ static void on_Button_2_clicked(void)
 	}
 #endif
 #ifdef OPERATION_MOTOR_POLES
-	//------- µç»ú ¼«Êı
+	//------- ç”µæœº ææ•°
 	else if(Operation_State_Machine == OPERATION_MOTOR_POLES)
 	{
 		if(Operation_Motor_Poles > OPERATION_POLES_MIX)
@@ -521,7 +521,7 @@ static void on_Button_2_clicked(void)
 		Lcd_Show_Operation( Operation_State_Machine, Operation_Motor_Poles);
 	}
 #endif
-	//------- ÆÁ±Î ·½Ê½
+	//------- å±è”½ æ–¹å¼
 	else if(Operation_State_Machine == OPERATION_SHIELD_MENU)
 	{
 		if(Operation_Shield_Value > 0)
@@ -532,7 +532,7 @@ static void on_Button_2_clicked(void)
 		Lcd_Show_Operation( Operation_State_Machine, Operation_Shield_Value);
 	}
 #ifdef OPERATION_BREATH_LIGHT_MAX
-	//------- ¹âÈ¦ÁÁ¶È
+	//------- å…‰åœˆäº®åº¦
 	if(Operation_State_Machine == OPERATION_BREATH_LIGHT_MAX)
 	{
 		if(Operation_Breath_Light_Max > 10)
@@ -545,7 +545,7 @@ static void on_Button_2_clicked(void)
 #endif
 }
 
-// ¢Û Ä£Ê½¼ü
+// â‘¢ æ¨¡å¼é”®
 static void on_Button_3_clicked(void)
 {
 	button_cnt = 0;
@@ -619,7 +619,7 @@ static void on_Button_3_clicked(void)
 }
 
 
-// ¢Ü ¿ª»ú¼ü  ¶Ì°´
+// â‘£ å¼€æœºé”®  çŸ­æŒ‰
 static void on_Button_4_Short_Press(void)
 {
 	Sleep_Time_Clean();
@@ -638,43 +638,43 @@ static void on_Button_4_Short_Press(void)
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SLAVE_NODE_ADDRESS, Operation_Addr_Value );
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SLAVE_BAUD_RATE, Operation_Baud_Rate );
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_SUPPORT_CONTROL_METHODS, Operation_Shield_Value );
-	//±£´æ flash
+	//ä¿å­˜ flash
 	Write_MbBuffer_Now();
 	//Dev_Check_Control_Methods();
 
-	//mcu_reset_wifi();// ¸´Î»Ä£×é
-	SysSoftReset();// Èí¼ş¸´Î»
+	//mcu_reset_wifi();// å¤ä½æ¨¡ç»„
+	SysSoftReset();// è½¯ä»¶å¤ä½
 }
 
-// ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 100¼¶ or 5¼¶
+// â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 100çº§ or 5çº§
 static void on_Button_1_2_Short_Press(void)
 {
 
 }
 
-// ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 100¼¶ or 5¼¶
+// â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 100çº§ or 5çº§
 static void on_Button_1_3_Short_Press(void)
 {
 
 }
 
 
-// ¢Ú + ¢Û  ×éºÏ¼ü  ¶Ì°´   
+// â‘¡ + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   
 static void on_Button_2_3_Short_Press(void)
 {
 }
 
-// ¢Ú + ¢Ü  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘£  ç»„åˆé”®  çŸ­æŒ‰
 static void on_Button_2_4_Short_Press(void)
 {
 }
 
-//------------------- °´¼ü»Øµ÷   ³¤°´ ----------------------------
+//------------------- æŒ‰é”®å›è°ƒ   é•¿æŒ‰ ----------------------------
 
 static void on_Button_1_Long_Press(void)
 {
 	static uint8_t Button_1_delay_cnt = 0;
-	//Ë¢Ì«¿ìÁË  20ms
+	//åˆ·å¤ªå¿«äº†  20ms
 	if(Button_1_delay_cnt++ < KEY_LONG_PRESS_STEP)
 		return;
 	Button_1_delay_cnt = 0;
@@ -777,7 +777,7 @@ static void on_Button_1_Long_Press(void)
 static void on_Button_2_Long_Press(void)
 {
 	static uint8_t Button_2_delay_cnt = 0;
-	//Ë¢Ì«¿ìÁË  20ms
+	//åˆ·å¤ªå¿«äº†  20ms
 	if(Button_2_delay_cnt++ < KEY_LONG_PRESS_STEP)
 		return;
 	Button_2_delay_cnt = 0;
@@ -896,7 +896,7 @@ static void on_Button_1_3_Long_Press(void)
 {
 }
 
-// »Ö¸´³ö³§ÉèÖÃ
+// æ¢å¤å‡ºå‚è®¾ç½®
 static void on_Button_2_3_Long_Press(void)
 {
 

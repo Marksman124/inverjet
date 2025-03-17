@@ -37,17 +37,17 @@ typedef struct
 
 void Chenk_BT_State(unsigned char* p_buffer, unsigned char len);
 
-//Ö÷Ñ­»·ÔËĞĞ
+//ä¸»å¾ªç¯è¿è¡Œ
 void MsProcess(ModbusSlaveObj_t * pObj);
-//¶ÔÏó³õÊ¼»¯
+//å¯¹è±¡åˆå§‹åŒ–
 void MsInit(ModbusSlaveObj_t *pObj,unsigned char slaveId,unsigned short timeout,void (*SerialWrite)(unsigned char *buff,int length));
-//´®¿Ú¶ÁÈ¡
+//ä¸²å£è¯»å–
 void MsSerialRead(ModbusSlaveObj_t * pObj,unsigned char *buff,int length);
-//³¬Ê±ÅĞ¶Ï
+//è¶…æ—¶åˆ¤æ–­
 void MsTimeout(ModbusSlaveObj_t * pObj);
-//ÉèÖÃ¼Ä´æÆ÷
+//è®¾ç½®å¯„å­˜å™¨
 void MsConfigureRegister(ModbusSlaveObj_t *pObj,unsigned char cmd,void *reg,unsigned short count);
-//´íÎóÂë¶¨Òå
+//é”™è¯¯ç å®šä¹‰
 typedef enum
 {
 	MS_OK                          = 0x00,

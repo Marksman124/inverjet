@@ -29,46 +29,46 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-#define USART_REC_LEN  			100  	//¶¨Òå×î´ó½ÓÊÕ×Ö½ÚÊı 200
-#define RXBUFFERSIZE   1 //»º´æ´óĞ¡
+#define USART_REC_LEN  			100  	//å®šä¹‰æœ€å¤§æ¥æ”¶å­—èŠ‚æ•° 200
+#define RXBUFFERSIZE   1 //ç¼“å­˜å¤§å°
 
 #define MODBUS_RS485_TX_EN_PORT			GPIOC
 #define MODBUS_RS485_TX_EN_PIN			GPIO_PIN_6
 
-//´®¿Ú1
-#define EN_USART1_RX 			1		//Ê¹ÄÜ£¨1£©/½ûÖ¹£¨0£©´®¿Ú1½ÓÊÕ  	
-extern uint8_t  USART1_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ĞĞ·û 
-extern uint16_t USART1_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
-extern UART_HandleTypeDef huart1; //UART¾ä±ú
-extern uint8_t aRxBuffer1[RXBUFFERSIZE];//HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£1
+#define EN_USART1_RX 			1		//ä½¿èƒ½ï¼ˆ1ï¼‰/ç¦æ­¢ï¼ˆ0ï¼‰ä¸²å£1æ¥æ”¶  	
+extern uint8_t  USART1_RX_BUF[USART_REC_LEN]; //æ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦ 
+extern uint16_t USART1_RX_STA;         		//æ¥æ”¶çŠ¶æ€æ ‡è®°	
+extern UART_HandleTypeDef huart1; //UARTå¥æŸ„
+extern uint8_t aRxBuffer1[RXBUFFERSIZE];//HALåº“USARTæ¥æ”¶Buffer
 
-//´®¿Ú2
-#define EN_USART2_RX 			1		//Ê¹ÄÜ£¨1£©/½ûÖ¹£¨0£©´®¿Ú1½ÓÊÕ
-extern uint8_t  USART2_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ĞĞ·û 
-extern uint16_t USART2_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
-extern UART_HandleTypeDef huart2; //UART¾ä±ú
-extern uint8_t aRxBuffer2[RXBUFFERSIZE];//HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£2
+#define EN_USART2_RX 			1		//ä½¿èƒ½ï¼ˆ1ï¼‰/ç¦æ­¢ï¼ˆ0ï¼‰ä¸²å£1æ¥æ”¶
+extern uint8_t  USART2_RX_BUF[USART_REC_LEN]; //æ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦ 
+extern uint16_t USART2_RX_STA;         		//æ¥æ”¶çŠ¶æ€æ ‡è®°	
+extern UART_HandleTypeDef huart2; //UARTå¥æŸ„
+extern uint8_t aRxBuffer2[RXBUFFERSIZE];//HALåº“USARTæ¥æ”¶Buffer
 
-//´®¿Ú3
-#define EN_USART3_RX 			1		//Ê¹ÄÜ£¨1£©/½ûÖ¹£¨0£©´®¿Ú1½ÓÊÕ
-extern uint8_t  USART3_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ĞĞ·û 
-extern uint16_t USART3_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
-extern UART_HandleTypeDef huart3; //UART¾ä±ú
-extern uint8_t aRxBuffer3[RXBUFFERSIZE];//HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£3
+#define EN_USART3_RX 			1		//ä½¿èƒ½ï¼ˆ1ï¼‰/ç¦æ­¢ï¼ˆ0ï¼‰ä¸²å£1æ¥æ”¶
+extern uint8_t  USART3_RX_BUF[USART_REC_LEN]; //æ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦ 
+extern uint16_t USART3_RX_STA;         		//æ¥æ”¶çŠ¶æ€æ ‡è®°	
+extern UART_HandleTypeDef huart3; //UARTå¥æŸ„
+extern uint8_t aRxBuffer3[RXBUFFERSIZE];//HALåº“USARTæ¥æ”¶Buffer
 
-//´®¿Ú4
-#define EN_USART4_RX 			1		//Ê¹ÄÜ£¨1£©/½ûÖ¹£¨0£©´®¿Ú1½ÓÊÕ
-extern uint8_t  USART4_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ĞĞ·û 
-extern uint16_t USART4_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
-extern UART_HandleTypeDef huart4; //UART¾ä±ú
-extern uint8_t aRxBuffer4[RXBUFFERSIZE];     //HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£4
+#define EN_USART4_RX 			1		//ä½¿èƒ½ï¼ˆ1ï¼‰/ç¦æ­¢ï¼ˆ0ï¼‰ä¸²å£1æ¥æ”¶
+extern uint8_t  USART4_RX_BUF[USART_REC_LEN]; //æ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦ 
+extern uint16_t USART4_RX_STA;         		//æ¥æ”¶çŠ¶æ€æ ‡è®°	
+extern UART_HandleTypeDef huart4; //UARTå¥æŸ„
+extern uint8_t aRxBuffer4[RXBUFFERSIZE];     //HALåº“USARTæ¥æ”¶Buffer
 
-//´®¿Ú4
-#define EN_USART5_RX 			1		//Ê¹ÄÜ£¨1£©/½ûÖ¹£¨0£©´®¿Ú1½ÓÊÕ
-extern uint8_t  USART5_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ĞĞ·û 
-extern uint16_t USART5_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
-extern UART_HandleTypeDef huart5; //UART¾ä±ú
-extern uint8_t aRxBuffer5[RXBUFFERSIZE];     //HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£4
+#define EN_USART5_RX 			1		//ä½¿èƒ½ï¼ˆ1ï¼‰/ç¦æ­¢ï¼ˆ0ï¼‰ä¸²å£1æ¥æ”¶
+extern uint8_t  USART5_RX_BUF[USART_REC_LEN]; //æ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦ 
+extern uint16_t USART5_RX_STA;         		//æ¥æ”¶çŠ¶æ€æ ‡è®°	
+extern UART_HandleTypeDef huart5; //UARTå¥æŸ„
+extern uint8_t aRxBuffer5[RXBUFFERSIZE];     //HALåº“USARTæ¥æ”¶Buffer
 
 /* USER CODE END Includes */
 
@@ -83,7 +83,7 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN Private defines */
-//****************  Ó³Éä ²ÎÊı
+//****************  æ˜ å°„ å‚æ•°
 extern uint16_t* p_Modbus_BaudRate;
 extern uint32_t Modbus_BaudRate_Table[];
 

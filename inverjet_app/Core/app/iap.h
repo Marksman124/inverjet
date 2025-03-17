@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		iap.h
-* @brief   		iap½Ó¿Ú¼°flashµØÖ·¶¨Òå
+* @brief   		iapæŽ¥å£åŠflashåœ°å€å®šä¹‰
 *
 *
 * @author			WQG
@@ -14,59 +14,59 @@
 
 #include "stmflash.h"
 
-typedef  void (*iapfun)(void);				//¶¨ÒåÒ»¸öº¯ÊýÀàÐÍµÄ²ÎÊý.
+typedef  void (*iapfun)(void);				//å®šä¹‰ä¸€ä¸ªå‡½æ•°ç±»åž‹çš„å‚æ•°.
 
-#define FLASH_ADDR_OFFSET_SIZE			(4)  					// Ã¿¸öÊý¾Ý´æ´¢Æ«ÒÆÁ¿
+#define FLASH_ADDR_OFFSET_SIZE			(4)  					// æ¯ä¸ªæ•°æ®å­˜å‚¨åç§»é‡
 #define STM_FLASH_SECTOR_SIZE				(2048)
 
-#define FLASH_APP_PROGRAM_ADDR			(0x08008000)  	// app ³ÌÐò ÆðÊ¼µØÖ·(´æ·ÅÔÚFLASH)
-#define FLASH_APP_PROGRAM_PAGE			(56)  					// app ³ÌÐòÉý¼¶°ü ´óÐ¡ (Ò³Êý n*2048)
+#define FLASH_APP_PROGRAM_ADDR			(0x08008000)  	// app ç¨‹åº èµ·å§‹åœ°å€(å­˜æ”¾åœ¨FLASH)
+#define FLASH_APP_PROGRAM_PAGE			(56)  					// app ç¨‹åºå‡çº§åŒ… å¤§å° (é¡µæ•° n*2048)
 
-#define FLASH_APP_PATCH_ADDR				(0x08024000)  	// app ³ÌÐòÉý¼¶°ü ÆðÊ¼µØÖ·(´æ·ÅÔÚFLASH)
-#define FLASH_APP_PARAM_ADDR				(0x0803E800)  	// app ²ÎÊý ÆðÊ¼µØÖ·
+#define FLASH_APP_PATCH_ADDR				(0x08024000)  	// app ç¨‹åºå‡çº§åŒ… èµ·å§‹åœ°å€(å­˜æ”¾åœ¨FLASH)
+#define FLASH_APP_PARAM_ADDR				(0x0803E800)  	// app å‚æ•° èµ·å§‹åœ°å€
 
 
-#define FLASH_BOOT_PROGRAM_ADDR			(0x08000000)  	// boot ÆðÊ¼µØÖ·(´æ·ÅÔÚFLASH)
+#define FLASH_BOOT_PROGRAM_ADDR			(0x08000000)  	// boot èµ·å§‹åœ°å€(å­˜æ”¾åœ¨FLASH)
 #define FLASH_BOOT_PROGRAM_PAGE			(15)  
 
-#define FLASH_BOOT_PARAM_ADDR  			(0x08007800)  	// boot ³ÌÐò²ÎÊý ÆðÊ¼µØÖ·(´æ·ÅÔÚFLASH)
+#define FLASH_BOOT_PARAM_ADDR  			(0x08007800)  	// boot ç¨‹åºå‚æ•° èµ·å§‹åœ°å€(å­˜æ”¾åœ¨FLASH)
 
-//	OTA ±êÖ¾
+//	OTA æ ‡å¿—
 #define BOOT_FLASH_ADDR_OTA_PASSWORD						(FLASH_BOOT_PARAM_ADDR)
-//	Éý¼¶°ü ´óÐ¡
+//	å‡çº§åŒ… å¤§å°
 #define BOOT_FLASH_ADDR_OTA_PACK_LEN						(BOOT_FLASH_ADDR_OTA_PASSWORD + FLASH_ADDR_OFFSET_SIZE)
 
-//	boot Èí¼þ°æ±¾
+//	boot è½¯ä»¶ç‰ˆæœ¬
 #define BOOT_FLASH_ADDR_BOOT_VERSION						(BOOT_FLASH_ADDR_OTA_PACK_LEN + FLASH_ADDR_OFFSET_SIZE)
-#define FLASH_ADDR_OFFSET_BOOT_VERSION					(16)  					// ³¤¶È  £¨×Ö·û´®´æ´¢£©
+#define FLASH_ADDR_OFFSET_BOOT_VERSION					(16)  					// é•¿åº¦  ï¼ˆå­—ç¬¦ä¸²å­˜å‚¨ï¼‰
 
-//	app ³ÌÐòÉý¼¶°ü ÆðÊ¼µØÖ·
+//	app ç¨‹åºå‡çº§åŒ… èµ·å§‹åœ°å€
 #define BOOT_FLASH_ADDR_OTA_PACK_ADDR						(BOOT_FLASH_ADDR_BOOT_VERSION + FLASH_ADDR_OFFSET_BOOT_VERSION)
 
-//	app ³ÌÐòÉý¼¶°ü ´óÐ¡
+//	app ç¨‹åºå‡çº§åŒ… å¤§å°
 #define BOOT_FLASH_ADDR_OTA_PACK_SIZE						(BOOT_FLASH_ADDR_OTA_PACK_ADDR + FLASH_ADDR_OFFSET_SIZE)
 
-//	app ²ÎÊý ÆðÊ¼µØÖ·
+//	app å‚æ•° èµ·å§‹åœ°å€
 #define BOOT_FLASH_ADDR_APP_PARAM_ADDR					(BOOT_FLASH_ADDR_OTA_PACK_SIZE + FLASH_ADDR_OFFSET_SIZE)
 
-//	app ÏÂÔØ°ü´óÐ¡
+//	app ä¸‹è½½åŒ…å¤§å°
 #define BOOT_FLASH_ADDR_DOWNLOAD_PACK_SIZE			(BOOT_FLASH_ADDR_APP_PARAM_ADDR + FLASH_ADDR_OFFSET_SIZE)
 
 
-#define RANGE_OTA_PACK_LEN_MIN						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	APP Éý¼¶°ü ×îÐ¡Öµ
-#define RANGE_OTA_PACK_LEN_MAX						(FLASH_APP_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	APP Éý¼¶°ü ×î´óÖµ
+#define RANGE_OTA_PACK_LEN_MIN						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	APP å‡çº§åŒ… æœ€å°å€¼
+#define RANGE_OTA_PACK_LEN_MAX						(FLASH_APP_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	APP å‡çº§åŒ… æœ€å¤§å€¼
 
-#define RANGE_BOOT_PACK_LEN_MIN						(STM_FLASH_SECTOR_SIZE)															//	boot Éý¼¶°ü ×î´óÖµ
-#define RANGE_BOOT_PACK_LEN_MAX						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	boot Éý¼¶°ü ×î´óÖµ
+#define RANGE_BOOT_PACK_LEN_MIN						(STM_FLASH_SECTOR_SIZE)															//	boot å‡çº§åŒ… æœ€å¤§å€¼
+#define RANGE_BOOT_PACK_LEN_MAX						(FLASH_BOOT_PROGRAM_PAGE * STM_FLASH_SECTOR_SIZE)		//	boot å‡çº§åŒ… æœ€å¤§å€¼
 
 #define RECORD_LEN_PAGE_MAX		238
 
-#define PRODUCT_APP_PASSWORD 				(0xFee1Dead)  	// feel dead  Ö±½ÓÖØÆô
-#define PRODUCT_BOOT_PASSWORD 			(0x9070B007)  	// go to boot  ½øÈëÉý¼¶
+#define PRODUCT_APP_PASSWORD 				(0xFee1Dead)  	// feel dead  ç›´æŽ¥é‡å¯
+#define PRODUCT_BOOT_PASSWORD 			(0x9070B007)  	// go to boot  è¿›å…¥å‡çº§
 
 
-void iap_load_app(uint32_t appxaddr);			//Ìø×ªµ½APP³ÌÐòÖ´ÐÐ
-void iap_write_appbin(uint32_t appxaddr,uint8_t *appbuf,uint32_t applen);	//ÔÚÖ¸¶¨µØÖ·¿ªÊ¼,Ð´Èëbin
+void iap_load_app(uint32_t appxaddr);			//è·³è½¬åˆ°APPç¨‹åºæ‰§è¡Œ
+void iap_write_appbin(uint32_t appxaddr,uint8_t *appbuf,uint32_t applen);	//åœ¨æŒ‡å®šåœ°å€å¼€å§‹,å†™å…¥bin
 void iap_Process(void);
 void iap_Bootloader_Process(void);
 

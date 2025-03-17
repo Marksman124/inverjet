@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		metering.c
-* @brief   		¼ÆÁ¿Ä£¿éÍ¨Ñ¶Ğ­Òé
+* @brief   		è®¡é‡æ¨¡å—é€šè®¯åè®®
 *
 *
 * @author			WQG
@@ -24,22 +24,22 @@ UART_HandleTypeDef* p_Metering_Module_Huart = &huart4;
 #endif
 
 
-//**************** ÊÕ·¢»º³åÇø
-uint8_t Metering_DMABuff[METERING_RS485_RX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸ö½ÓÊÕ»º´æÇø
-//uint8_t Metering_RxBuff[METERING_RS485_RX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸öÕıÕæµÄ½ÓÊÕÊı×é
-uint8_t Metering_TxBuff[METERING_RS485_TX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸ö·¢ËÍ»º´æÇø
+//**************** æ”¶å‘ç¼“å†²åŒº
+uint8_t Metering_DMABuff[METERING_RS485_RX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªæ¥æ”¶ç¼“å­˜åŒº
+//uint8_t Metering_RxBuff[METERING_RS485_RX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªæ­£çœŸçš„æ¥æ”¶æ•°ç»„
+uint8_t Metering_TxBuff[METERING_RS485_TX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªå‘é€ç¼“å­˜åŒº
 
-//**************** ÂÖÑ¯ÖÜÆÚ¼ÆÊı
+//**************** è½®è¯¢å‘¨æœŸè®¡æ•°
 uint16_t Metering_PERIODIC_CNT = 0;
 
 #define METERING_LEISURE 						( 0 )
 #define METERING_READING 						( 1 )
 uint8_t Metering_PERIODIC_Static = METERING_LEISURE;
 
-//****************  Ó³Éä ²ÎÊı
-uint16_t* p_mb_metering_Address=NULL;			//	Ä£¿éµØÖ·
+//****************  æ˜ å°„ å‚æ•°
+uint16_t* p_mb_metering_Address=NULL;			//	æ¨¡å—åœ°å€
 
-//**************** ¿ìËÙ²éÑ¯±í
+//**************** å¿«é€ŸæŸ¥è¯¢è¡¨
 // 0: Modbus   1: Metering
 uint16_t HoldingAddrTable[5][2] = {{0x20,0xFFFF},{0x21,0x0002},{0x22,0x0006},{0x23,0x000C},{0x24,0xFFFF},};
 
@@ -51,10 +51,10 @@ uint16_t InputAddrTable[16][3] = {
 {0x28,0xFFFF,1000},	{0x2A,0xFFFF,10},		{0x2C,0xFFFF,1000},	{0x2E,0xFFFF,1000},
 };
 
-//**************** ÏûÏ¢¶ÓÁĞ
+//**************** æ¶ˆæ¯é˜Ÿåˆ—
 osMessageQId MeteringQueueHandle;
 
-// Íâ²¿¶¨Òå
+// å¤–éƒ¨å®šä¹‰
 extern DMA_HandleTypeDef hdma_usart1_rx;
 
 /* Private defines -----------------------------------------------------------*/
@@ -64,8 +64,8 @@ extern DMA_HandleTypeDef hdma_usart1_rx;
 #define FLOAT_DATA_ADDR 							( 0x1000 )
 /* Private user code ---------------------------------------------------------*/
 
-/*-------------------- Ğ­Òé×ª»» ----------------------------------------------*/
-//¸ù¾İĞ­Òé×ª»»  µØÖ·ºÅ
+/*-------------------- åè®®è½¬æ¢ ----------------------------------------------*/
+//æ ¹æ®åè®®è½¬æ¢  åœ°å€å·
 uint16_t DataAddr_Metering_to_Modbus(uint16_t addr)
 {
 	uint16_t i,sum;
@@ -90,7 +90,7 @@ uint16_t DataAddr_Metering_to_Modbus(uint16_t addr)
 	return 0xFFFF;
 }
 
-//¸ù¾İĞ­Òé×ª»»  ¹¦ÄÜÂë
+//æ ¹æ®åè®®è½¬æ¢  åŠŸèƒ½ç 
 uint8_t FunctionCode_Metering_to_Modbus(uint16_t addr)
 {
 	uint16_t i,sum;
@@ -113,7 +113,7 @@ uint8_t FunctionCode_Metering_to_Modbus(uint16_t addr)
 	return 0;
 }
 
-//¸ù¾İĞ­Òé×ª»»  µØÖ·ºÅ
+//æ ¹æ®åè®®è½¬æ¢  åœ°å€å·
 uint16_t DataAddr_Modbus_to_Metering(uint8_t fun_code, uint16_t addr)
 {
 	uint16_t i,sum;
@@ -140,10 +140,10 @@ uint16_t DataAddr_Modbus_to_Metering(uint8_t fun_code, uint16_t addr)
 	return 0xFFFF;
 }
 
-//¸ù¾İĞ­Òé×ª»»  ¹¦ÄÜÂë
+//æ ¹æ®åè®®è½¬æ¢  åŠŸèƒ½ç 
 uint8_t FunctionCode_Modbus_to_Metering(uint8_t fun_code, uint16_t addr)
 {
-	// ¼ÆÁ¿Ä£¿é¹¦ÄÜÂë  03
+	// è®¡é‡æ¨¡å—åŠŸèƒ½ç   03
 	return MB_FUNC_READ_HOLDING_REGISTER;
 }
 
@@ -159,8 +159,8 @@ uint16_t uint8_t_to_uint16_t(uint8_t* p_buff)
 	return metering_addr;
 }
 
-/*-------------------- ÊÕ·¢´¦Àí ----------------------------------------------*/
-//·¢ËÍ
+/*-------------------- æ”¶å‘å¤„ç† ----------------------------------------------*/
+//å‘é€
 void Metering_UART_Send(uint8_t* p_buff, uint8_t len)
 {
 #ifdef METERING_MODULE_HUART
@@ -173,13 +173,13 @@ void Metering_UART_Send(uint8_t* p_buff, uint8_t len)
 IntUint value_data;
 FloatUint float_uint;
 
-//½ÓÊÕ
+//æ¥æ”¶
 void Metering_RxData(uint8_t len)
 {
 	uint16_t write_addr;
 	uint8_t	write_function;
 	
-	uint16_t metering_addr;//ÉÏ²ãmodbusµÄ¼Ä´æÆ÷µØÖ·
+	uint16_t metering_addr;//ä¸Šå±‚modbusçš„å¯„å­˜å™¨åœ°å€
 //	IntUint value_data;
 //	FloatUint float_uint;
 	
@@ -208,22 +208,22 @@ void Metering_RxData(uint8_t len)
 		}
 		Metering_PERIODIC_Static = METERING_LEISURE;
 	}
-	memset(Metering_DMABuff,0,METERING_RS485_RX_BUFF_SIZE);    				//Çå¿Õ»º´æÇø
-	__HAL_UART_CLEAR_IDLEFLAG(p_Metering_Module_Huart);               //Çå³ı±êÖ¾Î»
-	HAL_UART_Receive_DMA(p_Metering_Module_Huart,Metering_DMABuff,METERING_RS485_RX_BUFF_SIZE);  //¿ªDMA½ÓÊÕ£¬Êı¾İ´æÈërx_bufferÊı×éÖĞ¡£
+	memset(Metering_DMABuff,0,METERING_RS485_RX_BUFF_SIZE);    				//æ¸…ç©ºç¼“å­˜åŒº
+	__HAL_UART_CLEAR_IDLEFLAG(p_Metering_Module_Huart);               //æ¸…é™¤æ ‡å¿—ä½
+	HAL_UART_Receive_DMA(p_Metering_Module_Huart,Metering_DMABuff,METERING_RS485_RX_BUFF_SIZE);  //å¼€DMAæ¥æ”¶ï¼Œæ•°æ®å­˜å…¥rx_bufferæ•°ç»„ä¸­ã€‚
 #endif
 }
 
-/*-------------------- Ğ­Òé×é°ü ----------------------------------------------*/
-// ÖÜÆÚ²éÑ¯
+/*-------------------- åè®®ç»„åŒ… ----------------------------------------------*/
+// å‘¨æœŸæŸ¥è¯¢
 void Metering_Periodic_Polling(uint8_t* p_buff,uint16_t data_addr)
 {
 	uint16_t crc_value=0;
 	
 	Check_Metering_Address(p_mb_metering_Address);
 	
-	p_buff[0] = *p_mb_metering_Address;//´Ó»úºÅ
-	p_buff[1] = FunctionCode_Modbus_to_Metering( MB_FUNC_READ_INPUT_REGISTER, data_addr );//¹¦ÄÜÂë
+	p_buff[0] = *p_mb_metering_Address;//ä»æœºå·
+	p_buff[1] = FunctionCode_Modbus_to_Metering( MB_FUNC_READ_INPUT_REGISTER, data_addr );//åŠŸèƒ½ç 
 	p_buff[2] = ( data_addr >> 8 );
 	p_buff[3] = ( data_addr & 0xFF );
 	p_buff[4] = 0;
@@ -237,7 +237,7 @@ void Metering_Periodic_Polling(uint8_t* p_buff,uint16_t data_addr)
 }
 
 
-//×é°ü ¹¦ÄÜ04 
+//ç»„åŒ… åŠŸèƒ½04 
 uint8_t Metering_Check_Addr_Legal(uint8_t fun_code, uint16_t data_addr)
 {
 	if(fun_code == 3)
@@ -256,13 +256,13 @@ uint8_t Metering_Check_Addr_Legal(uint8_t fun_code, uint16_t data_addr)
 
 
 
-//×é°ü ¹¦ÄÜ04 
+//ç»„åŒ… åŠŸèƒ½04 
 void Metering_Packet_Type(uint8_t* p_buff,uint8_t fun_code, uint16_t data_addr, uint16_t value)
 {
 	uint16_t crc_value=0;
 	
-	p_buff[0] = *p_mb_metering_Address;//´Ó»úºÅ
-	p_buff[1] = fun_code;//¹¦ÄÜÂë
+	p_buff[0] = *p_mb_metering_Address;//ä»æœºå·
+	p_buff[1] = fun_code;//åŠŸèƒ½ç 
 	p_buff[2] = ( data_addr >> 8 );
 	p_buff[3] = ( data_addr & 0xFF );
 	p_buff[4] = value>>8;
@@ -273,7 +273,7 @@ void Metering_Packet_Type(uint8_t* p_buff,uint8_t fun_code, uint16_t data_addr, 
 }
 
 
-//»ñÈ¡ÂÖÑ¯
+//è·å–è½®è¯¢
 uint16_t Metering_Get_polling_cnt(uint16_t cnt)
 {
 	uint16_t i,sum,result;
@@ -307,9 +307,9 @@ uint16_t Metering_Get_polling_cnt(uint16_t cnt)
 
 
 
-/*-------------------- ¹¦ÄÜ½Ó¿Ú ----------------------------------------------*/
+/*-------------------- åŠŸèƒ½æ¥å£ ----------------------------------------------*/
 
-// ĞŞ¸Ä²¨ÌØÂÊ
+// ä¿®æ”¹æ³¢ç‰¹ç‡
 void USART_Config(uint32_t baud)
 {
 	/* Disable the peripheral */
@@ -348,25 +348,25 @@ void USART_Config(uint32_t baud)
 
 
 
-/*-------------------- »ù±¾½Ó¿Ú ----------------------------------------------*/
-// ³õÊ¼»¯
+/*-------------------- åŸºæœ¬æ¥å£ ----------------------------------------------*/
+// åˆå§‹åŒ–
 void Metering_Receive_Init(void)
 {
 #ifdef METERING_MODULE_HUART
-	//__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_RXNE); //Ê¹ÄÜIDLEÖĞ¶Ï
-	__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_IDLE);//Ê¹ÄÜidleÖĞ¶Ï
+	//__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_RXNE); //ä½¿èƒ½IDLEä¸­æ–­
+	__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_IDLE);//ä½¿èƒ½idleä¸­æ–­
 	__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_ERR);//
 	
-  HAL_UART_Receive_DMA(p_Metering_Module_Huart,Metering_DMABuff,METERING_RS485_RX_BUFF_SIZE);//´ò¿ª´®¿ÚDMA½ÓÊÕ
+  HAL_UART_Receive_DMA(p_Metering_Module_Huart,Metering_DMABuff,METERING_RS485_RX_BUFF_SIZE);//æ‰“å¼€ä¸²å£DMAæ¥æ”¶
 	
-	//¶¨ÒåÏûÏ¢¶ÓÁĞµÄÃû³Æ£¬´óĞ¡£¬ÀàĞÍ
+	//å®šä¹‰æ¶ˆæ¯é˜Ÿåˆ—çš„åç§°ï¼Œå¤§å°ï¼Œç±»å‹
 	osMessageQDef(MeteringQueue, 32, uint32_t);
-	//´´½¨ÏûÏ¢¶ÓÁĞ
+	//åˆ›å»ºæ¶ˆæ¯é˜Ÿåˆ—
 	MeteringQueueHandle = osMessageCreate(osMessageQ(MeteringQueue), NULL);
 #endif
 }
 
-// Ö÷´¦Àíº¯Êı   500ms ÖÜÆÚ
+// ä¸»å¤„ç†å‡½æ•°   500ms å‘¨æœŸ
 void Metering_Protocol_Analysis(void)
 {
 #ifdef METERING_MODULE_HUART
@@ -376,7 +376,7 @@ void Metering_Protocol_Analysis(void)
 	uint16_t value;
 	uint8_t table_mode;
 	
-	// Ö÷¶¯ÃüÁî
+	// ä¸»åŠ¨å‘½ä»¤
   QueueEvent = osMessageGet (MeteringQueueHandle, 0);
 	if(QueueEvent.status == osEventMessage)
 	{
@@ -387,8 +387,8 @@ void Metering_Protocol_Analysis(void)
 		{
 			Metering_Packet_Type(Metering_TxBuff, MB_FUNC_WRITE_REGISTER, meter_addr, value);
 			Metering_UART_Send(Metering_TxBuff, METERING_RS485_TX_BUFF_SIZE);
-			HAL_Delay(50); // µÈ´ı»Ø¸´£¿
-			if(meter_addr == METERING_ADDR_BAUDRATE) // ÉèÖÃ²¨ÌØÂÊ
+			HAL_Delay(50); // ç­‰å¾…å›å¤ï¼Ÿ
+			if(meter_addr == METERING_ADDR_BAUDRATE) // è®¾ç½®æ³¢ç‰¹ç‡
 			{
 				__HAL_UART_DISABLE(p_Metering_Module_Huart);
 #if METERING_MODULE_HUART == 1
@@ -400,7 +400,7 @@ void Metering_Protocol_Analysis(void)
 			}
 		}
 	}
-	// ¶¨ÆÚÂÖÑ¯
+	// å®šæœŸè½®è¯¢
 	if(Metering_PERIODIC_Static == METERING_LEISURE)
 		Metering_PERIODIC_CNT = Metering_Get_polling_cnt(Metering_PERIODIC_CNT);
 	

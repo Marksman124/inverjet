@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				Breath_light.c
-* @brief			ºôÎüµÆ  100 ½×¼¶  50ms¶¨Ê±
+* @brief			å‘¼å¸ç¯  100 é˜¶çº§  50mså®šæ—¶
 *
 * @author			WQG
 * @versions		v1.0
@@ -33,10 +33,10 @@ uint16_t  Light_Brightness_cmp = 0;
 
 double  Light_AdSample = 0;
 
-uint8_t Breath_light_direction=0; // ·½Ïò  ÁÁ Ãð
+uint8_t Breath_light_direction=0; // æ–¹å‘  äº® ç­
 
-uint8_t Key_Buzzer_cnt = 0; //·äÃùÆ÷¼ÆÊ±
-uint8_t Key_Buzzer_Type = 0;	//·äÃùÆ÷³¤¶Ì ÀàÐÍ
+uint8_t Key_Buzzer_cnt = 0; //èœ‚é¸£å™¨è®¡æ—¶
+uint8_t Key_Buzzer_Type = 0;	//èœ‚é¸£å™¨é•¿çŸ­ ç±»åž‹
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -44,11 +44,11 @@ void Breath_light_PwmOut(uint16_t pul);
 
 /* Private user code ---------------------------------------------------------*/
 
-//------------------- Ó²¼þ & Çý¶¯ ----------------------------
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
 
 void App_Breath_light_Init(void)
 {
-	//Ä¬ÈÏ¹Ø±Õ
+	//é»˜è®¤å…³é—­
 	Breath_light_PwmOut(0);
 	
 	DEBUG_LED1_OFF();
@@ -59,7 +59,7 @@ void App_Breath_light_Init(void)
 //uint16_t pwm_out_02[260]={0};
 //uint16_t offset_cnt=0;
 
-// ÊäÈëAD²ÉÑùÖµ£¬·µ»Ø¶ÔÓ¦µÄPWMÖµ
+// è¾“å…¥ADé‡‡æ ·å€¼ï¼Œè¿”å›žå¯¹åº”çš„PWMå€¼
 uint16_t get_PwmDuty(double  AD_Sample)
 {
 	double pwm=0;
@@ -72,7 +72,7 @@ uint16_t get_PwmDuty(double  AD_Sample)
 	return (uint16_t)pwm;
 }
 
-//------------------- Ö÷Ñ­»· ----------------------------
+//------------------- ä¸»å¾ªçŽ¯ ----------------------------
 void App_Breath_light_Handler(void)
 {
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_BREATH_LIGHT);
@@ -87,7 +87,7 @@ void App_Breath_light_Handler(void)
 			Light_Brightness_cmp = Light_Brightness;	
 	}
 	
-	if(System_is_Starting() || ((System_is_Running()||System_is_Error()) && Special_Status_Get(SPECIAL_BIT_SKIP_STARTING)))	// ÈíÆô¶¯
+	if(System_is_Starting() || ((System_is_Running()||System_is_Error()) && Special_Status_Get(SPECIAL_BIT_SKIP_STARTING)))	// è½¯å¯åŠ¨
 	{
 		if(Breath_light_direction == 0)
 		{
@@ -117,7 +117,7 @@ void App_Breath_light_Handler(void)
 //		offset_cnt = Light_AdSample/40;
 //		pwm_out_01[offset_cnt] = Light_Brightness;
 	}
-	else if(System_is_Pause())	// ÔÝÍ£
+	else if(System_is_Pause())	// æš‚åœ
 	{
 		if(Breath_light_direction == 0)
 		{
@@ -147,7 +147,7 @@ void App_Breath_light_Handler(void)
 //		offset_cnt = Light_AdSample/16;
 //		pwm_out_02[offset_cnt] = Light_Brightness;
 	}
-	else if(System_is_Power_Off())	// ¹Ø»ú
+	else if(System_is_Power_Off())	// å…³æœº
 	{
 		if(Light_AdSample > 0)
 		{
@@ -173,8 +173,8 @@ void App_Breath_light_Handler(void)
 }
 
 
-//------------------- pwm¿ØÖÆ ----------------------------
-// µ÷½Ú·¶Î§ : 1 - 100
+//------------------- pwmæŽ§åˆ¶ ----------------------------
+// è°ƒèŠ‚èŒƒå›´ : 1 - 100
 void Breath_light_PwmOut(uint16_t pul)
 {
 	HAL_TIM_PWM_Stop_IT(p_htim_breath_light, BREATH_LIGHT_PWM_CHANNEL);
@@ -182,7 +182,7 @@ void Breath_light_PwmOut(uint16_t pul)
 	HAL_TIM_PWM_Start(p_htim_breath_light, BREATH_LIGHT_PWM_CHANNEL);
 }
 
-//------------------- Ä£Äâµ÷½ÚÁÁ¶È ----------------------------
+//------------------- æ¨¡æ‹Ÿè°ƒèŠ‚äº®åº¦ ----------------------------
 
 void Breath_light_Max(void)
 {
@@ -194,7 +194,7 @@ void Breath_light_Off(void)
 	Breath_light_PwmOut(0);
 }
 
-//------------------- ·äÃùÆ÷ ----------------------------
+//------------------- èœ‚é¸£å™¨ ----------------------------
 void Buzzer_Click_On(void)
 {
 	if(System_is_Power_Off())

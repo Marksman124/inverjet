@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		down_conversion.h
-* @brief   		½µÆµ¿ØÖÆ
+* @brief   		é™é¢‘æ§åˆ¶
 *
 *
 * @author			WQG
@@ -20,33 +20,33 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 
-//#include "display.h"			// ÏÔÊ¾Ä£¿é
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+//#include "display.h"			// æ˜¾ç¤ºæ¨¡å—
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 
 /* Private includes ----------------------------------------------------------*/
 
 
 /* Exported types ------------------------------------------------------------*/
 
-// ½µÆµ ÀàĞÍ
+// é™é¢‘ ç±»å‹
 typedef enum
 {
-	Down_Conversion_Off = 0,					//	ÎŞ
-	Down_Conversion_Mos_Temper,				//	mos ¸ßÎÂ
-	Down_Conversion_Box_Temper,				//	»úÏä ¸ßÎÂ
-	Down_Conversion_Out_Current,			//	Êä³ö µçÁ÷
-	Down_Conversion_Out_Power,				//	Êä³ö ¹¦ÂÊ
+	Down_Conversion_Off = 0,					//	æ— 
+	Down_Conversion_Mos_Temper,				//	mos é«˜æ¸©
+	Down_Conversion_Box_Temper,				//	æœºç®± é«˜æ¸©
+	Down_Conversion_Out_Current,			//	è¾“å‡º ç”µæµ
+	Down_Conversion_Out_Power,				//	è¾“å‡º åŠŸç‡
 } Down_Conversion_Type_enum;
 
 
-// ½µÆµ ÆµÂÊ
+// é™é¢‘ é¢‘ç‡
 typedef enum
 {
-	Down_Conversion_Rate_Off = 0,						//	ÎŞ
-	Down_Conversion_Rate_Low,								//	ÂıËÙ						1%/2min
-	Down_Conversion_Rate_Normal,						//	Õı³£ËÙ¶È					1%/min
-	Down_Conversion_Rate_High,							//	¿ìËÙ						1%/30s
-	Down_Conversion_Rate_Realtime,					//	Òì³£¿ìËÙ					1%/10s
+	Down_Conversion_Rate_Off = 0,						//	æ— 
+	Down_Conversion_Rate_Low,								//	æ…¢é€Ÿ						1%/2min
+	Down_Conversion_Rate_Normal,						//	æ­£å¸¸é€Ÿåº¦					1%/min
+	Down_Conversion_Rate_High,							//	å¿«é€Ÿ						1%/30s
+	Down_Conversion_Rate_Realtime,					//	å¼‚å¸¸å¿«é€Ÿ					1%/10s
 } Down_Conversion_Rate_enum;
 
 /* Exported constants --------------------------------------------------------*/
@@ -55,72 +55,72 @@ typedef enum
 
 /* Exported macro ------------------------------------------------------------*/
 
-//-------------  ½µÆµÆµÂÊ ÒÀ¾İ -------------
-// MOS ÎÂ¶È ¡À1¡ãC  steady
-//			#define MOS_TEMPER_RATE_STABLE					(15 * 60)				//	15min 	ÎÈ¶¨
-#define MOS_TEMPER_RATE_LOW							(10 * 60)				//	10min 	ÂıËÙ
-#define MOS_TEMPER_RATE_NORMAL					( 5 * 60)				//	5min		Õı³£ËÙ¶È
-#define MOS_TEMPER_RATE_HIGH						( 2 * 60)				//	2min		¿ìËÙ
-#define MOS_TEMPER_RATE_REALTIME				( 1 * 60)				//	1min		Òì³£¿ìËÙ
+//-------------  é™é¢‘é¢‘ç‡ ä¾æ® -------------
+// MOS æ¸©åº¦ Â±1Â°C  steady
+//			#define MOS_TEMPER_RATE_STABLE					(15 * 60)				//	15min 	ç¨³å®š
+#define MOS_TEMPER_RATE_LOW							(10 * 60)				//	10min 	æ…¢é€Ÿ
+#define MOS_TEMPER_RATE_NORMAL					( 5 * 60)				//	5min		æ­£å¸¸é€Ÿåº¦
+#define MOS_TEMPER_RATE_HIGH						( 2 * 60)				//	2min		å¿«é€Ÿ
+#define MOS_TEMPER_RATE_REALTIME				( 1 * 60)				//	1min		å¼‚å¸¸å¿«é€Ÿ
 
-// BOX ÎÂ¶È ¡À1¡ãC
-//			#define BOX_TEMPER_RATE_STABLE					(15 * 60)				//	15min 	ÎÈ¶¨
-#define BOX_TEMPER_RATE_LOW							(10 * 60)				//	10min 	ÂıËÙ
-#define BOX_TEMPER_RATE_NORMAL					( 5 * 60)				//	5min		Õı³£ËÙ¶È
-#define BOX_TEMPER_RATE_HIGH						( 2 * 60)				//	2min		¿ìËÙ
-#define BOX_TEMPER_RATE_REALTIME				( 1 * 60)				//	1min		Òì³£¿ìËÙ
+// BOX æ¸©åº¦ Â±1Â°C
+//			#define BOX_TEMPER_RATE_STABLE					(15 * 60)				//	15min 	ç¨³å®š
+#define BOX_TEMPER_RATE_LOW							(10 * 60)				//	10min 	æ…¢é€Ÿ
+#define BOX_TEMPER_RATE_NORMAL					( 5 * 60)				//	5min		æ­£å¸¸é€Ÿåº¦
+#define BOX_TEMPER_RATE_HIGH						( 2 * 60)				//	2min		å¿«é€Ÿ
+#define BOX_TEMPER_RATE_REALTIME				( 1 * 60)				//	1min		å¼‚å¸¸å¿«é€Ÿ
 
-// Êä³ö µçÁ÷ ¡À2A
-//			#define OUT_CURRENT_RATE_STABLE					(15 * 60)				//	15min 	ÎÈ¶¨
-#define OUT_CURRENT_RATE_LOW						(2 * 60)				//	2min 	ÂıËÙ
-#define OUT_CURRENT_RATE_NORMAL					( 60 )					//	1min		Õı³£ËÙ¶È
-#define OUT_CURRENT_RATE_HIGH						( 30 )					//	30S		¿ìËÙ
-#define OUT_CURRENT_RATE_REALTIME				( 10 )					//	10s		Òì³£¿ìËÙ
+// è¾“å‡º ç”µæµ Â±2A
+//			#define OUT_CURRENT_RATE_STABLE					(15 * 60)				//	15min 	ç¨³å®š
+#define OUT_CURRENT_RATE_LOW						(2 * 60)				//	2min 	æ…¢é€Ÿ
+#define OUT_CURRENT_RATE_NORMAL					( 60 )					//	1min		æ­£å¸¸é€Ÿåº¦
+#define OUT_CURRENT_RATE_HIGH						( 30 )					//	30S		å¿«é€Ÿ
+#define OUT_CURRENT_RATE_REALTIME				( 10 )					//	10s		å¼‚å¸¸å¿«é€Ÿ
 
 
-// ½µÆµ ÆµÂÊ  N ÃëÃ¿ 1%
+// é™é¢‘ é¢‘ç‡  N ç§’æ¯ 1%
 #define DOWN_CONVERSION_RATE_LOW						(120)
 #define DOWN_CONVERSION_RATE_NORMAL					( 60)
 #define DOWN_CONVERSION_RATE_HIGH						( 30)
 #define DOWN_CONVERSION_RATE_REALTIME				( 10)
 
 
-// »ØÉı ËÙ¶È Ãë/1%
-#define REBOUND_FREQUENCHY_TIME_LOW						(120)		//	2min 	ÂıËÙ
-#define REBOUND_FREQUENCHY_TIME_HIGH					(30)		//	30s 	¿ìËÙ
+// å›å‡ é€Ÿåº¦ ç§’/1%
+#define REBOUND_FREQUENCHY_TIME_LOW						(120)		//	2min 	æ…¢é€Ÿ
+#define REBOUND_FREQUENCHY_TIME_HIGH					(30)		//	30s 	å¿«é€Ÿ
 
 
-//¹«Ê½
+//å…¬å¼
 #define GET_MAX_FROM_3(x, y, z) ((x) > (y) ? ((x) > (z) ? (x) : (z)) : ((y) > (z) ? (y) : (z)))
 
 /* Exported functions prototypes ---------------------------------------------*/
-// Çå³ı ËùÓĞ ½µÆµ ×´Ì¬
+// æ¸…é™¤ æ‰€æœ‰ é™é¢‘ çŠ¶æ€
 extern void Clean_All_Down_Conversion_Status(void);
 
 
-//-------------------- ¸ßÎÂ½µËÙ  mos ----------------------------
+//-------------------- é«˜æ¸©é™é€Ÿ  mos ----------------------------
 extern void Check_Down_Conversion_MOS_Temperature(short int Temperature);
-//-------------------- ¸ßÎÂ½µÆµ  »úÏä ----------------------------
+//-------------------- é«˜æ¸©é™é¢‘  æœºç®± ----------------------------
 extern void Check_Down_Conversion_BOX_Temperature(short int Temperature);
-//-------------------- ¹¦ÂÊ½µÆµ   ----------------------------
+//-------------------- åŠŸç‡é™é¢‘   ----------------------------
 extern void Check_Down_Conversion_Motor_Power(uint16_t power);
-//-------------------- µçÁ÷½µÆµ   ----------------------------
+//-------------------- ç”µæµé™é¢‘   ----------------------------
 extern void Check_Down_Conversion_Motor_Current(uint32_t Current);
 
-//-------------------- »ñÈ¡½µÆµ´ÎÊı ----------------------------
+//-------------------- è·å–é™é¢‘æ¬¡æ•° ----------------------------
 uint8_t Get_Down_Conversion_Time(void);
-//-------------------- »ñÈ¡½µÆµÇ°ËÙ¶È ----------------------------
+//-------------------- è·å–é™é¢‘å‰é€Ÿåº¦ ----------------------------
 uint8_t Get_Down_Conversion_Speed_Old(void);
-//-------------------- ÉèÖÃ½µÆµÇ°ËÙ¶È ----------------------------
+//-------------------- è®¾ç½®é™é¢‘å‰é€Ÿåº¦ ----------------------------
 void Set_Down_Conversion_Speed_Old(uint8_t vaule);
-//-------------------- »ñÈ¡½µÆµÏÖÔÚËÙ¶È ----------------------------
+//-------------------- è·å–é™é¢‘ç°åœ¨é€Ÿåº¦ ----------------------------
 uint8_t Get_Down_Conversion_Speed_Now(void);
 
-//-------------------- »ñÈ¡¸ßÎÂ½µËÙÄ£Ê½ ----------------------------
+//-------------------- è·å–é«˜æ¸©é™é€Ÿæ¨¡å¼ ----------------------------
 extern uint8_t Get_Temp_Slow_Down_State(void);
 
 
-// ½µÆµÈÎÎñÖ÷Ïß³Ì 	Ã¿Ãë½øÒ»´Î
+// é™é¢‘ä»»åŠ¡ä¸»çº¿ç¨‹ 	æ¯ç§’è¿›ä¸€æ¬¡
 extern void Down_Conversion_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/

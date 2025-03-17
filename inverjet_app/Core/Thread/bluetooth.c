@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				bluetooth.c
-* @brief			bluetooth Ä£×é
+* @brief			bluetooth æ¨¡ç»„
 *
 * @author			WQG
 * @versions		v1.0
@@ -31,12 +31,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 static BT_STATE_MODE_E BT_State_Machine = BT_NO_CONNECT;
-//´®¿Ú½ÓÊÕ
+//ä¸²å£æ¥æ”¶
 uint8_t BT_Uart_Read_Buffer;
-//ÉùÃ÷Ò»¸ö¶ÔÏó
+//å£°æ˜ä¸€ä¸ªå¯¹
 ModbusSlaveObj_t Ms_BT_Modbus;
 
-//´®¿Ú½ÓÊÕ
+//ä¸²å£æ¥å¯¹è±¡
 uint8_t BT_Read_Buffer_For_Test[64]={0};
 uint16_t BT_Read_Cnt_For_Test=0;
 
@@ -45,18 +45,18 @@ static uint16_t BT_Halder_cnt = 0;
 
 
 /* Private user code ---------------------------------------------------------*/
-//´®¿Ú·¢ËÍ½Ó¿Ú
+//ä¸²å£å‘é€æ¥å£
 void SerialWrite(unsigned char *buff,int length)
 {
 	HAL_UART_Transmit(&huart5,buff,length,200);
 }
 
-//-------------------- ·¢ËÍ ----------------------------
+//-------------------- å‘é€----------------------------
 void BT_UART_Send(uint8_t* p_buff, uint8_t len)
 {
 	HAL_UART_Transmit(&huart5, p_buff, len, 200);
 }
-//´®¿Ú½ÓÊÕ½Ó¿Ú
+//ä¸²å£æ¥æ”¶
 void BT_Read_Data_Bit(unsigned char vaule)
 {
 	//+EVENT:BLE_CONNECTED
@@ -95,7 +95,7 @@ void BT_Read_Data_Bit(unsigned char vaule)
 		
 }
 
-//½ÓÊÕÖĞ¶Ïµ÷ÓÃ
+//ä¸­æ–­è°ƒç”¨
 void Usart_IRQ_CallBack(uint8_t data)
 {
 	if(IS_CHECK_ERROR_MODE())
@@ -113,7 +113,7 @@ void Usart_IRQ_CallBack(uint8_t data)
 }
 
 
-// AT Ö¸Áî Éè MAC
+// AT æŒ‡ä»¤ è®¾ç½® MAC
 void BT_Set_MAC(void)
 {
 	char buff[32]={"AT+BLEMAC=123456789012\r\n"};
@@ -125,19 +125,21 @@ void BT_Set_MAC(void)
 	osDelay(1000);
 }
 
-// AT Ö¸Áî Éè Ãû³Æ
+// AT æŒ‡ä»¤ è®¾ç½®åç§°
 void BT_Set_Name(void)
 {
-	char buff[32]={"AT+BLENAME=inverjet\r\n"};
+	char buff_1[32]={"AT+BLENAME=inverjet\r\n"};
+	char buff_0[32]={"AT+BLENAME=Anjie_Ble\r\n"};
 	
-	//sprintf(buff,"AT+BLENAME=inverjet\r\n");
-	
-	SerialWrite((uint8_t*)buff,strlen(buff));
+	if(*p_BLE_Pair_Finish == 1)
+		SerialWrite((uint8_t*)buff_0,strlen(buff_0));
+	else
+		SerialWrite((uint8_t*)buff_1,strlen(buff_1));
 	
 	osDelay(1000);
 }
 
-// AT Ö¸Áî Éè ´Ó»úÄ£Ê½
+// AT æŒ‡ä»¤ è®¾ç½®ä»æœºæ¨¡å¼
 void BT_Set_Mode(uint8_t data)
 {
 	char buff[32]={0};
@@ -146,9 +148,22 @@ void BT_Set_Mode(uint8_t data)
 	
 	SerialWrite((uint8_t*)buff,strlen(buff));
 	
-	osDelay(6000);
+	osDelay(3000);
 }
-// AT Ö¸Áî Éè MTU
+
+// AT æŒ‡ä»¤ å¼€/å…³ å¹¿æ’­
+void BT_Set_Adven(uint8_t data)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+BLEADVEN=%d\r\n",data);
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
+}
+
+// AT æŒ‡ä»¤ è®¾ç½® MTU
 void BT_Set_MTU(uint8_t data)
 {
 	char buff[32]={0};
@@ -159,7 +174,7 @@ void BT_Set_MTU(uint8_t data)
 	
 	osDelay(1000);
 }
-// AT Ö¸Áî Éè ¹¦ÂÊ
+// AT æŒ‡ä»¤ è®¾ç½® åŠŸç‡
 void BT_Set_Power(uint8_t data)
 {
 	char buff[32]={0};
@@ -170,14 +185,34 @@ void BT_Set_Power(uint8_t data)
 	
 	osDelay(1000);
 }
-
-
-// AT Ö¸Áî ½øÈëÍ¸´«
+// AT æŒ‡ä»¤ è®¾ç½®å¹¿æ’­é—´éš”  ADVINTV
+void BT_Set_Advintv(uint16_t data)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+ADVINTV=%d\r\n",data);
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
+}
+// AT æŒ‡ä»¤ è®¾ç½®é…å¯¹ç  AT+BLEAUTH=123456
+void BT_Set_Auth(void)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+BLEAUTH=123456\r\n");
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(1000);
+}
+// AT æŒ‡ä»¤ è¿›å…¥é€ä¼ 
 void BT_Set_TRANSENTER(uint8_t data)
 {
 	char buff[32]={0};
 	
-	if(data == 0)//ÍË³ö
+	if(data == 0)//é€€å‡º
 	{
 		SerialWrite((uint8_t*)"+++",3);
 	}
@@ -190,7 +225,7 @@ void BT_Set_TRANSENTER(uint8_t data)
 	
 	osDelay(1000);
 }
-// AT Ö¸Áî É¨Ãè
+// AT æŒ‡ä»¤ å¼€å¯æ‰«æ
 void BT_Scan_Server(void)
 {
 	char buff[32]={0};
@@ -202,7 +237,7 @@ void BT_Scan_Server(void)
 	osDelay(5000);
 }
 
-// AT Ö¸Áî ÖØÆô
+// AT æŒ‡ä»¤ æ¨¡ç»„ é‡å¯
 void BT_Restar(void)
 {
 	char buff[32]={0};
@@ -214,8 +249,19 @@ void BT_Restar(void)
 	osDelay(3000);
 }
 
+// AT æŒ‡ä»¤ æ¢å¤å‡ºå‚
+void BT_Restore_Factory(void)
+{
+	char buff[32]={0};
+	
+	sprintf(buff,"AT+RESTORE\r\n");
+	
+	SerialWrite((uint8_t*)buff,strlen(buff));
+	
+	osDelay(5000);
+}
 
-// AT Ö¸Áî Á¬½Ó ¹¤×°
+// AT æŒ‡ä»¤ è¿æ¥ å·¥è£…
 void BT_Connect_TestServer(void)
 {
 	char buff[32]={0};
@@ -229,7 +275,7 @@ void BT_Connect_TestServer(void)
 }
 
 
-// AT Ö¸Áî ÍË³öÁ¬½Ó
+// AT æŒ‡ä»¤ é€€å‡ºè¿æ¥
 void BT_Out_Connect(void)
 {
 	char buff[32]={0};
@@ -240,7 +286,7 @@ void BT_Out_Connect(void)
 	osDelay(2000);
 }
 
-// Í¬²½×´Ì¬»ú
+// åŒæ­¥çŠ¶æ€æœº
 //void BT_State_Machine_Update(void)
 //{
 //	uint8_t buff[32]={0x15, 0x10, 0x00, 0x21, 0x00, 0x04, 0x08};
@@ -267,36 +313,72 @@ void BT_Out_Connect(void)
 //	BT_UART_Send(buff,17);
 //}
 
+void BT_Module_AT_Factory(void)
+{
+	BT_Set_TRANSENTER(0);
+	BT_Out_Connect();
+	BT_Restore_Factory();
+}
 
 //
 void BT_Module_AT_Init(void)
 {
 	BT_Set_TRANSENTER(0);
 	BT_Out_Connect();
+
+	BT_Set_Name();
 	BT_Set_Mode(0);
-	BT_Set_MTU(243);
-	BT_Set_Power(9);
-	//BT_Set_TRANSENTER(1);//½øÈëÍ¸´«
+	//BT_Set_MTU(243);
+	BT_Set_Power(10);
+	
+	//é‡å¯
+	BT_Restar();
+	
+	BT_Set_Advintv(160);
+	
+	//BT_Set_Auth();
+	
+	if(*p_BLE_Pair_Finish == 1)
+		BT_Set_Adven(1);
+	else
+		BT_Set_Adven(0);
+	//BT_Set_TRANSENTER(1);// è¿›å…¥é€ä¼ 
 }
 //
 void BT_Module_AT_ReInit(void)
 {
-	// À­µÍ¸´Î»
-	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	//osDelay(2000);
-	//²»¸´Î»
 	BT_Set_TRANSENTER(0);
+	BT_Out_Connect();
 	
+	//BT_Restore_Factory();
+	*p_BLE_Pair_Finish=0;
+	BLE_Pair_Finish_Now = 0;
 	
 	BT_Set_Name();
-	BT_Set_MAC();
+	Write_MbBuffer_Now();//
+	//BT_Set_MAC();
 	BT_Set_Mode(0);
-	BT_Set_MTU(243);
-	BT_Set_Power(9);
+	//BT_Set_MTU(243);
+	BT_Set_Power(10);
+	//é‡å¯
+	BT_Restar();
+	
+	BT_Set_Advintv(160);
+	//BT_Set_Auth();
+	//BT_Set_Adven(1);
 }
 
+void BT_Module_AT_NoConnect(void)
+{
+	BT_Set_TRANSENTER(0);
+	BT_Out_Connect();
+	
+	BT_Set_Adven(0);
+	//é‡å¯
+	//BT_Restar();
+}
 
-//------------------- À¶ÑÀ ½øÈë¹¤×° ----------------------------
+//------------------- è“ç‰™ è¿›å…¥å·¥è£… ----------------------------
 void BT_Module_AT_InTest(void)
 {
 	BT_Set_TRANSENTER(0);
@@ -314,18 +396,18 @@ void BT_Module_AT_InTest(void)
 }
 
 
-//------------------- À¶ÑÀ ³ÖĞø²âÊÔ ----------------------------
+//------------------- è“ç‰™ æŒç»­æµ‹è¯• ----------------------------
 void BT_Module_AT_DoTest(void)
 {
 	BT_Connect_TestServer();
 }
 
-//------------------- À¶ÑÀ Modbus ÅäÖÃ³õÊ¼»¯ ----------------------------
+//------------------- è“ç‰™ Modbus é…ç½®åˆå§‹åŒ–----------------------------
 void BT_Modbus_Config_Init(void)
 {
-	//³õÊ¼»¯¶ÔÏó
+	//åˆå§‹åŒ–
 	MsInit(&Ms_BT_Modbus,21,1,SerialWrite);
-	//ÉèÖÃ01¼Ä´æÆ÷µÄ²ÎÊı£¬²»ÉèÖÃµÄ»°»á·µ»ØÎŞĞ§µÄ¹¦ÄÜ´íÎóÂë
+	//è®¾ç½®01å¯„å­˜å™¨çš„å‚æ•°,
 	//MsConfigureRegister(&Ms_BT_Modbus,0x01,buff01,sizeof(buff01));
 	//MsConfigureRegister(&Ms_BT_Modbus,0x0F,buff01,sizeof(buff01));
 	MsConfigureRegister(&Ms_BT_Modbus,0x03,Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,0),REG_HOLDING_NREGS);
@@ -336,14 +418,14 @@ void BT_Modbus_Config_Init(void)
 	
 }
 /*******************************************************************************
-*¹¦ÄÜ£º³¬Ê±¼ÆÊı£¬·Åµ½¶¨Ê±Æ÷ÖĞÔËĞĞ£¬Ò»°ã·Åµ½1msÖĞ¶Ï×ã¹»Âú×ãÒªÇó
-*******************************************************************************/
+*åŠŸèƒ½ï¼šè¶…æ—¶è®¡æ•°ï¼Œæ”¾åˆ°å®šæ—¶å™¨ä¸­è¿è¡Œï¼Œä¸€èˆ¬æ”¾åˆ?msä¸­æ–­è¶³å¤Ÿæ»¡è¶³è¦æ±‚
+*/
 void BT_MsTimeout(void)
 {
 	MsTimeout(&Ms_BT_Modbus);
 }
 
-//------------------- ÉèÖÃwifi×´Ì¬»ú ----------------------------
+//------------------- è®¾ç½®wifiçŠ¶æ€æœº ----------------------------
 void BT_Set_Machine_State(BT_STATE_MODE_E para)
 {
 	if(para <= BT_ERROR)
@@ -352,14 +434,14 @@ void BT_Set_Machine_State(BT_STATE_MODE_E para)
 	}
 }
 	
-//------------------- »ñÈ¡wifi×´Ì¬»ú ----------------------------
+//------------------- è·å–wifiçŠ¶æ€æœº ----------------------------
 BT_STATE_MODE_E BT_Get_Machine_State(void)
 {
 	return BT_State_Machine;
 }
 
 
-//------------------- ½ÓÊÕ´¦Àíº¯Êı ----------------------------
+//------------------- æ¥æ”¶å¤„ç†å‡½æ•° ----------------------------
 void BT_Read_Handler(void)
 {
 	static uint8_t self_test_cnt=0;
@@ -383,23 +465,23 @@ void BT_Read_Handler(void)
 	}
 }
 
-//------------------- ½øÈëÅäÍø ----------------------------
+//------------------- è¿›å…¥é…ç½‘ ----------------------------
 void BT_Get_In_Distribution(void)
 {
 	BT_Set_Machine_State( BT_DISTRIBUTION );
 	
 	BT_Halder_cnt = 0;
-	//BT_Module_AT_ReInit();
+	BT_Module_AT_ReInit();
 }
 
-//------------------- ½øÈë¹ÊÕÏ ----------------------------
+//------------------- è¿›å…¥æ•…éšœ ----------------------------
 void BT_Get_In_Error(void)
 {
 	BT_Set_Machine_State( BT_ERROR );
 	
 }
 
-//------------------- ÅäÍø´¦Àí 0.5Ãë½øÒ»´Î----------------------------
+//------------------- é…ç½‘å¤„ç† 0.5ç§’è¿›ä¸€æ¬¡ ----------------------------
 void BT_Distribution_Halder(void)
 {
 	if(BT_Halder_cnt == 0)
@@ -422,7 +504,7 @@ void BT_Distribution_Halder(void)
 		BT_Halder_cnt = 0;
 }
 
-//------------------- ÁªÍø´¦Àí 0.5Ãë½øÒ»´Î----------------------------
+//------------------- è”ç½‘å¤„ç† 0.5ç§’è¿›ä¸€æ¬¡ ----------------------------
 //void BT_Online_Connect_Halder(void)
 //{
 //	if(BT_Halder_cnt == 0)

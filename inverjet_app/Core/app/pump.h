@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		pump.h
-* @brief   		Ë®±Ã¿ØÖÆÄ£¿é
+* @brief   		æ°´æ³µæ§åˆ¶æ¨¡å—
 *
 *
 * @author			WQG
@@ -57,7 +57,7 @@ extern uint16_t Voltage_Pump_2;
 extern void Call_PUMP_Handle_Init(void);
 extern void Call_PUMP_Handle_Task(void);
 
-/************* ²âÊÔÓÃ ***************************/
+/************* æµ‹è¯•ç”¨ ***************************/
 extern void PUMP_Hardware_Debug(void);
 
 /* USER CODE END Prototypes */

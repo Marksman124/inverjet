@@ -1,8 +1,8 @@
 /**
 ******************************************************************************
 * @file    		dmx512.c
-* @brief   		µÆ°åÍ¨Ñ¶Ğ­Òé
-*						Ê¹ÓÃ USART4 ,  RS485 ·½Ê½Í¨Ñ¶ 
+* @brief   		ç¯æ¿é€šè®¯åè®®
+*						ä½¿ç”¨ USART4 ,  RS485 æ–¹å¼é€šè®¯ 
 *
 * @author			WQG
 * @versions   v1.0
@@ -23,10 +23,10 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-//Í¨¹ı½ÓÊÕ»º´æÇøºóÔÙ´æÈë modbus_buffer ???
+//é€šè¿‡æ¥æ”¶ç¼“å­˜åŒºåå†å­˜å…¥ modbus_buffer ???
 #ifdef DMX512_SEPARATE_BUFFER
-//uint8_t Dmx512_RxBuff[DMX512_RS485_RX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸ö½ÓÊÕÊı×é
-uint8_t Dmx512_TxBuff[DMX512_RS485_TX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸ö·¢ËÍ»º´æÇø
+//uint8_t Dmx512_RxBuff[DMX512_RS485_RX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªæ¥æ”¶æ•°ç»„
+uint8_t Dmx512_TxBuff[DMX512_RS485_TX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªå‘é€ç¼“å­˜åŒº
 #endif
 
 uint8_t* p_Dmx512_RxBuff;
@@ -34,8 +34,8 @@ uint8_t* p_Dmx512_TxBuff;
 
 uint16_t* p_Dmx512_DataLen;
 
-//uint8_t Dmx512_Rx_Flag=1;//½ÓÊÕ±êÖ¾
-//uint8_t Dmx512_PERIODIC_CNT = 0;					//ÂÖÑ¯ÖÜÆÚ¼ÆÊı
+//uint8_t Dmx512_Rx_Flag=1;//æ¥æ”¶æ ‡å¿—
+//uint8_t Dmx512_PERIODIC_CNT = 0;					//è½®è¯¢å‘¨æœŸè®¡æ•°
 
 uint8_t Dmx512_Send_Buff[DMX512_RS485_TX_BUFF_SIZE+1] = {0};
 
@@ -91,14 +91,14 @@ void Dmx512_Receive_Init(void)
 	p_Dmx512_DataLen = (uint16_t*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,REG_DATA_ADDR_DMX512_LENTH);
 #endif
 	
-	__HAL_UART_ENABLE_IT(p_Dmx512_Huart, UART_IT_IDLE);//Ê¹ÄÜidleÖĞ¶Ï
+	__HAL_UART_ENABLE_IT(p_Dmx512_Huart, UART_IT_IDLE);//ä½¿èƒ½idleä¸­æ–­
 	HAL_UART_Receive_IT(p_Dmx512_Huart, p_Dmx512_RxBuff, DMX512_RS485_TX_BUFF_SIZE);
 	
 	//Dmx512_Rs485_RecMode();
 
-	Dmx512_Rs485_SendMode();			//ÉèÖÃÎª·¢ËÍÄ£Ê½
+	Dmx512_Rs485_SendMode();			//è®¾ç½®ä¸ºå‘é€æ¨¡å¼
 	
-	Set_Dmx512_Data_Change(0);//±êÖ¾ÖÃ0
+	Set_Dmx512_Data_Change(0);//æ ‡å¿—ç½®0
 #endif
 }
 
@@ -121,21 +121,21 @@ void UartPortModeChang(uint8_t mode)
 	}
 }
 
-void Dmx512_Send(uint8_t buff[],uint16_t num)		//numÎªÊı¾İ³¤¶È£¬ÒòÎªÓĞ0X00ËùÒÔ²»ÄÜÓÃstrlen¼ÆËã³¤¶È
+void Dmx512_Send(uint8_t buff[],uint16_t num)		//numä¸ºæ•°æ®é•¿åº¦ï¼Œå› ä¸ºæœ‰0X00æ‰€ä»¥ä¸èƒ½ç”¨strlenè®¡ç®—é•¿åº¦
 {
 	uint16_t i;
 	
-	//Dmx512_Rs485_SendMode();			//ÉèÖÃÎª·¢ËÍÄ£Ê½
+	//Dmx512_Rs485_SendMode();			//è®¾ç½®ä¸ºå‘é€æ¨¡å¼
 	
 	if( num > DMX512_RS485_TX_BUFF_SIZE )
 		num = DMX512_RS485_TX_BUFF_SIZE;
 	
-	Dmx512_Send_Buff[0] = 0x00;//ÆğÊ¼Âë
+	Dmx512_Send_Buff[0] = 0x00;//èµ·å§‹ç 
 	for(i = 0; i < num; i++)
 	{
 		Dmx512_Send_Buff[i+1] = buff[i];
 	}
-	//Dmx512_Send_Buff[num + 1] = 0x00;//½áÊøÂë  ²»ĞèÒª
+	//Dmx512_Send_Buff[num + 1] = 0x00;//ç»“æŸç   ä¸éœ€è¦
 	p_Dmx512_Huart->TxXferCount = (num+1);
 
 	UartPortModeChang(1);
@@ -146,7 +146,7 @@ void Dmx512_Send(uint8_t buff[],uint16_t num)		//numÎªÊı¾İ³¤¶È£¬ÒòÎªÓĞ0X00ËùÒÔ²»
 	UartPortModeChang(0);
 	
 	//Dmx512_Rs485_SendMode();
-	HAL_UART_Transmit(p_Dmx512_Huart,Dmx512_Send_Buff,num+1,0xffff);//´Ë´¦Îª¿ÉÒÔ·¢0X00½øĞĞÁËÒ»µãĞŞ¸Ä
+	HAL_UART_Transmit(p_Dmx512_Huart,Dmx512_Send_Buff,num+1,0xffff);//æ­¤å¤„ä¸ºå¯ä»¥å‘0X00è¿›è¡Œäº†ä¸€ç‚¹ä¿®æ”¹
 	//Dmx512_Rs485_RecMode();
 	//Dmx512_Delay(100);
 	
@@ -159,43 +159,43 @@ void Dmx512_Send(uint8_t buff[],uint16_t num)		//numÎªÊı¾İ³¤¶È£¬ÒòÎªÓĞ0X00ËùÒÔ²»
 //{
 //	uint16_t i;
 //	
-//	Dmx512_Rs485_SendMode();			//ÉèÖÃÎª·¢ËÍÄ£Ê½
+//	Dmx512_Rs485_SendMode();			//è®¾ç½®ä¸ºå‘é€æ¨¡å¼
 //	Dmx512_Delay(50);
-//	UartPortModeChang(1);					//ÉèÖÃ·¢ËÍµÄÒı½ÅÎªÆÕÍ¨IO
+//	UartPortModeChang(1);					//è®¾ç½®å‘é€çš„å¼•è„šä¸ºæ™®é€šIO
 
-//	HAL_GPIO_WritePin(DMX512_RS485_TX_PORT,DMX512_RS485_TX_PIN,GPIO_PIN_RESET); 									//Êä³öµÍµçÆ½,BREAK
-//	Dmx512_Delay(176); 							//ÑÓÊ±176us
-//	HAL_GPIO_WritePin(DMX512_RS485_TX_PORT,DMX512_RS485_TX_PIN,GPIO_PIN_SET); 										//Êä³ö¸ßµçÆ½,MAB
-//	Dmx512_Delay(12); 							//ÑÓÊ±12us
+//	HAL_GPIO_WritePin(DMX512_RS485_TX_PORT,DMX512_RS485_TX_PIN,GPIO_PIN_RESET); 									//è¾“å‡ºä½ç”µå¹³,BREAK
+//	Dmx512_Delay(176); 							//å»¶æ—¶176us
+//	HAL_GPIO_WritePin(DMX512_RS485_TX_PORT,DMX512_RS485_TX_PIN,GPIO_PIN_SET); 										//è¾“å‡ºé«˜ç”µå¹³,MAB
+//	Dmx512_Delay(12); 							//å»¶æ—¶12us
 //	
-//	UartPortModeChang(0);					//ÉèÖÃ·¢ËÍµÄÒı½ÅÎª¸´ÓÃIO
+//	UartPortModeChang(0);					//è®¾ç½®å‘é€çš„å¼•è„šä¸ºå¤ç”¨IO
 //	Dmx512_Delay(10);
-//  //HAL_UART_Transmit(p_Dmx512_Huart,buff,num,0xffff);//´Ë´¦Îª¿ÉÒÔ·¢0X00½øĞĞÁËÒ»µãĞŞ¸Ä
-//	for(i = 0; i <= 512; i++)  //0:startcode   1-512:µ÷¹âÊı¾İ
+//  //HAL_UART_Transmit(p_Dmx512_Huart,buff,num,0xffff);//æ­¤å¤„ä¸ºå¯ä»¥å‘0X00è¿›è¡Œäº†ä¸€ç‚¹ä¿®æ”¹
+//	for(i = 0; i <= 512; i++)  //0:startcode   1-512:è°ƒå…‰æ•°æ®
 //	{
 //		if(i == 0)
 //		{
-//				UART4->DR = 0x00 | 0x100;//µÚÒ»Ö¡startcode
-//				while((UART4->SR & 0X40) == 0); //È·±£Êı¾İ·¢ËÍÍê³É
+//				UART4->DR = 0x00 | 0x100;//ç¬¬ä¸€å¸§startcode
+//				while((UART4->SR & 0X40) == 0); //ç¡®ä¿æ•°æ®å‘é€å®Œæˆ
 //		}
 
 //		else
 //		{
 //				UART4->DR = 0x100 | 0x03;
-//				while((UART4->SR & 0X40) == 0);     //È·±£Êı¾İ·¢ËÍÍê³É
+//				while((UART4->SR & 0X40) == 0);     //ç¡®ä¿æ•°æ®å‘é€å®Œæˆ
 //		}
 //	}
 //	
-//	Dmx512_Rs485_RecMode();			//ÉèÖÃÎª½ÓÊÕÄ£Ê½
+//	Dmx512_Rs485_RecMode();			//è®¾ç½®ä¸ºæ¥æ”¶æ¨¡å¼
 //}
 
 void Dmx512_RxData(uint8_t len)
 {
 #ifdef DMX512_SEPARATE_BUFFER
 	Set_Dmx512_Data(p_Dmx512_RxBuff,DMX512_RS485_RX_BUFF_SIZE);
-	memset(p_Dmx512_RxBuff,0,DMX512_RS485_RX_BUFF_SIZE);    //Çå¿Õ»º´æÇø
+	memset(p_Dmx512_RxBuff,0,DMX512_RS485_RX_BUFF_SIZE);    //æ¸…ç©ºç¼“å­˜åŒº
 #endif
-	__HAL_UART_CLEAR_IDLEFLAG(p_Dmx512_Huart);               //Çå³ı±êÖ¾Î»
+	__HAL_UART_CLEAR_IDLEFLAG(p_Dmx512_Huart);               //æ¸…é™¤æ ‡å¿—ä½
 	HAL_UART_Receive_IT(p_Dmx512_Huart, p_Dmx512_RxBuff, DMX512_RS485_TX_BUFF_SIZE);
 }
 
@@ -231,7 +231,7 @@ void Dmx512_Protocol_Analysis(void)
 	if(Get_Dmx512_Data_Change() == 1)
 	{
 		Dmx512_Send(p_Dmx512_TxBuff, *p_Dmx512_DataLen );
-		Set_Dmx512_Data_Change(0);//±êÖ¾ÖÃ0
+		Set_Dmx512_Data_Change(0);//æ ‡å¿—ç½®0
 	}
 	
 #endif
@@ -253,7 +253,7 @@ void Dmx512_Hardware_Debug(void)
 		}
 		Dmx512_Send(p_Dmx512_TxBuff, DMX512_RS485_TX_BUFF_SIZE );
 
-		osDelay(2000);//2Ãë
+		osDelay(2000);//2ç§’
 		
 	}
 }

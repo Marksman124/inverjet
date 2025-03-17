@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		motor.h
-* @brief   		µç»ú Ïà¹ØÐ­Òé  ¿ØÖÆ×ªËÙÃüÁî 200ms
+* @brief   		ç”µæœº ç›¸å…³åè®®  æŽ§åˆ¶è½¬é€Ÿå‘½ä»¤ 200ms
 *
 *
 * @author			WQG
@@ -21,10 +21,10 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
 #include "usart.h"
-//#include "display.h"			// ÏÔÊ¾Ä£¿é
+//#include "display.h"			// æ˜¾ç¤ºæ¨¡å—
 //#include "port.h"
 //#include "mbcrc.h"				// crc
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -37,39 +37,39 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 #ifndef __MACRO_DEFINITION_H__
 
-#define MOTOR_THREAD_LIFECYCLE								50				// ÈÎÎñÉúÃüÖÜÆÚ 50ms
+#define MOTOR_THREAD_LIFECYCLE								50				// ä»»åŠ¡ç”Ÿå‘½å‘¨æœŸ 50ms
 
-// ÐÄÌø ÖÜÆÚ 500s 
-#define MOTOR_HEARTBEAT_CYCLE							(500/(MOTOR_THREAD_LIFECYCLE))				// 500 ºÁÃë
-// ÃüÁî ÖÜÆÚ 50 ms
-#define MOTOR_COMMAND_CYCLE								(200/(MOTOR_THREAD_LIFECYCLE))				// 5Ãë: 50 ºÁÃë     20Ãë : 200ms
-// ¶Á×´Ì¬ ÖÜÆÚ 1s 
-#define MOTOR_READ_STATIC_CYCLE						(1000/(MOTOR_THREAD_LIFECYCLE))				// 1 Ãë
+// å¿ƒè·³ å‘¨æœŸ 500s 
+#define MOTOR_HEARTBEAT_CYCLE							(500/(MOTOR_THREAD_LIFECYCLE))				// 500 æ¯«ç§’
+// å‘½ä»¤ å‘¨æœŸ 50 ms
+#define MOTOR_COMMAND_CYCLE								(200/(MOTOR_THREAD_LIFECYCLE))				// 5ç§’: 50 æ¯«ç§’     20ç§’ : 200ms
+// è¯»çŠ¶æ€ å‘¨æœŸ 1s 
+#define MOTOR_READ_STATIC_CYCLE						(1000/(MOTOR_THREAD_LIFECYCLE))				// 1 ç§’
 
-//µç»ú¼«Êý
+//ç”µæœºæžæ•°
 #define	MOTOR_POLE_NUMBER				(5)
 
-//×î´ó×ªËÙ 100%
+//æœ€å¤§è½¬é€Ÿ 100%
 #define	MOTOR_RPM_SPEED_MAX				(1950*MOTOR_POLE_NUMBER)		//9750
-//×îµÍ×ªËÙ 100%
+//æœ€ä½Žè½¬é€Ÿ 100%
 #define	MOTOR_RPM_SPEED_MIX				(700*MOTOR_POLE_NUMBER)		//3500
 
 // 700  1012   1324  1636   1948
-//Ã¿ 1% ×ªËÙ 
+//æ¯ 1% è½¬é€Ÿ 
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT				((MOTOR_RPM_SPEED_MAX-MOTOR_RPM_SPEED_MIX)/80)			//15.6
 
-//Ã¿ 20% ×ªËÙ 
+//æ¯ 20% è½¬é€Ÿ 
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT_20				((MOTOR_RPM_SPEED_MAX-MOTOR_RPM_SPEED_MIX)/4)			//312.5     
 
 
-//-------------- MOS ÎÂ¶È±¨¾¯Öµ 90¡ãC -------------------
+//-------------- MOS æ¸©åº¦æŠ¥è­¦å€¼ 90Â°C -------------------
 #define MOS_TEMP_ALARM_VALUE								90
-//-------------- MOS ÎÂ¶È ½µËÙ 80¡ãC -------------------
-#define MOS_TEMP_REDUCE_SPEED								80		// ½µµµ ÎÂ¶È
-#define MOS_TEMP_RESTORE_SPEED							75		// »Ö¸´ ÎÂ¶È
+//-------------- MOS æ¸©åº¦ é™é€Ÿ 80Â°C -------------------
+#define MOS_TEMP_REDUCE_SPEED								80		// é™æ¡£ æ¸©åº¦
+#define MOS_TEMP_RESTORE_SPEED							75		// æ¢å¤ æ¸©åº¦
  
-//Í¨Ñ¶¹ÊÕÏ ±¨¾¯Ê±¼ä
-#define FAULT_MOTOR_LOSS_TIME						(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 Ãë
+//é€šè®¯æ•…éšœ æŠ¥è­¦æ—¶é—´
+#define FAULT_MOTOR_LOSS_TIME						(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 ç§’
 
 
 /*------------------- IO define ----------------------------------------------*/
@@ -85,13 +85,13 @@ extern "C" {
 
 #endif
 //#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
-//¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý
-// »º³åÇø´óÐ¡
+//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
+// ç¼“å†²åŒºå¤§å°
 #define MOTOR_RS485_TX_BUFF_SIZE			16
 #define MOTOR_RS485_RX_BUFF_SIZE			256
 
 
-//Çý¶¯°å¹ÊÕÏ ±êÖ¾Î»
+//é©±åŠ¨æ¿æ•…éšœ æ ‡å¿—ä½
 #define MOTOR_FAULT_SIGN_BIT						(E101_TEMPERATURE_MOS | E102_TEMPERATURE_AMBIENT | E201_TEMPERATURE_HARDWARE | E301_WIFI_HARDWARE | E302_BT_HARDWARE | E303_RS485_HARDWARE)
 #define CLEAN_MOTOR_FAULT(n)						(n &= MOTOR_FAULT_SIGN_BIT)
 
@@ -111,65 +111,65 @@ extern "C" {
 #define	MOTOR_ADDR_NTC3_TEMP_OFFSET							62
 
 
-//======= µç»ú¹ÊÕÏ´úÂë ================================================================================
+//======= ç”µæœºæ•…éšœä»£ç  ================================================================================
 #define	MOTOR_FAULT_NONE																									0						//
-#define	MOTOR_FAULT_OVER_VOLTAGE																					1						//	ÊäÈëµçÑ¹Ð¡ÓÚ ×îÐ¡ÔÊÐíÖµµÄ5%
-#define	MOTOR_FAULT_UNDER_VOLTAGE																					2						//	ÊäÈëµçÑ¹´óÓÚ ×î´óÔÊÐíÖµµÄ5%
-#define	MOTOR_FAULT_DRV																										3						//	Ó²¼þ¶ÌÂ·±£»¤
-#define	MOTOR_FAULT_ABS_OVER_CURRENT																			4						//	SQRT(iq*iq+id*id)´óÓÚ×î´óµçÁ÷
-#define	MOTOR_FAULT_OVER_TEMP_FET																					5						//	MOSFETÎÂ¶È´óÓÚ×î´óÔÊÐíÎÂ¶È-0.1Ê±±¨¹ýÎÂ¹ÊÕÏ
+#define	MOTOR_FAULT_OVER_VOLTAGE																					1						//	è¾“å…¥ç”µåŽ‹å°äºŽ æœ€å°å…è®¸å€¼çš„5%
+#define	MOTOR_FAULT_UNDER_VOLTAGE																					2						//	è¾“å…¥ç”µåŽ‹å¤§äºŽ æœ€å¤§å…è®¸å€¼çš„5%
+#define	MOTOR_FAULT_DRV																										3						//	ç¡¬ä»¶çŸ­è·¯ä¿æŠ¤
+#define	MOTOR_FAULT_ABS_OVER_CURRENT																			4						//	SQRT(iq*iq+id*id)å¤§äºŽæœ€å¤§ç”µæµ
+#define	MOTOR_FAULT_OVER_TEMP_FET																					5						//	MOSFETæ¸©åº¦å¤§äºŽæœ€å¤§å…è®¸æ¸©åº¦-0.1æ—¶æŠ¥è¿‡æ¸©æ•…éšœ
 #define	MOTOR_FAULT_OVER_TEMP_MOTOR																				6						//	xxx
 #define	MOTOR_FAULT_GATE_DRIVER_OVER_VLOTAGE															7						//	xxx
 #define	MOTOR_FAULT_GATE_DRIVER_UNDER_VLOTAGE															8						//	xxx
-#define	MOTOR_FAULT_MCU_UNDER_VLOTAGE																			9						//	 mcuµçÑ¹²»ÎÈ¹ÊÕÏ
-#define	MOTOR_FAULT_BOOTING_FROM_WATCHDOG_RESET														10					//	»úÆ÷·¢Éú¿´ÃÅ¹·¸´Î»¹ÊÕÏ
+#define	MOTOR_FAULT_MCU_UNDER_VLOTAGE																			9						//	 mcuç”µåŽ‹ä¸ç¨³æ•…éšœ
+#define	MOTOR_FAULT_BOOTING_FROM_WATCHDOG_RESET														10					//	æœºå™¨å‘ç”Ÿçœ‹é—¨ç‹—å¤ä½æ•…éšœ
 #define	MOTOR_FAULT_ENCODER_SPI																						11					//	xxx
 #define	MOTOR_FAULT_ENCODER_SINCOS_BELOW_MIN_AMPLITUDE										12					//	xxx
 #define	MOTOR_FAULT_ENCODER_SINCOS_ABOVE_MAN_AMPLITUDE										13					//	xxx
-#define	MOTOR_FAULT_FLASH_CORRUPTION																			14					//	lashËð»µ£¨²ÎÊý´æ´¢Çø£©
-#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_1													15					//	1.65+/-0.5VµÄÆ«²î
-#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_2													16					//	1.65+/-0.5VµÄÆ«²î
-#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_3													17					//	1.65+/-0.5VµÄÆ«²î
-#define	MOTOR_FAULT_UNBALANCED_CURRENTS																		18					//	ÈýÏàµçÁ÷²»Æ½ºâ¹ÊÕÏ
+#define	MOTOR_FAULT_FLASH_CORRUPTION																			14					//	lashæŸåï¼ˆå‚æ•°å­˜å‚¨åŒºï¼‰
+#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_1													15					//	1.65+/-0.5Vçš„åå·®
+#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_2													16					//	1.65+/-0.5Vçš„åå·®
+#define	MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_3													17					//	1.65+/-0.5Vçš„åå·®
+#define	MOTOR_FAULT_UNBALANCED_CURRENTS																		18					//	ä¸‰ç›¸ç”µæµä¸å¹³è¡¡æ•…éšœ
 #define	MOTOR_FAULT_BRK																										19					//	xxx
 #define	MOTOR_FAULT_RESOLVER_LOT																					20					//	xxx
 #define	MOTOR_FAULT_RESOLVER_DOS																					21					//	xxx
 #define	MOTOR_FAULT_RESOLVER_LOS																					22					//	xxx
-#define	MOTOR_FAULT_FLASH_CURRUPTION_APP_CFG															23					//	Ó¦ÓÃ²ÎÊýflashÐ£Ñé³ö´í-²ÉÓÃÄ¬ÈÏ²ÎÊý½øÐÐ
-#define	MOTOR_FAULT_FLASH_CURRUPTION_MC_CFG																24					//	µç»ú²ÎÊýflashÐ£Ñé³ö´í-²ÉÓÃÄ¬ÈÏ²ÎÊý½øÐÐ
+#define	MOTOR_FAULT_FLASH_CURRUPTION_APP_CFG															23					//	åº”ç”¨å‚æ•°flashæ ¡éªŒå‡ºé”™-é‡‡ç”¨é»˜è®¤å‚æ•°è¿›è¡Œ
+#define	MOTOR_FAULT_FLASH_CURRUPTION_MC_CFG																24					//	ç”µæœºå‚æ•°flashæ ¡éªŒå‡ºé”™-é‡‡ç”¨é»˜è®¤å‚æ•°è¿›è¡Œ
 #define	MOTOR_FAULT_ENCODER_NO_MAGNET																			25					//	xxx
 #define	MOTOR_FAULT_ENCODER_MAGNET_TOO_STRONG															26					//	xxx
 
 
-#define	MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR																	27					//	AÏàµçÑ¹´«¸ÐÆ÷Ëð»µ
-#define	MOTOR_FAULT_OUTPUT_PHASE_B_SENSOR																	28					//	BÏàµçÑ¹´«¸ÐÆ÷Ëð»µ
-#define	MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR																	29					//	CÏàµçÑ¹´«¸ÐÆ÷Ëð»µ
-#define	MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON													30					//	AÏàÉÏµçÈ±Ïà
-#define	MOTOR_FAULT_OUTPUT_PHASE_B_LOSS_POWER_ON													31					//	BÏàÉÏµçÈ±Ïà
-#define	MOTOR_FAULT_OUTPUT_PHASE_C_LOSS_POWER_ON													32					//	CÏàÉÏµçÈ±Ïà
-#define	MOTOR_FAULT_OUTPUT_PHASE_2_AND_3_LOSS_POWER_ON										33					//	ÉÏµçÈ±2/3Ïà
-#define	MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_RUNNING														34					//	ÔËÐÐÖÐ È±AÏà
-#define	MOTOR_FAULT_OUTPUT_PHASE_B_LOSS_RUNNING														35					//	ÔËÐÐÖÐ È±AÏà
-#define	MOTOR_FAULT_OUTPUT_PHASE_C_LOSS_RUNNING														36					//	ÔËÐÐÖÐ È±AÏà
-#define	MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING											37					//	ÔËÐÐÖÐ È±2/3Ïà
-#define	MOTOR_FAULT_OUTPUT_LOCKROTOR																			38					//	¶Â×ª
+#define	MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR																	27					//	Aç›¸ç”µåŽ‹ä¼ æ„Ÿå™¨æŸå
+#define	MOTOR_FAULT_OUTPUT_PHASE_B_SENSOR																	28					//	Bç›¸ç”µåŽ‹ä¼ æ„Ÿå™¨æŸå
+#define	MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR																	29					//	Cç›¸ç”µåŽ‹ä¼ æ„Ÿå™¨æŸå
+#define	MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_POWER_ON													30					//	Aç›¸ä¸Šç”µç¼ºç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_B_LOSS_POWER_ON													31					//	Bç›¸ä¸Šç”µç¼ºç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_C_LOSS_POWER_ON													32					//	Cç›¸ä¸Šç”µç¼ºç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_2_AND_3_LOSS_POWER_ON										33					//	ä¸Šç”µç¼º2/3ç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_RUNNING														34					//	è¿è¡Œä¸­ ç¼ºAç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_B_LOSS_RUNNING														35					//	è¿è¡Œä¸­ ç¼ºAç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_C_LOSS_RUNNING														36					//	è¿è¡Œä¸­ ç¼ºAç›¸
+#define	MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING											37					//	è¿è¡Œä¸­ ç¼º2/3ç›¸
+#define	MOTOR_FAULT_OUTPUT_LOCKROTOR																			38					//	å µè½¬
 
-#define	MOTOR_FAULT_MOSFET_NTC_ERR																				39					//	MosÎÂ¶È´«¸ÐÆ÷¹ÊÕÏ
-
+#define	MOTOR_FAULT_MOSFET_NTC_ERR																				39					//	Mosæ¸©åº¦ä¼ æ„Ÿå™¨æ•…éšœ
+#define	MOTOR_FAULT_IDLING_ERROR																					40					//	ç©ºè½¬
 
 #define	MOTOR_FAULT_CODE_START							(MOTOR_FAULT_OVER_VOLTAGE)
-#define	MOTOR_FAULT_CODE_END								(MOTOR_FAULT_MOSFET_NTC_ERR)
+#define	MOTOR_FAULT_CODE_END								(MOTOR_FAULT_IDLING_ERROR)
 //====================================================================================================
 
-//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 //#elif (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
-//¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý¡ý
-// »º³åÇø´óÐ¡
+//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
+// ç¼“å†²åŒºå¤§å°
 #define TEMP001_MOTOR_RS485_TX_BUFF_SIZE			16
 #define TEMP001_MOTOR_RS485_RX_BUFF_SIZE			32
 
 
-//Çý¶¯°å¹ÊÕÏ ±êÖ¾Î»
+//é©±åŠ¨æ¿æ•…éšœ æ ‡å¿—ä½
 #define TEMP001_MOTOR_FAULT_SIGN_BIT						E102_TEMPERATURE_AMBIENT
 #define TEMP001_CLEAN_MOTOR_FAULT(n)						(n &= ~MOTOR_FAULT_SIGN_BIT)
 
@@ -188,97 +188,101 @@ extern "C" {
 #define	TEMP001_MOTOR_ADDR_MOTOR_FAULT_OFFSET							9
 
 
-//=== ¹ÊÕÏÎ» 1
-#define TEMP001_MOTOR_FAULT_BUS_VOLTAGE_UNDER					0x1
-#define TEMP001_MOTOR_FAULT_BUS_CURRENT_OVER					0x2
-#define TEMP001_MOTOR_FAULT_SAMPLE_ERROR							0x4
-#define TEMP001_MOTOR_FAULT_HARDWARE_OVERCURRENT			0x8
-#define TEMP001_MOTOR_FAULT_OUT_STEP_FAULT						0x10
-#define TEMP001_MOTOR_FAULT_STARTUP_FAILED						0x20
-#define TEMP001_MOTOR_FAULT_TIME_OUT									0x40
-#define TEMP001_MOTOR_FAULT_CRC_ERROR									0x80
+//=== æ•…éšœä½ 1
+#define TEMP001_MOTOR_FAULT_BUS_VOLTAGE_ERROR					0x1
+#define TEMP001_MOTOR_FAULT_BUS_CIRCUIT_BIAS					0x2
+#define TEMP001_MOTOR_FAULT_HARDWARE_OVERCURRENT			0x4
+#define TEMP001_MOTOR_FAULT_OUT_STEP_FAULT						0x8
+#define TEMP001_MOTOR_FAULT_STARTUP_FAILED						0x10
+#define TEMP001_MOTOR_FAULT_COMM_FAULT								0x20
+#define TEMP001_MOTOR_FAULT_OUTPUT_OVERCURRENT				0x40
+#define TEMP001_MOTOR_FAULT_IDLING_ERROR							0x80
 
-//=== ¹ÊÕÏÎ» 2
-#define TEMP001_MOTOR_FAULT_OUTPUT_OVERCURRENT				0x100
+//=== æ•…éšœä½ 2
+#define TEMP001_MOTOR_FAULT_MOSFET_TEMP_HARDWARE			0x100
 #define TEMP001_MOTOR_FAULT_LACK_PHASE								0x200
+#define TEMP001_MOTOR_FAULT_BRIDGE_HARDWARE						0x400
+#define TEMP001_MOTOR_FAULT_TEMP_OVER									0x800
 
-//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 //#endif
 /* Exported functions prototypes ---------------------------------------------*/
 void Metering_Receive_Init(void);
-// ÖØÆô
+// é‡å¯
 void Motor_Usart_Restar(void);
-// Çå³ý¹ÊÕÏ
+// æ¸…é™¤æ•…éšœ
 void Clean_Motor_OffLine_Timer(void);
-//------------------- 1ÃëÖ´ÐÐ  ----------------------------
+//------------------- 1ç§’æ‰§è¡Œ  ----------------------------
 void Motor_Function_In_One_Second(void);
-//------------------- Ö÷Ñ­»·º¯Êý  ----------------------------
+//------------------- ä¸»å¾ªçŽ¯å‡½æ•°  ----------------------------
 void App_Motor_Handler(void);
 	
-//------------------- µç»ú×ªËÙ¸üÐÂ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿæ›´æ–° ----------------------------
 extern uint8_t Motor_Speed_Update(void);
-//------------------- µç»ú×ªËÙÊÇ·ñ´ïµ½Ä¿±êÖµ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿæ˜¯å¦è¾¾åˆ°ç›®æ ‡å€¼ ----------------------------
 extern uint8_t Motor_Speed_Is_Reach(void);
-//------------------- µç»ú×ªËÙ Ä¿±êÖµ ÉèÖÃ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿ ç›®æ ‡å€¼ è®¾ç½® ----------------------------
 extern void Motor_Speed_Target_Set(uint8_t speed);
-//------------------- µç»ú ¿ìËÙÍ£Ö¹ ----------------------------
+//------------------- ç”µæœº å¿«é€Ÿåœæ­¢ ----------------------------
 extern void Motor_Quick_Stop(void);
-//------------------- µç»ú×ªËÙ Ä¿±êÖµ ÉèÖÃ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿ ç›®æ ‡å€¼ è®¾ç½® ----------------------------
 extern uint8_t Motor_Speed_Target_Get(void);
-//------------------- °Ù·Ö±È ×ª ×ªËÙ ----------------------------
+//------------------- ç™¾åˆ†æ¯” è½¬ è½¬é€Ÿ ----------------------------
 extern uint32_t Motor_Speed_To_Rpm(uint8_t speed);
-//------------------- ×ªËÙ ×ª °Ù·Ö±È ----------------------------
+//------------------- è½¬é€Ÿ è½¬ ç™¾åˆ†æ¯” ----------------------------
 extern uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm);
 
-//================================================== ÄÚ²¿µ÷ÓÃ½Ó¿Ú
-//-------------------- Çý¶¯×´Ì¬¼ìÑé   µç»ú×ªËÙ ----------------------------
+//================================================== å†…éƒ¨è°ƒç”¨æŽ¥å£
+//-------------------- é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºè½¬é€Ÿ ----------------------------
 extern void Drive_Status_Inspection_Motor_Speed(void);
-//-------------------- Çý¶¯×´Ì¬¼ìÑé   µç»úµçÁ÷ ----------------------------
+//-------------------- é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºç”µæµ ----------------------------
 extern void Drive_Status_Inspection_Motor_Current(void);
 
-//-------------------- »ñÈ¡µç»ú¹ÊÕÏ×´Ì¬ ----------------------------
+//-------------------- èŽ·å–ç”µæœºæ•…éšœçŠ¶æ€ ----------------------------
 uint16_t Get_Motor_Fault_State(void);
 
-//-------------------- ÉèÖÃµç»ú¹ÊÕÏ×´Ì¬ ----------------------------
+//-------------------- è®¾ç½®ç”µæœºæ•…éšœçŠ¶æ€ ----------------------------
 void Set_Motor_Fault_State(uint16_t fault_bit);
-//-------------------- Çå³ýµç»ú¹ÊÕÏ×´Ì¬ ----------------------------
+//-------------------- æ¸…é™¤ç”µæœºæ•…éšœçŠ¶æ€ ----------------------------
 void ReSet_Motor_Fault_State(uint16_t fault_bit);
-//-------------------- Ó²¼þ¹ÊÕÏ ----------------------------
+//-------------------- ç¡¬ä»¶æ•…éšœ ----------------------------
 uint8_t Motor_Is_Hardware_Fault(uint16_t fault_bit);
-//-------------------- Èí¼þ¹ÊÕÏ ----------------------------
+//-------------------- è½¯ä»¶æ•…éšœ ----------------------------
 uint8_t Motor_Is_Software_Fault(uint16_t fault_bit);
-//-------------------- Ö¸¶¨¹ÊÕÏ ----------------------------
+//-------------------- æŒ‡å®šæ•…éšœ ----------------------------
 uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit);
+//-------------------- restar æ•…éšœ ----------------------------
+uint8_t TEMP001_If_Faule_Need_ReStar(uint16_t fault_bit);
 
-//------------------- ·¢ËÍ ----------------------------
+//------------------- å‘é€ ----------------------------
 extern void Motor_Speed_Send(uint32_t speed_rpm);
-//------------------- ÐÄÌø ----------------------------
+//------------------- å¿ƒè·³ ----------------------------
 extern void Motor_Heartbeat_Send(void);
-//-------------------- ¶Á¼Ä´æÆ÷ ----------------------------
+//-------------------- è¯»å¯„å­˜å™¨ ----------------------------
 extern void Motor_Read_Register(void);
-//-------------------- ÏÂ·¢²âÊÔÄ£Ê½ ----------------------------
+//-------------------- ä¸‹å‘æµ‹è¯•æ¨¡å¼ ----------------------------
 extern void Motor_GetIn_TestMode(void);
 
-/*-------------------- ÊÕ·¢´¦Àí ----------------------------------------------*/
+/*-------------------- æ”¶å‘å¤„ç† ----------------------------------------------*/
 void Motor_State_Analysis(void);
-//-------------------- ·¢ËÍ ----------------------------
+//-------------------- å‘é€ ----------------------------
 extern void Motor_UART_Send(uint8_t* p_buff, uint8_t len);
-//-------------------- ½ÓÊÕ ----------------------------
+//-------------------- æŽ¥æ”¶ ----------------------------
 extern void Motor_RxData(uint8_t len);
 
-//-------------------- ¼ì²éµç»úµçÁ÷ ----------------------------
+//-------------------- æ£€æŸ¥ç”µæœºç”µæµ ----------------------------
 extern uint8_t Check_Motor_Current(void);
-//-------------------- ¼ì²éµç»ú×ªËÙ ----------------------------
+//-------------------- æ£€æŸ¥ç”µæœºè½¬é€Ÿ ----------------------------
 extern uint8_t Check_Motor_Speed(void);
 
 
 /* Private defines -----------------------------------------------------------*/
 
-extern uint8_t Motor_Speed_Now;			// µç»ú×ªËÙ 
+extern uint8_t Motor_Speed_Now;			// ç”µæœºè½¬é€Ÿ 
 
-//**************** ÊÕ·¢»º³åÇø
-extern uint8_t Motor_DMABuff[MOTOR_RS485_RX_BUFF_SIZE];//¶¨ÒåÒ»¸ö½ÓÊÕ»º´æÇø
-extern uint8_t Motor_TxBuff[MOTOR_RS485_TX_BUFF_SIZE];//¶¨ÒåÒ»¸ö·¢ËÍ»º´æÇø
+//**************** æ”¶å‘ç¼“å†²åŒº
+extern uint8_t Motor_DMABuff[MOTOR_RS485_RX_BUFF_SIZE];//å®šä¹‰ä¸€ä¸ªæŽ¥æ”¶ç¼“å­˜åŒº
+extern uint8_t Motor_TxBuff[MOTOR_RS485_TX_BUFF_SIZE];//å®šä¹‰ä¸€ä¸ªå‘é€ç¼“å­˜åŒº
 
 
 extern DMA_HandleTypeDef hdma_usart3_rx;

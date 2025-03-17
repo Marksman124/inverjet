@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				fault.c
-* @brief			¹ÊÕÏÄ£¿é 
+* @brief			æ•…éšœæ¨¡å— 
 *
 * @author			WQG
 * @versions		v1.0
@@ -26,25 +26,25 @@
 //uint8_t Fault_Recovery_Attempt_cnt=0;				//
 /* Private function prototypes -----------------------------------------------*/
 
-//------------------- °´¼ü»Øµ÷ ----------------------------
-//--------------- ¶Ì°´ -----------------------
-// ¢Ù ÉÏ
+//------------------- æŒ‰é”®å›è°ƒ ----------------------------
+//--------------- çŸ­æŒ‰ -----------------------
+// â‘  ä¸Š
 void on_Fault_Button_1_clicked(void);
-// ¢Ú ÏÂ
+// â‘¡ ä¸‹
 void on_Fault_Button_2_clicked(void);
-// ¢Û È·ÈÏ
+// â‘¢ ç¡®è®¤
 void on_Fault_Button_3_clicked(void);
-// ¢Ü È¡Ïû
+// â‘£ å–æ¶ˆ
 void on_Fault_Button_4_Short_Press(void);
 void on_Fault_Button_1_2_Short_Press(void);
-// ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 80¼¶ or 5¼¶
+// â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 80çº§ or 5çº§
 void on_Fault_Button_1_3_Short_Press(void);
-// ¢Ú + ¢Û  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘¢  ç»„åˆé”®  çŸ­æŒ‰
 void on_Fault_Button_2_3_Short_Press(void);
-// ¢Ú + ¢Ü  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘£  ç»„åˆé”®  çŸ­æŒ‰
 void on_Fault_Button_2_4_Short_Press(void);
-//--------------- ³¤°´ -----------------------
-// ³¤°´
+//--------------- é•¿æŒ‰ -----------------------
+// é•¿æŒ‰
 void on_Fault_Button_1_Long_Press(void);
 void on_Fault_Button_2_Long_Press(void);
 void on_Fault_Button_3_Long_Press(void);
@@ -65,25 +65,24 @@ void on_Fault_Button_2_4_Long_Press(void);
 
 uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,0x006,
 														0x101,0x102,
-														0x201,0x202,0x203,
-														0x301,0x302,0x303,0x304,
-														0x401};
+														0x201,0x202,0x203,0x204,
+														0x301,0x302,0x303,0x304};
 
-uint8_t Fault_Number_Sum = 0;	// ¹ÊÕÏ×ÜÊı
-uint8_t Fault_Number_Cnt = 0;	// µ±Ç°¹ÊÕÏ
+uint8_t Fault_Number_Sum = 0;	// æ•…éšœæ€»æ•°
+uint8_t Fault_Number_Cnt = 0;	// å½“å‰æ•…éšœ
 
-// ·¢ËÍ»º³åÇø
+// å‘é€ç¼“å†²åŒº
 uint8_t fault_send_buffer[24] = {0};
 
 
-// ¶Ì°´ ²Ûº¯Êı
+// çŸ­æŒ‰ æ§½å‡½æ•°
 void (*p_Fault_Button[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Fault_Button_1_clicked,  on_Fault_Button_2_clicked,  on_Fault_Button_3_clicked,  on_Fault_Button_4_Short_Press,
 	on_Fault_Button_1_2_Short_Press, on_Fault_Button_1_3_Short_Press,
 	on_Fault_Button_2_3_Short_Press, on_Fault_Button_2_4_Short_Press,
 };
 
-// ³¤°´ ²Ûº¯Êı
+// é•¿æŒ‰ æ§½å‡½æ•°
 void (*p_Fault_Long_Press[CALL_OUT_NUMBER_MAX])(void) = {
 	on_Fault_Button_1_Long_Press,  on_Fault_Button_2_Long_Press,  on_Fault_Button_3_Long_Press,  on_Fault_Button_4_Long_Press,
 	on_Fault_Button_1_2_Long_Press, on_Fault_Button_1_3_Long_Press,
@@ -96,12 +95,12 @@ static uint8_t Automatic_Polling_Timer_Cnt=0;
 /* Private user code ---------------------------------------------------------*/
 
 
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 void App_Fault_Init(void)
 {
 }
 
-// ¼ì²é ¹ÊÕÏ×´Ì¬ ÊÇ·ñºÏ·¨
+// æ£€æŸ¥ æ•…éšœçŠ¶æ€ æ˜¯å¦åˆæ³•
 uint8_t Fault_Check_Status_Legal(uint16_t parameter)
 {
 	if(parameter >= FAULT_STATE_MAX)
@@ -110,7 +109,7 @@ uint8_t Fault_Check_Status_Legal(uint16_t parameter)
 	return 1;
 }
 
-// ¼ì²â¹ÊÕÏ
+// æ£€æµ‹æ•…éšœ
 uint8_t If_System_Is_Error(void)
 {
 	 float Temperature;
@@ -118,18 +117,18 @@ uint8_t If_System_Is_Error(void)
 	uint16_t system_fault=0;
 	int16_t vaule;
 		
-	if(System_is_Operation())//²Ëµ¥
+	if(System_is_Operation())//èœå•
 		return 0;
 			
-	//Ìí¼Ó±¾µØ¹ÊÕÏ  ĞÂÔö¹¦ÄÜ 
+	//æ·»åŠ æœ¬åœ°æ•…éšœ  æ–°å¢åŠŸèƒ½ 
 
-	// ¼ì²é±¾µØ¹ÊÕÏ
+	// æ£€æŸ¥æœ¬åœ°æ•…éšœ
 	Temperature = Get_External_Temp();
 	vaule = Temperature * 10;
 
 	if(*p_Box_Temperature != vaule)
 	{
-		DEBUG_PRINT("»úÏäÎÂ¶È£º%0.3f ¡ãC \n",Temperature);
+		DEBUG_PRINT("æœºç®±æ¸©åº¦ï¼š%0.3f Â°C \n",Temperature);
 		//memcpy(p_Box_Temperature, &vaule, 2);
 		*p_Box_Temperature = vaule;
 	}
@@ -150,7 +149,7 @@ uint8_t If_System_Is_Error(void)
 			E102_Fault_Timer_Cnt --;
 	}
 	
-	//µç»ú¹ÊÕÏ  º¬Çı¶¯°åÍ¨Ñ¶¹ÊÕÏ
+	//ç”µæœºæ•…éšœ  å«é©±åŠ¨æ¿é€šè®¯æ•…éšœ
 	system_fault = Get_Motor_Fault_State();
 	
 	if(*p_System_Fault_Static != system_fault)
@@ -160,14 +159,14 @@ uint8_t If_System_Is_Error(void)
 			if(Motor_Is_Software_Fault(system_fault))
 			{
 				if((Motor_Is_Software_Fault(*p_System_Fault_Static)==0) || (*p_System_Fault_Static == 0))
-					Add_Fault_Recovery_Cnt(1);  //ÆÕÍ¨¹ÊÕÏ
+					Add_Fault_Recovery_Cnt(1);  //æ™®é€šæ•…éšœ
 			}
 		}
 
 		*p_System_Fault_Static = system_fault;
 		
-		//********  ¹ÊÕÏ×Ô¶¯»Ö¸´    *********************
-		// Í¨Ñ¶¹ÊÕÏ ¿ÉÁ¢¿Ì»Ö¸´
+		//********  æ•…éšœè‡ªåŠ¨æ¢å¤    *********************
+		// é€šè®¯æ•…éšœ å¯ç«‹åˆ»æ¢å¤
 		/*if(*p_System_Fault_Static == 0 )
 		{
 			CallOut_Fault_State();
@@ -181,7 +180,7 @@ uint8_t If_System_Is_Error(void)
 		return 0;
 }
 
-// ÉèÖÃ¹ÊÕÏÖµ
+// è®¾ç½®æ•…éšœå€¼
 void Set_Fault_Data(uint16_t type)
 {
 	
@@ -205,7 +204,7 @@ void Self_Testing_Check_Comm(void)
 {
 	if((*p_BLE_Rssi > BT_RSSI_ERROR_VAULE) || (*p_BLE_Rssi == 0) )
 	{
-		DEBUG_PRINT("À¶ÑÀÄ£×é¹ÊÕÏ: ĞÅºÅÇ¿¶È %d dBm   ( ºÏ¸ñ: %d dBm)\n",*p_BLE_Rssi, BT_RSSI_ERROR_VAULE);
+		DEBUG_PRINT("è“ç‰™æ¨¡ç»„æ•…éšœ: ä¿¡å·å¼ºåº¦ %d dBm   ( åˆæ ¼: %d dBm)\n",*p_BLE_Rssi, BT_RSSI_ERROR_VAULE);
 		Set_Motor_Fault_State(E302_BT_HARDWARE);
 	}
 	else
@@ -223,13 +222,13 @@ void Self_Testing_Check_Comm(void)
 	
 	if(If_System_Is_Error())
 	{
-		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//Ö±½ÓËø»ú
+		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//ç›´æ¥é”æœº
 	}
 }
 
 //-------------------   ----------------------------
 
-// »ñÈ¡×ÜÊı
+// è·å–æ€»æ•°
 uint8_t Get_Fault_Number_Sum(uint16_t para)
 {
 	uint8_t i;
@@ -244,7 +243,7 @@ uint8_t Get_Fault_Number_Sum(uint16_t para)
 	return result;
 }
 
-// »ñÈ¡¹ÊÕÏºÅ
+// è·å–æ•…éšœå·
 uint8_t Get_Fault_Number_Now(uint16_t para, uint8_t num)
 {
 	uint8_t i;
@@ -271,7 +270,7 @@ void Fault_Number_Update(void)
 		Fault_Number_Cnt = 1;
 }
 
-// ½øÈë¹ÊÕÏ½çÃæ
+// è¿›å…¥æ•…éšœç•Œé¢
 void To_Fault_Menu(void)
 {
 	
@@ -283,14 +282,14 @@ void To_Fault_Menu(void)
 		*p_OP_ShowNow_Speed_Memory = *p_OP_ShowNow_Speed;
 	*p_OP_ShowNow_Time_Memory = *p_OP_ShowNow_Time;
 	
-	// ¹ÊÕÏ ²Ëµ¥
+	// æ•…éšœ èœå•
 	App_Fault_Init();
 	
-	//¹¦ÄÜÔİÍ£
+	//åŠŸèƒ½æš‚åœ
 	Set_System_State_Machine(ERROR_DISPLAY_STATUS);
-	//µç»ú¹Ø±Õ
+	//ç”µæœºå…³é—­
 	*p_OP_ShowNow_Speed = 0;
-	Motor_Quick_Stop();//¹ÊÕÏÁ¢¼´Í£Ö¹  wuqingguang
+	Motor_Quick_Stop();//æ•…éšœç«‹å³åœæ­¢  wuqingguang
 	
 	Fault_Number_Sum = Get_Fault_Number_Sum(*p_System_Fault_Static);
 	
@@ -298,9 +297,9 @@ void To_Fault_Menu(void)
 	
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 	
-	Clean_Automatic_Shutdown_Timer();  //×Ô¶¯¹Ø»ú
+	Clean_Automatic_Shutdown_Timer();  //è‡ªåŠ¨å…³æœº
 }
-// ¹ÊÕÏ½çÃæ ¸üĞÂ
+// æ•…éšœç•Œé¢ æ›´æ–°
 void Update_Fault_Menu(void)
 {	
 	if(++Automatic_Polling_Timer_Cnt > 4)//5
@@ -315,7 +314,7 @@ void Update_Fault_Menu(void)
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
-// Çå³ı¹ÊÕÏ×´Ì¬
+// æ¸…é™¤æ•…éšœçŠ¶æ€
 void Clean_Fault_State(void)
 {
 	Clean_Motor_OffLine_Timer();
@@ -328,19 +327,19 @@ void Clean_Fault_State(void)
 	Set_System_State_Mode(*p_PMode_Now_Memory);
 	*p_OP_ShowNow_Speed = *p_OP_ShowNow_Speed_Memory;
 	*p_OP_ShowNow_Time = *p_OP_ShowNow_Time_Memory;
-	//»Ö¸´ºóÔİÍ£
+	//æ¢å¤åæš‚åœ
 	//Arbitrarily_To_Pause();
-	//»Ö¸´ºóÖ±½ÓÆô¶¯
+	//æ¢å¤åç›´æ¥å¯åŠ¨
 	Data_Set_Current_Speed(*p_OP_ShowNow_Speed_Memory);
 }
 /* Private function prototypes -----------------------------------------------*/
 
-//------------------- ÏÔÊ¾ÆÁ & ½Ó¿Ú ----------------------------
+//------------------- æ˜¾ç¤ºå± & æ¥å£ ----------------------------
 /*
 ******************************************************************************
 Display_Show_Number	
 
-ÏÔÊ¾µ±Ç°¹ÊÕÏ±àºÅ£¬ 0-100
+æ˜¾ç¤ºå½“å‰æ•…éšœç¼–å·ï¼Œ 0-100
 ******************************************************************************
 */  
 void Display_Show_Number(uint8_t no)
@@ -359,12 +358,12 @@ void Display_Show_Number(uint8_t no)
 ******************************************************************************
 Display_Show_FaultCode
 
-ÏÔÊ¾¹ÊÕÏ´úÂë£¬ E001 - E205
+æ˜¾ç¤ºæ•…éšœä»£ç ï¼Œ E001 - E205
 ******************************************************************************
 */  
 void Display_Show_FaultCode(uint16_t code)
 {
-	//×ÖÄ¸ E
+	//å­—æ¯ E
 	TM1621_display_Letter(TM1621_COORDINATE_MIN_HIGH,  'E');
 	TM1621_display_number(TM1621_COORDINATE_MIN_LOW,  	(code & 0x0F00)>>8);
 	
@@ -377,7 +376,7 @@ void Display_Show_FaultCode(uint16_t code)
 ******************************************************************************
 Display_Show_Sum
 
-ÏÔÊ¾¹ÊÕÏ×ÜÊı
+æ˜¾ç¤ºæ•…éšœæ€»æ•°
 ******************************************************************************
 */  
 void Display_Show_Sum(uint8_t sum)
@@ -390,7 +389,7 @@ void Display_Show_Sum(uint8_t sum)
 }
 
 /***********************************************************************
-*		ÏÔÊ¾ º¯Êı×ÜÈë¿Ú
+*		æ˜¾ç¤º å‡½æ•°æ€»å…¥å£
 *
 *
 ***********************************************************************/
@@ -404,7 +403,7 @@ void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 	}
 
 	Fault_Number_Update();
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_ON();
 	
 	// sum
@@ -424,9 +423,9 @@ void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type)
 }
 
 /* Private user code ---------------------------------------------------------*/
-//------------------- °´¼ü»Øµ÷ ----------------------------
+//------------------- æŒ‰é”®å›è°ƒ ----------------------------
 
-// ¢Ù µµÎ»¼ü
+// â‘  æ¡£ä½é”®
 static void on_Fault_Button_1_clicked(void)
 {
 	if(Fault_Number_Cnt < Fault_Number_Sum)
@@ -437,7 +436,7 @@ static void on_Fault_Button_1_clicked(void)
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
-// ¢Ú Ê±¼ä¼ü
+// â‘¡ æ—¶é—´é”®
 static void on_Fault_Button_2_clicked(void)
 {
 	if(Fault_Number_Cnt > 1)
@@ -448,44 +447,44 @@ static void on_Fault_Button_2_clicked(void)
 	Lcd_Fault_Display(Fault_Number_Sum, Fault_Number_Cnt, Get_Fault_Number_Now(*p_System_Fault_Static,Fault_Number_Cnt));
 }
 
-// ¢Û Ä£Ê½¼ü
+// â‘¢ æ¨¡å¼é”®
 static void on_Fault_Button_3_clicked(void)
 {
 
 }
 
 
-// ¢Ü ¿ª»ú¼ü  ¶Ì°´
+// â‘£ å¼€æœºé”®  çŸ­æŒ‰
 static void on_Fault_Button_4_Short_Press(void)
 {
 	
 }
 
-// ¢Ù + ¢Ú  ×éºÏ¼ü 
+// â‘  + â‘¡  ç»„åˆé”® 
 static void on_Fault_Button_1_2_Short_Press(void)
 {
 	
 }
 
 
-// ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 100¼¶ or 5¼¶
+// â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 100çº§ or 5çº§
 static void on_Fault_Button_1_3_Short_Press(void)
 {
 
 }
 
 
-// ¢Ú + ¢Û  ×éºÏ¼ü  ¶Ì°´   
+// â‘¡ + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   
 static void on_Fault_Button_2_3_Short_Press(void)
 {
 }
 
-// ¢Ú + ¢Ü  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘£  ç»„åˆé”®  çŸ­æŒ‰
 static void on_Fault_Button_2_4_Short_Press(void)
 {
 }
 
-//------------------- °´¼ü»Øµ÷   ³¤°´ ----------------------------
+//------------------- æŒ‰é”®å›è°ƒ   é•¿æŒ‰ ----------------------------
 
 static void on_Fault_Button_1_Long_Press(void)
 {
@@ -514,7 +513,7 @@ static void on_Fault_Button_4_Long_Press(void)
 
 static void on_Fault_Button_1_2_Long_Press(void)
 {
-	//   wifiÅä¶Ô
+	//   wifié…å¯¹
 	Buzzer_Click_On();
 	WIFI_Get_In_Distribution();
 }
@@ -526,7 +525,7 @@ static void on_Fault_Button_1_3_Long_Press(void)
 // 
 static void on_Fault_Button_2_3_Long_Press(void)
 {
-	//   À¶ÑÀÅä¶Ô
+	//   è“ç‰™é…å¯¹
 	Buzzer_Click_On();
 	BT_Get_In_Distribution();
 }

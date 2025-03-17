@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				control_interface.c
-* @brief			control_interface ¿ØÖÆ½Ó¿Ú, wifi,À¶ÑÀÖ±½Ó¿ØÖÆ
+* @brief			control_interface æ§åˆ¶æ¥å£, wifi,è“ç‰™ç›´æ¥æ§åˆ¶
 *
 * @author			WQG
 * @versions		v1.0
@@ -32,7 +32,7 @@
 
 /* Private user code ---------------------------------------------------------*/
 
-//------------------- ÅäÍø¿ØÖÆ Ò£¿Ø & wifi ----------------------------
+//------------------- é…ç½‘æ§åˆ¶ é¥æ§ & wifi ----------------------------
 void Ctrl_GetIn_Distribution(uint16_t para)
 {
 	if(para == 1)
@@ -45,8 +45,8 @@ void Ctrl_GetIn_Distribution(uint16_t para)
 	}
 }
 	
-//------------------- ÉèÖÃÏµÍ³¹¤×÷ Ä£Ê½ ----------------------------
-//		¸ßÎ»::0£ºP1\2\3  µÍÎ»:0£º×ÔÓÉ:1£º¶¨Ê±:2£ºÑµÁ·
+//------------------- è®¾ç½®ç³»ç»Ÿå·¥ä½œ æ¨¡å¼ ----------------------------
+//		é«˜ä½::0ï¼šP1\2\3  ä½ä½:0ï¼šè‡ªç”±:1ï¼šå®šæ—¶:2ï¼šè®­ç»ƒ
 void Ctrl_Set_System_Mode(uint16_t para)
 {
 	uint8_t mode;
@@ -57,30 +57,30 @@ void Ctrl_Set_System_Mode(uint16_t para)
 	
 	if(mode == 0)
 	{
-		// 3sºó×Ô¶¯ÔËĞĞ
-		To_Free_Mode(FREE_MODE_AUTO_START);	//	×ÔÓÉÄ£Ê½
+		// 3såè‡ªåŠ¨è¿è¡Œ
+		To_Free_Mode(FREE_MODE_AUTO_START);	//	è‡ªç”±æ¨¡å¼
 	}
 	else if(mode == 1)
 	{
-		To_Timing_Mode();	//	¶¨Ê±Ä£Ê½
+		To_Timing_Mode();	//	å®šæ—¶æ¨¡å¼
 	}
 	else if(mode == 2)
 	{
 		if(plan < TRAINING_MODE_NUMBER_MAX)
 		{
-			To_Train_Mode(plan);	//	ÑµÁ·Ä£Ê½
+			To_Train_Mode(plan);	//	è®­ç»ƒæ¨¡å¼
 		}
 	}
 }
 
 
-//------------------- ÉèÖÃÏµÍ³¹¤×÷ ×´Ì¬ ----------------------------
-//		0:ÔİÍ£,   1:ÔİÍ£»Ö¸´,   2:ÖØĞÂ¿ªÊ¼,  3:½áÊø
+//------------------- è®¾ç½®ç³»ç»Ÿå·¥ä½œ çŠ¶æ€ ----------------------------
+//		0:æš‚åœ,   1:æš‚åœæ¢å¤,   2:é‡æ–°å¼€å§‹,  3:ç»“æŸ
 void Ctrl_Set_System_Status(uint16_t para)
 {
 	if(para == 0)
 	{
-		if(System_is_Pause() == 0)	// ÔİÍ£ --> Æô¶¯
+		if(System_is_Pause() == 0)	// æš‚åœ --> å¯åŠ¨
 		{
 			Arbitrarily_To_Pause();
 			
@@ -93,7 +93,7 @@ void Ctrl_Set_System_Status(uint16_t para)
 	}
 	else if(para == 1)
 	{
-		if(System_is_Pause())	// ÔİÍ£ --> Æô¶¯
+		if(System_is_Pause())	// æš‚åœ --> å¯åŠ¨
 		{
 			Arbitrarily_To_Running();
 			*p_OP_ShowNow_Speed = p_OP_ShowLater->speed;
@@ -102,31 +102,31 @@ void Ctrl_Set_System_Status(uint16_t para)
 	}
 	else if(para == 2)
 	{
-		// ×ÔÓÉÄ£Ê½
+		// è‡ªç”±æ¨¡å¼
 		if(System_Mode_Free())
 		{
-			To_Free_Mode(FREE_MODE_AUTO_START);	//	×ÔÓÉ Ä£Ê½
+			To_Free_Mode(FREE_MODE_AUTO_START);	//	è‡ªç”± æ¨¡å¼
 		}
 		else if(System_Mode_Time())
 		{
-			To_Timing_Mode();	//	¶¨Ê± Ä£Ê½
+			To_Timing_Mode();	//	å®šæ—¶ æ¨¡å¼
 		}
 		else if(System_Mode_Train())
 		{
-			To_Train_Mode(Get_System_State_Mode());	//	ÑµÁ· Ä£Ê½
+			To_Train_Mode(Get_System_State_Mode());	//	è®­ç»ƒ æ¨¡å¼
 		}
 	}
 	else if(para == 3)
 	{
-		// ·µ»Ø ×ÔÓÉÄ£Ê½ ³õÊ¼×´Ì¬
+		// è¿”å› è‡ªç”±æ¨¡å¼ åˆå§‹çŠ¶æ€
 		To_Free_Mode(FREE_MODE_NOT_AUTO_START);
 		Lcd_Show();
 	}
 }
 
 
-//------------------- ÉèÖÃÏµÍ³ µçÔ´  ----------------------------
-//		0£º¹Ø»ú  1£º¿ª»ú
+//------------------- è®¾ç½®ç³»ç»Ÿ ç”µæº  ----------------------------
+//		0ï¼šå…³æœº  1ï¼šå¼€æœº
 void Ctrl_Set_System_PowerOn(uint16_t para)
 {
 	if(para == 0)
@@ -135,7 +135,7 @@ void Ctrl_Set_System_PowerOn(uint16_t para)
 	}
 	else
 	{
-		if(System_is_Power_Off())//¹Ø»úÖĞ Ö´ĞĞ¿ª»ú
+		if(System_is_Power_Off())//å…³æœºä¸­ æ‰§è¡Œå¼€æœº
 		{
 				System_Power_On();
 		}
@@ -143,14 +143,14 @@ void Ctrl_Set_System_PowerOn(uint16_t para)
 }
 
 
-//------------------- ÉèÖÃ µ±Ç°×ªËÙ (ÁÙÊ±ÓĞĞ§)----------------------------
+//------------------- è®¾ç½® å½“å‰è½¬é€Ÿ (ä¸´æ—¶æœ‰æ•ˆ)----------------------------
 void Ctrl_Set_Motor_Current_Speed(uint16_t para)
 {
 	Data_Set_Current_Speed((uint8_t)para&0xFF);
 }
 
 
-//------------------- ÉèÖÃ µ±Ç°Ê±¼ä (ÁÙÊ±ÓĞĞ§)----------------------------
+//------------------- è®¾ç½® å½“å‰æ—¶é—´ (ä¸´æ—¶æœ‰æ•ˆ)----------------------------
 void Ctrl_Set_Motor_Current_Time(uint16_t para)
 {
 	Data_Set_Current_Time(para);

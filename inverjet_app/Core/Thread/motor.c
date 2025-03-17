@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				motor.c
-* @brief			µç»ú Ïà¹ØĞ­Òé  ¿ØÖÆ×ªËÙÃüÁî 200ms  ¡¶ÀÏ¹ù°æ¡·
+* @brief			ç”µæœº ç›¸å…³åè®®  æ§åˆ¶è½¬é€Ÿå‘½ä»¤ 200ms  ã€Šè€éƒ­ç‰ˆã€‹
 *
 * @author			WQG
 * @versions		v1.0
@@ -22,7 +22,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 
-#if (MOTOR_MODULE_HUART == 3)//Çı¶¯°å´®¿Ú UART¾ä±ú
+#if (MOTOR_MODULE_HUART == 3)//é©±åŠ¨æ¿ä¸²å£ UARTå¥æŸ„
 UART_HandleTypeDef* p_huart_motor = &huart3;
 #elif (MOTOR_MODULE_HUART == 1)
 UART_HandleTypeDef* p_huart_motor = &huart1;
@@ -34,11 +34,11 @@ UART_HandleTypeDef* p_huart_motor = &huart4;
 
 /* Private variables ---------------------------------------------------------*/
 
-//**************** ÊÕ·¢»º³åÇø
-uint8_t Motor_DMABuff[MOTOR_RS485_RX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸ö½ÓÊÕ»º´æÇø
-uint8_t Motor_TxBuff[MOTOR_RS485_TX_BUFF_SIZE]={0};//¶¨ÒåÒ»¸ö·¢ËÍ»º´æÇø
+//**************** æ”¶å‘ç¼“å†²åŒº
+uint8_t Motor_DMABuff[MOTOR_RS485_RX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªæ¥æ”¶ç¼“å­˜åŒº
+uint8_t Motor_TxBuff[MOTOR_RS485_TX_BUFF_SIZE]={0};//å®šä¹‰ä¸€ä¸ªå‘é€ç¼“å­˜åŒº
 
-uint8_t Motor_Speed_Now = 0;			// µç»ú×ªËÙ 
+uint8_t Motor_Speed_Now = 0;			// ç”µæœºè½¬é€Ÿ 
 
 uint8_t Motor_Speed_Target = 0;
 
@@ -46,23 +46,23 @@ static uint16_t Motor_Timer_Cnt=0;
 
 //uint16_t* p_Speed_Mode; 
 
-uint16_t Motor_Fault_State=0;//µç»ú¹ÊÕÏ×´Ì¬
+uint16_t Motor_Fault_State=0;//ç”µæœºæ•…éšœçŠ¶æ€
 
 static uint32_t Motor_Rx_Timer_cnt= 0;
 
-static uint32_t Motor_Fault_Timer_cnt= 0;			// ¹ÊÕÏ¼ÆÊıÆ÷
+static uint32_t Motor_Fault_Timer_cnt= 0;			// æ•…éšœè®¡æ•°å™¨
 
 
 //#if (MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
-static uint8_t Rx_State= 0;		//´Ó»ú½ÓÊÕ×´Ì¬
+static uint8_t Rx_State= 0;		//ä»æœºæ¥æ”¶çŠ¶æ€
 //#endif
 
-static uint8_t Motor_Start_Flag = 0; 		// Æô¶¯±êÖ¾
-static uint16_t Motor_Start_Timer = 0; 	// Æô¶¯¼ÆÊ±
+static uint8_t Motor_Start_Flag = 0; 		// å¯åŠ¨æ ‡å¿—
+static uint16_t Motor_Start_Timer = 0; 	// å¯åŠ¨è®¡æ—¶
 
-static uint8_t Motor_ReStart_Cnt = 0; 			// ÖØÆô¼ÆÊı
-static uint8_t Motor_ReStart_Flag = 0; 			// ÖØÆô±êÖ¾
-static uint16_t Motor_ReStart_Timer = 0; 		// ÖØÆô¼ÆÊ±
+static uint8_t Motor_ReStart_Cnt = 0; 			// é‡å¯è®¡æ•°
+static uint8_t Motor_ReStart_Flag = 0; 			// é‡å¯æ ‡å¿—
+static uint16_t Motor_ReStart_Timer = 0; 		// é‡å¯è®¡æ—¶
 
 
 static uint16_t Motor_Fault_Old = 0;
@@ -75,7 +75,7 @@ static uint32_t Motor_Mode_Register = 0;
 #define MOTOR_SPEED_STEPPING			(1)
 
 #define GET_IN_START_UP_STAGE()				Motor_Start_Flag = 1;Motor_Start_Timer = 0
-#define GET_OUT_START_UP_STAGE()			Motor_Start_Flag = 0;Motor_ReStart_Cnt=0;Motor_ReStart_Flag = 0
+#define GET_OUT_START_UP_STAGE()			Motor_Start_Flag = 0;Motor_ReStart_Cnt=0;Motor_ReStart_Flag = 0;Motor_Start_Timer = 0
 #define	IS_IN_START_UP_STAGE()				(Motor_Start_Flag ==1)
 
 #define GET_IN_WAIT_RESTART_STAGE()				if((Motor_ReStart_Cnt < 3)&&(Motor_ReStart_Flag==0)){Motor_ReStart_Flag=1;Motor_ReStart_Timer=0;Motor_Start_Timer=0;Motor_ReStart_Cnt++;}
@@ -85,23 +85,23 @@ static uint32_t Motor_Mode_Register = 0;
 
 /* Private user code ---------------------------------------------------------*/
 
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 void Metering_Receive_Init(void)
 {
 	
 	//p_Speed_Mode = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_MOTOR_SPEED_MODE );
-	//__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_RXNE); //Ê¹ÄÜIDLEÖĞ¶Ï
-	__HAL_UART_ENABLE_IT(p_huart_motor, UART_IT_IDLE);//Ê¹ÄÜidleÖĞ¶Ï
+	//__HAL_UART_ENABLE_IT(p_Metering_Module_Huart, UART_IT_RXNE); //ä½¿èƒ½IDLEä¸­æ–­
+	__HAL_UART_ENABLE_IT(p_huart_motor, UART_IT_IDLE);//ä½¿èƒ½idleä¸­æ–­
 	__HAL_UART_ENABLE_IT(p_huart_motor, UART_IT_ERR);//
 	
-  HAL_UARTEx_ReceiveToIdle_DMA(p_huart_motor,Motor_DMABuff,MOTOR_RS485_RX_BUFF_SIZE);//´ò¿ª´®¿ÚDMA½ÓÊÕ
-	__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);		   // ÊÖ¶¯¹Ø±ÕDMA_IT_HTÖĞ¶Ï
+  HAL_UARTEx_ReceiveToIdle_DMA(p_huart_motor,Motor_DMABuff,MOTOR_RS485_RX_BUFF_SIZE);//æ‰“å¼€ä¸²å£DMAæ¥æ”¶
+	__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);		   // æ‰‹åŠ¨å…³é—­DMA_IT_HTä¸­æ–­
 }
 uint8_t If_Start_Up_Stable(void)
 {
 	uint8_t result = 0;
 	
-	if((System_Dial_Switch & 0x08)==0)//¹ù¹¤
+	if((System_Dial_Switch & 0x08)==0)//éƒ­å·¥
 	{
 		if(Motor_Start_Timer < 2)
 			result = 1;
@@ -118,7 +118,7 @@ uint8_t If_Start_Up_Finish(void)
 {
 	uint8_t result = 0;
 	
-	if((System_Dial_Switch & 0x08)==0)//¹ù¹¤
+	if((System_Dial_Switch & 0x08)==0)//éƒ­å·¥
 	{
 		if(Motor_Start_Timer > 20)
 			result = 1;
@@ -132,12 +132,12 @@ uint8_t If_Start_Up_Finish(void)
 	return result;
 }
 
-// ÖØÆôµÈ´ıÊ±¼ä
+// é‡å¯ç­‰å¾…æ—¶é—´
 uint8_t If_Wait_Restart_Finish(void)
 {
 	uint8_t result = 0;
 	
-	if((System_Dial_Switch & 0x08)==0)//¹ù¹¤
+	if((System_Dial_Switch & 0x08)==0)//éƒ­å·¥
 	{
 		if(Motor_Start_Timer > 10)
 			result = 1;
@@ -150,7 +150,7 @@ uint8_t If_Wait_Restart_Finish(void)
 	
 	return result;
 }
-// ÖØÆô
+// é‡å¯
 void Motor_Usart_Restar(void)
 {
 	if(HAL_UART_DeInit(&huart3) != HAL_OK)
@@ -158,13 +158,13 @@ void Motor_Usart_Restar(void)
     Error_Handler();
   }
   
-  // ÖØĞÂ´ò¿ª´®¿Ú
+  // é‡æ–°æ‰“å¼€ä¸²å£
   MX_USART3_UART_Init();
 	Metering_Receive_Init();
 }
 
 
-// Çå³ı¹ÊÕÏ
+// æ¸…é™¤æ•…éšœ
 void Clean_Motor_OffLine_Timer(void)
 {
 	Motor_Rx_Timer_cnt = 0;
@@ -172,7 +172,7 @@ void Clean_Motor_OffLine_Timer(void)
 	Motor_Fault_State = 0;
 }
 
-// 1Ãë Ö´ĞĞº¯Êı
+// 1ç§’ æ‰§è¡Œå‡½æ•°
 void Motor_Function_In_One_Second(void)
 {
 	if(IS_IN_START_UP_STAGE())
@@ -190,50 +190,50 @@ void Motor_Function_In_One_Second(void)
 	}
 }
 
-//------------------- Ö÷Ñ­»·º¯Êı  ----------------------------
+//------------------- ä¸»å¾ªç¯å‡½æ•°  ----------------------------
 void App_Motor_Handler(void)
 {
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_MOTOR);
 	
-	//Í¨ĞÅ¹ÊÕÏ¼ÆÊıÆ÷
-	Motor_Rx_Timer_cnt++;  //²»±¨¹ÊÕÏ ¼ÇµÃÉ¾  wuqingguang 2024-09-09
+	//é€šä¿¡æ•…éšœè®¡æ•°å™¨
+	Motor_Rx_Timer_cnt++;  //ä¸æŠ¥æ•…éšœ è®°å¾—åˆ   wuqingguang 2024-09-09
 	
 	if(Motor_Timer_Cnt < 9999)
 		Motor_Timer_Cnt ++;
 	else
 		Motor_Timer_Cnt = 0;
 	
-	// ===================  Í¨Ñ¶¹ÊÕÏ
+	// ===================  é€šè®¯æ•…éšœ
 #ifndef SYSTEM_DEBUG_MODE
 	if(IS_CHECK_ERROR_MODE())
 	{
 		if(Motor_Rx_Timer_cnt > (FAULT_MOTOR_LOSS_TIME/3))
 		{
-			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//Çı¶¯°å Í¨Ñ¶¹ÊÕÏ
+			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//é©±åŠ¨æ¿ é€šè®¯æ•…éšœ
 		}
 	}
 	else
 	{
 		if(Motor_Rx_Timer_cnt > FAULT_MOTOR_LOSS_TIME)
 		{
-			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//Çı¶¯°å Í¨Ñ¶¹ÊÕÏ
+			Set_Motor_Fault_State( E203_MOTOR_LOSS );							//é©±åŠ¨æ¿ é€šè®¯æ•…éšœ
 		}
 	}
 #endif
-	// ===================  ³¢ÊÔÖØÆô´®¿Ú
+	// ===================  å°è¯•é‡å¯ä¸²å£
 	if( ((Motor_Rx_Timer_cnt % FAULT_MOTOR_TRY_RESTAR_TIME)==0) && (Motor_Rx_Timer_cnt >= FAULT_MOTOR_TRY_RESTAR_TIME))
 	{
-		DEBUG_PRINT("[ERROR]\tÇı¶¯°åÍ¨Ñ¶¹ÊÕÏ cnt:\t%d\tÖØÆô´®¿Ú\n",Motor_Rx_Timer_cnt);
+		DEBUG_PRINT("[ERROR]\té©±åŠ¨æ¿é€šè®¯æ•…éšœ cnt:\t%d\té‡å¯ä¸²å£\n",Motor_Rx_Timer_cnt);
 		Motor_Usart_Restar();
 	}
 	if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 		//*********************************************************************************************
-		//* ------ ¹ù¹¤Çı¶¯°å ------ *******************************************************************
+		//* ------ éƒ­å·¥é©±åŠ¨æ¿ ------ *******************************************************************
 		//*********************************************************************************************
 		
-		// ===================  ÉèÖÃ×ªËÙ
+		// ===================  è®¾ç½®è½¬é€Ÿ
 		if((Motor_Timer_Cnt % MOTOR_POLLING_PERIOD)==MOTOR_COMMAND_CYCLE)
 		{
 #ifdef SYSTEM_DRIVER_BOARD_TOOL
@@ -244,56 +244,56 @@ void App_Motor_Handler(void)
 			else
 #endif
 			{
-				//ÉèÖÃ×ªËÙ
+				//è®¾ç½®è½¬é€Ÿ
 				Motor_Speed_Update();
 			}
 		}
-		// ===================  ¶Á×´Ì¬
+		// ===================  è¯»çŠ¶æ€
 		else if((Motor_Timer_Cnt % MOTOR_POLLING_PERIOD) == MOTOR_READ_STATIC_CYCLE)
 		{
-				//¶Á×´Ì¬  1 s
+				//è¯»çŠ¶æ€  1 s
 				Motor_Read_Register();
 		}
-		// ===================  ĞÄÌø
+		// ===================  å¿ƒè·³
 		else if((Motor_Timer_Cnt % MOTOR_POLLING_PERIOD) == MOTOR_HEARTBEAT_CYCLE)
 		{
-			//·¢ĞÄÌø
-			if((Motor_Speed_Now != 0))//Çı¶¯°åÒªÇó  Í£»úºó²»·¢ĞÄÌø
+			//å‘å¿ƒè·³
+			if((Motor_Speed_Now != 0))//é©±åŠ¨æ¿è¦æ±‚  åœæœºåä¸å‘å¿ƒè·³
 			{
-				//ĞÄÌø 200ms
+				//å¿ƒè·³ 200ms
 				Motor_Heartbeat_Send();
 			}
 		}
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 	else if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 		//*********************************************************************************************
-		//* ------ À¶¹¤Çı¶¯°å ------ *******************************************************************
+		//* ------ è“å·¥é©±åŠ¨æ¿ ------ *******************************************************************
 		//*********************************************************************************************
-		if(Rx_State == 1)	// ½ÓÊÕ
+		if(Rx_State == 1)	// æ¥æ”¶
 		{
 			//Rx_State = 2;
 			Motor_State_Analysis();
 	//	}
-	//	else if(Rx_State == 2)	// »Ø¸´
+	//	else if(Rx_State == 2)	// å›å¤
 	//	{
 			Rx_State = 0;
 			Motor_Speed_Update();
 		}
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 }
 
-//------------------- Í¬²½µç»ú×ªËÙ ----------------------------
-// ³ÖĞø·¢
+//------------------- åŒæ­¥ç”µæœºè½¬é€Ÿ ----------------------------
+// æŒç»­å‘
 uint8_t Motor_Speed_Update(void)
 {
 	uint8_t result=1;
 	uint8_t Motor_Acceleration=0;
 	
-	if((Get_System_State_Machine() == TRAINING_MODE_RUNNING)&&(PMode_Now == 5)&&(OP_ShowNow.time > 10))					// ÑµÁ· P5
+	if((Get_System_State_Machine() == TRAINING_MODE_RUNNING)&&(PMode_Now == 5)&&(OP_ShowNow.time > 10))					// è®­ç»ƒ P5
 		Motor_Acceleration = *p_Surf_Mode_Info_Acceleration;
 	else
 		Motor_Acceleration = MOTOR_ACCELERATION;
@@ -301,7 +301,7 @@ uint8_t Motor_Speed_Update(void)
 	
 	if( Motor_Speed_Now > Motor_Speed_Target )
 	{
-		if((Motor_Speed_Target == 0) && (Motor_Speed_Now <= MOTOR_ACTUAL_SPEED_MIN))// ×îµÍÖ±½Ó¹Ø
+		if((Motor_Speed_Target == 0) && (Motor_Speed_Now <= MOTOR_ACTUAL_SPEED_MIN))// æœ€ä½ç›´æ¥å…³
 		{
 			Motor_Speed_Now = 0;
 		}
@@ -324,7 +324,7 @@ uint8_t Motor_Speed_Update(void)
 		{
 			Motor_Speed_Now = 0;
 		}
-		else if((Motor_Speed_Now == 0) && (Motor_Speed_Target >= MOTOR_ACTUAL_SPEED_MIN))// ×îµÍÖ±½Ó¿ª
+		else if((Motor_Speed_Now == 0) && (Motor_Speed_Target >= MOTOR_ACTUAL_SPEED_MIN))// æœ€ä½ç›´æ¥å¼€
 		{
 			Motor_Speed_Now = MOTOR_ACTUAL_SPEED_MIN;
 			GET_IN_START_UP_STAGE();
@@ -344,25 +344,25 @@ uint8_t Motor_Speed_Update(void)
 	}
 	if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	{
-		// Çı¶¯°åÒªÇó, Í£»úºó²»ÒªÔÙ·¢¿ØÖÆÖ¸Áî
+		// é©±åŠ¨æ¿è¦æ±‚, åœæœºåä¸è¦å†å‘æ§åˆ¶æŒ‡ä»¤
 		if((Motor_Speed_Now == 0)&&(result == 0))
 			return result;
 	}
 	
 	*p_Send_Reality_Speed = Motor_Speed_To_Rpm(Motor_Speed_Now);
-	//·¢ËÍ Çı¶¯°å
+	//å‘é€ é©±åŠ¨æ¿
 	Motor_Speed_Send(*p_Send_Reality_Speed);
 	
 	if(result == 1)
 	{
-		//²âÊÔ·¢ËÍ´®¿Ú
-		DEBUG_PRINT("µçÆø×ªËÙ:\t%d\t\t×ªËÙ:\t%d\tµµÎ»:\t%d%%\n",*p_Send_Reality_Speed,*p_Send_Reality_Speed/5,Motor_Speed_Now);
+		//æµ‹è¯•å‘é€ä¸²å£
+		DEBUG_PRINT("ç”µæ°”è½¬é€Ÿ:\t%d\t\tè½¬é€Ÿ:\t%d\tæ¡£ä½:\t%d%%\n",*p_Send_Reality_Speed,*p_Send_Reality_Speed/5,Motor_Speed_Now);
 	}
 	
 	return result;
 }
 
-//------------------- µç»ú×ªËÙÊÇ·ñ´ïµ½Ä¿±êÖµ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿæ˜¯å¦è¾¾åˆ°ç›®æ ‡å€¼ ----------------------------
 uint8_t Motor_Speed_Is_Reach(void)
 {
 	if(Motor_Speed_Now == Motor_Speed_Target)
@@ -371,7 +371,7 @@ uint8_t Motor_Speed_Is_Reach(void)
 		return 0;
 }
 
-//------------------- µç»ú×ªËÙ Ä¿±êÖµ ÉèÖÃ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿ ç›®æ ‡å€¼ è®¾ç½® ----------------------------
 void Motor_Speed_Target_Set(uint8_t speed)
 {
 	if(speed > MOTOR_PERCENT_SPEED_MAX)
@@ -381,28 +381,28 @@ void Motor_Speed_Target_Set(uint8_t speed)
 		speed = MOTOR_PERCENT_SPEED_MIX;
 
 	if(Motor_Speed_Target != speed)
-		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//¹âÈ¦×Ô¶¯ÅĞ¶Ï
+		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//å…‰åœˆè‡ªåŠ¨åˆ¤æ–­
 	
 	Motor_Speed_Target = speed;
 }
 
-//------------------- µç»ú ¿ìËÙÍ£Ö¹ ----------------------------
+//------------------- ç”µæœº å¿«é€Ÿåœæ­¢ ----------------------------
 void Motor_Quick_Stop(void)
 {
 	if(Motor_Speed_Target != 0)
-		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//¹âÈ¦×Ô¶¯ÅĞ¶Ï
+		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//å…‰åœˆè‡ªåŠ¨åˆ¤æ–­
 	
 	Motor_Speed_Target = 0;
 	Motor_Speed_Now = 1;
 }
 
-//------------------- µç»ú×ªËÙ Ä¿±êÖµ ÉèÖÃ ----------------------------
+//------------------- ç”µæœºè½¬é€Ÿ ç›®æ ‡å€¼ è®¾ç½® ----------------------------
 uint8_t Motor_Speed_Target_Get(void)
 {
 	return Motor_Speed_Target;
 
 }
-//------------------- °Ù·Ö±È¹¦ÂÊ ×ª µç»ú×ªËÙ ----------------------------
+//------------------- ç™¾åˆ†æ¯”åŠŸç‡ è½¬ ç”µæœºè½¬é€Ÿ ----------------------------
 // 100% -->  1960 rpm
 // P2/P1=(N2/N1)^3=(Q2/Q1)^3=(V1/V2)^3
 
@@ -414,7 +414,7 @@ uint32_t Motor_Speed_To_Rpm(uint8_t speed)
 	
 	if(speed > 100)
 		speed = 100;
-	//¹¦ÂÊ °Ù·Ö±È
+	//åŠŸç‡ ç™¾åˆ†æ¯”
 //	p = (double)speed/100;
 //  a = pow(p, 1.0 / 3);
 //	
@@ -422,7 +422,7 @@ uint32_t Motor_Speed_To_Rpm(uint8_t speed)
 //	
 //	speed_rpm = (uint32_t)(a);
 
-	//×ªËÙ°Ù·Ö±È
+	//è½¬é€Ÿç™¾åˆ†æ¯”
 	//speed_rpm = speed*MOTOR_RPM_CONVERSION_COEFFICIENT;
 	if(speed < MOTOR_PERCENT_SPEED_MIX)
 	{
@@ -466,8 +466,8 @@ uint8_t Motor_Rpm_To_Speed(uint32_t speed_rpm)
 	return (speed&0xFF);
 }
 
-//------------------- ¹ÊÕÏÀàĞÍ×ª»» ----------------------------
-uint16_t Change_Faule_To_Upper(uint8_t type)
+//------------------- æ•…éšœç±»å‹è½¬æ¢ ----------------------------
+uint16_t Change_Faule_To_Upper(uint16_t type)
 {
 	uint16_t change_fault=0;
 	
@@ -476,79 +476,101 @@ uint16_t Change_Faule_To_Upper(uint8_t type)
 	
 	if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
-		if((type >= MOTOR_FAULT_CODE_START) && (type <= MOTOR_FAULT_CODE_END))
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
+		//if((type >= MOTOR_FAULT_CODE_START) && (type <= MOTOR_FAULT_CODE_END))
+		if(type > 0)
 		{
-			if((type == MOTOR_FAULT_OVER_VOLTAGE ) || (type == MOTOR_FAULT_UNDER_VOLTAGE ))	//-----------Ä¸ÏßµçÑ¹ ¹ıÑ¹ | Ç·Ñ¹ 01 02
+			if((type == MOTOR_FAULT_OVER_VOLTAGE ) || (type == MOTOR_FAULT_UNDER_VOLTAGE ))	//-----------æ¯çº¿ç”µå‹ è¿‡å‹ | æ¬ å‹ 01 02
 				change_fault = E001_BUS_VOLTAGE_ABNORMAL;
 			
-			else if(type == MOTOR_FAULT_ABS_OVER_CURRENT)			//----------- ¹ıÁ÷  04
+			else if(type == MOTOR_FAULT_ABS_OVER_CURRENT)			//----------- è¿‡æµ  04
 				change_fault = E002_BUS_CURRENT_ABNORMAL;
 			
-			else if((type >= MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_1) && (type <= MOTOR_FAULT_UNBALANCED_CURRENTS ) )//-----------Êä³öÈıÏàµçÁ÷²»Æ½ºâ  15 - 18
+			else if((type >= MOTOR_FAULT_HIGH_OFFSET_CURRENT_SENSOR_1) && (type <= MOTOR_FAULT_UNBALANCED_CURRENTS ) )//-----------è¾“å‡ºä¸‰ç›¸ç”µæµä¸å¹³è¡¡  15 - 18
 				change_fault = E003_BUS_CURRENT_BIAS;
 			
-			else if(type == MOTOR_FAULT_DRV)		//-----------¶ÌÂ·  03
+			else if(type == MOTOR_FAULT_DRV)		//-----------çŸ­è·¯  03
 				change_fault = E004_ABNORMAL_SHORT_CIRCUIT;
-			// ------ ²»±¨ÉÏµçÈ±Ïà
-			else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_RUNNING) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- È±Ïà 34 - 37
+			// ------ ä¸æŠ¥ä¸Šç”µç¼ºç›¸
+			else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_LOSS_RUNNING) && (type <= MOTOR_FAULT_OUTPUT_PHASE_2_AND3_LOSS_RUNNING ) )//----------- ç¼ºç›¸ 34 - 37
 				change_fault = E005_LACK_PHASE;
 			
-			else if(type == MOTOR_FAULT_OUTPUT_LOCKROTOR)		//-----------¶Â×ª  38
+			else if(type == MOTOR_FAULT_OUTPUT_LOCKROTOR)		//-----------å µè½¬  38
 				change_fault = E006_LOCK_ROTOR;
 			
-			else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS ¹ıÈÈ 05
+			else if(type == MOTOR_FAULT_OVER_TEMP_FET)			//----------- MOS è¿‡çƒ­ 05
 				change_fault = E101_TEMPERATURE_MOS;
 
-			else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- È±Ïà ´«¸ĞÆ÷
-				change_fault = 0;//E205_VOLTAGE_AMBIENT;
+			else if((type >= MOTOR_FAULT_OUTPUT_PHASE_A_SENSOR) && (type <= MOTOR_FAULT_OUTPUT_PHASE_C_SENSOR ) )//----------- ç¼ºç›¸ ä¼ æ„Ÿå™¨
+				change_fault = E005_LACK_PHASE;
 			
-			else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS ´«¸ĞÆ÷¹ÊÕÏ 39
+			else if(type == MOTOR_FAULT_MOSFET_NTC_ERR)			//----------- MOS ä¼ æ„Ÿå™¨æ•…éšœ 39
 				change_fault = E201_TEMPERATURE_HARDWARE;
 			
-			//----------- ÆäËü ¹ÊÕÏ
+			else if(type == MOTOR_FAULT_IDLING_ERROR)			//----------- ç©ºè½¬ 39
+			{
+				change_fault = E204_IDLING_ERROR;
+				Fault_Restar_Set(1);
+			}
+			//----------- å…¶å®ƒ æ•…éšœ
 			else
 				change_fault = E202_MOTOR_DRIVER;
 		}
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 	else if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
-		//Ä¸ÏßµçÑ¹Òì³£
-		if((type & TEMP001_MOTOR_FAULT_BUS_VOLTAGE_UNDER)||(type & TEMP001_MOTOR_FAULT_BUS_CURRENT_OVER))
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
+		//æ¯çº¿ç”µå‹å¼‚å¸¸
+		if(type & TEMP001_MOTOR_FAULT_BUS_VOLTAGE_ERROR)
 			change_fault |= E001_BUS_VOLTAGE_ABNORMAL;
 		
-		//Ó²¼ş¹ÊÕÏ
-		if((type & TEMP001_MOTOR_FAULT_OUT_STEP_FAULT) || (type & TEMP001_MOTOR_FAULT_STARTUP_FAILED))
-			change_fault |= E202_MOTOR_DRIVER;
+		//ç¡¬ä»¶æ•…éšœ
+		if(type & TEMP001_MOTOR_FAULT_MOSFET_TEMP_HARDWARE)
+			change_fault |= E201_TEMPERATURE_HARDWARE;
 		
-		//Í¨ĞÅ¹ÊÕÏ
-		if((type & TEMP001_MOTOR_FAULT_TIME_OUT)||(type & TEMP001_MOTOR_FAULT_CRC_ERROR))
+		//é€šä¿¡æ•…éšœ
+		if(type & TEMP001_MOTOR_FAULT_COMM_FAULT)
 			change_fault |= E203_MOTOR_LOSS;
 			
-		//Æ«ÖÃÒì³£
-		if(type & TEMP001_MOTOR_FAULT_SAMPLE_ERROR)
+		//mos temp over
+		if(type & TEMP001_MOTOR_FAULT_TEMP_OVER)
+			change_fault |= E101_TEMPERATURE_MOS;
+		
+		//åç½®å¼‚å¸¸
+		if(type & TEMP001_MOTOR_FAULT_BUS_CIRCUIT_BIAS)
 			change_fault |= E003_BUS_CURRENT_BIAS;
 		
-		//Ó²¼ş¹ıÁ÷  --¶ÌÂ·
+		//ç¡¬ä»¶è¿‡æµ  --çŸ­è·¯
 		if(type & TEMP001_MOTOR_FAULT_HARDWARE_OVERCURRENT)
 			change_fault |= E004_ABNORMAL_SHORT_CIRCUIT;
 		
-		//Êä³ö¹ıÁ÷
+		//è¾“å‡ºè¿‡æµ
 		if(type & TEMP001_MOTOR_FAULT_OUTPUT_OVERCURRENT)
 			change_fault |= E002_BUS_CURRENT_ABNORMAL;
 		
-		//È±Ïà
+		//ç¼ºç›¸
 		if(type & TEMP001_MOTOR_FAULT_LACK_PHASE)
 			change_fault |= E005_LACK_PHASE;
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+		
+		// ç©ºè½¬
+		if(type & TEMP001_MOTOR_FAULT_IDLING_ERROR)
+		{
+			change_fault |= E204_IDLING_ERROR;
+			Fault_Restar_Set(1);
+		}
+		
+		//else
+		if((type & TEMP001_MOTOR_FAULT_OUT_STEP_FAULT)||(type & TEMP001_MOTOR_FAULT_STARTUP_FAILED)|| (type & TEMP001_MOTOR_FAULT_BRIDGE_HARDWARE))
+			change_fault |= E202_MOTOR_DRIVER;
+		
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 	
 	return change_fault;
 }
 
-/*-------------------- ÊÕ·¢´¦Àí ----------------------------------------------*/
+/*-------------------- æ”¶å‘å¤„ç† ----------------------------------------------*/
 // crc16-XMODEM
 uint16_t CRC16_XMODEM_T(uint8_t *ptr, uint16_t len)
 {
@@ -597,7 +619,7 @@ uint16_t CRC16_XMODEM_T(uint8_t *ptr, uint16_t len)
     return(crc);
 }
 
-// Ğ£ÑéºÍ È¡·´
+// æ ¡éªŒå’Œ å–å
 uint8_t CRC8_ADD(uint8_t *ptr, uint16_t len)
 {
 	uint8_t crc = 0x00;
@@ -614,8 +636,8 @@ uint8_t CRC8_ADD(uint8_t *ptr, uint16_t len)
 #endif
 }
 
-//-------------------- µç»ú×´Ì¬½âÎö ----------------------------
-//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+//-------------------- ç”µæœºçŠ¶æ€è§£æ ----------------------------
+//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 void AQPED002_Motor_State_Analysis(void)
 {
 	uint16_t result_fault=0;
@@ -635,7 +657,7 @@ void AQPED002_Motor_State_Analysis(void)
 		}
 		else
 		{
-			//Çı¶¯°å Í¨Ñ¶¹ÊÕÏ »Ö¸´
+			//é©±åŠ¨æ¿ é€šè®¯æ•…éšœ æ¢å¤
 			ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 			Motor_Loss_Cnt = 0;
 		}
@@ -643,32 +665,32 @@ void AQPED002_Motor_State_Analysis(void)
 	
 	Motor_Rx_Timer_cnt = 0;
 	//
-	// ÂË²¨ºóµÄmosfetÎÂ¶È
+	// æ»¤æ³¢åçš„mosfetæ¸©åº¦
 	Temperature = Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOSFET_TEMP_OFFSET+1];
 	//memcpy(p_Mos_Temperature, &Temperature, 2);
 	*p_Mos_Temperature = Temperature;
-	// ÂË²¨ºóµÄµç»úÎÂ¶È ¸ÄÓÃ Èí¼ş°æ±¾
+	// æ»¤æ³¢åçš„ç”µæœºæ¸©åº¦ æ”¹ç”¨ è½¯ä»¶ç‰ˆæœ¬
 	Driver_Software_Version_Read = Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_TEMP_OFFSET+1];
 
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_DRIVER_SOFTWARE_VERSION_HIGH, Driver_Software_Version_Read/100);
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_DRIVER_SOFTWARE_VERSION_LOW, Driver_Software_Version_Read%100);
-	// µç»úÆ½¾ùµçÁ÷
+	// ç”µæœºå¹³å‡ç”µæµ
 	double mosfet_current = Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET]<<24 |Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET+1]<<16 |Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET+2]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_CURRENT_OFFSET+3];
 	*p_Motor_Current = (uint16_t)(mosfet_current/1.4);
-	// µ±Ç°µçÆø×ªËÙerpm
+	// å½“å‰ç”µæ°”è½¬é€Ÿerpm
 	*p_Motor_Reality_Speed = Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET]<<24 |Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET+1]<<16 |Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET+2]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_SPEED_OFFSET+3];
 	*p_Motor_Reality_Speed = *p_Motor_Reality_Speed / MOTOR_POLE_NUMBER;
-	// Ä¸ÏßµçÑ¹
+	// æ¯çº¿ç”µå‹
 	*p_Motor_Bus_Voltage = Motor_State_Storage[MOTOR_ADDR_BUS_VOLTAGE_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_BUS_VOLTAGE_OFFSET+1];
-	// Ä¸ÏßµçÁ÷  Ã»ÓĞ¼ì²â
+	// æ¯çº¿ç”µæµ  æ²¡æœ‰æ£€æµ‹
 	*p_Motor_Bus_Current = 0;
-	// »ñÈ¡µç»ú¹ÊÕÏ
+	// è·å–ç”µæœºæ•…éšœ
 	*p_Motor_Fault_Static = Motor_State_Storage[MOTOR_ADDR_MOTOR_FAULT_OFFSET];
 #ifdef SYSTEM_DRIVER_BOARD_TOOL	
-	// »ñÈ¡µç»úÄ£Ê½×´Ì¬
+	// è·å–ç”µæœºæ¨¡å¼çŠ¶æ€
 	Motor_Mode_Register = Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET]<<24 |Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET+1]<<16 |Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET+2]<<8 | Motor_State_Storage[MOTOR_ADDR_MOTOR_MODE_OFFSET+3];
 #endif
-	// 10KNTCÎÂ¶È1 2 3
+	// 10KNTCæ¸©åº¦1 2 3
 	ntc_tmp[0] = Motor_State_Storage[MOTOR_ADDR_NTC1_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC1_TEMP_OFFSET+1];
 	ntc_tmp[1] = Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC2_TEMP_OFFSET+1];
 	ntc_tmp[2] = Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET]<<8 | Motor_State_Storage[MOTOR_ADDR_NTC3_TEMP_OFFSET+1];
@@ -677,23 +699,23 @@ void AQPED002_Motor_State_Analysis(void)
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_02, ntc_tmp[1]);
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MOSFET_TEMPERATURE_03, ntc_tmp[2]);
 	
-	//----- ´®¿Ú´òÓ¡   ------------------------------------------------------------------------------
+	//----- ä¸²å£æ‰“å°   ------------------------------------------------------------------------------
 	/*if(memcmp(Motor_State_Old, Motor_State_Storage, MOTOR_PROTOCOL_ADDR_MAX) != 0)
 	{
 		DEBUG_PRINT("\n\n\
-		mosfetÎÂ¶È:\t%d.%d (¡ãC)\n\
-		Çı¶¯°æ±¾:\t%d.%d \n\
-		µç»úµçÁ÷:\t%d.%d (A)\n\
-		µ±Ç°×ªËÙ:\t\t\t\t%d (rpm)\n\
-		Ä¸ÏßµçÑ¹:\t%d.%d (V)\n\
-		µç»ú¹ÊÕÏ:\t\t%X \n\
-		10KNTCÎÂ¶È1 2 3:\t%d.%d (¡ãC)\t%d.%d (¡ãC)\t%d.%d (¡ãC)\n\n",
+		mosfetæ¸©åº¦:\t%d.%d (Â°C)\n\
+		é©±åŠ¨ç‰ˆæœ¬:\t%d.%d \n\
+		ç”µæœºç”µæµ:\t%d.%d (A)\n\
+		å½“å‰è½¬é€Ÿ:\t\t\t\t%d (rpm)\n\
+		æ¯çº¿ç”µå‹:\t%d.%d (V)\n\
+		ç”µæœºæ•…éšœ:\t\t%X \n\
+		10KNTCæ¸©åº¦1 2 3:\t%d.%d (Â°C)\t%d.%d (Â°C)\t%d.%d (Â°C)\n\n",
 				Temperature/10,Temperature%10,Driver_Software_Version_Read/10,Driver_Software_Version_Read%10,*p_Motor_Current/100,*p_Motor_Current%100,
 				*p_Motor_Reality_Speed,*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,*p_Motor_Fault_Static,
 				ntc_tmp[0]/10,ntc_tmp[0]%10,ntc_tmp[1]/10,ntc_tmp[1]%10,ntc_tmp[2]/10,ntc_tmp[2]%10);
 		
 		if((ntc_tmp[0]>Temperature)||(ntc_tmp[1]>Temperature)||(ntc_tmp[2]>Temperature))
-			DEBUG_PRINT("\n mosfetÎÂ¶È´íÎó \t%d.%d (¡ãC)\n",Temperature/10,Temperature%10);
+			DEBUG_PRINT("\n mosfetæ¸©åº¦é”™è¯¯ \t%d.%d (Â°C)\n",Temperature/10,Temperature%10);
 		
 		memcpy(Motor_State_Old, Motor_State_Storage, MOTOR_PROTOCOL_ADDR_MAX);
 	}*/
@@ -723,35 +745,35 @@ void AQPED002_Motor_State_Analysis(void)
 		}
 	}
 #ifdef SYSTEM_DRIVER_BOARD_TOOL
-	// ÎÂ¶È´«¸ĞÆ÷¹ÊÕÏ  
+	// æ¸©åº¦ä¼ æ„Ÿå™¨æ•…éšœ  
 	if((ntc_tmp[0] == -2000)||(ntc_tmp[0] == -3000)||
 				(ntc_tmp[1] == -2000)||(ntc_tmp[1] == -3000)||
 					(ntc_tmp[2] == -2000)||(ntc_tmp[2] == -3000))
 	{
 		Set_Motor_Fault_State(E201_TEMPERATURE_HARDWARE);
 	}
-	// Ä¸ÏßµçÑ¹¹ÊÕÏ   ¡À5%
+	// æ¯çº¿ç”µå‹æ•…éšœ   Â±5%
 	if((*p_Motor_Bus_Voltage > 228)||(*p_Motor_Bus_Voltage < 252))
 	{
 		Set_Motor_Fault_State(E001_BUS_VOLTAGE_ABNORMAL);
 	}
 #endif
 	
-	// ¸ßÎÂ 		½µÆµ	mos
+	// é«˜æ¸© 		é™é¢‘	mos
 	Check_Down_Conversion_MOS_Temperature((*p_Mos_Temperature)/10);
-	// Êä³öµçÁ÷ 	½µÆµ
+	// è¾“å‡ºç”µæµ 	é™é¢‘
 	Check_Down_Conversion_Motor_Current(*p_Motor_Current/100);
-	// Êä³ö¹¦ÂÊ 		½µÆµ
+	// è¾“å‡ºåŠŸç‡ 		é™é¢‘
 	//Check_Down_Conversion_Motor_Power(*p_Motor_Reality_Power);
 	
-	// Çı¶¯×´Ì¬¼ìÑé   µç»ú×ªËÙ
+	// é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºè½¬é€Ÿ
 	Drive_Status_Inspection_Motor_Speed();
-	// Çı¶¯×´Ì¬¼ìÑé   µç»úµçÁ÷
+	// é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºç”µæµ
 	Drive_Status_Inspection_Motor_Current();
 	
 }
-//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
-//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
+//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 void TEMP001_Motor_State_Analysis(void)
 {
 	uint16_t result_fault=0;
@@ -771,7 +793,7 @@ void TEMP001_Motor_State_Analysis(void)
 		}
 		else
 		{
-			//Çı¶¯°å Í¨Ñ¶¹ÊÕÏ »Ö¸´
+			//é©±åŠ¨æ¿ é€šè®¯æ•…éšœ æ¢å¤
 			ReSet_Motor_Fault_State(E203_MOTOR_LOSS);
 			Motor_Loss_Cnt = 0;
 		}
@@ -779,17 +801,17 @@ void TEMP001_Motor_State_Analysis(void)
 	
 	Motor_Rx_Timer_cnt = 0;
 
-	// µ±Ç° ×ªËÙ
+	// å½“å‰ è½¬é€Ÿ
 	*p_Motor_Reality_Speed = Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_SPEED_OFFSET]*10;
-	// Èí¼ş°æ±¾
+	// è½¯ä»¶ç‰ˆæœ¬
 	Driver_Software_Version_Read = Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_VERSION_OFFSET];
-	// Ä¸ÏßµçÑ¹
+	// æ¯çº¿ç”µå‹
 	*p_Motor_Bus_Voltage = Motor_State_Storage[TEMP001_MOTOR_ADDR_BUS_VOLTAGE_OFFSET] *10;
-	// Ä¸ÏßµçÁ÷
+	// æ¯çº¿ç”µæµ
 	*p_Motor_Bus_Current = Motor_State_Storage[TEMP001_MOTOR_ADDR_BUS_CURRENT_OFFSET] *100;
-	// µç»úµçÁ÷
+	// ç”µæœºç”µæµ
 	*p_Motor_Current = Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_CURRENT_OFFSET] *100;
-	// mosfetÎÂ¶È
+	// mosfetæ¸©åº¦
 	if((Motor_State_Storage[TEMP001_MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET] >= 1) && (Motor_State_Storage[TEMP001_MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET] <= 3))
 	{
 		ntc_tmp[Motor_State_Storage[TEMP001_MOTOR_ADDR_MOSFET_TEMP_NUM_OFFSET]-1] = Motor_State_Storage[TEMP001_MOTOR_ADDR_MOSFET_TEMP_OFFSET] *10;
@@ -797,22 +819,22 @@ void TEMP001_Motor_State_Analysis(void)
 	Temperature = (ntc_tmp[0]>ntc_tmp[1])?ntc_tmp[0]:ntc_tmp[1];
 	Temperature = (Temperature>ntc_tmp[2])?Temperature:ntc_tmp[2];
 	*p_Mos_Temperature = Temperature;
-	// µ±Ç°¹¦ÂÊ
+	// å½“å‰åŠŸç‡
 	*p_Motor_Reality_Power =  Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_POWER_OFFSET+1]<<8 | Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_POWER_OFFSET];
-	// µç»ú¹ÊÕÏ
+	// ç”µæœºæ•…éšœ
  	*p_Motor_Fault_Static = Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_FAULT_OFFSET+1]<<8 | Motor_State_Storage[TEMP001_MOTOR_ADDR_MOTOR_FAULT_OFFSET];
 	
-	//----- ´®¿Ú´òÓ¡   ------------------------------------------------------------------------------
+	//----- ä¸²å£æ‰“å°   ------------------------------------------------------------------------------
 	/*DEBUG_PRINT("\n\n\
-	µ±Ç°×ªËÙ:\t\t\t%d (rpm)\n\
-	Çı¶¯°æ±¾:\t%X\n\
-	Ä¸ÏßµçÑ¹:\t%d.%d (V)\n\
-	Ä¸ÏßµçÁ÷:\t%d.%d (A)\n\
-	µç»úµçÁ÷:\t%d.%d (A)\n\
-	mosfetÎÂ¶È:\t\t%d.%d (¡ãC)\n\
-	10KNTCÎÂ¶È1 2 3:\t%d.%d (¡ãC)\t%d.%d (¡ãC)\t%d.%d (¡ãC)\n\
-	µ±Ç°¹¦ÂÊ:\t%d (W)\n\
-	µç»ú¹ÊÕÏ:\t\t0x%X\n",
+	å½“å‰è½¬é€Ÿ:\t\t\t%d (rpm)\n\
+	é©±åŠ¨ç‰ˆæœ¬:\t%X\n\
+	æ¯çº¿ç”µå‹:\t%d.%d (V)\n\
+	æ¯çº¿ç”µæµ:\t%d.%d (A)\n\
+	ç”µæœºç”µæµ:\t%d.%d (A)\n\
+	mosfetæ¸©åº¦:\t\t%d.%d (Â°C)\n\
+	10KNTCæ¸©åº¦1 2 3:\t%d.%d (Â°C)\t%d.%d (Â°C)\t%d.%d (Â°C)\n\
+	å½“å‰åŠŸç‡:\t%d (W)\n\
+	ç”µæœºæ•…éšœ:\t\t0x%X\n",
 
 	*p_Motor_Reality_Speed,Driver_Software_Version_Read,
 	*p_Motor_Bus_Voltage/10,*p_Motor_Bus_Voltage%10,
@@ -840,7 +862,7 @@ void TEMP001_Motor_State_Analysis(void)
 			else*/
 			{
 				result_fault = Change_Faule_To_Upper(*p_Motor_Fault_Static);
-				if(((result_fault & E001_BUS_VOLTAGE_ABNORMAL)==0)&&(IS_IN_START_UP_STAGE())&&(Motor_ReStart_Cnt < 3))
+				if((TEMP001_If_Faule_Need_ReStar(result_fault)==0)&&(IS_IN_START_UP_STAGE())&&(Motor_ReStart_Cnt < 3))
 				{
 					GET_IN_WAIT_RESTART_STAGE();
 				}
@@ -853,19 +875,19 @@ void TEMP001_Motor_State_Analysis(void)
 		}
 	}
 	
-	// ¸ßÎÂ 		½µÆµ	mos
+	// é«˜æ¸© 		é™é¢‘	mos
 	Check_Down_Conversion_MOS_Temperature(Temperature/10);
-	// Êä³öµçÁ÷ 	½µÆµ
+	// è¾“å‡ºç”µæµ 	é™é¢‘
 	Check_Down_Conversion_Motor_Current(*p_Motor_Current/100);
-	// Êä³ö¹¦ÂÊ 		½µÆµ
+	// è¾“å‡ºåŠŸç‡ 		é™é¢‘
 	Check_Down_Conversion_Motor_Power(*p_Motor_Reality_Power);
 	
-	// Çı¶¯×´Ì¬¼ìÑé   µç»ú×ªËÙ
+	// é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºè½¬é€Ÿ
 	Drive_Status_Inspection_Motor_Speed();
-	// Çı¶¯×´Ì¬¼ìÑé   µç»úµçÁ÷
+	// é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºç”µæµ
 	Drive_Status_Inspection_Motor_Current();
 }
-//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 
 void Motor_State_Analysis(void)
 {
@@ -874,29 +896,29 @@ void Motor_State_Analysis(void)
 	else if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 		TEMP001_Motor_State_Analysis();
 }
-//================================================== ÄÚ²¿µ÷ÓÃ½Ó¿Ú
+//================================================== å†…éƒ¨è°ƒç”¨æ¥å£
 
-//-------------------- Çı¶¯×´Ì¬¼ìÑé   µç»ú×ªËÙ ----------------------------
+//-------------------- é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºè½¬é€Ÿ ----------------------------
 void Drive_Status_Inspection_Motor_Speed(void)
 {
-//ÅĞ¶Ïµç»ú×ªËÙ
+//åˆ¤æ–­ç”µæœºè½¬é€Ÿ
 #ifdef MOTOR_SPEED_ERROR_TIME
-	static uint16_t Check_Motor_Speed_Cnt=0;		// ¼ÆÊ±Æ÷
-	static uint8_t Number_Of_Fault_Alarms = 0;	//	¹ÊÕÏ¼ÆÊıÆ÷
+	static uint16_t Check_Motor_Speed_Cnt=0;		// è®¡æ—¶å™¨
+	static uint8_t Number_Of_Fault_Alarms = 0;	//	æ•…éšœè®¡æ•°å™¨
 	
-	if(Motor_Speed_Is_Reach())	//µÈ×ªËÙÉèÖÃÎÈ¶¨ÏÂÀ´ºóÔÙ×öÅĞ¶Ï
+	if(Motor_Speed_Is_Reach())	//ç­‰è½¬é€Ÿè®¾ç½®ç¨³å®šä¸‹æ¥åå†åšåˆ¤æ–­
 	{
 		if(Check_Motor_Speed())
 		{
 			if(Check_Motor_Speed_Cnt > 0)
 			{
-				DEBUG_PRINT("\n[µç»ú×ªËÙÕıÈ·]\tÄ¿±ê×ªËÙ\t%d(rpm)\tÊµ¼Ê×ªËÙ\t%d(rpm)\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed);
+				DEBUG_PRINT("\n[ç”µæœºè½¬é€Ÿæ­£ç¡®]\tç›®æ ‡è½¬é€Ÿ\t%d(rpm)\tå®é™…è½¬é€Ÿ\t%d(rpm)\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed);
 			}
-			if(Number_Of_Fault_Alarms >= 3)//ÒÑ¾­±¨¹ÊÕÏ
+			if(Number_Of_Fault_Alarms >= 3)//å·²ç»æŠ¥æ•…éšœ
 			{
-				//µç»ú×ªËÙ²»×¼ ¹ÊÕÏ 202 Çı¶¯¹ÊÕÏ
+				//ç”µæœºè½¬é€Ÿä¸å‡† æ•…éšœ 202 é©±åŠ¨æ•…éšœ
 				ReSet_Motor_Fault_State(E202_MOTOR_DRIVER);
-				DEBUG_PRINT("\n[µç»ú¹ÊÕÏ»Ö¸´]\t  Êµ¼Ê×ªËÙ\t%d(rpm)\n",*p_Motor_Reality_Speed);
+				DEBUG_PRINT("\n[ç”µæœºæ•…éšœæ¢å¤]\t  å®é™…è½¬é€Ÿ\t%d(rpm)\n",*p_Motor_Reality_Speed);
 			}
 				
 			Check_Motor_Speed_Cnt = 0;
@@ -909,7 +931,7 @@ void Drive_Status_Inspection_Motor_Speed(void)
 			{
 				if(Check_Motor_Speed_Cnt == 0)
 				{
-					DEBUG_PRINT("\n[µç»ú×ªËÙ´íÎó]\tÄ¿±ê×ªËÙ\t%d(rpm)\tÊµ¼Ê×ªËÙ\t%d(rpm)\t¼ÆÊıÆ÷\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
+					DEBUG_PRINT("\n[ç”µæœºè½¬é€Ÿé”™è¯¯]\tç›®æ ‡è½¬é€Ÿ\t%d(rpm)\tå®é™…è½¬é€Ÿ\t%d(rpm)\tè®¡æ•°å™¨\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
 				}
 				Check_Motor_Speed_Cnt++;
 			}
@@ -917,21 +939,21 @@ void Drive_Status_Inspection_Motor_Speed(void)
 			{
 				if(Number_Of_Fault_Alarms >= 3)
 				{
-					//µç»ú×ªËÙ²»×¼ ¹ÊÕÏ 202 Çı¶¯¹ÊÕÏ
+					//ç”µæœºè½¬é€Ÿä¸å‡† æ•…éšœ 202 é©±åŠ¨æ•…éšœ
 					Set_Motor_Fault_State(E202_MOTOR_DRIVER);
 					if(Number_Of_Fault_Alarms == 3)
 					{
 						Number_Of_Fault_Alarms ++ ;
-						DEBUG_PRINT("\n[ERROR]\tµç»ú×ªËÙ²»×¼\tÄ¿±ê×ªËÙ\t%d(rpm)\tÊµ¼Ê×ªËÙ\t%d(rpm)\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed);
+						DEBUG_PRINT("\n[ERROR]\tç”µæœºè½¬é€Ÿä¸å‡†\tç›®æ ‡è½¬é€Ÿ\t%d(rpm)\tå®é™…è½¬é€Ÿ\t%d(rpm)\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed);
 					}
 				}
 				else
 				{
-					//°Ñµ±Ç°ËÙ¶ÈÍ¬²½³ÉÇı¶¯°åËÙ¶È
+					//æŠŠå½“å‰é€Ÿåº¦åŒæ­¥æˆé©±åŠ¨æ¿é€Ÿåº¦
 					Motor_Speed_Now = Motor_Rpm_To_Speed(*p_Motor_Reality_Speed);
-					DEBUG_PRINT("\n[°Ñµ±Ç°ËÙ¶ÈÍ¬²½³ÉÇı¶¯°åËÙ¶È]\t×ªËÙ\t%d(rpm)\t°Ù·Ö±È\t%d()\n",*p_Motor_Reality_Speed,Motor_Speed_Now);
+					DEBUG_PRINT("\n[æŠŠå½“å‰é€Ÿåº¦åŒæ­¥æˆé©±åŠ¨æ¿é€Ÿåº¦]\tè½¬é€Ÿ\t%d(rpm)\tç™¾åˆ†æ¯”\t%d()\n",*p_Motor_Reality_Speed,Motor_Speed_Now);
 				
-					//Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);	//¹âÈ¦ÖØĞÂÉÁË¸
+					//Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);	//å…‰åœˆé‡æ–°é—ªçƒ
 					Number_Of_Fault_Alarms ++ ;
 					Check_Motor_Speed_Cnt = 0;
 				}
@@ -945,12 +967,12 @@ void Drive_Status_Inspection_Motor_Speed(void)
 #endif
 }
 
-//-------------------- Çı¶¯×´Ì¬¼ìÑé   µç»úµçÁ÷ ----------------------------
+//-------------------- é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºç”µæµ ----------------------------
 void Drive_Status_Inspection_Motor_Current(void)
 {
-//ÅĞ¶Ïµç»úµçÁ÷
+//åˆ¤æ–­ç”µæœºç”µæµ
 #ifdef MOTOR_CANNOT_START_TIME
-		static uint16_t Check_Motor_Current_Cnt=0;	// ¼ÆÊ±Æ÷
+		static uint16_t Check_Motor_Current_Cnt=0;	// è®¡æ—¶å™¨
 	
 	
 		if(Check_Motor_Current())
@@ -962,11 +984,11 @@ void Drive_Status_Inspection_Motor_Current(void)
 			if(Check_Motor_Current_Cnt <= MOTOR_CANNOT_START_TIME)
 			{
 				Check_Motor_Current_Cnt ++;
-				DEBUG_PRINT("\n[ÅĞ¶Ïµç»úµçÁ÷]\tÄ¿±ê×ªËÙ\t%d(rpm)\tÊµ¼Ê×ªËÙ\t%d(rpm)\t¼ÆÊıÆ÷\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
+				DEBUG_PRINT("\n[åˆ¤æ–­ç”µæœºç”µæµ]\tç›®æ ‡è½¬é€Ÿ\t%d(rpm)\tå®é™…è½¬é€Ÿ\t%d(rpm)\tè®¡æ•°å™¨\t%d\n",Motor_Speed_To_Rpm(Motor_Speed_Now),*p_Motor_Reality_Speed,Check_Motor_Speed_Cnt);
 			}
 			else
 			{
-				//µç»úÆğ²»À´ ¹ÊÕÏ 202 Çı¶¯¹ÊÕÏ
+				//ç”µæœºèµ·ä¸æ¥ æ•…éšœ 202 é©±åŠ¨æ•…éšœ
 				Set_Motor_Fault_State(E202_MOTOR_DRIVER);
 			}
 		}
@@ -974,17 +996,17 @@ void Drive_Status_Inspection_Motor_Current(void)
 
 }
 
-//-------------------- »ñÈ¡µç»ú¹ÊÕÏ×´Ì¬ ----------------------------
+//-------------------- è·å–ç”µæœºæ•…éšœçŠ¶æ€ ----------------------------
 uint16_t Get_Motor_Fault_State(void)
 {
 	
 	return Motor_Fault_State;
 }
 
-//-------------------- ÉèÖÃµç»ú¹ÊÕÏ×´Ì¬ ----------------------------
+//-------------------- è®¾ç½®ç”µæœºæ•…éšœçŠ¶æ€ ----------------------------
 void Set_Motor_Fault_State(uint16_t fault_bit)
 {
-	//-----------------  Õ¹Ê¾Ñù»ú -------------------------
+	//-----------------  å±•ç¤ºæ ·æœº -------------------------
 #ifdef SYSTEM_SHOW_MODEL_MACHINE
 		Motor_Fault_State = 0;
 #else
@@ -992,17 +1014,17 @@ void Set_Motor_Fault_State(uint16_t fault_bit)
 #endif
 	
 #ifdef SYSTEM_DRIVER_BOARD_TOOL
-		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//Ö±½ÓËø»ú
+		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//ç›´æ¥é”æœº
 #endif
 }
 
-//-------------------- Çå³ıµç»ú¹ÊÕÏ×´Ì¬ ----------------------------
+//-------------------- æ¸…é™¤ç”µæœºæ•…éšœçŠ¶æ€ ----------------------------
 void ReSet_Motor_Fault_State(uint16_t fault_bit)
 {
 	 Motor_Fault_State &= ~fault_bit;
 }
 
-//-------------------- Ó²¼ş¹ÊÕÏ  ----------------------------
+//-------------------- ç¡¬ä»¶æ•…éšœ  ----------------------------
 uint8_t Motor_Is_Hardware_Fault(uint16_t fault_bit)
 {
 	if(fault_bit & ORDINARY_FAULT_BIT)
@@ -1011,7 +1033,7 @@ uint8_t Motor_Is_Hardware_Fault(uint16_t fault_bit)
 		return 0;
 }
 
-//-------------------- Èí¼ş¹ÊÕÏ ----------------------------
+//-------------------- è½¯ä»¶æ•…éšœ ----------------------------
 uint8_t Motor_Is_Software_Fault(uint16_t fault_bit)
 {
 	//uint16_t ordinary_fault_bit = E001_BUS_VOLTAGE_ABNORMAL | E201_TEMPERATURE_HARDWARE | E203_MOTOR_LOSS;
@@ -1022,7 +1044,18 @@ uint8_t Motor_Is_Software_Fault(uint16_t fault_bit)
 		return 0;
 }
 
-//-------------------- Ö¸¶¨¹ÊÕÏ ----------------------------
+//-------------------- restar æ•…éšœ ----------------------------
+uint8_t TEMP001_If_Faule_Need_ReStar(uint16_t fault_bit)
+{
+	//uint16_t ordinary_fault_bit = E001_BUS_VOLTAGE_ABNORMAL | E201_TEMPERATURE_HARDWARE | E203_MOTOR_LOSS;
+	
+	if(fault_bit & TEMP001_RESTAR_FAULT_BIT)
+		return 1;
+	else
+		return 0;
+}
+
+//-------------------- æŒ‡å®šæ•…éšœ ----------------------------
 uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit)
 {
 	if(fault_bit & specified_bit)
@@ -1031,7 +1064,7 @@ uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit)
 		return 0;
 }
 
-//-------------------- ·¢ËÍ ----------------------------
+//-------------------- å‘é€ ----------------------------
 void Motor_UART_Send(uint8_t* p_buff, uint8_t len)
 {
 #ifdef MOTOR_MODULE_HUART
@@ -1039,67 +1072,67 @@ void Motor_UART_Send(uint8_t* p_buff, uint8_t len)
 	
 #endif
 }
-//-------------------- ½ÓÊÕ ----------------------------
+//-------------------- æ¥æ”¶ ----------------------------
 void Motor_RxData(uint8_t len)
 {
 	if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 		uint16_t crc_value=0;
 		
-		// ¼ì²é ³¤¶È
+		// æ£€æŸ¥ é•¿åº¦
 		if(((Motor_DMABuff[1]+5) != len)||(Motor_DMABuff[1] < 20))
 		{
-			DEBUG_PRINT("[ERROR]\t½ÓÊÕ³¤¶È´íÎó:\tÊÕµ½:\t%d   Êµ¼Ê:\t%d\n",Motor_DMABuff[1]+5, len);
+			DEBUG_PRINT("[ERROR]\tæ¥æ”¶é•¿åº¦é”™è¯¯:\tæ”¶åˆ°:\t%d   å®é™…:\t%d\n",Motor_DMABuff[1]+5, len);
 			return;
 		}
 		
-		//¼ì²écrc
+		//æ£€æŸ¥crc
 		crc_value = CRC16_XMODEM_T(&Motor_DMABuff[2], Motor_DMABuff[1] );
 		//crc_read = ((Motor_DMABuff[len-2]<<8) & Motor_DMABuff[len-1]);
 		if(crc_value != ((Motor_DMABuff[len-3]<<8) | Motor_DMABuff[len-2]))
 		{
-			DEBUG_PRINT("[ERROR]\tcrcĞ£Ñé´íÎó:\t¼ÆËãµÃµ½:\t%d   ÊÕµ½µÄ:\t%d\n",crc_value, ((Motor_DMABuff[len-3]<<8) & Motor_DMABuff[len-2]));
+			DEBUG_PRINT("[ERROR]\tcrcæ ¡éªŒé”™è¯¯:\tè®¡ç®—å¾—åˆ°:\t%d   æ”¶åˆ°çš„:\t%d\n",crc_value, ((Motor_DMABuff[len-3]<<8) & Motor_DMABuff[len-2]));
 			return;
 		}
 		
 		memcpy(Motor_State_Storage, &Motor_DMABuff[MOTOR_PROTOCOL_HEADER_OFFSET], MOTOR_PROTOCOL_ADDR_MAX);
 		Motor_State_Analysis();
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 	else if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 		uint8_t crc_value=0;
 		
-		// ¼ì²é ³¤¶È
+		// æ£€æŸ¥ é•¿åº¦
 		if(len != 13)
 		{
-			DEBUG_PRINT("[ERROR]\t½ÓÊÕ³¤¶È´íÎó:\tÊÕµ½:\t%d  \n", len);
+			DEBUG_PRINT("[ERROR]\tæ¥æ”¶é•¿åº¦é”™è¯¯:\tæ”¶åˆ°:\t%d  \n", len);
 			return;
 		}
 		
-		//¼ì²écrc
+		//æ£€æŸ¥crc
 		crc_value = CRC8_ADD(&Motor_DMABuff[0], 12);
 		//crc_read = ((Motor_DMABuff[len-2]<<8) & Motor_DMABuff[len-1]);
 		if(crc_value != Motor_DMABuff[12])
 		{
-			DEBUG_PRINT("[ERROR]\tcrcĞ£Ñé´íÎó:\t¼ÆËãµÃµ½:\t%X   ÊÕµ½µÄ:\t%X\n",crc_value, (Motor_DMABuff[12]));
+			DEBUG_PRINT("[ERROR]\tcrcæ ¡éªŒé”™è¯¯:\tè®¡ç®—å¾—åˆ°:\t%X   æ”¶åˆ°çš„:\t%X\n",crc_value, (Motor_DMABuff[12]));
 			return;
 		}
 		
 		memcpy(Motor_State_Storage, &Motor_DMABuff[TEMP001_MOTOR_PROTOCOL_HEADER_OFFSET], TEMP001_MOTOR_PROTOCOL_ADDR_MAX);
-		//½ÓÊÕ±êÖ¾
+		//æ¥æ”¶æ ‡å¿—
 		Rx_State = 1;
 
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 }
 
 
 
-/*-------------------- ¿ìËÙ·¢ËÍÃüÁî ----------------------------------------------*/
-//------------------- ÉèÖÃµç»ú×ªËÙ ----------------------------
+/*-------------------- å¿«é€Ÿå‘é€å‘½ä»¤ ----------------------------------------------*/
+//------------------- è®¾ç½®ç”µæœºè½¬é€Ÿ ----------------------------
 void Motor_Speed_Send(uint32_t speed_rpm)
 {
 	uint32_t rpm=0;
@@ -1107,7 +1140,7 @@ void Motor_Speed_Send(uint32_t speed_rpm)
 	if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_AQPED002)
 	{
 		rpm = speed_rpm*MOTOR_POLE_NUMBER;
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 		uint8_t buffer[10]={0x02,0x05,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x03};
 		uint16_t crc_value=0;
 #ifdef SYSTEM_DRIVER_BOARD_TOOL
@@ -1127,31 +1160,31 @@ void Motor_Speed_Send(uint32_t speed_rpm)
 		buffer[8] = crc_value & 0xFF;
 		
 		Motor_UART_Send(buffer, 10);
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 	else if(MOTOR_DEVICE_PROTOCOL_VERSION == MOTOR_DEVICE_HARDWARE_TEMP001)
 	{
-	//¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı¡ı
+	//â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“â†“
 		uint8_t buffer[13]={0x50,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xB1,0x00};
 		
 		//buffer[1] = Motor_Speed_To_Frequency(speed_rpm);
 		buffer[1] = speed_rpm & 0xFF;
 		buffer[2] = (speed_rpm>>8) & 0xFF;
 		
-		buffer[3] = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_DRIVE_MODE) & 0xFF;	// ³§ÄÚÄ£Ê½
+		buffer[3] = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_DRIVE_MODE) & 0xFF;	// å‚å†…æ¨¡å¼
 		
-		buffer[11] = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_MODEL_CODE) & 0xFF;	// µç»úĞÍºÅ
+		buffer[11] = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_MODEL_CODE) & 0xFF;	// ç”µæœºå‹å·
 		
 		buffer[12] =  CRC8_ADD(buffer, 12);
 		
 		Motor_UART_Send(buffer, 13);
 
-	//¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü¡ü
+	//â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘â†‘
 	}
 }
 
 
-//------------------- ĞÄÌø ----------------------------
+//------------------- å¿ƒè·³ ----------------------------
 void Motor_Heartbeat_Send(void)
 {
 	uint8_t buffer[10]={0x02,0x01,0x1E,0xF3,0xFF,0x03};
@@ -1160,7 +1193,7 @@ void Motor_Heartbeat_Send(void)
 }
 
 
-//-------------------- ¶Á¼Ä´æÆ÷ ( È«¶Á )----------------------------
+//-------------------- è¯»å¯„å­˜å™¨ ( å…¨è¯» )----------------------------
 void Motor_Read_Register(void)
 {
 	uint8_t buffer[10]={0x02,0x01,0x04,0x40,0x84,0x03};
@@ -1168,7 +1201,7 @@ void Motor_Read_Register(void)
 	Motor_UART_Send(buffer, 6);
 }
 
-//-------------------- ÏÂ·¢²âÊÔ²ÎÊı ( ²âÊÔ )----------------------------
+//-------------------- ä¸‹å‘æµ‹è¯•å‚æ•° ( æµ‹è¯• )----------------------------
 void Motor_GetIn_TestMode(void)
 {
 #define	MOTOR_TESTMODE_MSG_SIZEOF						( 54 )
@@ -1182,7 +1215,7 @@ void Motor_GetIn_TestMode(void)
 	Motor_UART_Send(buffer_temp, MOTOR_TESTMODE_MSG_SIZEOF);
 }
 
-//-------------------- ¼ì²éµç»úµçÁ÷ ----------------------------
+//-------------------- æ£€æŸ¥ç”µæœºç”µæµ ----------------------------
 uint8_t Check_Motor_Current(void)
 {
 #ifdef MOTOR_CURRENT_MIX
@@ -1195,7 +1228,7 @@ uint8_t Check_Motor_Current(void)
 	return 1;
 }
 
-//-------------------- ¼ì²éµç»ú×ªËÙ ----------------------------
+//-------------------- æ£€æŸ¥ç”µæœºè½¬é€Ÿ ----------------------------
 uint8_t Check_Motor_Speed(void)
 {
 #ifdef MOTOR_SPEED_VIBRATION_RANGE

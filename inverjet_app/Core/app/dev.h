@@ -31,11 +31,11 @@ typedef __IO uint16_t vu16;
 #define MODBUS_LOCAL_ADDRESS			(21)
 #define MODBUS_BAUDRATE_DEFAULT			2
 
-extern uint16_t* p_Local_Address;			//	±¾µØµØÖ·
-extern uint16_t* p_Baud_Rate;					//	²¨ÌØÂÊ
+extern uint16_t* p_Local_Address;			//	æœ¬åœ°åœ°å€
+extern uint16_t* p_Baud_Rate;					//	æ³¢ç‰¹ç‡
 
-extern uint16_t* p_Software_Version_high;			//	Èí¼ş°æ±¾ ¸ß
-extern uint16_t* p_Software_Version_low;			//	Èí¼ş°æ±¾ µÍ
+extern uint16_t* p_Software_Version_high;			//	è½¯ä»¶ç‰ˆæœ¬ é«˜
+extern uint16_t* p_Software_Version_low;			//	è½¯ä»¶ç‰ˆæœ¬ ä½
 
 uint32_t Dev_BaudRate_Get(uint8_t usart_num);
 extern void Dev_Information_Init(void);
@@ -47,9 +47,9 @@ extern void Set_Baud_Rate(uint16_t rate);
 extern void Set_Software_Version(void);
 extern void Disable_Usart_Receiver(uint8_t no);
 extern void Dev_Check_Control_Methods( void );
-// ¼ì²éÊÇ·ñÆÁ±Î 1:ÆÁ±Î 0:Õı³£
+// æ£€æŸ¥æ˜¯å¦å±è”½ 1:å±è”½ 0:æ­£å¸¸
 extern uint8_t Dev_Is_Control_Methods(uint16_t bit);
-// »ñÈ¡Çı¶¯°åĞÍºÅ
+// è·å–é©±åŠ¨æ¿å‹å·
 extern void Set_Motor_Device_Protocol_Version(void);
 extern uint8_t Get_Motor_Device_Protocol_Version(void);
 

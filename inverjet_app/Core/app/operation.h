@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		operation.h
-* @brief   		²Ù×÷Ä£¿é ÓÃÓÚÒþ²Ø²Ù×÷ µ¥¶À³öÀ´±ãÓÚÆÁ±Î\É¾³ý
+* @brief   		æ“ä½œæ¨¡å— ç”¨äºŽéšè—æ“ä½œ å•ç‹¬å‡ºæ¥ä¾¿äºŽå±è”½\åˆ é™¤
 *
 *
 * @author			WQG
@@ -33,23 +33,23 @@ extern "C" {
 //typedef enum 
 //{
 
-//#define	OPERATION_P5_ACCELERATION				(1)			//	¼ÓËÙ¶È
-//#define	OPERATION_P5_100_TIME						(OPERATION_P5_ACCELERATION+1)			//	100% Ê±¼ä
-//#define	OPERATION_P5_0_TIME							(OPERATION_P5_100_TIME+1)			//	0% Ê±¼ä
+//#define	OPERATION_P5_ACCELERATION				(1)			//	åŠ é€Ÿåº¦
+//#define	OPERATION_P5_100_TIME						(OPERATION_P5_ACCELERATION+1)			//	100% æ—¶é—´
+//#define	OPERATION_P5_0_TIME							(OPERATION_P5_100_TIME+1)			//	0% æ—¶é—´
 
 
-#define OPERATION_ADDR_SET							(1)																//	µØÖ·ÉèÖÃ
-#define	OPERATION_BAUD_RATE							(OPERATION_ADDR_SET+1)						//	²¨ÌØÂÊ
-//#define	OPERATION_SPEED_MODE					(OPERATION_BAUD_RATE+1)						//	×ªËÙ·½Ê½£º 0£º×ªËÙ  1£º¹¦ÂÊ
-//#define	OPERATION_MOTOR_POLES						(OPERATION_BAUD_RATE+1)					//	µç»ú¼«Êý
+#define OPERATION_ADDR_SET							(1)																//	åœ°å€è®¾ç½®
+#define	OPERATION_BAUD_RATE							(OPERATION_ADDR_SET+1)						//	æ³¢ç‰¹çŽ‡
+//#define	OPERATION_SPEED_MODE					(OPERATION_BAUD_RATE+1)						//	è½¬é€Ÿæ–¹å¼ï¼š 0ï¼šè½¬é€Ÿ  1ï¼šåŠŸçŽ‡
+//#define	OPERATION_MOTOR_POLES						(OPERATION_BAUD_RATE+1)					//	ç”µæœºæžæ•°
 
-#define	OPERATION_SHIELD_MENU						(OPERATION_BAUD_RATE+1)						//	ÆÁ±Î¿ØÖÆ·½Ê½
-#define	OPERATION_DISPLAY_VERSION				(OPERATION_SHIELD_MENU+1)					//	ÏÔÊ¾°å °æ±¾ºÅ
+#define	OPERATION_SHIELD_MENU						(OPERATION_BAUD_RATE+1)						//	å±è”½æŽ§åˆ¶æ–¹å¼
+#define	OPERATION_DISPLAY_VERSION				(OPERATION_SHIELD_MENU+1)					//	æ˜¾ç¤ºæ¿ ç‰ˆæœ¬å·
 
-//#define	OPERATION_BREATH_LIGHT_MAX			(OPERATION_DISPLAY_VERSION+1)			//	¹âÈ¦ÁÁ¶È
+//#define	OPERATION_BREATH_LIGHT_MAX			(OPERATION_DISPLAY_VERSION+1)			//	å…‰åœˆäº®åº¦
 
-#define	OPERATION_DEIVES_VERSION				(OPERATION_DISPLAY_VERSION+1)			//	Çý¶¯°å °æ±¾ºÅ
-#define	OPERATION_STATE_END							(OPERATION_DEIVES_VERSION+1)			//	½áÊø
+#define	OPERATION_DEIVES_VERSION				(OPERATION_DISPLAY_VERSION+1)			//	é©±åŠ¨æ¿ ç‰ˆæœ¬å·
+#define	OPERATION_STATE_END							(OPERATION_DEIVES_VERSION+1)			//	ç»“æŸ
 //} OPERATION_STATE_MODE_E;
 
 /* Exported constants --------------------------------------------------------*/
@@ -58,7 +58,7 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 
-//-------------- °´¼ü×éºÏÏìÓ¦ ×ÜÊý -------------------
+//-------------- æŒ‰é”®ç»„åˆå“åº” æ€»æ•° -------------------
 #define CALL_OUT_NUMBER_MAX						8
 
 
@@ -69,12 +69,12 @@ extern "C" {
 
 #define OPERATION_POLES_MIX						MOTOR_RPM_MIX_OF_POLES
 
-#define	OPERATION_CALL_OUT_TIME					(62)			//	×Ô¶¯ÍË³öÊ±¼ä  1·ÖÖÓ
+#define	OPERATION_CALL_OUT_TIME					(62)			//	è‡ªåŠ¨é€€å‡ºæ—¶é—´  1åˆ†é’Ÿ
 /* Exported functions prototypes ---------------------------------------------*/
 
 extern void App_Operation_Init(void);
 	
-// ½øÈë²Ù×÷²Ëµ¥
+// è¿›å…¥æ“ä½œèœå•
 extern void To_Operation_Menu(void);
 
 extern void Sleep_Time_Count(uint8_t no);
@@ -85,10 +85,10 @@ extern uint8_t Check_Sleep_Time_Out(void);
 
 /* Private defines -----------------------------------------------------------*/
 
-// ¶Ì°´ ²Ûº¯Êý
+// çŸ­æŒ‰ æ§½å‡½æ•°
 extern void (*p_Operation_Button[CALL_OUT_NUMBER_MAX])(void);
 
-// ³¤°´ ²Ûº¯Êý
+// é•¿æŒ‰ æ§½å‡½æ•°
 extern void (*p_Operation_Long_Press[CALL_OUT_NUMBER_MAX])(void);
 
 

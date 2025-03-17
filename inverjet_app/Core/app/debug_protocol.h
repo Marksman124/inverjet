@@ -19,7 +19,7 @@ extern "C" {
 #include "main.h"
 #include "modbus.h"
 #include <stdio.h>
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 
 /* Exported macro ------------------------------------------------------------*/
 #define DEBUG_PROTOCOL_RX_MAX			16
@@ -37,14 +37,18 @@ void Add_Ctrl_Log(void);
 
 void UART_Send_Debug(uint8_t * p_buff, uint8_t len);
 
+void Main_Modbus_Send(uint8_t * p_buff, uint8_t len);
+
+void Main_Modbus_Send_Auto_Run(void);
+
 void Debug_Protocol_Init(void);
-// ÖØÆô
+// é‡å¯
 void Debug_Usart_Restar(void);
 	
 	
 	
 	
-// ¶¨ÒåDEBUG_PRINTºê£¬ÓÃÓÚÌõ¼ş±àÒëµ÷ÊÔĞÅÏ¢
+// å®šä¹‰DEBUG_PRINTå®ï¼Œç”¨äºæ¡ä»¶ç¼–è¯‘è°ƒè¯•ä¿¡æ¯
 #ifdef UART_PRINTF_LOG
   #define DEBUG_PRINT(format, ...) 	sprintf((char *)debug_buffer,format, __VA_ARGS__);UART_Send_Debug(debug_buffer,strlen((char *)debug_buffer))
 #else

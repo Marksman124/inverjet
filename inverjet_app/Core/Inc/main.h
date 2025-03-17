@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -49,11 +49,11 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
-// ´®¿Ú1 --> ÖÐ¿ØModbus 	(485)
-// ´®¿Ú2 --> wifi 			(ttl)
-// ´®¿Ú3 --> Çý¶¯°å 			(ttl)
-// ´®¿Ú4 --> µ÷ÊÔ debug 	(ttl)
-// ´®¿Ú5 --> À¶ÑÀ				(ttl)
+// ä¸²å£1 --> ä¸­æŽ§Modbus 	(485)
+// ä¸²å£2 --> wifi 			(ttl)
+// ä¸²å£3 --> é©±åŠ¨æ¿ 			(ttl)
+// ä¸²å£4 --> è°ƒè¯• debug 	(ttl)
+// ä¸²å£5 --> è“ç‰™				(ttl)
 
 #define MODBUS_USART								MACRO_MODBUS_USART
 #define	WIFI_USART									MACRO_WIFI_USART
@@ -76,10 +76,10 @@ extern "C" {
 //*******************************************************
 
 
-// ²úÆ·»úÐÍÂë
+// äº§å“æœºåž‹ç 
 #define	SYSTEM_PRODUCT_MODEL_CODE								MACRO_SYSTEM_PRODUCT_MODEL_CODE		//
 
-// Èí¼þ°æ±¾
+// è½¯ä»¶ç‰ˆæœ¬
 #define	SOFTWARE_VERSION_UINT32									MACRO_SOFTWARE_VERSION_UINT32
 
 

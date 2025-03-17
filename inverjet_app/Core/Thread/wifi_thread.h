@@ -1,7 +1,7 @@
-/**
+ï»¿/**
 ******************************************************************************
 * @file    		wifi.h
-* @brief   		wifi Ä£×é
+* @brief   		wifi æ¨¡ç»„
 *
 *
 * @author			WQG
@@ -29,10 +29,10 @@ extern "C" {
 
 typedef enum 
 {
-	WIFI_NO_CONNECT = 0,				//	ÎŞÁ¬½Ó
-	WIFI_DISTRIBUTION,					//	ÅäÍøÖĞ
-	WIFI_WORKING,								//	Õı³£ÔËĞĞ
-	WIFI_ERROR,									//	ÍøÂç¹ÊÕÏ	
+	WIFI_NO_CONNECT = 0,				//	æ— è¿æ¥
+	WIFI_DISTRIBUTION,					//	é…ç½‘ä¸­
+	WIFI_WORKING,								//	æ­£å¸¸è¿è¡Œ
+	WIFI_ERROR,									//	ç½‘ç»œæ•…éšœ	
 } WIFI_STATE_MODE_E;
 
 
@@ -42,7 +42,7 @@ typedef enum
 
 /* Exported macro ------------------------------------------------------------*/
 
-#define WIFI_DISTRIBUTION_BLINK_TIME				3				// 1500ms  (°ëÃë)
+#define WIFI_DISTRIBUTION_BLINK_TIME				3				// 1500ms  (åŠç§’)
 
 #define WIFI_ERROR_BLINK_TIME								10				// 250ms		(25ms)
 
@@ -52,37 +52,37 @@ typedef enum
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-//------------------- ÉèÖÃwifi×´Ì¬»ú ----------------------------
+//------------------- è®¾ç½®wifiçŠ¶æ€æœº ----------------------------
 extern void WIFI_Set_Machine_State(WIFI_STATE_MODE_E para);
-//------------------- »ñÈ¡wifi×´Ì¬»ú ----------------------------
+//------------------- è·å–wifiçŠ¶æ€æœº ----------------------------
 extern WIFI_STATE_MODE_E WIFI_Get_Machine_State(void);
 
 
-//------------------- ½ÓÊÕ´¦Àíº¯Êı ----------------------------
+//------------------- æ¥æ”¶å¤„ç†å‡½æ•° ----------------------------
 extern void WIFI_Read_Handler(void);
 
-//------------------- ½øÈëÅäÍø ----------------------------
+//------------------- è¿›å…¥é…ç½‘ ----------------------------
 extern void WIFI_Get_In_Distribution(void);
-//------------------- ½øÈë¹ÊÕÏ ----------------------------
+//------------------- è¿›å…¥æ•…éšœ ----------------------------
 extern void WIFI_Get_In_Error(void);
 
-//------------------- ÉÏ´«×´Ì¬¸üĞÂ ----------------------------
+//------------------- ä¸Šä¼ çŠ¶æ€æ›´æ–° ----------------------------
 extern void WIFI_Update_State_Upload(void);
 
-//-------------- ÉÏ´« Íê³ÉÍ³¼Æ  -------------------
+//-------------- ä¸Šä¼  å®Œæˆç»Ÿè®¡  -------------------
 extern void WIFI_Finish_Statistics_Upload( void );
 	
 
 
 /* Private defines -----------------------------------------------------------*/
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 extern void wifi_Module_Init(void);
-// °´¼üÖ÷Ñ­»·ÈÎÎñ
+// æŒ‰é”®ä¸»å¾ªç¯ä»»åŠ¡
 //  20 ms
 extern void Wifi_Module_Handler(void);
 
 
-// ÉÏ´«dpµã (Í³Ò»½Ó¿Ú)
+// ä¸Šä¼ dpç‚¹ (ç»Ÿä¸€æ¥å£)
 extern  void Wifi_DP_Data_Update(uint16_t id);
 
 #ifdef __cplusplus

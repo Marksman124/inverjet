@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		state_machine.h
-* @brief   		×´Ì¬»ú
+* @brief   		çŠ¶æ€æœº
 *
 *
 * @author			WQG
@@ -20,7 +20,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 
 /* Private includes ----------------------------------------------------------*/
 
@@ -28,60 +28,60 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 
 //*********************************
-//========== ×´Ì¬»ú ===============
+//========== çŠ¶æ€æœº ===============
 //*********************************
 typedef enum 
 {
-	POWER_OFF_STATUS = 0,			//	¹Ø»ú
-	//×ÔÓÉÄ£Ê½
-  FREE_MODE_INITIAL,				//	1		³õÊ¼×´Ì¬	
-	FREE_MODE_STARTING,				//			Æô¶¯ÖĞ
-  FREE_MODE_RUNNING,				//			ÔËĞĞÖĞ
-	FREE_MODE_SUSPEND,				//			ÔİÍ£
-	FREE_MODE_STOP,						//	5		½áÊø
-	//¶¨Ê±Ä£Ê½
-  TIMING_MODE_INITIAL,			//	6		³õÊ¼×´Ì¬
-	TIMING_MODE_STARTING,			//			Æô¶¯ÖĞ
-  TIMING_MODE_RUNNING,			//			ÔËĞĞÖĞ
-	TIMING_MODE_SUSPEND,			//			ÔİÍ£
-	TIMING_MODE_STOP,					//	10	½áÊø
-	//ÑµÁ·Ä£Ê½
-  TRAINING_MODE_INITIAL,		//	11	³õÊ¼×´Ì¬
-	TRAINING_MODE_STARTING,		//			Æô¶¯ÖĞ
-  TRAINING_MODE_RUNNING,		//			ÔËĞĞÖĞ
-	TRAINING_MODE_SUSPEND,		//			ÔİÍ£
-	TRAINING_MODE_STOP,				//	15	½áÊø
+	POWER_OFF_STATUS = 0,			//	å…³æœº
+	//è‡ªç”±æ¨¡å¼
+  FREE_MODE_INITIAL,				//	1		åˆå§‹çŠ¶æ€	
+	FREE_MODE_STARTING,				//			å¯åŠ¨ä¸­
+  FREE_MODE_RUNNING,				//			è¿è¡Œä¸­
+	FREE_MODE_SUSPEND,				//			æš‚åœ
+	FREE_MODE_STOP,						//	5		ç»“æŸ
+	//å®šæ—¶æ¨¡å¼
+  TIMING_MODE_INITIAL,			//	6		åˆå§‹çŠ¶æ€
+	TIMING_MODE_STARTING,			//			å¯åŠ¨ä¸­
+  TIMING_MODE_RUNNING,			//			è¿è¡Œä¸­
+	TIMING_MODE_SUSPEND,			//			æš‚åœ
+	TIMING_MODE_STOP,					//	10	ç»“æŸ
+	//è®­ç»ƒæ¨¡å¼
+  TRAINING_MODE_INITIAL,		//	11	åˆå§‹çŠ¶æ€
+	TRAINING_MODE_STARTING,		//			å¯åŠ¨ä¸­
+  TRAINING_MODE_RUNNING,		//			è¿è¡Œä¸­
+	TRAINING_MODE_SUSPEND,		//			æš‚åœ
+	TRAINING_MODE_STOP,				//	15	ç»“æŸ
 	
-	// ÆäËü×´Ì¬
-  OPERATION_MENU_STATUS,		//			²Ù×÷²Ëµ¥
-	ERROR_DISPLAY_STATUS,			//			¹ÊÕÏ½çÃæ
-	OTA_UPGRADE_STATUS,				//			OTA Éı¼¶
-	SYSTEM_STATE_END,					//	½áÊø
+	// å…¶å®ƒçŠ¶æ€
+  OPERATION_MENU_STATUS,		//			æ“ä½œèœå•
+	ERROR_DISPLAY_STATUS,			//			æ•…éšœç•Œé¢
+	OTA_UPGRADE_STATUS,				//			OTA å‡çº§
+	SYSTEM_STATE_END,					//	ç»“æŸ
 } SYSTEM_STATE_MACHINE_E;
 
 
 //*********************************
-//========== ÑµÁ·Ä£Ê½ =============
+//========== è®­ç»ƒæ¨¡å¼ =============
 //*********************************
 typedef enum 
 {
-	SYSTEM_MODE_FREE_0 = 0,			//	×ÔÓÉ & ¶¨Ê± Ä£Ê½
+	SYSTEM_MODE_FREE_0 = 0,			//	è‡ªç”± & å®šæ—¶ æ¨¡å¼
   SYSTEM_MODE_TRAIN_P1,				//	P1
 	SYSTEM_MODE_TRAIN_P2,				//	
   SYSTEM_MODE_TRAIN_P3,				//	
 	SYSTEM_MODE_TRAIN_P4,				//	
-	SYSTEM_MODE_TRAIN_P5,				//	³åÀË
+	SYSTEM_MODE_TRAIN_P5,				//	å†²æµª
 } SYSTEM_MODE_NUM_E;
 
 
 //*********************************
-//========== ¿ØÖÆÔ´ =============
+//========== æ§åˆ¶æº =============
 //*********************************
 typedef enum 
 {
-	CTRL_FROM_KEY = 0,				//	°´¼ü
+	CTRL_FROM_KEY = 0,				//	æŒ‰é”®
 	CTRL_FROM_WIFI,						//	wifi
-	CTRL_FROM_BT,							//	À¶ÑÀ
+	CTRL_FROM_BT,							//	è“ç‰™
 	CTRL_FROM_RS485,					//	modbus 485	
 } System_Ctrl_Mode_Type_enum;
 
@@ -93,104 +93,104 @@ typedef enum
 /* Exported macro ------------------------------------------------------------*/
 
 
-//-------------- ÌØ±ğ×´Ì¬ Î» -------------------
-#define SPECIAL_BIT_SKIP_INITIAL				0x01		//Ìø¹ı ³õÊ¼»¯   ²»×Ô¶¯µ¹Êı3s
-#define SPECIAL_BIT_SKIP_STARTING				0x02		//Ìø¹ı ÈíÆô¶¯  Ö±½Ó½øÈë ÔËĞĞ
-#define SPECIAL_BIT_SPEED_CHANGE				0x04		//ÔËĞĞÖĞ¸ü¸Ä×ªËÙ
+//-------------- ç‰¹åˆ«çŠ¶æ€ ä½ -------------------
+#define SPECIAL_BIT_SKIP_INITIAL				0x01		//è·³è¿‡ åˆå§‹åŒ–   ä¸è‡ªåŠ¨å€’æ•°3s
+#define SPECIAL_BIT_SKIP_STARTING				0x02		//è·³è¿‡ è½¯å¯åŠ¨  ç›´æ¥è¿›å…¥ è¿è¡Œ
+#define SPECIAL_BIT_SPEED_CHANGE				0x04		//è¿è¡Œä¸­æ›´æ”¹è½¬é€Ÿ
 
-#define SPECIAL_BIT_SPEED_100_GEAR			0x10		//ËÙ¶È 100 µµÎ»
-#define SPECIAL_BIT_TIME_100_GEAR				0x20		//¶¨Ê± 100 µµÎ»
+#define SPECIAL_BIT_SPEED_100_GEAR			0x10		//é€Ÿåº¦ 100 æ¡£ä½
+#define SPECIAL_BIT_TIME_100_GEAR				0x20		//å®šæ—¶ 100 æ¡£ä½
 
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
-// ³õÊ¼»¯
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
+// åˆå§‹åŒ–
 extern void App_State_Machine_Init(void);
-//------------- Ä£Ê½·¢ÉúÇĞ»» ------------------------------------
+//------------- æ¨¡å¼å‘ç”Ÿåˆ‡æ¢ ------------------------------------
 extern void Check_Mode_Change(uint16_t machine);
-//------------------- ÉèÖÃ×´Ì¬»ú  ----------------------------
+//------------------- è®¾ç½®çŠ¶æ€æœº  ----------------------------
 extern uint8_t Set_System_State_Machine(uint8_t val);
-//------------------- »ñÈ¡×´Ì¬»ú  ----------------------------
+//------------------- è·å–çŠ¶æ€æœº  ----------------------------
 extern uint8_t Get_System_State_Machine(void);
 
-//------------------- ÉèÖÃ Ä£Ê½  ----------------------------
+//------------------- è®¾ç½® æ¨¡å¼  ----------------------------
 extern uint8_t Set_System_State_Mode(uint8_t val);
-//------------------- »ñÈ¡ Ä£Ê½  ----------------------------
+//------------------- è·å– æ¨¡å¼  ----------------------------
 extern uint8_t Get_System_State_Mode(void);
 
-//------------------- ¿ìËÙ»ñÈ¡×´Ì¬  ----------------------------
-// µç»úÆô¶¯×´Ì¬
+//------------------- å¿«é€Ÿè·å–çŠ¶æ€  ----------------------------
+// ç”µæœºå¯åŠ¨çŠ¶æ€
 extern uint8_t Motor_is_Start(void);
-// Õı³£¹¤×÷×´Ì¬
+// æ­£å¸¸å·¥ä½œçŠ¶æ€
 extern uint8_t System_is_Normal_Operation(void);
-// ³õÊ¼×´Ì¬
+// åˆå§‹çŠ¶æ€
 extern uint8_t System_is_Initial(void);
-// Æô¶¯×´Ì¬
+// å¯åŠ¨çŠ¶æ€
 extern uint8_t System_is_Starting(void);
-// ÔËĞĞ×´Ì¬
+// è¿è¡ŒçŠ¶æ€
 extern uint8_t System_is_Running(void);
-// ÔİÍ£×´Ì¬
+// æš‚åœçŠ¶æ€
 extern uint8_t System_is_Pause(void);
-// ½áÊø×´Ì¬
+// ç»“æŸçŠ¶æ€
 extern uint8_t System_is_Stop(void);
-// ²Ù×÷²Ëµ¥
+// æ“ä½œèœå•
 extern uint8_t System_is_Operation(void);
-// ¹ÊÕÏ½çÃæ
+// æ•…éšœç•Œé¢
 extern uint8_t System_is_Error(void);
-// ¹Ø»ú
+// å…³æœº
 extern uint8_t System_is_Power_Off(void);
 // OTA
 extern uint8_t System_is_OTA(void);
-// ×ÔÓÉ Ä£Ê½
+// è‡ªç”± æ¨¡å¼
 extern uint8_t System_Mode_Free(void);
-// ¶¨Ê± Ä£Ê½
+// å®šæ—¶ æ¨¡å¼
 extern uint8_t System_Mode_Time(void);
-// ÑµÁ· Ä£Ê½
+// è®­ç»ƒ æ¨¡å¼
 extern uint8_t System_Mode_Train(void);
-// ³åÀË Ä£Ê½
+// å†²æµª æ¨¡å¼
 extern uint8_t System_Mode_Surf(void);
-//------------------- ¸ü¸Ä×´Ì¬ ²»¸Ä±äÄ£Ê½  ----------------------------
+//------------------- æ›´æ”¹çŠ¶æ€ ä¸æ”¹å˜æ¨¡å¼  ----------------------------
 
-// --> ³õÊ¼×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> åˆå§‹çŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 extern void Arbitrarily_To_Initial(void);
 	
-// --> Æô¶¯×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> å¯åŠ¨çŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 extern void Arbitrarily_To_Starting(void);
 
-// --> ÔËĞĞ×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> è¿è¡ŒçŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 extern void Arbitrarily_To_Running(void);
 
-// --> ÔİÍ£×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> æš‚åœçŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 extern void Arbitrarily_To_Pause(void);
 
-// --> ½áÊø×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> ç»“æŸçŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 extern void Arbitrarily_To_Stop(void);
 
-//------------------- ÅĞ¶Ï ×´Ì¬ & Ä£Ê½  ----------------------------
-// 	Ä£Ê½ ÊÇ·ñ·¢Éú±ä»¯ 
-//	1:ÊÇ  0:·ñ
+//------------------- åˆ¤æ–­ çŠ¶æ€ & æ¨¡å¼  ----------------------------
+// 	æ¨¡å¼ æ˜¯å¦å‘ç”Ÿå˜åŒ– 
+//	1:æ˜¯  0:å¦
 extern uint8_t Is_Change_System_Mode(uint16_t machine);
 
-//------------------- ÌØ±ğ×´Ì¬ »ú  ----------------------------
+//------------------- ç‰¹åˆ«çŠ¶æ€ æœº  ----------------------------
 
-// Ìí¼Ó ÌØ±ğ×´Ì¬ ±êÖ¾
+// æ·»åŠ  ç‰¹åˆ«çŠ¶æ€ æ ‡å¿—
 extern void Special_Status_Add(uint8_t num);
 
-// É¾³ı ÌØ±ğ×´Ì¬ ±êÖ¾
+// åˆ é™¤ ç‰¹åˆ«çŠ¶æ€ æ ‡å¿—
 extern void Special_Status_Delete(uint8_t num);
 	
-// »ñÈ¡ ÌØ±ğ×´Ì¬ ±êÖ¾
+// è·å– ç‰¹åˆ«çŠ¶æ€ æ ‡å¿—
 extern uint8_t Special_Status_Get(uint8_t num);
 
-//------------------- ÔËĞĞ²ÎÊıÉèÖÃ½Ó¿Ú ----------------------------
-// Ä£Ê½
+//------------------- è¿è¡Œå‚æ•°è®¾ç½®æ¥å£ ----------------------------
+// æ¨¡å¼
 extern void System_Para_Set_PMode(uint16_t pmode, System_Ctrl_Mode_Type_enum ctrler);
-// ×´Ì¬»ú
+// çŠ¶æ€æœº
 extern void System_Para_Set_Status(uint16_t status, System_Ctrl_Mode_Type_enum ctrler);
-// ËÙ¶È
+// é€Ÿåº¦
 extern void System_Para_Set_Speed(uint16_t speed, System_Ctrl_Mode_Type_enum ctrler);
-// Ê±¼ä
+// æ—¶é—´
 extern void System_Para_Set_Time(uint16_t time, System_Ctrl_Mode_Type_enum ctrler);
 	
 /* Private defines -----------------------------------------------------------*/

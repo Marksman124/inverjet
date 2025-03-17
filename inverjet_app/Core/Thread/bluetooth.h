@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		bluetooth.h
-* @brief   		bluetooth Ä£×é
+* @brief   		bluetooth æ¨¡ç»„
 *
 *
 * @author			WQG
@@ -29,10 +29,10 @@ extern "C" {
 
 typedef enum 
 {
-	BT_NO_CONNECT = 0,				//	ÎŞÁ¬½Ó
-	BT_DISTRIBUTION,					//	ÅäÍøÖĞ
-	BT_WORKING,								//	Õı³£ÔËĞĞ
-	BT_ERROR,									//	ÍøÂç¹ÊÕÏ	
+	BT_NO_CONNECT = 0,				//	æ— è¿æ¥
+	BT_DISTRIBUTION,					//	é…ç½‘ä¸­
+	BT_WORKING,								//	æ­£å¸¸è¿è¡Œ
+	BT_ERROR,									//	ç½‘ç»œæ•…éšœ
 } BT_STATE_MODE_E;
 
 
@@ -51,50 +51,54 @@ typedef enum
 
 
 /* Exported functions prototypes ---------------------------------------------*/
-//´®¿Ú·¢ËÍ½Ó¿Ú
+//ä¸²å£å‘é€æ¥å£
 extern void SerialWrite(unsigned char *buff,int length);
 
 extern void BT_UART_Send(uint8_t* p_buff, uint8_t len);
-//´®¿Ú·¢ËÍ½Ó¿Ú
+//ä¸²å£å‘é€æ¥å£
 extern void BT_Read_Data_Bit(unsigned char vaule);
 
 extern void BT_MsTimeout(void);
 
-//½ÓÊÕÖĞ¶Ïµ÷ÓÃ
+//æ¥æ”¶ä¸­æ–­è°ƒç”¨
 extern void Usart_IRQ_CallBack(uint8_t data);
-//------------------- ÉèÖÃwifi×´Ì¬»ú ----------------------------
+//------------------- è®¾ç½®wifiçŠ¶æ€æœº ----------------------------
 extern void BT_Set_Machine_State(BT_STATE_MODE_E para);
-//------------------- »ñÈ¡wifi×´Ì¬»ú ----------------------------
+//------------------- è·å–wifiçŠ¶æ€æœº ----------------------------
 extern BT_STATE_MODE_E BT_Get_Machine_State(void);
 
-//------------------- À¶ÑÀ Modbus ÅäÖÃ³õÊ¼»¯ ----------------------------
+//------------------- è“ç‰™ Modbus é…ç½®åˆå§‹åŒ– ----------------------------
 extern void BT_Modbus_Config_Init(void);
-// AT Ö¸Áî Éè MTU
+// AT æŒ‡ä»¤ è®¾ MTU
 extern void BT_Set_MTU(uint8_t data);
-// AT Ö¸Áî Éè ¹¦ÂÊ
+// AT æŒ‡ä»¤ è®¾ åŠŸç‡
 extern void BT_Set_Power(uint8_t data);
-// AT Ö¸Áî ½øÈëÍ¸´«
+// AT æŒ‡ä»¤ è¿›å…¥é€ä¼ 
 extern void BT_Set_TRANSENTER(uint8_t data);
+
+extern void BT_Module_AT_Factory(void);
 //
 extern void BT_Module_AT_Init(void);
-//ÖØĞÂ³õÊ¼»¯
+//é‡æ–°åˆå§‹åŒ–
 extern void BT_Module_AT_ReInit(void);
 
-//------------------- À¶ÑÀ ½øÈë¹¤×° ----------------------------
+extern void BT_Module_AT_NoConnect(void);
+
+//------------------- è“ç‰™ è¿›å…¥å·¥è£… ----------------------------
 extern void BT_Module_AT_InTest(void);
-//------------------- À¶ÑÀ ³ÖĞø²âÊÔ ----------------------------
+//------------------- è“ç‰™ æŒç»­æµ‹è¯• ----------------------------
 extern void BT_Module_AT_DoTest(void);
 
-//------------------- ½ÓÊÕ´¦Àíº¯Êı ----------------------------
+//------------------- æ¥æ”¶å¤„ç†å‡½æ•° ----------------------------
 extern void BT_Read_Handler(void);
 
-//------------------- ½øÈëÅäÍø ----------------------------
+//------------------- è¿›å…¥é…ç½‘ ----------------------------
 extern void BT_Get_In_Distribution(void);
-//------------------- ½øÈë¹ÊÕÏ ----------------------------
+//------------------- è¿›å…¥æ•…éšœ ----------------------------
 extern void BT_Get_In_Error(void);
-//------------------- ÅäÍø´¦Àí 0.5Ãë½øÒ»´Î----------------------------
+//------------------- é…ç½‘å¤„ç† 0.5ç§’è¿›ä¸€æ¬¡----------------------------
 extern void BT_Distribution_Halder(void);
-//------------------- ÁªÍø´¦Àí 0.5Ãë½øÒ»´Î----------------------------
+//------------------- è”ç½‘å¤„ç† 0.5ç§’è¿›ä¸€æ¬¡----------------------------
 extern void BT_Online_Connect_Halder(void);
 
 /* Private defines -----------------------------------------------------------*/

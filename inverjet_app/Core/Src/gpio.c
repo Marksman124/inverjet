@@ -40,12 +40,12 @@ IO_Hardware_Info IO_Pump[2][4] = {
 //};
 
 
-//--------------- ≤¶¬Îø™πÿ  ----------------------------------
-//*************  Œª ˝
+//--------------- Êã®Á†ÅÂºÄÂÖ≥  ----------------------------------
+//*************  ‰ΩçÊï∞
 //#define DIAL_SWITCH_NUMBER		2
 #define DIAL_SWITCH_NUMBER		4
 
-//*************  IO “˝Ω≈
+//*************  IO ÂºïËÑö
 //IO_Hardware_Info IO_Dial_Switch[DIAL_SWITCH_NUMBER]	= {{GPIOC,GPIO_PIN_4},{GPIOC,GPIO_PIN_5}};	//  PB5
 IO_Hardware_Info IO_Dial_Switch[DIAL_SWITCH_NUMBER]	= {{SW_1_GPIO_Port,SW_1_Pin},{SW_2_GPIO_Port,SW_2_Pin},{SW_3_GPIO_Port,SW_3_Pin},{SW_4_GPIO_Port,SW_4_Pin}};	//  PB5
 
@@ -239,7 +239,7 @@ uint8_t Gpio_Get_Dial_Switch(void)
 	{
 		read_io = HAL_GPIO_ReadPin(IO_Dial_Switch[i].io_type, IO_Dial_Switch[i].io_pin);
 		
-		if(read_io == 0)//µÕ”––ß
+		if(read_io == 0)//‰ΩéÊúâÊïà
 			rulse |= 1<<i;
 	}
 	

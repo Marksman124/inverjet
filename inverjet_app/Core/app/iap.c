@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		iap.c
-* @brief   		iapÏà¹Ø£¬Bootloader ºÍ app ¹«ÓÃ
+* @brief   		iapç›¸å…³ï¼ŒBootloader å’Œ app å…¬ç”¨
 *
 *
 * @author			WQG
@@ -13,48 +13,48 @@
 #include "cmsis_os.h"
 #include "mbcrc.h"
 
-uint32_t  ProductAppPassword  =     PRODUCT_APP_PASSWORD;  //²úÆ·Ó¦ÓÃÃØÔ¿
+uint32_t  ProductAppPassword  =     PRODUCT_APP_PASSWORD;  //äº§å“åº”ç”¨ç§˜é’¥
 
 
 iapfun jump2app; 
 uint16_t iapbuf[1024];   
-//appxaddr:Ó¦ÓÃ³ÌĞòµÄÆğÊ¼µØÖ·
-//appbuf:Ó¦ÓÃ³ÌĞòCODE.
-//appsize:Ó¦ÓÃ³ÌĞò´óĞ¡(×Ö½Ú).
+//appxaddr:åº”ç”¨ç¨‹åºçš„èµ·å§‹åœ°å€
+//appbuf:åº”ç”¨ç¨‹åºCODE.
+//appsize:åº”ç”¨ç¨‹åºå¤§å°(å­—èŠ‚).
 void iap_write_appbin(uint32_t appxaddr,uint8_t *appbuf,uint32_t appsize)
 {
 	uint16_t t;
 	uint16_t i=0;
 	uint16_t temp;
-	uint32_t fwaddr=appxaddr;//µ±Ç°Ğ´ÈëµÄµØÖ·
+	uint32_t fwaddr=appxaddr;//å½“å‰å†™å…¥çš„åœ°å€
 	uint8_t *dfu=appbuf;
-	portDISABLE_INTERRUPTS();			//¹Ø±ÕÖĞ¶Ï
+	portDISABLE_INTERRUPTS();			//å…³é—­ä¸­æ–­
 	for(t=0;t<appsize;t++)
 	{
 		temp=(uint16_t)dfu[1]<<8;
 		temp+=(uint16_t)dfu[0];	  
-		dfu+=2;//Æ«ÒÆ2¸ö×Ö½Ú
+		dfu+=2;//åç§»2ä¸ªå­—èŠ‚
 		iapbuf[i++]=temp;	    
 		if(i==1024)
 		{
 			i=0;
 			STMFLASH_Write(fwaddr,iapbuf,1024);	
-			fwaddr+=2048;//Æ«ÒÆ2048  16=2*8.ËùÒÔÒª³ËÒÔ2.
+			fwaddr+=2048;//åç§»2048  16=2*8.æ‰€ä»¥è¦ä¹˜ä»¥2.
 		}
 	}
-	if(i)STMFLASH_Write(fwaddr,iapbuf,i);//½«×îºóµÄÒ»Ğ©ÄÚÈİ×Ö½ÚĞ´½øÈ¥.  
-	portENABLE_INTERRUPTS();			//¿ªÆôÖĞ¶Ï
+	if(i)STMFLASH_Write(fwaddr,iapbuf,i);//å°†æœ€åçš„ä¸€äº›å†…å®¹å­—èŠ‚å†™è¿›å».  
+	portENABLE_INTERRUPTS();			//å¼€å¯ä¸­æ–­
 }
 
-//Ìø×ªµ½Ó¦ÓÃ³ÌĞò¶Î
-//appxaddr:ÓÃ»§´úÂëÆğÊ¼µØÖ·.
+//è·³è½¬åˆ°åº”ç”¨ç¨‹åºæ®µ
+//appxaddr:ç”¨æˆ·ä»£ç èµ·å§‹åœ°å€.
 void iap_load_app(uint32_t appxaddr)
 {
-	if(((*(uint32_t*)appxaddr)&0x2FFE0000)==0x20000000)	//¼ì²éÕ»¶¥µØÖ·ÊÇ·ñºÏ·¨.
+	if(((*(uint32_t*)appxaddr)&0x2FFE0000)==0x20000000)	//æ£€æŸ¥æ ˆé¡¶åœ°å€æ˜¯å¦åˆæ³•.
 	{ 
-		jump2app=(iapfun)*(uint32_t*)(appxaddr+4);		//ÓÃ»§´úÂëÇøµÚ¶ş¸ö×ÖÎª³ÌĞò¿ªÊ¼µØÖ·(¸´Î»µØÖ·)		
-		MsrMsp(*(uint32_t*)appxaddr);					//³õÊ¼»¯APP¶ÑÕ»Ö¸Õë(ÓÃ»§´úÂëÇøµÄµÚÒ»¸ö×ÖÓÃÓÚ´æ·ÅÕ»¶¥µØÖ·)
-		jump2app();									//Ìø×ªµ½APP.
+		jump2app=(iapfun)*(uint32_t*)(appxaddr+4);		//ç”¨æˆ·ä»£ç åŒºç¬¬äºŒä¸ªå­—ä¸ºç¨‹åºå¼€å§‹åœ°å€(å¤ä½åœ°å€)		
+		MsrMsp(*(uint32_t*)appxaddr);					//åˆå§‹åŒ–APPå †æ ˆæŒ‡é’ˆ(ç”¨æˆ·ä»£ç åŒºçš„ç¬¬ä¸€ä¸ªå­—ç”¨äºå­˜æ”¾æ ˆé¡¶åœ°å€)
+		jump2app();									//è·³è½¬åˆ°APP.
 	}
 }		 
 
@@ -81,10 +81,10 @@ uint8_t Check_Pack_CRC(void)
 	return 0;
 }
 
-////Éı¼¶
+////å‡çº§
 void iap_Process(void)
 {
-	uint16_t buff[1024];//»º³å
+	uint16_t buff[1024];//ç¼“å†²
 	uint8_t i=0;
 	uint32_t writeAddr=0,readAddr=0;
 	writeAddr=FLASH_APP_PROGRAM_ADDR;
@@ -104,10 +104,10 @@ void iap_Process(void)
 
 
 
-////Éı¼¶
+////å‡çº§
 void iap_Bootloader_Process(void)
 {
-	uint16_t buff[1024];//»º³å
+	uint16_t buff[1024];//ç¼“å†²
 	uint8_t i=0;
 	uint32_t writeAddr=0,readAddr=0;
 	
@@ -116,7 +116,7 @@ void iap_Bootloader_Process(void)
 	
 	if(Check_Pack_CRC())
 	{
-		IntxDisable(); // ½ûÓÃËùÓĞÖĞ¶Ï
+		IntxDisable(); // ç¦ç”¨æ‰€æœ‰ä¸­æ–­
 		for(i=0; i<FLASH_BOOT_PROGRAM_PAGE; i++)
 		{
 			STMFLASH_Read(readAddr,buff,1024);
@@ -124,7 +124,7 @@ void iap_Bootloader_Process(void)
 			writeAddr+=2048;
 			readAddr+=2048;
 		}
-		IntxEnable();// ¿ªÖĞ¶Ï
+		IntxEnable();// å¼€ä¸­æ–­
 	}
 	else{
 		

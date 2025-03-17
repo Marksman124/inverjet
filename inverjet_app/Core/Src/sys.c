@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		sys.c
-* @brief   		ÏµÍ³µ×²ãÇý¶¯
+* @brief   		ç³»ç»Ÿåº•å±‚é©±åŠ¨
 *
 *
 * @author			WQG
@@ -11,30 +11,30 @@
 */
 #include "sys.h"
 
-//THUMBÖ¸Áî²»Ö§³Ö»ã±àÄÚÁª
-//²ÉÓÃÈçÏÂ·½·¨ÊµÏÖÖ´ÐÐ»ã±àÖ¸ÁîWFI  
+//THUMBæŒ‡ä»¤ä¸æ”¯æŒæ±‡ç¼–å†…è”
+//é‡‡ç”¨å¦‚ä¸‹æ–¹æ³•å®žçŽ°æ‰§è¡Œæ±‡ç¼–æŒ‡ä»¤WFI  
 void WfiSet(void)
 {
 	__ASM volatile("wfi");		  
 }
-//¹Ø±ÕËùÓÐÖÐ¶Ï
+//å…³é—­æ‰€æœ‰ä¸­æ–­
 void IntxDisable(void)
 {		  
 	__ASM volatile("cpsid i");
 }
-//¿ªÆôËùÓÐÖÐ¶Ï
+//å¼€å¯æ‰€æœ‰ä¸­æ–­
 void IntxEnable(void)
 {
 	__ASM volatile("cpsie i");		  
 }
-//ÉèÖÃÕ»¶¥µØÖ·
-//addr:Õ»¶¥µØÖ·
+//è®¾ç½®æ ˆé¡¶åœ°å€
+//addr:æ ˆé¡¶åœ°å€
 __asm void MsrMsp(uint32_t addr) 
 {
     MSR MSP, r0 			//set Main Stack value
     BX r14
 }
-//Èí¼þ¸´Î»  
+//è½¯ä»¶å¤ä½  
 void SysSoftReset(void)
 {   
 	SCB->AIRCR =0X05FA0000|(uint32_t)0x04;	  

@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				data.c
-* @brief			Êı¾İ¹ÜÀíÄ£¿é
+* @brief			æ•°æ®ç®¡ç†æ¨¡å—
 *
 * @author			WQG
 * @versions		v1.0
@@ -18,7 +18,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 
-// ²¦Âë¿ª¹Ø
+// æ‹¨ç å¼€å…³
 uint8_t System_Dial_Switch = 0;
 
 /* Private define ------------------------------------------------------------*/
@@ -36,7 +36,7 @@ uint32_t Product_Model_Ccode[MODEL_DIAL_SWITCH_NUMBER] =
 
 /* Private user code ---------------------------------------------------------*/
 
-//------------------- »ñÈ¡»úĞÍÂë ----------------------------
+//------------------- è·å–æœºå‹ç  ----------------------------
 uint32_t Get_Model_Code_Num(void)
 {
 	uint8_t dial_bit=0;
@@ -51,7 +51,7 @@ uint32_t Get_Model_Code_Num(void)
 		return PRODUCT_MODEL_CODE_SJ230;
 }
 
-// Ã¿ %1 Ã¿Ãë Ôö¼ÓÓÎÓ¾¾àÀë ·Å´ó100±¶
+// æ¯ %1 æ¯ç§’ å¢åŠ æ¸¸æ³³è·ç¦» æ”¾å¤§100å€
 uint32_t Get_Every_1Percent_Distance_Per_Second(void)
 {
 	uint32_t code=0;
@@ -76,7 +76,7 @@ uint32_t Get_Every_1Percent_Distance_Per_Second(void)
 	}
 }
 
-//×î´ó×ªËÙ 100%
+//æœ€å¤§è½¬é€Ÿ 100%
 uint32_t Get_Motor_Rpm_Speed_Max(void)
 {
 	uint32_t code=0;
@@ -102,7 +102,7 @@ uint32_t Get_Motor_Rpm_Speed_Max(void)
 }
 
 
-//×îµÍ×ªËÙ 20%
+//æœ€ä½è½¬é€Ÿ 20%
 uint32_t Get_Motor_Rpm_Speed_Mix(void)
 {
 	uint32_t code=0;
@@ -127,9 +127,9 @@ uint32_t Get_Motor_Rpm_Speed_Mix(void)
 	}
 }
 
-// ¹¦ÂÊ ½µÆµ
+// åŠŸç‡ é™é¢‘
 //*********************************************************************************************
-//-------------- µç»ú¹¦ÂÊ ±¨¾¯Öµ  -------------------
+//-------------- ç”µæœºåŠŸç‡ æŠ¥è­¦å€¼  -------------------
 uint32_t Get_Motor_Power_Alarm_Value(void)
 {
 	uint32_t code=0;
@@ -154,7 +154,7 @@ uint32_t Get_Motor_Power_Alarm_Value(void)
 	}
 }
 
-//-------------- µç»ú¹¦ÂÊ ½µËÙ  -------------------
+//-------------- ç”µæœºåŠŸç‡ é™é€Ÿ  -------------------
 uint32_t Get_Motor_Power_Reduce_Speed(void)
 {
 	uint32_t code=0;
@@ -179,7 +179,7 @@ uint32_t Get_Motor_Power_Reduce_Speed(void)
 	}
 }
 
-//-------------- µç»ú¹¦ÂÊ »Ö¸´  -------------------
+//-------------- ç”µæœºåŠŸç‡ æ¢å¤  -------------------
 uint32_t Get_Motor_Power_Restore_Speed(void)
 {
 	uint32_t code=0;
@@ -205,9 +205,9 @@ uint32_t Get_Motor_Power_Restore_Speed(void)
 }
 //*********************************************************************************************
 
-// µçÁ÷ ½µÆµ
+// ç”µæµ é™é¢‘
 //*********************************************************************************************
-//-------------- Êä³öµçÁ÷ ±¨¾¯Öµ  -------------------
+//-------------- è¾“å‡ºç”µæµ æŠ¥è­¦å€¼  -------------------
 uint32_t Get_Motor_Current_Alarm_Value(void)
 {
 	uint32_t code=0;
@@ -232,7 +232,7 @@ uint32_t Get_Motor_Current_Alarm_Value(void)
 	}
 }
 
-//-------------- Êä³öµçÁ÷ ½µËÙ  -------------------
+//-------------- è¾“å‡ºç”µæµ é™é€Ÿ  -------------------
 uint32_t Get_Motor_Current_Reduce_Speed(void)
 {
 	uint32_t code=0;
@@ -257,7 +257,7 @@ uint32_t Get_Motor_Current_Reduce_Speed(void)
 	}
 }
 
-//-------------- Êä³öµçÁ÷ »Ö¸´  -------------------
+//-------------- è¾“å‡ºç”µæµ æ¢å¤  -------------------
 uint32_t Get_Motor_Current_Restore_Speed(void)
 {
 	uint32_t code=0;

@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		display.h
-* @brief   		ÏÔÊ¾Ä£¿é  ÏÔÊ¾Ä£¿é±¾Éí²»Õ¼ÓÃÏß³Ì,ÓÉÆäËüÏß³ÌÈÎÎñµ÷ÓÃ
+* @brief   		æ˜¾ç¤ºæ¨¡å—  æ˜¾ç¤ºæ¨¡å—æœ¬èº«ä¸å ç”¨çº¿ç¨‹,ç”±å…¶å®ƒçº¿ç¨‹ä»»åŠ¡è°ƒç”¨
 *
 *
 * @author			WQG
@@ -38,14 +38,14 @@ typedef struct Operating_Parameters
 }Operating_Parameters;
 
 
-// ½µÆµ ÀàĞÍ
+// é™é¢‘ ç±»å‹
 typedef enum
 {
-	MOTOR_DOWN_CONVERSION_NO = 0,						//	ÎŞ
-	MOTOR_DOWN_CONVERSION_MOS_TEMPER,				//	mos ¸ßÎÂ
-	MOTOR_DOWN_CONVERSION_BOX_TEMPER,				//	»úÏä ¸ßÎÂ
-	MOTOR_DOWN_CONVERSION_OUT_CURRENT,			//	Êä³ö µçÁ÷
-	MOTOR_DOWN_CONVERSION_OUT_POWER,				//	Êä³ö ¹¦ÂÊ
+	MOTOR_DOWN_CONVERSION_NO = 0,						//	æ— 
+	MOTOR_DOWN_CONVERSION_MOS_TEMPER,				//	mos é«˜æ¸©
+	MOTOR_DOWN_CONVERSION_BOX_TEMPER,				//	æœºç®± é«˜æ¸©
+	MOTOR_DOWN_CONVERSION_OUT_CURRENT,			//	è¾“å‡º ç”µæµ
+	MOTOR_DOWN_CONVERSION_OUT_POWER,				//	è¾“å‡º åŠŸç‡
 } Motor_Down_Conversion_Type_enum;
 
 
@@ -55,33 +55,33 @@ typedef enum
 
 /* Exported macro ------------------------------------------------------------*/
 
-//-------------- ÑµÁ·Ä£Ê½ ×î´óÖµ -------------------
+//-------------- è®­ç»ƒæ¨¡å¼ æœ€å¤§å€¼ -------------------
 
 #define TRAINING_MODE_NUMBER_MAX						SYSTEM_MODE_TRAIN_P5
 #define TRAINING_MODE_PERIOD_MAX						50
-//³åÀËÄ£Ê½ --¡· P5
+//å†²æµªæ¨¡å¼ --ã€‹ P5
 #define SURFING_MODE_NUMBER_ID							SYSTEM_MODE_TRAIN_P5
-//------------------- ºÏ·¨·¶Î§ ----------------------------
+//------------------- åˆæ³•èŒƒå›´ ----------------------------
 #define SPEED_LEGAL_MIN						MOTOR_PERCENT_SPEED_MIX
 #define SPEED_LEGAL_MAX						MOTOR_PERCENT_SPEED_MAX
 
 #define TIME_LEGAL_MIN						20
 #define TIME_LEGAL_MAX						MOTOR_TIME_SHOW_MAX
 
-//------------------- µç»ú²ÎÊı ----------------------------
-#define	MOTOR_RPM_NUMBER_OF_POLES								5		//µç»ú¼¶Êı Ä¬ÈÏÖµ
-#define	MOTOR_RPM_MIX_OF_POLES									1		//µç»ú¼¶Êı ºÏ·¨×îĞ¡Öµ
-#define	MOTOR_RPM_MAX_OF_POLES									8		//µç»ú¼¶Êı ºÏ·¨×î´óÖµ
+//------------------- ç”µæœºå‚æ•° ----------------------------
+#define	MOTOR_RPM_NUMBER_OF_POLES								5		//ç”µæœºçº§æ•° é»˜è®¤å€¼
+#define	MOTOR_RPM_MIX_OF_POLES									1		//ç”µæœºçº§æ•° åˆæ³•æœ€å°å€¼
+#define	MOTOR_RPM_MAX_OF_POLES									8		//ç”µæœºçº§æ•° åˆæ³•æœ€å¤§å€¼
 
-#define	MOTOR_DRIVE_MODE_POLES								0x01	//³§ÄÚÄ£Ê½ Ä¬ÈÏÖµ
-#define	MOTOR_MODEL_CODE_POLES								0xB1	//µç»úĞÍºÅ Ä¬ÈÏÖµ
+#define	MOTOR_DRIVE_MODE_POLES								0x01	//å‚å†…æ¨¡å¼ é»˜è®¤å€¼
+#define	MOTOR_MODEL_CODE_POLES								0xB1	//ç”µæœºå‹å· é»˜è®¤å€¼
 
-//------------------- ÆÁ±Î¿ØÖÆ ----------------------------
-#define	BLOCK_BLUETOOTH_CONTROL									1		// ÆÁ±Î À¶ÑÀ ¿ØÖÆ
-#define	BLOCK_MODBUS_CONTROL										2		// ÆÁ±Î MODBUS ¿ØÖÆ
-#define	BLOCK_WIFI_CONTROL											4		// ÆÁ±Î WIFI ¿ØÖÆ
+//------------------- å±è”½æ§åˆ¶ ----------------------------
+#define	BLOCK_BLUETOOTH_CONTROL									1		// å±è”½ è“ç‰™ æ§åˆ¶
+#define	BLOCK_MODBUS_CONTROL										2		// å±è”½ MODBUS æ§åˆ¶
+#define	BLOCK_WIFI_CONTROL											4		// å±è”½ WIFI æ§åˆ¶
 
-// Ïß³Ì »î¶¯
+// çº¿ç¨‹ æ´»åŠ¨
 #define	THREAD_ACTIVITY_BREATH_LIGHT						( 1<<0 )
 #define	THREAD_ACTIVITY_RS485_MODBUS						( 1<<1 )
 #define	THREAD_ACTIVITY_MAIN										( 1<<2 )
@@ -97,8 +97,11 @@ typedef enum
 
 #define OUT_SELF_TEST_MODE()										(System_Self_Testing_State = 0)
 
+
+#define IN_AUTO_RUNNING_MODE()											(System_Auto_Running_State = 0xA7)
+#define IS_AUTO_RUNNING_MODE()											((System_Auto_Running_State == 0xA7) ? 1:0)
 /* Exported functions prototypes ---------------------------------------------*/
-//================= ³åÀËÄ£Ê½ È«¾Ö ²ÎÊı ================================
+//================= å†²æµªæ¨¡å¼ å…¨å±€ å‚æ•° ================================
 extern void Surf_Mode_Info_Data_Init(void);
 
 extern uint8_t Check_Data_Init(void);
@@ -106,7 +109,7 @@ extern uint8_t Check_Data_Init(void);
 extern void App_Data_Init(void);
 
 extern void App_Data_ReInit(void);
-// ¶Á flash
+// è¯» flash
 extern uint8_t Read_OPMode(void);
 
 extern void MB_Write_Timer_CallOut(void);
@@ -114,89 +117,89 @@ extern void MB_Write_Timer_CallOut(void);
 extern uint8_t Write_MbBuffer_Later(void);
 
 extern uint8_t Write_MbBuffer_Now(void);
-//´æ´¢ ĞÂ ËÙ¶È
+//å­˜å‚¨ æ–° é€Ÿåº¦
 extern void Update_OP_Speed(void);
-//´æ´¢ ĞÂ Ê±¼ä
+//å­˜å‚¨ æ–° æ—¶é—´
 extern void Update_OP_Time(void);
-//´æ´¢ ĞÂ ËÙ¶È & Ê±¼ä
+//å­˜å‚¨ æ–° é€Ÿåº¦ & æ—¶é—´
 extern void Update_OP_All(void);
 
 extern void OP_Update_Mode(void);
-//¼ì²é ĞÂ ËÙ¶È & Ê±¼ä  ·ÀÖ¹Òç³ö
+//æ£€æŸ¥ æ–° é€Ÿåº¦ & æ—¶é—´  é˜²æ­¢æº¢å‡º
 void Check_OP_All(void);
 
-// ¸ü¸ÄÊôĞÔÖµ
+// æ›´æ”¹å±æ€§å€¼
 extern uint8_t Set_Data_OPMode(Operating_Parameters* p_op);
-//------------------- ÅĞ¶Ï Ä£Ê½ ºÏ·¨ ----------------------------
+//------------------- åˆ¤æ–­ æ¨¡å¼ åˆæ³• ----------------------------
 uint8_t Is_Mode_Legal(uint8_t mode);
-//------------------- ÅĞ¶ÏËÙ¶È ºÏ·¨ ----------------------------
+//------------------- åˆ¤æ–­é€Ÿåº¦ åˆæ³• ----------------------------
 extern uint8_t Is_Speed_Legal(uint16_t speed);
 
 extern uint8_t Is_Time_Legal(uint16_t time);
 
-//------------------- ÉèÖÃ µ±Ç° ËÙ¶È ----------------------------
+//------------------- è®¾ç½® å½“å‰ é€Ÿåº¦ ----------------------------
 extern void Data_Set_Current_Speed(uint8_t speed);
-//------------------- ÉèÖÃ µ±Ç° Ê±¼ä ----------------------------
+//------------------- è®¾ç½® å½“å‰ æ—¶é—´ ----------------------------
 extern void Data_Set_Current_Time(uint16_t time);
-//------------------- ÉèÖÃ ÑµÁ·Ê±¶Î ----------------------------
+//------------------- è®¾ç½® è®­ç»ƒæ—¶æ®µ ----------------------------
 extern void Set_Pmode_Period_Now(uint16_t value);
-//------------------- ÊÇ·ñ½ÓÊÕÍâ²¿¿ØÖÆ ----------------------------
+//------------------- æ˜¯å¦æ¥æ”¶å¤–éƒ¨æ§åˆ¶ ----------------------------
 extern uint8_t If_Accept_External_Control(uint8_t mode);
-//------------------- »ñÈ¡Èí¼ş°æ±¾ºÅ  ×Ö·û´®×ª uint32 ----------------------------
+//------------------- è·å–è½¯ä»¶ç‰ˆæœ¬å·  å­—ç¬¦ä¸²è½¬ uint32 ----------------------------
 extern void get_uint3_version(char * buffer);
-//------------------- Çå³ıwifi±êÖ¾ ----------------------------
+//------------------- æ¸…é™¤wifiæ ‡å¿— ----------------------------
 extern void System_Wifi_State_Clean(void);
-//------------------- Çå³ıÀ¶ÑÀ±êÖ¾ ----------------------------
+//------------------- æ¸…é™¤è“ç‰™æ ‡å¿— ----------------------------
 extern void System_BT_State_Clean(void);
-//------------------- ÉèÖÃ¿ØÖÆ·½Ê½ ----------------------------
+//------------------- è®¾ç½®æ§åˆ¶æ–¹å¼ ----------------------------
 extern void Set_Ctrl_Mode_Type(System_Ctrl_Mode_Type_enum type);
-//------------------- »ñÈ¡¿ØÖÆ·½Ê½ ----------------------------
+//------------------- è·å–æ§åˆ¶æ–¹å¼ ----------------------------
 extern System_Ctrl_Mode_Type_enum Get_Ctrl_Mode_Type(void);
 
-//------------------- OTA ×Ô¶¯ÍË³ö 1Ãë½øÒ»´Î ----------------------------
+//------------------- OTA è‡ªåŠ¨é€€å‡º 1ç§’è¿›ä¸€æ¬¡ ----------------------------
 extern void OTA_Time_Out(void);
 
 
-//------------------- »ñÈ¡»úĞÍÂë ----------------------------
+//------------------- è·å–æœºå‹ç  ----------------------------
 extern uint32_t Get_Model_Code_Num(void);
-// Ã¿ %1 Ã¿Ãë Ôö¼ÓÓÎÓ¾¾àÀë ·Å´ó100±¶
+// æ¯ %1 æ¯ç§’ å¢åŠ æ¸¸æ³³è·ç¦» æ”¾å¤§100å€
 extern uint32_t Get_Every_1Percent_Distance_Per_Second(void);
-//×î´ó×ªËÙ 100%
+//æœ€å¤§è½¬é€Ÿ 100%
 extern uint32_t Get_Motor_Rpm_Speed_Max(void);
-//×îµÍ×ªËÙ 20%
+//æœ€ä½è½¬é€Ÿ 20%
 extern uint32_t Get_Motor_Rpm_Speed_Mix(void);
-// ¹¦ÂÊ ½µÆµ
+// åŠŸç‡ é™é¢‘
 //*********************************************************************************************
-//-------------- µç»ú¹¦ÂÊ ±¨¾¯Öµ  -------------------
+//-------------- ç”µæœºåŠŸç‡ æŠ¥è­¦å€¼  -------------------
 extern uint32_t Get_Motor_Power_Alarm_Value(void);
-//-------------- µç»ú¹¦ÂÊ ½µËÙ  -------------------
+//-------------- ç”µæœºåŠŸç‡ é™é€Ÿ  -------------------
 extern uint32_t Get_Motor_Power_Reduce_Speed(void);
-//-------------- µç»ú¹¦ÂÊ »Ö¸´  -------------------
+//-------------- ç”µæœºåŠŸç‡ æ¢å¤  -------------------
 extern uint32_t Get_Motor_Power_Restore_Speed(void);
 //*********************************************************************************************
-// µçÁ÷ ½µÆµ
+// ç”µæµ é™é¢‘
 //*********************************************************************************************
-//-------------- Êä³öµçÁ÷ ±¨¾¯Öµ  -------------------
+//-------------- è¾“å‡ºç”µæµ æŠ¥è­¦å€¼  -------------------
 extern uint32_t Get_Motor_Current_Alarm_Value(void);
-//-------------- Êä³öµçÁ÷ ½µËÙ  -------------------
+//-------------- è¾“å‡ºç”µæµ é™é€Ÿ  -------------------
 extern uint32_t Get_Motor_Current_Reduce_Speed(void);
-//-------------- Êä³öµçÁ÷ »Ö¸´  -------------------
+//-------------- è¾“å‡ºç”µæµ æ¢å¤  -------------------
 extern uint32_t Get_Motor_Current_Restore_Speed(void);
 //*********************************************************************************************
 
-// Íê³ÉÊı¾İÍ³¼Æ
+// å®Œæˆæ•°æ®ç»Ÿè®¡
 //*********************************************************************************************
-//-------------- ¼ÆËã Íê³ÉÍ³¼Æ  -------------------
+//-------------- è®¡ç®— å®Œæˆç»Ÿè®¡  -------------------
 extern void Finish_Statistics_Count(uint8_t count);
-//-------------- Çå³ı Íê³ÉÍ³¼Æ  -------------------
+//-------------- æ¸…é™¤ å®Œæˆç»Ÿè®¡  -------------------
 extern void Finish_Statistics_Clean( void );
-//-------------- ÉÏ´« Íê³ÉÍ³¼Æ  -------------------
+//-------------- ä¸Šä¼  å®Œæˆç»Ÿè®¡  -------------------
 extern void Finish_Statistics_Upload( void );
 	
 
-//-------------- Ïß³Ì »î¶¯ ±êÖ¾ÇåÁã  -------------------
+//-------------- çº¿ç¨‹ æ´»åŠ¨ æ ‡å¿—æ¸…é›¶  -------------------
 extern void Thread_Activity_Sign_Clean( void );
-//-------------- Ïß³Ì »î¶¯ ÉèÖÃ  -------------------
+//-------------- çº¿ç¨‹ æ´»åŠ¨ è®¾ç½®  -------------------
 extern void Thread_Activity_Sign_Set( uint16_t val );
 	
 
@@ -207,111 +210,115 @@ extern Operating_Parameters OP_ShowNow;
 extern Operating_Parameters* p_OP_ShowLater;
 
 
-// ÑµÁ·Ä£Ê½ µ±Ç°×´Ì¬
+// è®­ç»ƒæ¨¡å¼ å½“å‰çŠ¶æ€
 extern uint8_t PMode_Now;
 
 extern uint8_t Period_Now;
 
-// ¸÷Ä£Ê½ ÊôĞÔ ³õÊ¼Öµ
+// å„æ¨¡å¼ å±æ€§ åˆå§‹å€¼
 extern Operating_Parameters OP_Init_Free;
 
 extern Operating_Parameters OP_Init_Timing;
 
 extern Operating_Parameters OP_Init_PMode[TRAINING_MODE_NUMBER_MAX][TRAINING_MODE_PERIOD_MAX];
 
-//--------------------------- ÏµÍ³ÊôĞÔ
-extern uint16_t* p_System_State_Machine;			//×´Ì¬»ú
-extern uint16_t* p_PMode_Now;									// µ±Ç°Ä£Ê½
-extern uint16_t* p_OP_ShowNow_Speed;					// µ±Ç°ËÙ¶È
-extern uint16_t* p_OP_ShowNow_Time;						// µ±Ç°Ê±¼ä
+//--------------------------- ç³»ç»Ÿå±æ€§
+extern uint16_t* p_System_State_Machine;			//çŠ¶æ€æœº
+extern uint16_t* p_PMode_Now;									// å½“å‰æ¨¡å¼
+extern uint16_t* p_OP_ShowNow_Speed;					// å½“å‰é€Ÿåº¦
+extern uint16_t* p_OP_ShowNow_Time;						// å½“å‰æ—¶é—´
 
-//--------------------------- ÁÙÊ± ÓÃÓÚ¹ÊÕÏµÈ½çÃæ¼ÇÂ¼·µ»ØÖµ
-extern uint16_t* p_System_State_Machine_Memory;			// ×´Ì¬»ú
-extern uint16_t* p_PMode_Now_Memory;								// µ±Ç°Ä£Ê½
-extern uint16_t* p_OP_ShowNow_Speed_Memory;					// µ±Ç°ËÙ¶È
-extern uint16_t* p_OP_ShowNow_Time_Memory;					// µ±Ç°Ê±¼ä
+//--------------------------- ä¸´æ—¶ ç”¨äºæ•…éšœç­‰ç•Œé¢è®°å½•è¿”å›å€¼
+extern uint16_t* p_System_State_Machine_Memory;			// çŠ¶æ€æœº
+extern uint16_t* p_PMode_Now_Memory;								// å½“å‰æ¨¡å¼
+extern uint16_t* p_OP_ShowNow_Speed_Memory;					// å½“å‰é€Ÿåº¦
+extern uint16_t* p_OP_ShowNow_Time_Memory;					// å½“å‰æ—¶é—´
 
-extern System_Ctrl_Mode_Type_enum Ctrl_Mode_Type;				// ¿ØÖÆ·½Ê½  0:°´¼ü   1:wifi 2:bt
-// ¸÷Ä£Ê½ ÊôĞÔ
+extern System_Ctrl_Mode_Type_enum Ctrl_Mode_Type;				// æ§åˆ¶æ–¹å¼  0:æŒ‰é”®   1:wifi 2:bt
+// å„æ¨¡å¼ å±æ€§
 extern Operating_Parameters* p_OP_Free_Mode;
 
 extern Operating_Parameters* p_OP_Timing_Mode;
 
 extern Operating_Parameters (*p_OP_PMode)[TRAINING_MODE_PERIOD_MAX];
 //==========================================================
-//--------------------------- Çı¶¯°å¶ÁÈ¡ĞÅÏ¢
+//--------------------------- é©±åŠ¨æ¿è¯»å–ä¿¡æ¯
 //==========================================================
-extern uint16_t Driver_Software_Version_Read;		// Çı¶¯°åÈí¼ş°æ±¾	 ¶ÁÉÏÀ´µÄÔ­Ê¼Öµ
+extern uint16_t Driver_Software_Version_Read;		// é©±åŠ¨æ¿è½¯ä»¶ç‰ˆæœ¬	 è¯»ä¸Šæ¥çš„åŸå§‹å€¼
 
-extern uint16_t* p_Motor_Fault_Static;						// ¹ÊÕÏ×´Ì¬		Çı¶¯°å
+extern uint16_t* p_Motor_Fault_Static;						// æ•…éšœçŠ¶æ€		é©±åŠ¨æ¿
 
-extern uint32_t* p_Motor_Reality_Speed;					// µç»ú Êµ¼Ê ×ªËÙ
-extern uint32_t* p_Motor_Reality_Power;					// µç»ú Êµ¼Ê ¹¦ÂÊ
+extern uint32_t* p_Motor_Reality_Speed;					// ç”µæœº å®é™… è½¬é€Ÿ
+extern uint32_t* p_Motor_Reality_Power;					// ç”µæœº å®é™… åŠŸç‡
 
-extern int16_t* p_Mos_Temperature;							// mos ÎÂ¶È
-extern uint32_t* p_Motor_Current;								// µç»ú µçÁ÷		Êä³ö
-extern uint16_t* p_Motor_Bus_Voltage;						// Ä¸Ïß µçÑ¹		ÊäÈë
-extern uint16_t* p_Motor_Bus_Current;						// Ä¸Ïß µçÁ÷  	ÊäÈë
+extern int16_t* p_Mos_Temperature;							// mos æ¸©åº¦
+extern uint32_t* p_Motor_Current;								// ç”µæœº ç”µæµ		è¾“å‡º
+extern uint16_t* p_Motor_Bus_Voltage;						// æ¯çº¿ ç”µå‹		è¾“å…¥
+extern uint16_t* p_Motor_Bus_Current;						// æ¯çº¿ ç”µæµ  	è¾“å…¥
 
 //==========================================================
-//--------------------------- Õû»úĞÅÏ¢
+//--------------------------- æ•´æœºä¿¡æ¯
 //==========================================================
-extern uint16_t* p_System_Fault_Static;					// ¹ÊÕÏ×´Ì¬		Õû»ú
-extern int16_t* p_Box_Temperature;							// µçÏä ÎÂ¶È
-extern uint32_t* p_Send_Reality_Speed;					// ÏÂ·¢ Êµ¼Ê ×ªËÙ
+extern uint16_t* p_System_Fault_Static;					// æ•…éšœçŠ¶æ€		æ•´æœº
+extern int16_t* p_Box_Temperature;							// ç”µç®± æ¸©åº¦
+extern uint32_t* p_Send_Reality_Speed;					// ä¸‹å‘ å®é™… è½¬é€Ÿ
 
 
-extern uint16_t* p_Support_Control_Methods;			//ÆÁ±Î¿ØÖÆ·½Ê½
-extern uint16_t* p_Motor_Pole_Number;						//µç»ú¼«Êı
-extern uint16_t* p_Breath_Light_Max;						//¹âÈ¦ÁÁ¶È  
+extern uint16_t* p_Support_Control_Methods;			//å±è”½æ§åˆ¶æ–¹å¼
+extern uint16_t* p_Motor_Pole_Number;						//ç”µæœºææ•°
+extern uint16_t* p_Breath_Light_Max;						//å…‰åœˆäº®åº¦  
 	
-extern uint8_t Motor_State_Storage[MOTOR_PROTOCOL_ADDR_MAX];	//µç»ú×´Ì¬
+extern uint8_t Motor_State_Storage[MOTOR_PROTOCOL_ADDR_MAX];	//ç”µæœºçŠ¶æ€
 
-//================= ÁÙÊ±±äÁ¿  È«¾Ö ================================
+//================= ä¸´æ—¶å˜é‡  å…¨å±€ ================================
 // ----------------------------------------------------------------------------------------------
-extern uint16_t* p_Surf_Mode_Info_Acceleration;  			//	³åÀËÄ£Ê½ -- ¼ÓËÙ¶È
-extern uint16_t* p_Surf_Mode_Info_Prepare_Time;  			//	³åÀËÄ£Ê½ -- ×¼±¸Ê±¼ä
-extern uint16_t* p_Surf_Mode_Info_Low_Speed;  				//	³åÀËÄ£Ê½ -- µÍËÙµµ -- ËÙ¶È
-extern uint16_t* p_Surf_Mode_Info_Low_Time;						//	³åÀËÄ£Ê½ -- µÍËÙµµ -- Ê±¼ä
-extern uint16_t* p_Surf_Mode_Info_High_Speed;  				//	³åÀËÄ£Ê½ -- ¸ßËÙµµ -- ËÙ¶È
-extern uint16_t* p_Surf_Mode_Info_High_Time;  				//	³åÀËÄ£Ê½ -- ¸ßËÙµµ -- Ê±¼ä
+extern uint16_t* p_Surf_Mode_Info_Acceleration;  			//	å†²æµªæ¨¡å¼ -- åŠ é€Ÿåº¦
+extern uint16_t* p_Surf_Mode_Info_Prepare_Time;  			//	å†²æµªæ¨¡å¼ -- å‡†å¤‡æ—¶é—´
+extern uint16_t* p_Surf_Mode_Info_Low_Speed;  				//	å†²æµªæ¨¡å¼ -- ä½é€Ÿæ¡£ -- é€Ÿåº¦
+extern uint16_t* p_Surf_Mode_Info_Low_Time;						//	å†²æµªæ¨¡å¼ -- ä½é€Ÿæ¡£ -- æ—¶é—´
+extern uint16_t* p_Surf_Mode_Info_High_Speed;  				//	å†²æµªæ¨¡å¼ -- é«˜é€Ÿæ¡£ -- é€Ÿåº¦
+extern uint16_t* p_Surf_Mode_Info_High_Time;  				//	å†²æµªæ¨¡å¼ -- é«˜é€Ÿæ¡£ -- æ—¶é—´
 // ----------------------------------------------------------------------------------------------
+
+extern uint16_t *p_BLE_Pair_Finish;
+extern uint16_t BLE_Pair_Finish_Now;
 
 extern uint16_t *p_WIFI_Rssi;
 extern uint16_t *p_BLE_Rssi;
 
-extern uint16_t* p_Analog_key_Value;							// ĞéÄâ°´¼ü
+extern uint16_t* p_Analog_key_Value;							// è™šæ‹ŸæŒ‰é”®
 
 extern uint8_t System_PowerUp_Finish;
 
 extern uint8_t System_Self_Testing_State;
 
-//================= µ÷ÊÔÊ¹ÓÃ  Ê±¼ä ================================
+extern uint8_t System_Auto_Running_State;
+//================= è°ƒè¯•ä½¿ç”¨  æ—¶é—´ ================================
 
-extern uint32_t* p_System_Runing_Second_Cnt;			// ÏµÍ³Ê±¼ä
-extern uint32_t* p_No_Operation_Second_Cnt;				// ÎŞÈË²Ù×÷Ê±¼ä
-extern uint32_t* p_System_Startup_Second_Cnt;			// Æô¶¯Ê±¼ä
+extern uint32_t* p_System_Runing_Second_Cnt;			// ç³»ç»Ÿæ—¶é—´
+extern uint32_t* p_No_Operation_Second_Cnt;				// æ— äººæ“ä½œæ—¶é—´
+extern uint32_t* p_System_Startup_Second_Cnt;			// å¯åŠ¨æ—¶é—´
 
 //==========================================================
-//--------------------------- Íê³ÉÍ³¼Æ (APPÒª)
+//--------------------------- å®Œæˆç»Ÿè®¡ (APPè¦)
 //==========================================================
-extern uint16_t* p_Finish_Statistics_Time;					//	Íê³ÉÍ³¼Æ --> Ê±³¤
-extern uint16_t* p_Finish_Statistics_Speed;					//	Íê³ÉÍ³¼Æ --> Ç¿¶È
-extern uint32_t* p_Finish_Statistics_Distance;			//	Íê³ÉÍ³¼Æ --> ÓÎÓ¾¾àÀë
-extern uint16_t* p_Preparation_Time_BIT;						//	×¼±¸Ê±¼ä Bit: ¶¨Ê±Ä£Ê½ P1-P6
+extern uint16_t* p_Finish_Statistics_Time;					//	å®Œæˆç»Ÿè®¡ --> æ—¶é•¿
+extern uint16_t* p_Finish_Statistics_Speed;					//	å®Œæˆç»Ÿè®¡ --> å¼ºåº¦
+extern uint32_t* p_Finish_Statistics_Distance;			//	å®Œæˆç»Ÿè®¡ --> æ¸¸æ³³è·ç¦»
+extern uint16_t* p_Preparation_Time_BIT;						//	å‡†å¤‡æ—¶é—´ Bit: å®šæ—¶æ¨¡å¼ P1-P6
 
-extern uint16_t* p_Thread_Activity_Sign;					//	Ïß³Ì »î¶¯ ±êÖ¾Î»
+extern uint16_t* p_Thread_Activity_Sign;					//	çº¿ç¨‹ æ´»åŠ¨ æ ‡å¿—ä½
 
-extern uint32_t* p_Wifi_Timing_Value;							// Ğ£Ê±	
+extern uint32_t* p_Wifi_Timing_Value;							// æ ¡æ—¶	
 extern uint32_t* p_Wifi_Timing_Value_Old;				//
 
 extern uint16_t* p_Check_Timing_Add_More;				//
 
 extern uint16_t* p_Check_Timing_Minus_More;				//
 
-extern uint16_t* p_Check_Timing_Error_Cnt;				// wifiÄ£¿é Ğ£Ê±´íÎó¼ÆÊıÆ÷
+extern uint16_t* p_Check_Timing_Error_Cnt;				// wifiæ¨¡å— æ ¡æ—¶é”™è¯¯è®¡æ•°å™¨
 
-extern uint16_t* p_Wifi_DP_Upload_Level;					// wifiÄ£¿é dpµãÉÏ±¨µÈ¼¶
+extern uint16_t* p_Wifi_DP_Upload_Level;					// wifiæ¨¡å— dpç‚¹ä¸ŠæŠ¥ç­‰çº§
 
 #ifdef __cplusplus
 }

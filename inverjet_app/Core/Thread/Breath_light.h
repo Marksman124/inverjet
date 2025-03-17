@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		Breath_light.h
-* @brief   		ºôÎüµÆÄ£¿é   ¶ÀÁ¢Ïß³Ì
+* @brief   		å‘¼å¸ç¯æ¨¡å—   ç‹¬ç«‹çº¿ç¨‹
 *
 *
 * @author			WQG
@@ -23,20 +23,20 @@ extern "C" {
 #include "tim.h"
 #include "display.h"
 
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 
 /* Private includes ----------------------------------------------------------*/
 
 
 /* Exported types ------------------------------------------------------------*/
 
-// ·äÃùÆ÷³¤¶È
+// èœ‚é¸£å™¨é•¿åº¦
 typedef enum
 {
-	NO_BUZZER_TIME = 0,				//	ÎŞ
-	CLICK_BUZZER_TIME,				//	µã»÷
-	LONG_BUZZER_TIME,					//	³¤°´
-	DOUBLE_LONG_BUZZER_TIME,	//	³¬³¤°´
+	NO_BUZZER_TIME = 0,				//	æ— 
+	CLICK_BUZZER_TIME,				//	ç‚¹å‡»
+	LONG_BUZZER_TIME,					//	é•¿æŒ‰
+	DOUBLE_LONG_BUZZER_TIME,	//	è¶…é•¿æŒ‰
 } Buzzer_Time_Type_enum;
 
 
@@ -56,12 +56,12 @@ typedef enum
 extern void App_Breath_light_Init(void);
 extern void App_Breath_light_Handler(void);
 
-//------------------- Ä£Äâµ÷½ÚÁÁ¶È ----------------------------
+//------------------- æ¨¡æ‹Ÿè°ƒèŠ‚äº®åº¦ ----------------------------
 
 void Breath_light_Max(void);
 
 void Breath_light_Off(void);
-//------------------- ·äÃùÆ÷ ----------------------------
+//------------------- èœ‚é¸£å™¨ ----------------------------
 
 void Buzzer_Click_On(void);
 

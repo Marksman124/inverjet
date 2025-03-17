@@ -20,17 +20,17 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
-#include "display.h"			// ÏÔÊ¾Ä£¿é
+#include "display.h"			// æ˜¾ç¤ºæ¨¡å—
 #include "gpio.h"
-#include "usart.h"				// ´®¿Ú
-#include "timing.h"				// ºóÌ¨¶¨Ê±Æ÷
+#include "usart.h"				// ä¸²å£
+#include "timing.h"				// åå°å®šæ—¶å™¨
 #include "Breath_light.h"
-#include "operation.h"		// ²Ù×÷ ²Ëµ¥
-#include "fault.h"				// ¹ÊÕÏ ²Ëµ¥
+#include "operation.h"		// æ“ä½œ èœå•
+#include "fault.h"				// æ•…éšœ èœå•
 
-#include "wifi_thread.h"				// wifi Ä£×é
-#include "bluetooth.h"				// bluetooth Ä£×é
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "wifi_thread.h"				// wifi æ¨¡ç»„
+#include "bluetooth.h"				// bluetooth æ¨¡ç»„
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -51,25 +51,25 @@ typedef struct IO_Hardware_Pin
 /* Exported macro ------------------------------------------------------------*/
 #ifndef __MACRO_DEFINITION_H__
 
-#define KEY_THREAD_LIFECYCLE								20				// ÈÎÎñÉúÃüÖÜÆÚ 200ms
+#define KEY_THREAD_LIFECYCLE								20				// ä»»åŠ¡ç”Ÿå‘½å‘¨æœŸ 200ms
 
-#define KEY_LONG_PRESS_TIME_3S									(2000/KEY_THREAD_LIFECYCLE)			//³¤°´Ê±¼ä 3s
-#define KEY_LONG_PRESS_TIME_2S									(2000/KEY_THREAD_LIFECYCLE)			//³¤°´Ê±¼ä 2s
-#define KEY_LONG_PRESS_TIME_1S									(1000/KEY_THREAD_LIFECYCLE)			//¶ÌÒ»µãµÄ ³¤°´Ê±¼ä  1s
+#define KEY_LONG_PRESS_TIME_3S									(2000/KEY_THREAD_LIFECYCLE)			//é•¿æŒ‰æ—¶é—´ 3s
+#define KEY_LONG_PRESS_TIME_2S									(2000/KEY_THREAD_LIFECYCLE)			//é•¿æŒ‰æ—¶é—´ 2s
+#define KEY_LONG_PRESS_TIME_1S									(1000/KEY_THREAD_LIFECYCLE)			//çŸ­ä¸€ç‚¹çš„ é•¿æŒ‰æ—¶é—´  1s
 
 #define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//????  5 min  300000
 
-//-------------- ·äÃùÆ÷ ³¤¶È -------------------
-//******************  µ÷ÊÔÄ£Ê½ **************************
-//-------------- ·äÃùÆ÷ ³¤¶È -------------------
-#define KEY_BUZZER_TIME								(200/KEY_THREAD_LIFECYCLE)					//ÖÜÆÚ  KEY_THREAD_LIFECYCLE ±¶Êı
-#define KEY_BUZZER_TIME_LONG					(400/KEY_THREAD_LIFECYCLE)					//ÖÜÆÚ  KEY_THREAD_LIFECYCLE ±¶Êı
-#define KEY_BUZZER_TIME_LONG_32				(800/KEY_THREAD_LIFECYCLE)					//ÖÜÆÚ  KEY_THREAD_LIFECYCLE ±¶Êı
+//-------------- èœ‚é¸£å™¨ é•¿åº¦ -------------------
+//******************  è°ƒè¯•æ¨¡å¼ **************************
+//-------------- èœ‚é¸£å™¨ é•¿åº¦ -------------------
+#define KEY_BUZZER_TIME								(200/KEY_THREAD_LIFECYCLE)					//å‘¨æœŸ  KEY_THREAD_LIFECYCLE å€æ•°
+#define KEY_BUZZER_TIME_LONG					(400/KEY_THREAD_LIFECYCLE)					//å‘¨æœŸ  KEY_THREAD_LIFECYCLE å€æ•°
+#define KEY_BUZZER_TIME_LONG_32				(800/KEY_THREAD_LIFECYCLE)					//å‘¨æœŸ  KEY_THREAD_LIFECYCLE å€æ•°
 
 
 #endif
 
-//-------------- °´¼ü×éºÏÏìÓ¦ ×ÜÊı -------------------
+//-------------- æŒ‰é”®ç»„åˆå“åº” æ€»æ•° -------------------
 #define KEY_CALL_OUT_NUMBER_MAX						11
 
 #define KEY_VALUE_BIT_BUTTON_1						0x01
@@ -82,37 +82,37 @@ typedef struct IO_Hardware_Pin
 #define KEY_VALUE_BIT_BUTTON_7						0x40
 /* Exported functions prototypes ---------------------------------------------*/
 
-//------------------- °´¼ü»Øµ÷ ----------------------------
-//--------------- ¶Ì°´ -----------------------
-// ¢Ù µµÎ»¼ü
+//------------------- æŒ‰é”®å›è°ƒ ----------------------------
+//--------------- çŸ­æŒ‰ -----------------------
+// â‘  æ¡£ä½é”®
 extern void on_pushButton_clicked(void);
-// ¢Ú Ê±¼ä¼ü
+// â‘¡ æ—¶é—´é”®
 extern void on_pushButton_2_clicked(void);
-// ¢Û Ä£Ê½¼ü
+// â‘¢ æ¨¡å¼é”®
 extern void on_pushButton_3_clicked(void);
-// ¢Ü ¿ª»ú¼ü  ¶Ì°´
+// â‘£ å¼€æœºé”®  çŸ­æŒ‰
 extern void on_pushButton_4_Short_Press(void);
-// ¢Ù + ¢Ú  ×éºÏ¼ü  ²âÊÔ ÉèÖÃ¹ÊÕÏ
+// â‘  + â‘¡  ç»„åˆé”®  æµ‹è¯• è®¾ç½®æ•…éšœ
 extern void on_pushButton_1_2_Short_Press(void);
-// ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 80¼¶ or 5¼¶
+// â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 80çº§ or 5çº§
 extern void on_pushButton_1_3_Short_Press(void);
-// ¢Ú + ¢Û  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘¢  ç»„åˆé”®  çŸ­æŒ‰
 extern void on_pushButton_2_3_Short_Press(void);
-// ¢Ú + ¢Ü  ×éºÏ¼ü  ¶Ì°´
+// â‘¡ + â‘£  ç»„åˆé”®  çŸ­æŒ‰
 extern void on_pushButton_2_4_Short_Press(void);
 
 /**********************************************************************************************
 *
-*						°´¼ü»Øµ÷    ¶Ì°´  ÍØÕ¹¼ü
+*						æŒ‰é”®å›è°ƒ    çŸ­æŒ‰  æ‹“å±•é”®
 *
 **********************************************************************************************/
-//==================================  +  ¼ü
+//==================================  +  é”®
 void on_DiButton_Add_clicked(void);
-//==================================   - ¼ü
+//==================================   - é”®
 void on_DiButton_Minus_clicked(void);
 
-//--------------- ³¤°´ -----------------------
-// ³¤°´
+//--------------- é•¿æŒ‰ -----------------------
+// é•¿æŒ‰
 extern void on_pushButton_1_Long_Press(void);
 extern void on_pushButton_2_Long_Press(void);
 extern void on_pushButton_3_Long_Press(void);
@@ -124,23 +124,23 @@ extern void on_pushButton_2_4_Long_Press(void);
 
 
 extern void on_pushButton_NULL_Press(void);
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
-// ³õÊ¼»¯
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
+// åˆå§‹åŒ–
 extern void App_Key_Init(void);
-// °´¼üµÆ
+// æŒ‰é”®ç¯
 extern void Led_Button_On(uint8_t para);
-// °´¼üÖ÷Ñ­»·ÈÎÎñ
+// æŒ‰é”®ä¸»å¾ªç¯ä»»åŠ¡
 extern void App_Key_Handler(void);
-// »ñÈ¡°´¼ü
+// è·å–æŒ‰é”®
 extern uint8_t Key_Get_IO_Input(void);
-//------------------- ¹¦ÄÜ½Ó¿Ú ----------------------------
-//	¿ª»ú ½øÈë×ÔÓÉÄ£Ê½
+//------------------- åŠŸèƒ½æ¥å£ ----------------------------
+//	å¼€æœº è¿›å…¥è‡ªç”±æ¨¡å¼
 extern void System_Power_On(void);
-//	¹Ø»ú
+//	å…³æœº
 extern void System_Power_Off(void);
-//	¿ª»ú»­Ãæ
+//	å¼€æœºç”»é¢
 extern void System_Boot_Screens(void);
-//	»Ö¸´³ö³§ÉèÖÃ
+//	æ¢å¤å‡ºå‚è®¾ç½®
 extern void Restore_Factory_Settings(void);
 //	OTA
 extern uint8_t System_To_OTA(void);

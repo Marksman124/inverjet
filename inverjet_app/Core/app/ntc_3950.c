@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				ntc_3950.c
-* @brief			ntc_3950 ÎÂ¶È¼ì²â (ÈÈÃôµç×è)
+* @brief			ntc_3950 æ¸©åº¦æ£€æµ‹ (çƒ­æ•ç”µé˜»)
 *
 * @author			WQG
 * @versions		v1.0
@@ -35,7 +35,7 @@ static uint16_t Temperature_Fault_Cnt = 0;
 
 /* Private user code ---------------------------------------------------------*/
 
-//²é±í·¨ Î´¼ÆËã
+//æŸ¥è¡¨æ³• æœªè®¡ç®—
 #define NTC_ADC_MAX 181
 const uint16_t NTC_ADC_Tab[NTC_ADC_MAX] = {
 54,	58,	62,	66,	70,	75,	80,	86,	91,	97,//-55~-46
@@ -59,17 +59,17 @@ const uint16_t NTC_ADC_Tab[NTC_ADC_MAX] = {
 3966,
 };
 /*************************************************           
-[º¯ÊıÃû³Æ]u16Check_NTC_TabTemp                                                  
-[º¯Êı¹¦ÄÜ]²é±í¼ÆËãÎÂ¶È    ¶ş·Ö·¨²é±í                                               
-[²Î    Êı]NTC_ADvalue ²É¼¯µÃµ½µÄADÖµ                                                   
-[È«¾Ö±äÁ¿]                                                  
-[·µ »Ø Öµ]µ±Ç°µÄÎÂ¶ÈÖµ+55                                                  
-[±¸    ×¢]                                                  
+[å‡½æ•°åç§°]u16Check_NTC_TabTemp                                                  
+[å‡½æ•°åŠŸèƒ½]æŸ¥è¡¨è®¡ç®—æ¸©åº¦    äºŒåˆ†æ³•æŸ¥è¡¨                                               
+[å‚    æ•°]NTC_ADvalue é‡‡é›†å¾—åˆ°çš„ADå€¼                                                   
+[å…¨å±€å˜é‡]                                                  
+[è¿” å› å€¼]å½“å‰çš„æ¸©åº¦å€¼+55                                                  
+[å¤‡    æ³¨]                                                  
 *************************************************/             
 uint16_t u16Check_NTC_TabTemp(uint16_t NTC_ADvalue)
 {
- uint16_t end = NTC_ADC_MAX-1;//Êı×é×îºóÒ»¸öÊı
- uint16_t Front = 0;//Êı×éµÚÒ»¸öÊı
+ uint16_t end = NTC_ADC_MAX-1;//æ•°ç»„æœ€åä¸€ä¸ªæ•°
+ uint16_t Front = 0;//æ•°ç»„ç¬¬ä¸€ä¸ªæ•°
  uint8_t half = 0;
  uint16_t TempValue = 0;
  uint16_t TempAdcValue = 0;
@@ -78,17 +78,17 @@ uint16_t u16Check_NTC_TabTemp(uint16_t NTC_ADvalue)
  {
      for(half=90;end-Front!=1;)
 	 {
-	  if(TempAdcValue>NTC_ADC_Tab[half])//Èç¹û´óÓÚÖĞ¼äÖµ£¬Íùºó²é
+	  if(TempAdcValue>NTC_ADC_Tab[half])//å¦‚æœå¤§äºä¸­é—´å€¼ï¼Œå¾€åæŸ¥
 	  {
 		Front = half;
 		half = (Front+end)/2;
 	  }
-	  else if(TempAdcValue<NTC_ADC_Tab[half])//Èç¹ûĞ¡ÓÚÖĞ¼äÖµ£¬ÍùÇ°²é
+	  else if(TempAdcValue<NTC_ADC_Tab[half])//å¦‚æœå°äºä¸­é—´å€¼ï¼Œå¾€å‰æŸ¥
 	  {
 	   end = half;
 	   half = (Front+end)/2;
 	  }
-	  else//ÕıºÃµÈÓÚ±í¸ñÖĞµÄÖµ
+	  else//æ­£å¥½ç­‰äºè¡¨æ ¼ä¸­çš„å€¼
 	  {
 	   TempValue = half;
 	   break;
@@ -106,7 +106,7 @@ uint16_t u16Check_NTC_TabTemp(uint16_t NTC_ADvalue)
 	  }
 	 }
  }
- else//³¬³ö·¶Î§
+ else//è¶…å‡ºèŒƒå›´
  {
   if(TempAdcValue<=NTC_ADC_Tab[0]) 
       TempValue = 0;
@@ -118,28 +118,28 @@ uint16_t u16Check_NTC_TabTemp(uint16_t NTC_ADvalue)
  return TempValue;
 }
 
-//¹«Ê½·¨
-#define B 3950.0//ÎÂ¶ÈÏµÊı
-#define TN 298.15//¶î¶¨ÎÂ¶È(¾ø¶ÔÎÂ¶È¼Ó³£ÎÂ:273.15+25)
-#define RN 10// ¶î¶¨×èÖµ(¾ø¶ÔÎÂ¶ÈÊ±µÄµç×èÖµ10k)
-#define BaseVol 3.30 //ADC»ù×¼µçÑ¹
-#define Correction 0 //Îó²î½ÃÕı
+//å…¬å¼æ³•
+#define B 3950.0//æ¸©åº¦ç³»æ•°
+#define TN 298.15//é¢å®šæ¸©åº¦(ç»å¯¹æ¸©åº¦åŠ å¸¸æ¸©:273.15+25)
+#define RN 10// é¢å®šé˜»å€¼(ç»å¯¹æ¸©åº¦æ—¶çš„ç”µé˜»å€¼10k)
+#define BaseVol 3.30 //ADCåŸºå‡†ç”µå‹
+#define Correction 0 //è¯¯å·®çŸ«æ­£
 /*************************************************           
-[º¯ÊıÃû³Æ]fGet_NTC_Temp                                                  
-[º¯Êı¹¦ÄÜ]¼ÆËãntcÎÂ¶È                                                  
-[²Î    Êı]Rntc µ±Ç°µÄNTCµç×èÖµ                                                  
-[È«¾Ö±äÁ¿]                                                  
-[·µ »Ø Öµ]µ±Ç°µÄÎÂ¶ÈÖµ                                                  
-[±¸    ×¢]                                                  
+[å‡½æ•°åç§°]fGet_NTC_Temp                                                  
+[å‡½æ•°åŠŸèƒ½]è®¡ç®—ntcæ¸©åº¦                                                  
+[å‚    æ•°]Rntc å½“å‰çš„NTCç”µé˜»å€¼                                                  
+[å…¨å±€å˜é‡]                                                  
+[è¿” å› å€¼]å½“å‰çš„æ¸©åº¦å€¼                                                  
+[å¤‡    æ³¨]                                                  
 *************************************************/             
 float Get_Tempture(uint32_t adc)
 {
 	float RV,RT,Tmp;
-	RV=BaseVol/4096.0*(float)adc;//ADCÎª12Î»ADC,Çó³öNTCµçÑ¹:RV=ADCValu/4096*BaseVoltag
-	RT=RV*10/(BaseVol-RV);//Çó³öµ±Ç°ÎÂ¶È×èÖµ (BaseVoltage-RV)/R16=RV/RT;
+	RV=BaseVol/4096.0*(float)adc;//ADCä¸º12ä½ADC,æ±‚å‡ºNTCç”µå‹:RV=ADCValu/4096*BaseVoltag
+	RT=RV*10/(BaseVol-RV);//æ±‚å‡ºå½“å‰æ¸©åº¦é˜»å€¼ (BaseVoltage-RV)/R16=RV/RT;
 	Tmp=1/(1/TN+(log(RT/RN)/B))-273.15+Correction;//%RT = RN exp*B(1/T-1/TN)%
 
-	//DEBUG_PRINT("ad:%d\tµçÑ¹:%0.3f\tµç×è:%0.3f\tÎÂ¶È£º%0.3f¡ãC\n",adc, RV, RT, Tmp);
+	//DEBUG_PRINT("ad:%d\tç”µå‹:%0.3f\tç”µé˜»:%0.3f\tæ¸©åº¦ï¼š%0.3fÂ°C\n",adc, RV, RT, Tmp);
 	
 	return Tmp;
 	
@@ -147,62 +147,62 @@ float Get_Tempture(uint32_t adc)
 
 
 /**
-  * @brief ¶ÁÈ¡ÄÚ²¿ÎÂ¶È´«¸ĞÆ÷
+  * @brief è¯»å–å†…éƒ¨æ¸©åº¦ä¼ æ„Ÿå™¨
   */
 //float Get_Internal_Temp(void)
 //{
-//    uint32_t Temp;//ÎÂ¶È²ÉÑù·Ö²ãÖµ
-//    float Vsense = 0.0;//ÎÂ¶È²ÉÑùµçÑ¹Öµ
-//    float Temperature = 0.0;//ÎÂ¶ÈÖµ
-    //Êı¾İÊÖ²áÎÂ¶È×ª»»¹«Ê½£ºT = ((V25-Vsense)/Avg_Slope) + 25
-//    float V25 = 1.43;//²éÔÄÊÖ²á»ñµÃ
-//    float Avg_Slope = 0.0043;//4.3mV/ÉãÊÏ¶È
-//    //printf("rnrn------------------MCUÄÚ²¿ÎÂ¶È´«¸ĞÆ÷²âÊÔ------------------rnrn");
-//    //step1 Æô¶¯ADC
+//    uint32_t Temp;//æ¸©åº¦é‡‡æ ·åˆ†å±‚å€¼
+//    float Vsense = 0.0;//æ¸©åº¦é‡‡æ ·ç”µå‹å€¼
+//    float Temperature = 0.0;//æ¸©åº¦å€¼
+    //æ•°æ®æ‰‹å†Œæ¸©åº¦è½¬æ¢å…¬å¼ï¼šT = ((V25-Vsense)/Avg_Slope) + 25
+//    float V25 = 1.43;//æŸ¥é˜…æ‰‹å†Œè·å¾—
+//    float Avg_Slope = 0.0043;//4.3mV/æ‘„æ°åº¦
+//    //printf("rnrn------------------MCUå†…éƒ¨æ¸©åº¦ä¼ æ„Ÿå™¨æµ‹è¯•------------------rnrn");
+//    //step1 å¯åŠ¨ADC
 //    HAL_ADC_Start(&hadc1);
-//    //step2 ÎÂ¶È²É¼¯×ª»»
+//    //step2 æ¸©åº¦é‡‡é›†è½¬æ¢
 //    HAL_ADC_PollForConversion(&hadc1,5);
-//    //step3 ×ª»»¼ÆËã
-//    Temp = HAL_ADC_GetValue(&hadc1);//»ñÈ¡²ÉÑùÖµ·Ö²ãÖµ
-//    Vsense = Temp *(3.3/4096);//²ÉÑù¾«¶È12bit,×î´ó·Ö²ãÖµ4096
-//    Temperature = ((V25-Vsense)/Avg_Slope) + 25;//°´¹«Ê½¼ÆËãÎÂ¶ÈÖµ
-//    //step4 ´®¿Ú´òÓ¡
+//    //step3 è½¬æ¢è®¡ç®—
+//    Temp = HAL_ADC_GetValue(&hadc1);//è·å–é‡‡æ ·å€¼åˆ†å±‚å€¼
+//    Vsense = Temp *(3.3/4096);//é‡‡æ ·ç²¾åº¦12bit,æœ€å¤§åˆ†å±‚å€¼4096
+//    Temperature = ((V25-Vsense)/Avg_Slope) + 25;//æŒ‰å…¬å¼è®¡ç®—æ¸©åº¦å€¼
+//    //step4 ä¸²å£æ‰“å°
 
-	//printf("ÎÂ¶È·Ö²ãÖµ£º%drnÎÂ¶ÈµçÑ¹Öµ£º%0.3frnÎÂ¶È²ÉÑùÖµ£º%0.3frn",Temp,Vsense,Temperature);
+	//printf("æ¸©åº¦åˆ†å±‚å€¼ï¼š%drnæ¸©åº¦ç”µå‹å€¼ï¼š%0.3frnæ¸©åº¦é‡‡æ ·å€¼ï¼š%0.3frn",Temp,Vsense,Temperature);
 
 //	return Temperature;
 //}
 
 void MX_ADC_CHANNEL_Config(uint32_t Channel) {
   ADC_ChannelConfTypeDef sConfig = {0};
-  sConfig.Channel = Channel; // ÉèÖÃÍ¨µÀ
-  sConfig.Rank = 1; // ×ª»»Ë³Ğò
-  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5; // ²ÉÑùÊ±¼ä
-  //sConfig.Offset = 0; // Æ«ÒÆÁ¿
+  sConfig.Channel = Channel; // è®¾ç½®é€šé“
+  sConfig.Rank = 1; // è½¬æ¢é¡ºåº
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5; // é‡‡æ ·æ—¶é—´
+  //sConfig.Offset = 0; // åç§»é‡
   HAL_ADC_ConfigChannel(p_hadc_ntc, &sConfig);
 }
 
 /**
-  * @brief ¶ÁÈ¡Íâ²¿ÎÂ¶È´«¸ĞÆ÷
+  * @brief è¯»å–å¤–éƒ¨æ¸©åº¦ä¼ æ„Ÿå™¨
   */
 float Get_External_Temp(void)
 {
-    uint32_t adc;//ÎÂ¶È²ÉÑù·Ö²ãÖµ
-    float Temperature = 0.0;//ÎÂ¶ÈÖµ
+    uint32_t adc;//æ¸©åº¦é‡‡æ ·åˆ†å±‚å€¼
+    float Temperature = 0.0;//æ¸©åº¦å€¼
 	
-	  // ÅäÖÃÍ¨µÀ
+	  // é…ç½®é€šé“
 		MX_ADC_CHANNEL_Config(ADC_CHANNEL_9);
-		//Ğ£×¼
+		//æ ¡å‡†
 		HAL_ADCEx_Calibration_Start(p_hadc_ntc);
-    //step1 Æô¶¯ADC
+    //step1 å¯åŠ¨ADC
     HAL_ADC_Start(p_hadc_ntc);
-    //step2 ÎÂ¶È²É¼¯×ª»»
+    //step2 æ¸©åº¦é‡‡é›†è½¬æ¢
     HAL_ADC_PollForConversion(p_hadc_ntc,ADC_SAMPLETIME_239CYCLES_5);
 	
-		if(HAL_IS_BIT_SET(HAL_ADC_GetState(p_hadc_ntc), HAL_ADC_STATE_REG_EOC))//¶ÁÈ¡ADCÍê³É±êÖ¾Î»
+		if(HAL_IS_BIT_SET(HAL_ADC_GetState(p_hadc_ntc), HAL_ADC_STATE_REG_EOC))//è¯»å–ADCå®Œæˆæ ‡å¿—ä½
 		{
-			//step3 ×ª»»¼ÆËã
-			adc = HAL_ADC_GetValue(p_hadc_ntc);//»ñÈ¡²ÉÑùÖµ·Ö²ãÖµ
+			//step3 è½¬æ¢è®¡ç®—
+			adc = HAL_ADC_GetValue(p_hadc_ntc);//è·å–é‡‡æ ·å€¼åˆ†å±‚å€¼
 		}
     //Temperature = u16Check_NTC_TabTemp(Temp);
 
@@ -222,7 +222,7 @@ float Get_External_Temp(void)
 		return Temperature;
 }
 	
-//------------------- »ñÈ¡wifi×´Ì¬»ú ----------------------------
+//------------------- è·å–wifiçŠ¶æ€æœº ----------------------------
 
 
 

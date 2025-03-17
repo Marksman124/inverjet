@@ -12,7 +12,7 @@
 
 unsigned char BT_OTA_Mode=0;
 
-unsigned long BT_OTA_Pack_Len=0;					// ◊‹≥§∂»
+unsigned long BT_OTA_Pack_Len=0;					// ÊÄªÈïøÂ∫¶
 
 unsigned long BT_Pack_Len=0;
 
@@ -20,19 +20,19 @@ unsigned char BT_OTA_Buffer[MODBUS_SLAVE_TX_RX_MAX_LEN]={0};
 
 #define BT_MODLE_AT_MSG_LENGTH									23	
 
-/* ¡¨Ω”≥…π¶  +EVENT:BLE_CONNECTED > */ 
+/* ËøûÊé•ÊàêÂäü  +EVENT:BLE_CONNECTED > */ 
 const unsigned char connected_table[BT_MODLE_AT_MSG_LENGTH] = {
 	0x2B, 0x45, 0x56, 0x45, 0x4E, 0x54, 0x3A, 0x42, 0x4C, 0x45, 
 	0x5F, 0x43, 0x4F, 0x4E, 0x4E, 0x45, 0x43, 0x54, 0x45, 0x44, 
 	0x0D, 0x0A, 0x3E};
 
-/* ∂œø™¡¨Ω”  +EVENT:BLE_DISCONNECT */ 
+/* Êñ≠ÂºÄËøûÊé•  +EVENT:BLE_DISCONNECT */ 
 const unsigned char disconnected_table[BT_MODLE_AT_MSG_LENGTH] = {
 	0x2B, 0x45, 0x56, 0x45, 0x4E, 0x54, 0x3A, 0x42, 0x4C, 0x45,
 	0x5F, 0x44, 0x49, 0x53, 0x43, 0x4F, 0x4E, 0x4E, 0x45, 0x43, 
 	0x54, 0x0D, 0x0A};
 
-/* Ω¯»ÎÕ∏¥´  AT+TRANSENTER> */ 
+/* ËøõÂÖ•ÈÄè‰º†  AT+TRANSENTER> */ 
 const unsigned char transenter_table[16] = {
 	0x41, 0x54, 0x2B, 0x54, 0x52, 0x41, 0x4E, 0x53, 0x45, 0x4E, 
 	0x54, 0x45, 0x52, 0x0D, 0x0A, 0x3E};
@@ -61,7 +61,7 @@ void Chenk_BT_State(unsigned char* p_buffer, unsigned char len)
 }
 
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚À¯Ω” ’∂”¡–
+*ÂäüËÉΩÔºöËß£ÈîÅÊé•Êî∂ÈòüÂàó
 *******************************************************************************/
 void _MsRxQueueUnLock(ModbusSlaveObj_t * pObj)
 {
@@ -71,7 +71,7 @@ void _MsRxQueueUnLock(ModbusSlaveObj_t * pObj)
 		memset(pObj->rxBuff,0,MODBUS_SLAVE_TX_RX_MAX_LEN);
 }
 /*******************************************************************************
-*π¶ƒ‹£∫≥¨ ±º∆ ˝£¨∑≈µΩ∂® ±∆˜÷–‘À––£¨“ª∞„∑≈µΩ1ms÷–∂œ◊„πª¬˙◊„“™«Û
+*ÂäüËÉΩÔºöË∂ÖÊó∂ËÆ°Êï∞ÔºåÊîæÂà∞ÂÆöÊó∂Âô®‰∏≠ËøêË°åÔºå‰∏ÄËà¨ÊîæÂà∞1ms‰∏≠Êñ≠Ë∂≥Â§üÊª°Ë∂≥Ë¶ÅÊ±Ç
 *******************************************************************************/
 void MsTimeout(ModbusSlaveObj_t * pObj)
 {
@@ -90,7 +90,7 @@ void MsTimeout(ModbusSlaveObj_t * pObj)
     }
 }
 /*******************************************************************************
-*π¶ƒ‹£∫¥Æø⁄∂¡»°£¨∑≈µΩ÷–∂¡»°£¨“ª∏ˆ◊÷Ω⁄∂¡»°“≤ «ø…“‘µƒ
+*ÂäüËÉΩÔºö‰∏≤Âè£ËØªÂèñÔºåÊîæÂà∞‰∏≠ËØªÂèñÔºå‰∏Ä‰∏™Â≠óËäÇËØªÂèñ‰πüÊòØÂèØ‰ª•ÁöÑ
 *******************************************************************************/
 void MsSerialRead(ModbusSlaveObj_t * pObj,unsigned char *buff,int length)
 {
@@ -112,7 +112,7 @@ void MsSerialRead(ModbusSlaveObj_t * pObj,unsigned char *buff,int length)
         }
     }
 }
-/* CRC”‡ Ω±Ì */
+/* CRC‰ΩôÂºèË°® */
 const unsigned short crc_table[256] = {
     0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
     0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
@@ -149,7 +149,7 @@ const unsigned short crc_table[256] = {
 };
 
 /*******************************************************************************
-*π¶ƒ‹£∫CRC–£—È
+*ÂäüËÉΩÔºöCRCÊ†°È™å
 *******************************************************************************/
 unsigned short _MsCRC16(unsigned char *ptr, int len)
 {
@@ -163,9 +163,9 @@ unsigned short _MsCRC16(unsigned char *ptr, int len)
     return (crc);
 }
 /*******************************************************************************
-*π¶ƒ‹£∫∂‘œÛ≥ı ºªØ
-*≤Œ ˝£∫pObj ∂‘œÛ slaveId ¥”ª˙∫≈ timeout“ª÷°≥¨ ± ±º‰ SerialWrite –¥Ω”ø⁄
-*◊¢“‚£∫timeout∏˘æ›MsTimeout(ModbusSlaveObj_t * pObj)÷–∂œ ±º‰Ω¯––º∆À„,»Á÷–∂œ ±º‰50us,“™«Û“ª÷°≥¨ ± ±º‰Œ™3.7ms timeout = 3700 / 50
+*ÂäüËÉΩÔºöÂØπË±°ÂàùÂßãÂåñ
+*ÂèÇÊï∞ÔºöpObj ÂØπË±° slaveId ‰ªéÊú∫Âè∑ timeout‰∏ÄÂ∏ßË∂ÖÊó∂Êó∂Èó¥ SerialWrite ÂÜôÊé•Âè£
+*Ê≥®ÊÑèÔºötimeoutÊ†πÊçÆMsTimeout(ModbusSlaveObj_t * pObj)‰∏≠Êñ≠Êó∂Èó¥ËøõË°åËÆ°ÁÆó,Â¶Ç‰∏≠Êñ≠Êó∂Èó¥50us,Ë¶ÅÊ±Ç‰∏ÄÂ∏ßË∂ÖÊó∂Êó∂Èó¥‰∏∫3.7ms timeout = 3700 / 50
 *******************************************************************************/
 void MsInit(ModbusSlaveObj_t *pObj,unsigned char slaveId,unsigned short timeout,void (*SerialWrite)(unsigned char *buff,int length))
 {
@@ -180,9 +180,9 @@ void MsInit(ModbusSlaveObj_t *pObj,unsigned char slaveId,unsigned short timeout,
 	pObj->SerialWrite = SerialWrite;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫…Ë÷√ºƒ¥Ê∆˜
-*≤Œ ˝£∫pObj ∂‘œÛ cmd √¸¡Ó regºƒ¥Ê∆˜¿‡–Õ  count ºƒ¥Ê∆˜∏ˆ ˝
-*◊¢“‚£∫œﬂ»¶¿‡–Õæ˘Œ™unsigned char¿‡–Õ “ª∏ˆ◊÷Ω⁄¥˙±Ì“ªŒª ºƒ¥Ê∆˜Œ™16Œª”–∑˚∫≈
+*ÂäüËÉΩÔºöËÆæÁΩÆÂØÑÂ≠òÂô®
+*ÂèÇÊï∞ÔºöpObj ÂØπË±° cmd ÂëΩ‰ª§ regÂØÑÂ≠òÂô®Á±ªÂûã  count ÂØÑÂ≠òÂô®‰∏™Êï∞
+*Ê≥®ÊÑèÔºöÁ∫øÂúàÁ±ªÂûãÂùá‰∏∫unsigned charÁ±ªÂûã ‰∏Ä‰∏™Â≠óËäÇ‰ª£Ë°®‰∏Ä‰Ωç ÂØÑÂ≠òÂô®‰∏∫16‰ΩçÊúâÁ¨¶Âè∑
 *******************************************************************************/
 void MsConfigureRegister(ModbusSlaveObj_t *pObj,unsigned char cmd,void *reg,unsigned short count)
 {
@@ -224,7 +224,7 @@ void MsConfigureRegister(ModbusSlaveObj_t *pObj,unsigned char cmd,void *reg,unsi
 	
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x01√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x01ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd01(ModbusSlaveObj_t *pObj)
 {
@@ -271,7 +271,7 @@ MsState _MsAnalyzeCmd01(ModbusSlaveObj_t *pObj)
 	return MS_OK;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x02√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x02ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd02(ModbusSlaveObj_t *pObj)
 {
@@ -318,7 +318,7 @@ MsState _MsAnalyzeCmd02(ModbusSlaveObj_t *pObj)
 	return MS_OK;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x10√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x10ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 {
@@ -342,13 +342,13 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 		j += 2;
 	}
 	
-	if(addr == MB_SYSTEM_WORKING_MODE) //	œµÕ≥π§◊˜ƒ£ Ω  ∏ﬂŒª::0£∫P1\2\3  µÕŒª:0£∫◊‘”…:1£∫∂® ±:2£∫—µ¡∑
+	if(addr == MB_SYSTEM_WORKING_MODE) //	Á≥ªÁªüÂ∑•‰ΩúÊ®°Âºè  È´ò‰Ωç::0ÔºöP1\2\3  ‰Ωé‰Ωç:0ÔºöËá™Áî±:1ÔºöÂÆöÊó∂:2ÔºöËÆ≠ÁªÉ
 	{
-		if(Get_System_State_Mode() > 0)//Pƒ£ Ω
+		if(Get_System_State_Mode() > 0)//PÊ®°Âºè
 		{
 			Set_Pmode_Period_Now(0);
 		}
-		if(System_is_Power_Off())//◊¥Ã¨ª˙
+		if(System_is_Power_Off())//Áä∂ÊÄÅÊú∫
 		{
 			System_Power_Off();
 		}
@@ -361,7 +361,7 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		//Ctrl_Set_System_Mode(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE]);
-		Set_Ctrl_Mode_Type(CTRL_FROM_BT);//±Íº«øÿ÷∆¿¥‘¥
+		Set_Ctrl_Mode_Type(CTRL_FROM_BT);//Ê†áËÆ∞ÊéßÂà∂Êù•Ê∫ê
 	}
 			
 	pObj->txBuff[0] = pObj->rxBuff[0];
@@ -377,7 +377,7 @@ MsState _MsAnalyzeCmd10(ModbusSlaveObj_t *pObj)
 	return MS_OK;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x0F√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x0FÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd0F(ModbusSlaveObj_t *pObj)
 {
@@ -431,7 +431,7 @@ MsState _MsAnalyzeCmd0F(ModbusSlaveObj_t *pObj)
 	return MS_OK;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x03√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x03ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd03(ModbusSlaveObj_t *pObj)
 {
@@ -462,7 +462,7 @@ MsState _MsAnalyzeCmd03(ModbusSlaveObj_t *pObj)
 	return MS_OK;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x04√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x04ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd04(ModbusSlaveObj_t *pObj)
 {
@@ -494,7 +494,7 @@ MsState _MsAnalyzeCmd04(ModbusSlaveObj_t *pObj)
 }
 
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x05√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x05ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd05(ModbusSlaveObj_t *pObj)
 {
@@ -522,7 +522,7 @@ unsigned short addr;
 	return MS_OK;
 }
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x06√¸¡Ó
+*ÂäüËÉΩÔºöËß£Êûê0x06ÂëΩ‰ª§
 *******************************************************************************/
 MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 {
@@ -539,7 +539,7 @@ MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 	}
 	pObj->reg06Ptr[addr] = _MsGetInt16(pObj->rxBuff,4);
 	
-	if(addr == MB_SYSTEM_WORKING_MODE) //	œµÕ≥π§◊˜ƒ£ Ω  ∏ﬂŒª::0£∫P1\2\3  µÕŒª:0£∫◊‘”…:1£∫∂® ±:2£∫—µ¡∑
+	if(addr == MB_SYSTEM_WORKING_MODE) //	Á≥ªÁªüÂ∑•‰ΩúÊ®°Âºè  È´ò‰Ωç::0ÔºöP1\2\3  ‰Ωé‰Ωç:0ÔºöËá™Áî±:1ÔºöÂÆöÊó∂:2ÔºöËÆ≠ÁªÉ
 	{
 		System_Para_Set_PMode(pObj->reg06Ptr[addr], CTRL_FROM_BT);
 	}
@@ -569,7 +569,7 @@ MsState _MsAnalyzeCmd06(ModbusSlaveObj_t *pObj)
 }
 
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ0x15√¸¡Ó …˝º∂
+*ÂäüËÉΩÔºöËß£Êûê0x15ÂëΩ‰ª§ ÂçáÁ∫ß
 *******************************************************************************/
 MsState _MsAnalyzeCmd15(ModbusSlaveObj_t *pObj)
 {
@@ -604,7 +604,7 @@ MsState _MsAnalyzeCmd15(ModbusSlaveObj_t *pObj)
 //	pObj->sendCount = 8;
 //	return MS_OK;
 //	
-//	unsigned long write_addr=0;						// flash –¥»Îµÿ÷∑
+//	unsigned long write_addr=0;						// flash ÂÜôÂÖ•Âú∞ÂùÄ
 //	unsigned long sign=0;
 //	
 //	Clean_ModbusTimerCnt();
@@ -612,7 +612,7 @@ MsState _MsAnalyzeCmd15(ModbusSlaveObj_t *pObj)
 //	if( (( fileNumber <= REG_FILE_NUMBER_MAX ) || ( fileNumber == REG_FILE_NUMBER_END )) && ( fileLength <= REG_FILE_LENTH_MAX ) )
 //	{
 
-//			if(fileNumber == REG_FILE_NUMBER_STAR) // ∆ º∞¸
+//			if(fileNumber == REG_FILE_NUMBER_STAR) // Ëµ∑ÂßãÂåÖ
 //			{OTA_Pack_Len = 0;}
 //			
 //			taskENTER_CRITICAL();
@@ -621,13 +621,13 @@ MsState _MsAnalyzeCmd15(ModbusSlaveObj_t *pObj)
 //			OTA_Pack_Len += (fileLength*2);
 //			taskEXIT_CRITICAL();
 //			
-//			if(fileNumber == REG_FILE_NUMBER_END)//◊Ó∫Û“ª÷°
+//			if(fileNumber == REG_FILE_NUMBER_END)//ÊúÄÂêé‰∏ÄÂ∏ß
 //			{
-//				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&OTA_Pack_Len,2); // –¥∞¸≥§∂» (∫¨crc)
+//				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&OTA_Pack_Len,2); // ÂÜôÂåÖÈïøÂ∫¶ (Âê´crc)
 //				sign = PRODUCT_BOOT_PASSWORD;
-//				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // Ω¯»ÎOTA 
+//				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // ËøõÂÖ•OTA 
 
-//				SysSoftReset();// »Ìº˛∏¥Œª
+//				SysSoftReset();// ËΩØ‰ª∂Â§ç‰Ωç
 //			}
 //	}
 //	else
@@ -638,14 +638,14 @@ MsState _MsAnalyzeCmd15(ModbusSlaveObj_t *pObj)
 }
 
 /*******************************************************************************
-*π¶ƒ‹£∫Ω‚Œˆ√¸¡Ó
+*ÂäüËÉΩÔºöËß£ÊûêÂëΩ‰ª§
 *******************************************************************************/
 void MsProcess(ModbusSlaveObj_t * pObj)
 {
 	MsState res;
 	unsigned short crc;
 	
-	unsigned long write_addr=0;						// flash –¥»Îµÿ÷∑
+	unsigned long write_addr=0;						// flash ÂÜôÂÖ•Âú∞ÂùÄ
 	unsigned long sign=0;
 	unsigned long len=0;
 	
@@ -662,15 +662,15 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 			if((pObj->rxWriteIdx == 8)&&(pObj->rxBuff[0] == 0x15)&&(pObj->rxBuff[1] == 0x01)
 				&&(pObj->rxBuff[2] == 0x00)&&(pObj->rxBuff[3] == 0x00)&&(pObj->rxBuff[4] == 0x00)
 			&&(pObj->rxBuff[5] == 0x01)&&(pObj->rxBuff[6] == 0xBB)&&(pObj->rxBuff[7] == 0xBB)) {
-					//πÃº˛ ˝æ›∑¢ÀÕÕÍ≥…
-					STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&BT_OTA_Pack_Len,2); // –¥∞¸≥§∂» (∫¨crc)
+					//Âõ∫‰ª∂Êï∞ÊçÆÂèëÈÄÅÂÆåÊàê
+					STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&BT_OTA_Pack_Len,2); // ÂÜôÂåÖÈïøÂ∫¶ (Âê´crc)
 					sign = PRODUCT_BOOT_PASSWORD;
-					STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // Ω¯»ÎOTA 
+					STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // ËøõÂÖ•OTA 
 
-					SysSoftReset();// »Ìº˛∏¥Œª
+					SysSoftReset();// ËΩØ‰ª∂Â§ç‰Ωç
 				
 			}else {
-				//πÃº˛ ˝æ›¥¶¿Ì
+				//Âõ∫‰ª∂Êï∞ÊçÆÂ§ÑÁêÜ
 				if(memcmp(BT_OTA_Buffer,pObj->rxBuff,pObj->rxWriteIdx) == 0)
 				{
 					_MsRxQueueUnLock(pObj);
@@ -725,11 +725,13 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 					return;
 			}
 			BT_Set_Machine_State(BT_WORKING);
+			BLE_Pair_Finish_Now = 1;
+			
 			switch(pObj->rxBuff[1])
 			{
 			case 0x01:
 				res = _MsAnalyzeCmd01(pObj);
-			//Ω¯»Î…˝º∂
+			//ËøõÂÖ•ÂçáÁ∫ß
 			BT_OTA_Mode = 0xAA;
 			BT_OTA_Pack_Len = 0;
 			first_error = 0;
@@ -757,7 +759,7 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 				if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL))
 				{
 					res = _MsAnalyzeCmd06(pObj);
-					//±£¥Ê
+					//‰øùÂ≠ò
 					Write_MbBuffer_Later();
 				}
 				break;
@@ -765,7 +767,7 @@ void MsProcess(ModbusSlaveObj_t * pObj)
 				if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL))
 				{
 					res = _MsAnalyzeCmd10(pObj);
-					//±£¥Ê
+					//‰øùÂ≠ò
 					Write_MbBuffer_Later();
 				}
 				break;

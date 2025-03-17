@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		stmflash.c
-* @brief   		flash ½Ó¿Ú
+* @brief   		flash æ¥å£
 *
 *
 * @author			WQG
@@ -14,135 +14,135 @@
 
 extern void    FLASH_PageErase(uint32_t PageAddress);
  
-//¶ÁÈ¡Ö¸¶¨µØÖ·µÄ°ë×Ö(16Î»Êı¾İ)
-//faddr:¶ÁµØÖ·(´ËµØÖ·±ØĞëÎª2µÄ±¶Êı!!)
-//·µ»ØÖµ:¶ÔÓ¦Êı¾İ.
+//è¯»å–æŒ‡å®šåœ°å€çš„åŠå­—(16ä½æ•°æ®)
+//faddr:è¯»åœ°å€(æ­¤åœ°å€å¿…é¡»ä¸º2çš„å€æ•°!!)
+//è¿”å›å€¼:å¯¹åº”æ•°æ®.
 uint16_t STMFLASH_ReadHalfWord(uint32_t faddr)
 {
 	return *(uint16_t*)faddr; 
 }
-#if STM32_FLASH_WREN	//Èç¹ûÊ¹ÄÜÁËĞ´   
-//²»¼ì²éµÄĞ´Èë
-//WriteAddr:ÆğÊ¼µØÖ·
-//pBuffer:Êı¾İÖ¸Õë
-//NumToWrite:°ë×Ö(16Î»)Êı   
+#if STM32_FLASH_WREN	//å¦‚æœä½¿èƒ½äº†å†™   
+//ä¸æ£€æŸ¥çš„å†™å…¥
+//WriteAddr:èµ·å§‹åœ°å€
+//pBuffer:æ•°æ®æŒ‡é’ˆ
+//NumToWrite:åŠå­—(16ä½)æ•°   
 void STMFLASH_Write_NoCheck(uint32_t WriteAddr,uint16_t *pBuffer,uint16_t NumToWrite)   
 {
 	uint16_t i;
 	for(i=0;i<NumToWrite;i++)
 	{
 		HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD,WriteAddr,pBuffer[i]);
-	  WriteAddr+=2;//µØÖ·Ôö¼Ó2.
+	  WriteAddr+=2;//åœ°å€å¢åŠ 2.
 	}
 } 
-//´ÓÖ¸¶¨µØÖ·¿ªÊ¼Ğ´ÈëÖ¸¶¨³¤¶ÈµÄÊı¾İ
-//WriteAddr:ÆğÊ¼µØÖ·(´ËµØÖ·±ØĞëÎª2µÄ±¶Êı!!)
-//pBuffer:Êı¾İÖ¸Õë
-//NumToWrite:°ë×Ö(16Î»)Êı(¾ÍÊÇÒªĞ´ÈëµÄ16Î»Êı¾İµÄ¸öÊı.)
+//ä»æŒ‡å®šåœ°å€å¼€å§‹å†™å…¥æŒ‡å®šé•¿åº¦çš„æ•°æ®
+//WriteAddr:èµ·å§‹åœ°å€(æ­¤åœ°å€å¿…é¡»ä¸º2çš„å€æ•°!!)
+//pBuffer:æ•°æ®æŒ‡é’ˆ
+//NumToWrite:åŠå­—(16ä½)æ•°(å°±æ˜¯è¦å†™å…¥çš„16ä½æ•°æ®çš„ä¸ªæ•°.)
 #if STM32_FLASH_SIZE<256
-#define STM_SECTOR_SIZE 1024 //×Ö½Ú
+#define STM_SECTOR_SIZE 1024 //å­—èŠ‚
 #else 
 #define STM_SECTOR_SIZE	2048
 #endif
 
-uint16_t STMFLASH_BUF[STM_SECTOR_SIZE/2];//×î¶àÊÇ2K×Ö½Ú
+uint16_t STMFLASH_BUF[STM_SECTOR_SIZE/2];//æœ€å¤šæ˜¯2Kå­—èŠ‚
 /**
-*@brief     ´ÓÖ¸¶¨µØÖ·¿ªÊ¼Ğ´ÈëÖ¸¶¨³¤¶ÈµÄÊı¾İ
-*@param     WriteAddr : ÆğÊ¼µØÖ·(´ËµØÖ·±ØĞëÎª2µÄ±¶Êı!!)
-*           pBuffer   : Êı¾İÖ¸Õë
-*           NumToWrite: °ë×Ö(16Î»)Êı(¾ÍÊÇÒªĞ´ÈëµÄ16Î»Êı¾İµÄ¸öÊı.)
-*@return    ÎŞ
+*@brief     ä»æŒ‡å®šåœ°å€å¼€å§‹å†™å…¥æŒ‡å®šé•¿åº¦çš„æ•°æ®
+*@param     WriteAddr : èµ·å§‹åœ°å€(æ­¤åœ°å€å¿…é¡»ä¸º2çš„å€æ•°!!)
+*           pBuffer   : æ•°æ®æŒ‡é’ˆ
+*           NumToWrite: åŠå­—(16ä½)æ•°(å°±æ˜¯è¦å†™å…¥çš„16ä½æ•°æ®çš„ä¸ªæ•°.)
+*@return    æ— 
 */
 void STMFLASH_Write(uint32_t WriteAddr,uint16_t  *pBuffer,uint16_t  NumToWrite)
 {
-    uint32_t  PageAddr;                                                                                            // FlashÒ³µØÖ·
-    uint32_t  WordAddr;                                                                                            // ÒªĞ´ÈëµÄµØÖ·ÔÚFlashÒ³ÖĞµÄÎ»ÖÃ(16Î»×Ö¼ÆËã)
-    uint32_t  WordRemainder;                                                                                       // FlashÒ³ÖĞµÄÊ£ÓàµØÖ·(16Î»×Ö¼ÆËã)
-    uint32_t  ShiftingAddr;                                                                                        // È¥µô0X08000000ºóµÄµØÖ·
+    uint32_t  PageAddr;                                                                                            // Flashé¡µåœ°å€
+    uint32_t  WordAddr;                                                                                            // è¦å†™å…¥çš„åœ°å€åœ¨Flashé¡µä¸­çš„ä½ç½®(16ä½å­—è®¡ç®—)
+    uint32_t  WordRemainder;                                                                                       // Flashé¡µä¸­çš„å‰©ä½™åœ°å€(16ä½å­—è®¡ç®—)
+    uint32_t  ShiftingAddr;                                                                                        // å»æ‰0X08000000åçš„åœ°å€
     uint32_t  i;    
     
-    /* µ±Ö¸¶¨ÆğÊ¼µØÖ·Ğ¡ÓÚSTM32_FLASH_BASE (0x0800000) »òÕß´óÓÚĞ¾Æ¬±¾ÉíµÄFlashÈİÁ¿Ê±£¬Ğ´ÈëµØÖ·ÎŞĞ§£¬Ìø³öº¯Êı */
+    /* å½“æŒ‡å®šèµ·å§‹åœ°å€å°äºSTM32_FLASH_BASE (0x0800000) æˆ–è€…å¤§äºèŠ¯ç‰‡æœ¬èº«çš„Flashå®¹é‡æ—¶ï¼Œå†™å…¥åœ°å€æ— æ•ˆï¼Œè·³å‡ºå‡½æ•° */
     if(WriteAddr < STM32_FLASH_BASE || (WriteAddr >= (STM32_FLASH_BASE + 1024 * STM32_FLASH_SIZE)))
     {
-        return;                                                                                                    // ·Ç·¨µØÖ·
+        return;                                                                                                    // éæ³•åœ°å€
     }
-    HAL_FLASH_Unlock();     // ½âËø
+    HAL_FLASH_Unlock();     // è§£é”
 		
-    ShiftingAddr  = WriteAddr - STM32_FLASH_BASE;                                                                  // Êµ¼ÊÆ«ÒÆµØÖ·.ÒªĞ´ÈëÊı¾İÆğÊ¼µØÖ·µÄÎ»ÖÃ
-    PageAddr      =  ShiftingAddr / FLASH_PAGE_SIZE;                                                               // ÒªĞ´ÈëµÄµØÖ·ËùÔÚµÄFlashÒ³£¨0~256£©
-    WordAddr      = (ShiftingAddr % FLASH_PAGE_SIZE) / 2;                                                          // ÔÚFlashÒ³ÄÚµÄÆ«ÒÆ(2¸ö×Ö½ÚÎª»ù±¾µ¥Î».)
-    WordRemainder = FLASH_PAGE_SIZE/2 - WordAddr;                                                                  // FlashÒ³Ê£Óà¿Õ¼ä´óĞ¡
+    ShiftingAddr  = WriteAddr - STM32_FLASH_BASE;                                                                  // å®é™…åç§»åœ°å€.è¦å†™å…¥æ•°æ®èµ·å§‹åœ°å€çš„ä½ç½®
+    PageAddr      =  ShiftingAddr / FLASH_PAGE_SIZE;                                                               // è¦å†™å…¥çš„åœ°å€æ‰€åœ¨çš„Flashé¡µï¼ˆ0~256ï¼‰
+    WordAddr      = (ShiftingAddr % FLASH_PAGE_SIZE) / 2;                                                          // åœ¨Flashé¡µå†…çš„åç§»(2ä¸ªå­—èŠ‚ä¸ºåŸºæœ¬å•ä½.)
+    WordRemainder = FLASH_PAGE_SIZE/2 - WordAddr;                                                                  // Flashé¡µå‰©ä½™ç©ºé—´å¤§å°
     if(NumToWrite <= WordRemainder)
     {
-        WordRemainder = NumToWrite;                                                                                // ²»´óÓÚ¸ÃFlashÒ³·¶Î§
+        WordRemainder = NumToWrite;                                                                                // ä¸å¤§äºè¯¥Flashé¡µèŒƒå›´
     }
  
     while(1) 
     {
-			STMFLASH_Read(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE,STMFLASH_BUF,FLASH_PAGE_SIZE/2);//¶Á³öÕû¸öÉÈÇøµÄÄÚÈİ
-        //STMFLASH_ReadMultipleBytes(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE,STMFLASH_BUF,FLASH_PAGE_SIZE/2);    // ¶Á³öÕû¸öFlashÒ³µÄÄÚÈİ´æ·Åµ½STMFLASH_BUFÖĞ
+			STMFLASH_Read(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE,STMFLASH_BUF,FLASH_PAGE_SIZE/2);//è¯»å‡ºæ•´ä¸ªæ‰‡åŒºçš„å†…å®¹
+        //STMFLASH_ReadMultipleBytes(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE,STMFLASH_BUF,FLASH_PAGE_SIZE/2);    // è¯»å‡ºæ•´ä¸ªFlashé¡µçš„å†…å®¹å­˜æ”¾åˆ°STMFLASH_BUFä¸­
         
-        /* ²éÑéÊı¾İ£¬¿´flashÒ³ÊÇ·ñĞèÒª²Á³ı */
-        for(i = 0;i < WordRemainder;i++)                                                                           // Ğ£ÑéÊı¾İ
+        /* æŸ¥éªŒæ•°æ®ï¼Œçœ‹flashé¡µæ˜¯å¦éœ€è¦æ“¦é™¤ */
+        for(i = 0;i < WordRemainder;i++)                                                                           // æ ¡éªŒæ•°æ®
         {
             if(STMFLASH_BUF[WordAddr + i] != 0XFFFF)
             {
-                break;                                                                                             // ĞèÒª²Á³ı
+                break;                                                                                             // éœ€è¦æ“¦é™¤
             }     
         }
-        /* Èç¹ûÒªĞ´ÈëÊı¾İµÄFlashÒ³ÃæÉÏ£¬ËùÓĞµÄ×Ö¶¼µÈÓÚ0XFFFF£¬ÄÇÃ´ÔÚÉÏÃæµÄÑ­»·Ö®ºó£¬i = WordRemainder*/
-        if(i < WordRemainder)                                                                                      // ĞèÒª²Á³ı
+        /* å¦‚æœè¦å†™å…¥æ•°æ®çš„Flashé¡µé¢ä¸Šï¼Œæ‰€æœ‰çš„å­—éƒ½ç­‰äº0XFFFFï¼Œé‚£ä¹ˆåœ¨ä¸Šé¢çš„å¾ªç¯ä¹‹åï¼Œi = WordRemainder*/
+        if(i < WordRemainder)                                                                                      // éœ€è¦æ“¦é™¤
         {
-            FLASH_PageErase(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE);                                      // ²Á³ıÕâ¸öFlashÒ³
-            for(i = 0;i < WordRemainder;i++)                                                                       // ¸´ÖÆ
+            FLASH_PageErase(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE);                                      // æ“¦é™¤è¿™ä¸ªFlashé¡µ
+            for(i = 0;i < WordRemainder;i++)                                                                       // å¤åˆ¶
             {
                 STMFLASH_BUF[i + WordAddr] = pBuffer[i];
             }
-            STMFLASH_Write_NoCheck(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE,STMFLASH_BUF,FLASH_PAGE_SIZE/2);    // Ğ´ÈëÕû¸öÒ³
+            STMFLASH_Write_NoCheck(PageAddr*FLASH_PAGE_SIZE + STM32_FLASH_BASE,STMFLASH_BUF,FLASH_PAGE_SIZE/2);    // å†™å…¥æ•´ä¸ªé¡µ
         }
         /* i = WordRemainder */
         else
         {
-            STMFLASH_Write_NoCheck(WriteAddr,pBuffer,WordRemainder);                                               // Ğ´ÒÑ¾­²Á³ıÁËµÄ,Ö±½ÓĞ´ÈëÉÈÇøÊ£ÓàÇø¼ä. 
+            STMFLASH_Write_NoCheck(WriteAddr,pBuffer,WordRemainder);                                               // å†™å·²ç»æ“¦é™¤äº†çš„,ç›´æ¥å†™å…¥æ‰‡åŒºå‰©ä½™åŒºé—´. 
         }
  
         if(NumToWrite == WordRemainder)
         {
-            break;                                                                                                 // Ğ´Èë½áÊøÁË
+            break;                                                                                                 // å†™å…¥ç»“æŸäº†
         }
-        else                                                                                                       // Ğ´ÈëÎ´½áÊø
+        else                                                                                                       // å†™å…¥æœªç»“æŸ
         {
-            PageAddr++;                                                                                            // Ò³µØÖ·Ôö¼Ó1
-            WordAddr    = 0;                                                                                       // Æ«ÒÆÎ»ÖÃÎª0     
-            pBuffer    += WordRemainder;                                                                           // Ö¸ÕëÆ«ÒÆ
-            WriteAddr  += WordRemainder*2;                                                                         // Ğ´µØÖ·Æ«ÒÆ(16Î»Êı¾İÖ·,ĞèÒª*2)
-            NumToWrite -= WordRemainder;                                                                           // ×Ö½Ú(16Î»)Êıµİ¼õ
+            PageAddr++;                                                                                            // é¡µåœ°å€å¢åŠ 1
+            WordAddr    = 0;                                                                                       // åç§»ä½ç½®ä¸º0     
+            pBuffer    += WordRemainder;                                                                           // æŒ‡é’ˆåç§»
+            WriteAddr  += WordRemainder*2;                                                                         // å†™åœ°å€åç§»(16ä½æ•°æ®å€,éœ€è¦*2)
+            NumToWrite -= WordRemainder;                                                                           // å­—èŠ‚(16ä½)æ•°é€’å‡
             if(NumToWrite > (FLASH_PAGE_SIZE/2))
             {
-							WordRemainder = FLASH_PAGE_SIZE/2;                                                                 // ÏÂÒ»¸öFlashÒ³»¹ÊÇĞ´²»Íê
+							WordRemainder = FLASH_PAGE_SIZE/2;                                                                 // ä¸‹ä¸€ä¸ªFlashé¡µè¿˜æ˜¯å†™ä¸å®Œ
             }
             else
 						{
-							WordRemainder = NumToWrite;                                                                       // ÏÂÒ»¸öFlashÒ³¿ÉÒÔĞ´ÍêÁË
+							WordRemainder = NumToWrite;                                                                       // ä¸‹ä¸€ä¸ªFlashé¡µå¯ä»¥å†™å®Œäº†
 						}
         }
     };
-    HAL_FLASH_Lock();                                                                                                  // ÉÏËø
+    HAL_FLASH_Lock();                                                                                                  // ä¸Šé”
 }
 
 #endif
 
-//´ÓÖ¸¶¨µØÖ·¿ªÊ¼¶Á³öÖ¸¶¨³¤¶ÈµÄÊı¾İ
-//ReadAddr:ÆğÊ¼µØÖ·
-//pBuffer:Êı¾İÖ¸Õë
-//NumToWrite:°ë×Ö(16Î»)Êı
+//ä»æŒ‡å®šåœ°å€å¼€å§‹è¯»å‡ºæŒ‡å®šé•¿åº¦çš„æ•°æ®
+//ReadAddr:èµ·å§‹åœ°å€
+//pBuffer:æ•°æ®æŒ‡é’ˆ
+//NumToWrite:åŠå­—(16ä½)æ•°
 void STMFLASH_Read(uint32_t ReadAddr,uint16_t *pBuffer,uint16_t NumToRead)   	
 {
 	uint16_t i;
 	for(i=0;i<NumToRead;i++)
 	{
-		pBuffer[i]=STMFLASH_ReadHalfWord(ReadAddr);//¶ÁÈ¡2¸ö×Ö½Ú.
-		ReadAddr+=2;//Æ«ÒÆ2¸ö×Ö½Ú.	
+		pBuffer[i]=STMFLASH_ReadHalfWord(ReadAddr);//è¯»å–2ä¸ªå­—èŠ‚.
+		ReadAddr+=2;//åç§»2ä¸ªå­—èŠ‚.	
 	}
 }
 

@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				timing.c
-* @brief			¶¨Ê±Ïß³Ì  ¼ä¸ô 1 s, Ö´ĞĞµ¹ÊıºÍ¼ÆÊ±¹¤×÷
+* @brief			å®šæ—¶çº¿ç¨‹  é—´éš” 1 s, æ‰§è¡Œå€’æ•°å’Œè®¡æ—¶å·¥ä½œ
 *
 * @author			WQG
 * @versions		v1.0
@@ -33,31 +33,35 @@
 
 
 /* Private variables ---------------------------------------------------------*/
-// Í¨ÓÃ¼ÆÊıÆ÷
+// é€šç”¨è®¡æ•°å™¨
 static uint32_t Timing_Timer_Cnt = 0;
 
-// ÈÎÎñ¼ÆÊ±Æ÷
+// ä»»åŠ¡è®¡æ—¶å™¨
 static uint32_t Timing_Thread_Task_Cnt = 0;
 static uint32_t Timing_Half_Second_Cnt = 0;
-static uint32_t WIFI_Distribution_Timing_Cnt=0;		// wifi×´Ì¬Í¼±ê ¼ÆÊ±Æ÷
-static uint32_t BT_Distribution_Timing_Cnt=0;			// À¶ÑÀ×´Ì¬Í¼±ê ¼ÆÊ±Æ÷
-static uint32_t System_Fault_Timing_Cnt=0;				// ¹ÊÕÏ»Ö¸´ ¼ÆÊ±Æ÷
-static uint32_t Fault_Recovery_Timing_Cnt=0;			// ¹ÊÕÏ»Ö¸´´ÎÊı ¼ÆÊ±Æ÷		1Ğ¡Ê±
+static uint32_t WIFI_Distribution_Timing_Cnt=0;		// wifiçŠ¶æ€å›¾æ ‡ è®¡æ—¶å™¨
+static uint32_t BT_Distribution_Timing_Cnt=0;			// è“ç‰™çŠ¶æ€å›¾æ ‡ è®¡æ—¶å™¨
+static uint32_t System_Fault_Timing_Cnt=0;				// æ•…éšœæ¢å¤ è®¡æ—¶å™¨
+static uint32_t Fault_Recovery_Timing_Cnt=0;			// æ•…éšœæ¢å¤æ¬¡æ•° è®¡æ—¶å™¨		1å°æ—¶
 
-static uint32_t Automatic_Shutdown_Timing_Cnt=0;				// ×Ô¶¯¹Ø»ú ¼ÆÊ±Æ÷
+static uint32_t Automatic_Shutdown_Timing_Cnt=0;				// è‡ªåŠ¨å…³æœº è®¡æ—¶å™¨
 
-static uint8_t System_Fault_Recovery_Cnt=0;				// ¹ÊÕÏ»Ö¸´´ÎÊı ¼ÆÊıÆ÷
-static uint8_t Change_Speed_Timing_Cnt = 0;				// ¸ü¸ÄËÙ¶È 3Ãëºó¿ªÊ¼¶¯×÷ ¼ÆÊ±Æ÷
+static uint8_t System_Fault_Recovery_Cnt=0;				// æ•…éšœæ¢å¤æ¬¡æ•° è®¡æ•°å™¨
+static uint8_t Change_Speed_Timing_Cnt = 0;				// æ›´æ”¹é€Ÿåº¦ 3ç§’åå¼€å§‹åŠ¨ä½œ è®¡æ—¶å™¨
 
-//  ¸ßÎÂ ½µËÙ
-static uint32_t Temp_Slow_Down_Timing_Cnt= 0;		//¼ÆÊ±Æ÷
+//  é«˜æ¸© é™é€Ÿ
+static uint32_t Temp_Slow_Down_Timing_Cnt= 0;		//è®¡æ—¶å™¨
 
-//  Ë¢ĞÂÆÁÄ»
+//  åˆ·æ–°å±å¹•
 static uint8_t LCD_Refresh_State= 0;
 
+//  æ•…éšœæ¢å¤
+static uint8_t Fault_Restar_State= 0;
+
+uint8_t System_Auto_Running_State;
 #ifdef SYSTEM_LONG_RUNNING_MODE
-//********* ÀÏ»¯¹¤×° ***********************************************
-// ÀÏ»¯¹¤×° ¼ÆÊ±Æ÷
+//********* è€åŒ–å·¥è£… ***********************************************
+// è€åŒ–å·¥è£… è®¡æ—¶å™¨
 static uint32_t Old_Chemical_Equipment_Cnt =0;
 //******************************************************************
 #endif
@@ -65,19 +69,19 @@ static uint32_t Old_Chemical_Equipment_Cnt =0;
 
 /* Private user code ---------------------------------------------------------*/
 
-// Ó²¼ş & Çı¶¯
+// ç¡¬ä»¶ & é©±åŠ¨
 void App_Timing_Init(void)
 {
 	LCD_Show_Bit = STATUS_BIT_PERCENTAGE;
 	
 	System_Boot_Screens();			// 5s
 	Dev_Check_Control_Methods();
-	//¿ª»úÍê³É
+	//å¼€æœºå®Œæˆ
 	System_PowerUp_Finish = 0xAA;
-	//all_data_update();		// wifi ÉÏ´«
+	//all_data_update();		// wifi ä¸Šä¼ 
 	
 	System_Power_Off();
-	//System_Power_On();//wuqingguang ÉÏµç¸ÄÎª¿ª»ú ×ÔÆô¶¯²âÊÔÊ¹ÓÃ
+	//System_Power_On();//wuqingguang ä¸Šç”µæ”¹ä¸ºå¼€æœº è‡ªå¯åŠ¨æµ‹è¯•ä½¿ç”¨
 }
 
 static uint32_t wifi_timing_old = 0;
@@ -112,13 +116,13 @@ void Use_Wifi_Timing_Check(void)
 		return;
 	}
 	
-	if(*p_Wifi_Timing_Value_Old >= *p_Wifi_Timing_Value)  //×ß¿ìÁË
+	if(*p_Wifi_Timing_Value_Old >= *p_Wifi_Timing_Value)  //èµ°å¿«äº†
 	{
 		Timing_Thread_Task_Cnt --;
 		*p_Check_Timing_Minus_More += 1;
 		*p_Check_Timing_Add_More = 0;
 	}
-	else if((*p_Wifi_Timing_Value - *p_Wifi_Timing_Value_Old) > 1) //×ßÂıÁË
+	else if((*p_Wifi_Timing_Value - *p_Wifi_Timing_Value_Old) > 1) //èµ°æ…¢äº†
 	{
 		Timing_Thread_Task_Cnt ++;
 		*p_Check_Timing_Add_More += 1;
@@ -140,23 +144,35 @@ void Clean_Timing_Timer_Cnt(void)
 	Timing_Timer_Cnt = 0;
 }
 
-// ÉèÖÃË¢ĞÂ±êÖ¾
+// è®¾ç½®åˆ·æ–°æ ‡å¿—
 void LCD_Refresh_Set(uint8_t value)
 {
 	LCD_Refresh_State = value;
 }
 
-// »ñÈ¡Ë¢ĞÂ±êÖ¾
+// è·å–åˆ·æ–°æ ‡å¿—
 uint8_t LCD_Refresh_Get(void)
 {
 	return LCD_Refresh_State;
 }
 
-// »Ö¸´Ë¢ĞÂ
+// æ¢å¤åˆ·æ–°
 void LCD_Refresh_Restore(void)
 {
 	if(LCD_Refresh_Get()== 1)
 		LCD_Refresh_Set(0);
+}
+
+// è®¾ç½®æ•…éšœæ¢å¤ è‡ªå¯åŠ¨
+void Fault_Restar_Set(uint8_t value)
+{
+	Fault_Restar_State = value;
+}
+
+// è·å–æ•…éšœæ¢å¤ è‡ªå¯åŠ¨
+uint8_t Fault_Restar_Get(void)
+{
+	return Fault_Restar_State;
 }
 
 void Speed_Save_Flash(Operating_Parameters op_node,uint8_t system_state)
@@ -179,17 +195,17 @@ void Speed_Save_Flash(Operating_Parameters op_node,uint8_t system_state)
 	}
 }
 
-// wifi ×´Ì¬»ù    TIMING_THREAD_LIFECYCLE
+// wifi çŠ¶æ€åŸº    TIMING_THREAD_LIFECYCLE
 void WIFI_State_Handler(void)
 {
 	static uint8_t wifi_state = 0;
 	//static uint8_t wifi_time_cnt = 0;
 	
-	// -------- ÆÁ±Î
+	// -------- å±è”½
 	if(Dev_Is_Control_Methods(MACRO_WIFI_USART))
 	{
 		LCD_Show_Bit &= ~STATUS_BIT_WIFI;
-//		// ÖÜÆÚ 3s
+//		// å‘¨æœŸ 3s
 //		if(wifi_time_cnt < (TIMING_THREAD_HALF_SECOND*2))
 //		{
 //			LCD_Show_Bit |= STATUS_BIT_WIFI;
@@ -213,7 +229,7 @@ void WIFI_State_Handler(void)
 //		
 //		wifi_time_cnt ++;
 	}
-	// -------- ¹ÊÕÏ
+	// -------- æ•…éšœ
 	else if(WIFI_Get_Machine_State() == WIFI_ERROR)
 	{
 		if((Timing_Thread_Task_Cnt % WIFI_ERROR_BLINK_TIME) == 0)
@@ -225,15 +241,15 @@ void WIFI_State_Handler(void)
 				LCD_Show_Bit &= ~STATUS_BIT_WIFI;
 		}
 	}
-	// -------- Õı³£
+	// -------- æ­£å¸¸
 	else
 	{
-		if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND) //°ëÃë
+		if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND) //åŠç§’
 		{
 			if( mcu_get_wifi_work_state() != wifi_state )
 			{
 				wifi_state = mcu_get_wifi_work_state();
-				DEBUG_PRINT("wifi×´Ì¬: %d\n",wifi_state);
+				DEBUG_PRINT("wifiçŠ¶æ€: %d\n",wifi_state);
 			}
 			
 			if(WIFI_Get_Machine_State() == WIFI_DISTRIBUTION)
@@ -265,7 +281,7 @@ void WIFI_State_Handler(void)
 	}
 }
 
-// À¶ÑÀ ×´Ì¬»ù  TIMING_THREAD_LIFECYCLE
+// è“ç‰™ çŠ¶æ€åŸº  TIMING_THREAD_LIFECYCLE
 void BT_State_Handler(void)
 {
 	if(BT_Get_Machine_State() == BT_ERROR)
@@ -281,7 +297,7 @@ void BT_State_Handler(void)
 	}
 	else
 	{
-		if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND) //°ëÃë
+		if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND) //åŠç§’
 		{
 			if(BT_Get_Machine_State() == BT_DISTRIBUTION)
 			{
@@ -299,17 +315,23 @@ void BT_State_Handler(void)
 					else
 						LCD_Show_Bit &= ~STATUS_BIT_BLUETOOTH;
 				}
-				
-				//³¬Ê±ÅäÍø»Ö¸´
+				//è¶…æ—¶é…ç½‘æ¢å¤
 				if( (Timing_Half_Second_Cnt - BT_Distribution_Timing_Cnt) > BT_DISTRIBUTION_TIME_CALLOUT)
 				{
 					BT_Distribution_Timing_Cnt = 0;
 					BT_Set_Machine_State(BT_NO_CONNECT);
+					BT_Module_AT_NoConnect();
 					LCD_Show_Bit &= ~STATUS_BIT_BLUETOOTH;
 				}
 			}
 			else if(BT_Get_Machine_State() == BT_WORKING)
 			{
+				if(*p_BLE_Pair_Finish != BLE_Pair_Finish_Now)
+				{
+					*p_BLE_Pair_Finish = BLE_Pair_Finish_Now;
+					//å­˜å‚¨  å­˜ä¸€ä¸ª è¿˜æ˜¯ æ‰‡åŒºå­˜
+					Write_MbBuffer_Now();
+				}
 				BT_Distribution_Timing_Cnt = 0;
 				LCD_Show_Bit |= STATUS_BIT_BLUETOOTH;
 			}
@@ -323,7 +345,7 @@ void BT_State_Handler(void)
 }
 
 
-// Çå³ı ¹ÊÕÏ ×´Ì¬»ù
+// æ¸…é™¤ æ•…éšœ çŠ¶æ€åŸº
 void Timing_Clean_Fault_State(void)
 {
 	if(If_Fault_Recovery_Max())
@@ -335,25 +357,26 @@ void Timing_Clean_Fault_State(void)
 }
 
 
-// ÍË³ö ¹ÊÕÏ ×´Ì¬
+// é€€å‡º æ•…éšœ çŠ¶æ€
 void CallOut_Fault_State(void)
 {
 	Timing_Clean_Fault_State();
-	if(System_is_Power_Off())//¹Ø»ú
+	if(System_is_Power_Off() || Fault_Restar_Get())//å…³æœº & ç©ºè½¬
 	{
 		System_Power_Off();
+		Fault_Restar_Set(0);
 	}
 	Lcd_Show();
 }
 
-// ¹ÊÕÏ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// æ•…éšœ çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Fault_State_Handler(void)
 {
 	if(ERROR_DISPLAY_STATUS != Get_System_State_Machine())
 	{
 		To_Fault_Menu();
 	}
-	else if(System_is_Error())//¹ÊÕÏ 2min»Ö¸´ ·ÇÍ¨Ñ¶¹ÊÕÏ
+	else if(System_is_Error())//æ•…éšœ 2minæ¢å¤ éé€šè®¯æ•…éšœ
 	{
 		if(If_Fault_Recovery_Max()==0)
 		{
@@ -362,7 +385,7 @@ void Fault_State_Handler(void)
 				System_Fault_Timing_Cnt = Timing_Half_Second_Cnt;
 			}
 			
-			//³¬Ê± ¹ÊÕÏ »Ö¸´
+			//è¶…æ—¶ æ•…éšœ æ¢å¤
 			if( (Timing_Half_Second_Cnt - System_Fault_Timing_Cnt) > SYSTEM_FAULT_TIME_CALLOUT)
 			{
 				if( *p_Motor_Fault_Static == 0)
@@ -386,7 +409,7 @@ void Fault_State_Handler(void)
 	Update_Fault_Menu();
 }
 
-// ÈíÆô¶¯ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// è½¯å¯åŠ¨ çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Starting_State_Handler(void)
 {
 	System_Check_Timer_Clean();
@@ -403,11 +426,11 @@ void Starting_State_Handler(void)
 //	}
 }
 
-// ÔËĞĞ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// è¿è¡Œ çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Running_State_Handler(void)
 {
 
-	if(Get_System_State_Machine() == FREE_MODE_RUNNING)									// ×ÔÓÉ
+	if(Get_System_State_Machine() == FREE_MODE_RUNNING)									// è‡ªç”±
 	{
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time + 1);
 		if(*p_OP_ShowNow_Time >= MOTOR_TIME_SHOW_MAX)
@@ -415,9 +438,9 @@ void Running_State_Handler(void)
 			*p_OP_ShowNow_Time = 0;
 		}
 	}
-	else if(Get_System_State_Machine() == TIMING_MODE_RUNNING)					// ¶¨Ê±
+	else if(Get_System_State_Machine() == TIMING_MODE_RUNNING)					// å®šæ—¶
 	{
-		Finish_Statistics_Count(1);	//¼ÆËã Íê³ÉÍ³¼Æ
+		Finish_Statistics_Count(1);	//è®¡ç®— å®Œæˆç»Ÿè®¡
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time - 1);
 		Lcd_Show();
 		if(*p_OP_ShowNow_Time == 0)
@@ -426,23 +449,23 @@ void Running_State_Handler(void)
 			*p_OP_ShowNow_Time = p_OP_Timing_Mode->time;
 		}
 	}
-	else if(Get_System_State_Machine() == TRAINING_MODE_RUNNING)					// ÑµÁ·
+	else if(Get_System_State_Machine() == TRAINING_MODE_RUNNING)					// è®­ç»ƒ
 	{
-		Finish_Statistics_Count(1);	//¼ÆËã Íê³ÉÍ³¼Æ
+		Finish_Statistics_Count(1);	//è®¡ç®— å®Œæˆç»Ÿè®¡
 		*p_OP_ShowNow_Time = (*p_OP_ShowNow_Time + 1);
 		
-		if(Get_System_State_Mode() == SURFING_MODE_NUMBER_ID)//³åÀË
+		if(Get_System_State_Mode() == SURFING_MODE_NUMBER_ID)//å†²æµª
 		{
 			if(*p_OP_ShowNow_Time >= MOTOR_TIME_SHOW_MAX)
 			{
 				*p_OP_ShowNow_Time = 0;
 			}
 			if((*p_OP_ShowNow_Time < *p_Surf_Mode_Info_Prepare_Time))
-				Data_Set_Current_Speed(*p_Surf_Mode_Info_Low_Speed);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"ÔİÍ£"
+				Data_Set_Current_Speed(*p_Surf_Mode_Info_Low_Speed);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"æš‚åœ"
 			else if(((*p_OP_ShowNow_Time - (*p_Surf_Mode_Info_Prepare_Time)) % (*p_Surf_Mode_Info_High_Time + *p_Surf_Mode_Info_Low_Time)) == 0)
-				Data_Set_Current_Speed(*p_Surf_Mode_Info_High_Speed);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"ÔİÍ£"
+				Data_Set_Current_Speed(*p_Surf_Mode_Info_High_Speed);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"æš‚åœ"
 			else if(((*p_OP_ShowNow_Time - (*p_Surf_Mode_Info_Prepare_Time)) % (*p_Surf_Mode_Info_High_Time + *p_Surf_Mode_Info_Low_Time)) == *p_Surf_Mode_Info_High_Time)
-				Data_Set_Current_Speed(*p_Surf_Mode_Info_Low_Speed);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"ÔİÍ£"
+				Data_Set_Current_Speed(*p_Surf_Mode_Info_Low_Speed);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"æš‚åœ"
 		}
 		else if(Is_Mode_Legal(Get_System_State_Mode()))
 		{
@@ -456,7 +479,7 @@ void Running_State_Handler(void)
 				else
 				{
 					Period_Now ++;
-					Data_Set_Current_Speed(p_OP_PMode[Get_System_State_Mode()-1][Period_Now].speed);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"ÔİÍ£"
+					Data_Set_Current_Speed(p_OP_PMode[Get_System_State_Mode()-1][Period_Now].speed);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"æš‚åœ"
 				}
 			}
 		}
@@ -482,16 +505,16 @@ void Running_State_Handler(void)
 		
 		}
 	}
-	// ×ªËÙ´ïµ½Ä¿±êÖµ
+	// è½¬é€Ÿè¾¾åˆ°ç›®æ ‡å€¼
 	if(Motor_Speed_Is_Reach())
 	{
-		// ¹âÈ¦ ³£ÁÁ
+		// å…‰åœˆ å¸¸äº®
 		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 		{
 			Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 		}
 	}
-	//½µÆµ
+	//é™é¢‘
 	Down_Conversion_Handler();
 
 	if(Get_Temp_Slow_Down_State())
@@ -500,7 +523,7 @@ void Running_State_Handler(void)
 		Temp_Slow_Down_Timing_Cnt = 0;
 	
 	
-	//¼õËÙ½çÃæ 2Ãë1Ë¢
+	//å‡é€Ÿç•Œé¢ 2ç§’1åˆ·
 	if(((Temp_Slow_Down_Timing_Cnt % 4)==2)||((Temp_Slow_Down_Timing_Cnt % 4)==3))
 	{
 		LCD_Refresh_Set(1);
@@ -514,11 +537,11 @@ void Running_State_Handler(void)
 	
 }
 
-// ÔİÍ£ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// æš‚åœ çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Pause_State_Handler(void)
 {
 	if(*p_OP_ShowNow_Speed != 0)
-		Data_Set_Current_Speed(0);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"ÔİÍ£"
+		Data_Set_Current_Speed(0);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"æš‚åœ"
 	
 	if(Timing_Half_Second_Cnt >= Automatic_Shutdown_Timing_Cnt)
 	{
@@ -535,27 +558,27 @@ void Pause_State_Handler(void)
 	if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 		Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 }
-// ²Ëµ¥ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// èœå• çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Operation_State_Handler(void)
 {
 	Sleep_Time_Count(1);
-	// 3Ãë ÉÁË¸
+	// 3ç§’ é—ªçƒ
 	if(Check_Sleep_Time_Out())
 	{
-		//±£´æ flash
-		Write_MbBuffer_Later();//´æflash
+		//ä¿å­˜ flash
+		Write_MbBuffer_Later();//å­˜flash
 		System_Power_Off();
 		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))
 			Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 	}
 }
-// Í£Ö¹ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// åœæ­¢ çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Stop_State_Handler(void)
 {
 	if(Timing_Timer_Cnt == 0)
-		Finish_Statistics_Upload();			// ÉÏ´«<Í³¼ÆÊı¾İ>
+		Finish_Statistics_Upload();			// ä¸Šä¼ <ç»Ÿè®¡æ•°æ®>
 	Timing_Timer_Cnt++;
-	// 3Ãë ÉÁË¸
+	// 3ç§’ é—ªçƒ
 	if(Timing_Timer_Cnt < 4)
 	{
 		if( (Timing_Timer_Cnt % 2) == 1)
@@ -569,12 +592,12 @@ void Stop_State_Handler(void)
 	}
 	else
 	{
-		// ·µ»Ø ×ÔÓÉÄ£Ê½ ³õÊ¼×´Ì¬
+		// è¿”å› è‡ªç”±æ¨¡å¼ åˆå§‹çŠ¶æ€
 		To_Free_Mode(FREE_MODE_NOT_AUTO_START);
-		// ·µ»Ø ×ÔÓÉÄ£Ê½ ÔİÍ£×´Ì¬
+		// è¿”å› è‡ªç”±æ¨¡å¼ æš‚åœçŠ¶æ€
 		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
 		*p_OP_ShowNow_Speed = 0;
-		Data_Set_Current_Speed(0);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"Æô¶¯"
+		Data_Set_Current_Speed(0);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"å¯åŠ¨"
 		Arbitrarily_To_Pause();
 		
 		Lcd_Show();
@@ -584,12 +607,12 @@ void Stop_State_Handler(void)
 		Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING);
 }
 
-// ³õÊ¼ ×´Ì¬»ù  1Ãë½øÒ»´Î
+// åˆå§‹ çŠ¶æ€åŸº  1ç§’è¿›ä¸€æ¬¡
 void Initial_State_Handler(void)
 {
-	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// Ìø¹ı ×Ô¶¯Æô¶¯
+	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// è·³è¿‡ è‡ªåŠ¨å¯åŠ¨
 	{
-		/* wuqingguang ³ÖĞøÉÁË¸
+		/* wuqingguang æŒç»­é—ªçƒ
 		if((Timing_Timer_Cnt % 2) == 1)
 		{
 			LCD_Refresh_Set(1);
@@ -608,7 +631,7 @@ void Initial_State_Handler(void)
 	}
 	else
 	{
-		// 3Ãë ÉÁË¸
+		// 3ç§’ é—ªçƒ
 		if(Timing_Timer_Cnt < 2)
 		{
 			if(Timing_Timer_Cnt == 1)
@@ -624,7 +647,7 @@ void Initial_State_Handler(void)
 		}
 		else
 		{
-			LCD_Refresh_Set(0);//»Ö¸´Ë¢ĞÂ
+			LCD_Refresh_Set(0);//æ¢å¤åˆ·æ–°
 			
 			//Add_Ctrl_Log();
 			
@@ -632,23 +655,23 @@ void Initial_State_Handler(void)
 			{
 				p_OP_ShowLater->time = *p_OP_ShowNow_Time;
 			}
-			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//¹âÈ¦×Ô¶¯ÅĞ¶Ï
+			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//å…‰åœˆè‡ªåŠ¨åˆ¤æ–­
 			
 			
-	//		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))	//Ìø¹ı ÈíÆô¶¯
+	//		if(Special_Status_Get(SPECIAL_BIT_SKIP_STARTING))	//è·³è¿‡ è½¯å¯åŠ¨
 			{
-				//Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING); //µ×²ã×ªËÙÍ¬²½ºóÔÙÉ¾³ı
+				//Special_Status_Delete(SPECIAL_BIT_SKIP_STARTING); //åº•å±‚è½¬é€ŸåŒæ­¥åå†åˆ é™¤
 				p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
 				
 				Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 				
-				//±£´æ
+				//ä¿å­˜
 				Lcd_Show();
 				Arbitrarily_To_Running();
 			}
 	//		else
 	//		{
-	//			// ½øÈë ÈíÆô¶¯
+	//			// è¿›å…¥ è½¯å¯åŠ¨
 	//			Arbitrarily_To_Starting();
 	//			//*p_OP_ShowLater->time = *p_OP_ShowNow_Time;
 	//			*p_OP_ShowNow_Time = 20;
@@ -661,7 +684,7 @@ void Initial_State_Handler(void)
 	Timing_Timer_Cnt++;
 }
 
-// ¶¨Ê±ÈÎÎñÖ÷Ïß³Ì
+// å®šæ—¶ä»»åŠ¡ä¸»çº¿ç¨‹
 void App_Timing_Task(void)
 {
 	static uint8_t half_second_state=0;
@@ -671,7 +694,7 @@ void App_Timing_Task(void)
 	WIFI_State_Handler();
 	BT_State_Handler();
 	
-	if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND)//°ëÃë
+	if(Timing_Thread_Task_Cnt >= TIMING_THREAD_HALF_SECOND)//åŠç§’
 	{
 		Timing_Thread_Task_Cnt = 0;
 		Timing_Half_Second_Cnt ++;
@@ -679,22 +702,22 @@ void App_Timing_Task(void)
 		if(half_second_state == 1)
 		{
 			half_second_state = 0;
-			*p_System_Runing_Second_Cnt += 1;			// ÔËĞĞÊ±¼ä
-			*p_No_Operation_Second_Cnt += 1;			// ÎŞ²Ù×÷Ê±¼ä
-			*p_System_Startup_Second_Cnt += 1;		// ĞİÃßÊ±¼ä
+			*p_System_Runing_Second_Cnt += 1;			// è¿è¡Œæ—¶é—´
+			*p_No_Operation_Second_Cnt += 1;			// æ— æ“ä½œæ—¶é—´
+			*p_System_Startup_Second_Cnt += 1;		// ä¼‘çœ æ—¶é—´
 							
 			if((Fault_Recovery_Timing_Cnt > 0) && ((Timing_Half_Second_Cnt - Fault_Recovery_Timing_Cnt) > SYSTEM_FAULT_RECOVERY_TIME))
 			{
-				DEBUG_PRINT("¹ÊÕÏ»Ö¸´¼ÆÊ±³¬¹ı1Ğ¡Ê±,Çå³ı¼ÆÊıÆ÷:\t%d\n",System_Fault_Recovery_Cnt);
-				Clean_Fault_Recovery_Cnt();//³¬¹ı 1 Ğ¡Ê± Çå³ı¼ÆÊıÆ÷
-				Fault_Recovery_Timing_Cnt = 0; // ÖØĞÂ¼ÆÊ±
+				DEBUG_PRINT("æ•…éšœæ¢å¤è®¡æ—¶è¶…è¿‡1å°æ—¶,æ¸…é™¤è®¡æ•°å™¨:\t%d\n",System_Fault_Recovery_Cnt);
+				Clean_Fault_Recovery_Cnt();//è¶…è¿‡ 1 å°æ—¶ æ¸…é™¤è®¡æ•°å™¨
+				Fault_Recovery_Timing_Cnt = 0; // é‡æ–°è®¡æ—¶
 			}
 #ifdef SYSTEM_LONG_RUNNING_MODE
-			//********* ÀÏ»¯¹¤×° ***********************************************
-			// ÀÏ»¯¹¤×° 4h¿ª  14400 Í£2h  7200
-			// ËÕ¹¤ Æô¶¯²âÊÔ  ¿ª3min  Í£1min : 180 : 60
+			//********* è€åŒ–å·¥è£… ***********************************************
+			// è€åŒ–å·¥è£… 4hå¼€  14400 åœ2h  7200
+			// è‹å·¥ å¯åŠ¨æµ‹è¯•  å¼€3min  åœ1min : 180 : 60
 			Old_Chemical_Equipment_Cnt ++;
-			if(System_is_Power_Off())//¹Ø»ú
+			if(System_is_Power_Off())//å…³æœº
 			{
 				if(Old_Chemical_Equipment_Cnt > 7200)
 				{
@@ -714,15 +737,18 @@ void App_Timing_Task(void)
 			}
 			//******************************************************************
 #endif
-			
-			// Ê±¼ä : ÉÁË¸  °ëÃë
+#ifdef SYSTEM_DRIVER_BOARD_TOOL
+//********* åœºå†…è€åŒ– ***********************************************
+	 //Main_Modbus_Send_Auto_Run();
+#endif
+			// æ—¶é—´ : é—ªçƒ  åŠç§’
 			if(System_is_Normal_Operation())
 			{
 				LCD_Show_Bit |= STATUS_BIT_COLON;
 				TM1621_Show_Symbol(TM1621_COORDINATE_TIME_COLON, 		1);
 				TM1621_LCD_Redraw();
 			}
-			// µç»úÏß³ÌÈÎÎñ
+			// ç”µæœºçº¿ç¨‹ä»»åŠ¡
 			Motor_Function_In_One_Second();
 		}
 		else
@@ -735,21 +761,21 @@ void App_Timing_Task(void)
 				return;
 			}
 			
-			//¼ì²éĞ£Ê±
+			//æ£€æŸ¥æ ¡æ—¶
 			Use_Wifi_Timing_Check();
 			
 			if(Motor_is_Start()==0)
 			{
-				// Ê±¼ä : ÉÁË¸  °ëÃë
+				// æ—¶é—´ : é—ªçƒ  åŠç§’
 				LCD_Show_Bit &= ~STATUS_BIT_COLON;
 				TM1621_Show_Symbol(TM1621_COORDINATE_TIME_COLON, 		0);
 				TM1621_LCD_Redraw();
 			}
-			//Çå³ı½µÆµ×´Ì¬
+			//æ¸…é™¤é™é¢‘çŠ¶æ€
 			if(System_is_Running() == 0)
 				Clean_All_Down_Conversion_Status();
-			//¹ÊÕÏ¼ì²â
-//-----------------  Õ¹Ê¾Ñù»ú -------------------------
+			//æ•…éšœæ£€æµ‹
+//-----------------  å±•ç¤ºæ ·æœº -------------------------
 #ifndef SYSTEM_SHOW_MODEL_MACHINE
 			if(If_System_Is_Error())
 			{
@@ -778,15 +804,15 @@ void App_Timing_Task(void)
 				{
 					Running_State_Handler();
 				}
-				else if(System_is_Pause())//ÔİÍ£
+				else if(System_is_Pause())//æš‚åœ
 				{
 					Pause_State_Handler();
 				}
-				else if(System_is_Stop())//½áÊø
+				else if(System_is_Stop())//ç»“æŸ
 				{
 					Stop_State_Handler();
 				}
-				else if(System_is_Operation())//²Ëµ¥
+				else if(System_is_Operation())//èœå•
 				{
 					Operation_State_Handler();
 				}
@@ -799,7 +825,7 @@ void App_Timing_Task(void)
 		Lcd_Show();
 }
 
-// ¶¨Ê±ÈÎÎñÖ÷Ïß³Ì
+// å®šæ—¶ä»»åŠ¡ä¸»çº¿ç¨‹
 void App_Timing_Handler(void)
 {
 //	static uint16_t restart_cnt=0;
@@ -808,7 +834,7 @@ void App_Timing_Handler(void)
 //	{
 //		if(restart_cnt++ > 10)
 //		{
-//			SysSoftReset();// Èí¼ş¸´Î»
+//			SysSoftReset();// è½¯ä»¶å¤ä½
 //		}
 //	}
 	Thread_Activity_Sign_Clean();
@@ -822,7 +848,7 @@ void App_Timing_Handler(void)
 			System_Self_Testing_Porgram();
 		while((Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY) != 0x0F) || (Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH) != 0x09))
 		{
-			Lcd_System_Information();//»úĞÍÂë & ²¦Âë×´Ì¬ 6s
+			Lcd_System_Information();//æœºå‹ç  & æ‹¨ç çŠ¶æ€ 6s
 			If_System_Is_Error();
 			osDelay(THREAD_PERIOD_MAIN_TASK);
 		};
@@ -840,6 +866,12 @@ void App_Timing_Handler(void)
 		Write_MbBuffer_Now();
 		OUT_SELF_TEST_MODE();
 	}
+	else if(IS_AUTO_RUNNING_MODE())
+	{
+		TM1621_Show_All();
+		Breath_light_Max();
+		Led_Button_On(0x0F);	// æŒ‰é”®
+	}
 	else
 	{
 		App_Timing_Task();
@@ -847,31 +879,31 @@ void App_Timing_Handler(void)
 }
 
 
-// ¿ªÆôÏß³Ì
+// å¼€å¯çº¿ç¨‹
 void App_Timing_On(void)
 {
 	
 }
 
 
-// ¹Ø±ÕÏß³Ì
+// å…³é—­çº¿ç¨‹
 void App_Timing_Off(void)
 {
 	
 }
 
 
-//-------------------- Çå³ı¹ÊÕÏ»Ö¸´¼ÆÊıÆ÷ ----------------------------
+//-------------------- æ¸…é™¤æ•…éšœæ¢å¤è®¡æ•°å™¨ ----------------------------
 void Clean_Fault_Recovery_Cnt(void)
 {
 	 System_Fault_Recovery_Cnt = 0;
 }
 
-//-------------------- ÀÛ¼Æ¹ÊÕÏ»Ö¸´¼ÆÊıÆ÷ ----------------------------
+//-------------------- ç´¯è®¡æ•…éšœæ¢å¤è®¡æ•°å™¨ ----------------------------
 void Add_Fault_Recovery_Cnt(uint8_t no)
 {
 	if(System_Fault_Recovery_Cnt == 0)
-		Fault_Recovery_Timing_Cnt = Timing_Half_Second_Cnt; // ÖØĞÂ¼ÆÊ±
+		Fault_Recovery_Timing_Cnt = Timing_Half_Second_Cnt; // é‡æ–°è®¡æ—¶
 	
 	System_Fault_Recovery_Cnt += no;
 	
@@ -879,7 +911,7 @@ void Add_Fault_Recovery_Cnt(uint8_t no)
 		Fault_Recovery_Timing_Cnt = 0;
 }
 
-//-------------------- ³¬¹ı×î´ó´ÎÊı ----------------------------
+//-------------------- è¶…è¿‡æœ€å¤§æ¬¡æ•° ----------------------------
 uint8_t If_Fault_Recovery_Max(void)
 {
 	if(System_Fault_Recovery_Cnt >= SYSTEM_FAULT_RECOVERY_MAX)
@@ -888,19 +920,19 @@ uint8_t If_Fault_Recovery_Max(void)
 		return 0;
 }
 
-//-------------------- Çå³ı ×Ô¶¯¹Ø»ú¼ÆÊ±Æ÷ ----------------------------
+//-------------------- æ¸…é™¤ è‡ªåŠ¨å…³æœºè®¡æ—¶å™¨ ----------------------------
 void Clean_Automatic_Shutdown_Timer(void)
 {
 	 Automatic_Shutdown_Timing_Cnt = Timing_Half_Second_Cnt;
 }
 
-//-------------------- Çå³ı ¸ü¸ÄËÙ¶È¼ÆÊ±Æ÷ ----------------------------
+//-------------------- æ¸…é™¤ æ›´æ”¹é€Ÿåº¦è®¡æ—¶å™¨ ----------------------------
 void Clean_Change_Speed_Timer(void)
 {
 	 Change_Speed_Timing_Cnt = 0;
 }
 
-//-------------------- Çå³ı ½µÆµË¢ĞÂ¼ÆÊ±Æ÷ ----------------------------
+//-------------------- æ¸…é™¤ é™é¢‘åˆ·æ–°è®¡æ—¶å™¨ ----------------------------
 void Clean_Temp_Slow_Down_Timer(void)
 {
 	Temp_Slow_Down_Timing_Cnt = 0;

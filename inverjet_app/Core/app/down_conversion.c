@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				down_conversion.c
-* @brief			½µÆµ¿ØÖÆ
+* @brief			é™é¢‘æ§åˆ¶
 *
 * @author			WQG
 * @versions		v1.0
@@ -27,23 +27,23 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-//-------------- Í£»ú ²ÎÊı -------------------
+//-------------- åœæœº å‚æ•° -------------------
 static uint8_t Current_Fault_To_Stop_Timer = 0;
 static uint16_t Temperature_Fault_To_Stop_Timer = 0;
 
-//-------------- ½µÆµ ²ÎÊı -------------------
+//-------------- é™é¢‘ å‚æ•° -------------------
 
-static Down_Conversion_Type_enum 		Down_Conversion_Type = Down_Conversion_Off;						//	½µÆµÀàĞÍ
-static Down_Conversion_Rate_enum 		Down_Conversion_Rate = Down_Conversion_Rate_Off;			//	½µÆµËÙÂÊ
+static Down_Conversion_Type_enum 		Down_Conversion_Type = Down_Conversion_Off;						//	é™é¢‘ç±»å‹
+static Down_Conversion_Rate_enum 		Down_Conversion_Rate = Down_Conversion_Rate_Off;			//	é™é¢‘é€Ÿç‡
 
-static uint8_t Down_Conversion_Time=0;				//	½µÆµ ´ÎÊı
+static uint8_t Down_Conversion_Time=0;				//	é™é¢‘ æ¬¡æ•°
 
-static uint8_t Temp_Slow_Down_Speed_Old=0;		//	½µÆµ ËÙ¶È  °Ù·Ö±È
-static uint8_t Temp_Slow_Down_Speed_Now=0;		//	½µÆµ ËÙ¶È  °Ù·Ö±È
+static uint8_t Temp_Slow_Down_Speed_Old=0;		//	é™é¢‘ é€Ÿåº¦  ç™¾åˆ†æ¯”
+static uint8_t Temp_Slow_Down_Speed_Now=0;		//	é™é¢‘ é€Ÿåº¦  ç™¾åˆ†æ¯”
 
-static uint32_t Down_Conversion_Handler_Timing_Cnt=0;		// ¼ÆÊ±Æ÷
+static uint32_t Down_Conversion_Handler_Timing_Cnt=0;		// è®¡æ—¶å™¨
 
-//-------------- mos ÎÂ¶È -------------------
+//-------------- mos æ¸©åº¦ -------------------
 
 //static uint8_t Temperature_Mos_Old=0;
 static uint8_t Temperature_Mos_Now=0;
@@ -54,7 +54,7 @@ static uint8_t Temperature_Mos_Now=0;
 static uint8_t Mos_Temperature_Array[5]={0};
 static uint8_t Mos_Temperature_Array_cnt = 0;
 
-//-------------- »úÏä ÎÂ¶È -------------------
+//-------------- æœºç®± æ¸©åº¦ -------------------
 
 //static uint8_t Temperature_Box_Old=0;
 static uint8_t Temperature_Box_Now=0;
@@ -65,7 +65,7 @@ static uint8_t Temperature_Box_Now=0;
 static uint8_t Box_Temperature_Array[5]={0};
 static uint8_t Box_Temperature_Array_cnt = 0;
 
-//-------------- Êä³ö µçÁ÷ -------------------
+//-------------- è¾“å‡º ç”µæµ -------------------
 
 //static uint8_t Current_Motor_Old=0;
 static uint8_t Current_Motor_Now=0;
@@ -79,7 +79,7 @@ static uint8_t Out_Current_Array_cnt = 0;
 
 /* Private user code ---------------------------------------------------------*/
 
-// ¸üĞÂËùÓĞ²ÎÊı×´Ì¬
+// æ›´æ–°æ‰€æœ‰å‚æ•°çŠ¶æ€
 void UpDate_Global_Status_Old(void)
 {
 //	Temperature_Mos_Old = Temperature_Mos_Now;
@@ -92,7 +92,7 @@ void UpDate_Global_Status_Old(void)
 }
 
 
-// Çå³ı ËùÓĞ ½µÆµ ×´Ì¬
+// æ¸…é™¤ æ‰€æœ‰ é™é¢‘ çŠ¶æ€
 void Clean_All_Down_Conversion_Status(void)
 {
 	if(Down_Conversion_Time == 0)
@@ -102,18 +102,18 @@ void Clean_All_Down_Conversion_Status(void)
 	Current_Fault_To_Stop_Timer = 0;
 	Temperature_Fault_To_Stop_Timer = 0;
 	
-	Down_Conversion_Type = Down_Conversion_Off;						//	½µÆµÀàĞÍ
-	Down_Conversion_Rate = Down_Conversion_Rate_Off;			//	½µÆµËÙÂÊ
+	Down_Conversion_Type = Down_Conversion_Off;						//	é™é¢‘ç±»å‹
+	Down_Conversion_Rate = Down_Conversion_Rate_Off;			//	é™é¢‘é€Ÿç‡
 
 	if(Temp_Slow_Down_Speed_Old > 0)
 		Data_Set_Current_Speed(Temp_Slow_Down_Speed_Old);
 	
-	Down_Conversion_Time=0;				//	½µÆµ ´ÎÊı
-	Temp_Slow_Down_Speed_Old=0;		//	½µÆµ ËÙ¶È  °Ù·Ö±È
-	Temp_Slow_Down_Speed_Now=0;		//	½µÆµ ËÙ¶È  °Ù·Ö±È
-	Down_Conversion_Handler_Timing_Cnt=0;		// ¼ÆÊ±Æ÷
+	Down_Conversion_Time=0;				//	é™é¢‘ æ¬¡æ•°
+	Temp_Slow_Down_Speed_Old=0;		//	é™é¢‘ é€Ÿåº¦  ç™¾åˆ†æ¯”
+	Temp_Slow_Down_Speed_Now=0;		//	é™é¢‘ é€Ÿåº¦  ç™¾åˆ†æ¯”
+	Down_Conversion_Handler_Timing_Cnt=0;		// è®¡æ—¶å™¨
 
-//-------------- mos ÎÂ¶È -------------------
+//-------------- mos æ¸©åº¦ -------------------
 	//Temperature_Mos_Old=0;
 	Temperature_Mos_Now=0;
 
@@ -122,7 +122,7 @@ void Clean_All_Down_Conversion_Status(void)
 	memset(Mos_Temperature_Array,0,5);
 	Mos_Temperature_Array_cnt = 0;
 
-//-------------- »úÏä ÎÂ¶È -------------------
+//-------------- æœºç®± æ¸©åº¦ -------------------
 	//Temperature_Box_Old=0;
 	Temperature_Box_Now=0;
 
@@ -131,7 +131,7 @@ void Clean_All_Down_Conversion_Status(void)
 	memset(Box_Temperature_Array,0,5);
 	Box_Temperature_Array_cnt = 0;
 
-//-------------- Êä³ö µçÁ÷ -------------------
+//-------------- è¾“å‡º ç”µæµ -------------------
 	//Current_Motor_Old=0;
 	Current_Motor_Now=0;
 
@@ -141,19 +141,19 @@ void Clean_All_Down_Conversion_Status(void)
 	Out_Current_Array_cnt = 0;
 }
 
-// ÉèÖÃ×ªËÙ
+// è®¾ç½®è½¬é€Ÿ
 void Down_Conversion_Set_Speed(uint8_t speed)
 {
 	Temp_Slow_Down_Speed_Now = speed;
 	Data_Set_Current_Speed(Temp_Slow_Down_Speed_Now);
-	//¸üĞÂÊ±¼ä
+	//æ›´æ–°æ—¶é—´
 	UpDate_Global_Status_Old();
 }
 
-// ½µÆµ²Ù×÷
+// é™é¢‘æ“ä½œ
 void Do_Down_Conversion_interface(void)
 {
-	// µÚÒ»´Î½ø
+	// ç¬¬ä¸€æ¬¡è¿›
 	if(Down_Conversion_Time == 0)
 	{
 		Temp_Slow_Down_Speed_Old = Motor_Speed_Target_Get();
@@ -174,7 +174,7 @@ void Do_Down_Conversion_interface(void)
 	}
 }
 
-// ÅĞ¶Ïµ±Ç°½µÆµÄ£Ê½
+// åˆ¤æ–­å½“å‰é™é¢‘æ¨¡å¼
 void Check_Down_Conversion_State(void)
 {
 	if((Down_Conversion_Type == Down_Conversion_Off)&&(Motor_Speed_Target_Get() > TIME_SLOW_DOWN_SPEED_MIX))
@@ -183,12 +183,12 @@ void Check_Down_Conversion_State(void)
 			Down_Conversion_Type = Down_Conversion_Out_Current;
 		else if(Temperature_Mos_Now >= MOS_TEMP_REDUCE_SPEED)
 			Down_Conversion_Type = Down_Conversion_Mos_Temper;
-		else if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED)
-			Down_Conversion_Type = Down_Conversion_Box_Temper;
+		//else if(Temperature_Box_Now >= AMBIENT_TEMP_REDUCE_SPEED)
+			//Down_Conversion_Type = Down_Conversion_Box_Temper;
 	}
 }
 
-// ÅĞ¶Ïµ±Ç°½µÆµËÙÂÊ
+// åˆ¤æ–­å½“å‰é™é¢‘é€Ÿç‡
 void Check_Down_Conversion_Rate(void)
 {
 	//uint32_t time_difference_temp = 0;
@@ -218,7 +218,7 @@ void Check_Down_Conversion_Rate(void)
 	else
 		rate_out_current = Down_Conversion_Rate_Off;
 	
-	//È¡×î´óÖµ
+	//å–æœ€å¤§å€¼
 	Down_Conversion_Rate = GET_MAX_FROM_3(rate_mos_temper, rate_box_temper, rate_out_current);
 }
 //void Check_Down_Conversion_Rate(void)
@@ -235,11 +235,11 @@ void Check_Down_Conversion_Rate(void)
 //		{
 //			time_difference_temp = Down_Conversion_Handler_Timing_Cnt - Temperature_Mos_Timer_Old;
 //			
-//			if(time_difference_temp < MOS_TEMPER_RATE_REALTIME)				//	1min		Òì³£¿ìËÙ
+//			if(time_difference_temp < MOS_TEMPER_RATE_REALTIME)				//	1min		å¼‚å¸¸å¿«é€Ÿ
 //				rate_mos_temper = Down_Conversion_Rate_Realtime;
-//			else if(time_difference_temp < MOS_TEMPER_RATE_HIGH)			//	2min		¿ìËÙ
+//			else if(time_difference_temp < MOS_TEMPER_RATE_HIGH)			//	2min		å¿«é€Ÿ
 //				rate_mos_temper = Down_Conversion_Rate_High;
-//			else if(time_difference_temp < MOS_TEMPER_RATE_NORMAL)		//	5min		Õı³£ËÙ¶È
+//			else if(time_difference_temp < MOS_TEMPER_RATE_NORMAL)		//	5min		æ­£å¸¸é€Ÿåº¦
 //				rate_mos_temper = Down_Conversion_Rate_Normal;
 //		}
 //	}
@@ -251,11 +251,11 @@ void Check_Down_Conversion_Rate(void)
 //		{
 //			time_difference_temp = Down_Conversion_Handler_Timing_Cnt - Temperature_Box_Timer_Old;
 //			
-//			if(time_difference_temp < BOX_TEMPER_RATE_REALTIME)				//	1min		Òì³£¿ìËÙ
+//			if(time_difference_temp < BOX_TEMPER_RATE_REALTIME)				//	1min		å¼‚å¸¸å¿«é€Ÿ
 //				rate_box_temper = Down_Conversion_Rate_Realtime;
-//			else if(time_difference_temp < BOX_TEMPER_RATE_HIGH)			//	2min		¿ìËÙ
+//			else if(time_difference_temp < BOX_TEMPER_RATE_HIGH)			//	2min		å¿«é€Ÿ
 //				rate_box_temper = Down_Conversion_Rate_High;
-//			else if(time_difference_temp < BOX_TEMPER_RATE_NORMAL)		//	5min		Õı³£ËÙ¶È
+//			else if(time_difference_temp < BOX_TEMPER_RATE_NORMAL)		//	5min		æ­£å¸¸é€Ÿåº¦
 //				rate_box_temper = Down_Conversion_Rate_Normal;
 //		}
 //	}
@@ -267,21 +267,21 @@ void Check_Down_Conversion_Rate(void)
 //		{
 //			time_difference_temp = Down_Conversion_Handler_Timing_Cnt - Current_Motor_Timer_Old;
 //			
-//			if(time_difference_temp < OUT_CURRENT_RATE_REALTIME)				//	10S		Òì³£¿ìËÙ
+//			if(time_difference_temp < OUT_CURRENT_RATE_REALTIME)				//	10S		å¼‚å¸¸å¿«é€Ÿ
 //				rate_out_current = Down_Conversion_Rate_Realtime;
-//			else if(time_difference_temp < OUT_CURRENT_RATE_HIGH)				//	30S		¿ìËÙ
+//			else if(time_difference_temp < OUT_CURRENT_RATE_HIGH)				//	30S		å¿«é€Ÿ
 //				rate_out_current = Down_Conversion_Rate_High;
-//			else if(time_difference_temp < OUT_CURRENT_RATE_NORMAL)			//	1min		Õı³£ËÙ¶È
+//			else if(time_difference_temp < OUT_CURRENT_RATE_NORMAL)			//	1min		æ­£å¸¸é€Ÿåº¦
 //				rate_out_current = Down_Conversion_Rate_Normal;
 //		}
 //	}
 //	
-//	//È¡×î´óÖµ
+//	//å–æœ€å¤§å€¼
 //	Down_Conversion_Rate = GET_MAX_FROM_3(rate_mos_temper, rate_box_temper, rate_out_current);
 //}
 
 
-// ¸ù¾İËÙÂÊ½µÆµ
+// æ ¹æ®é€Ÿç‡é™é¢‘
 void Update_Down_Conversion_Speed(void)
 {
 	static uint16_t local_timer_cnt=0;
@@ -291,22 +291,22 @@ void Update_Down_Conversion_Speed(void)
 	
 	switch( Down_Conversion_Rate )
 	{
-		case Down_Conversion_Rate_Off:					//	ÎŞ
+		case Down_Conversion_Rate_Off:					//	æ— 
 			return;
 			//break;
-		case Down_Conversion_Rate_Low:					//	ÂıËÙ						1%/2min
+		case Down_Conversion_Rate_Low:					//	æ…¢é€Ÿ						1%/2min
 			if( local_timer_cnt > DOWN_CONVERSION_RATE_LOW)
 				result = 1;
 			break;
-		case Down_Conversion_Rate_Normal:				//	Õı³£ËÙ¶È					1%/min
+		case Down_Conversion_Rate_Normal:				//	æ­£å¸¸é€Ÿåº¦					1%/min
 			if( local_timer_cnt > DOWN_CONVERSION_RATE_NORMAL)
 				result = 1;
 			break;
-		case Down_Conversion_Rate_High:					//	¿ìËÙ						1%/30s
+		case Down_Conversion_Rate_High:					//	å¿«é€Ÿ						1%/30s
 			if( local_timer_cnt > DOWN_CONVERSION_RATE_HIGH)
 				result = 1;
 			break;
-		case Down_Conversion_Rate_Realtime:			//	Òì³£¿ìËÙ					1%/10s
+		case Down_Conversion_Rate_Realtime:			//	å¼‚å¸¸å¿«é€Ÿ					1%/10s
 			if( local_timer_cnt > DOWN_CONVERSION_RATE_REALTIME)
 				result = 1;
 			break;
@@ -319,7 +319,7 @@ void Update_Down_Conversion_Speed(void)
 	
 }
 
-// Í£»ú ÅĞ¶Ï
+// åœæœº åˆ¤æ–­
 void Check_Fault_to_Stop(void)
 {
 //	uint8_t DCR_Timer[Down_Conversion_Rate_Realtime+1] = {
@@ -328,9 +328,12 @@ void Check_Fault_to_Stop(void)
 //		DOWN_CONVERSION_RATE_HIGH,
 //		DOWN_CONVERSION_RATE_REALTIME};
 	
-	if(Current_Motor_Now > MOTOR_CURRENT_ALARM_VALUE)
+	if(Current_Motor_Now >= MOTOR_CURRENT_ALARM_VALUE)
 	{
-		if(Current_Fault_To_Stop_Timer++ > 5)		// 5Ãë
+		Current_Fault_To_Stop_Timer++;
+		if(Current_Fault_To_Stop_Timer == 1)		// 1ç§’
+			Down_Conversion_Set_Speed(TIME_SLOW_DOWN_SPEED_MIX);
+		else if(Current_Fault_To_Stop_Timer > 5)		// 5ç§’
 		{
 			Set_Motor_Fault_State(E002_BUS_CURRENT_ABNORMAL);
 		}
@@ -338,43 +341,46 @@ void Check_Fault_to_Stop(void)
 	else
 		Current_Fault_To_Stop_Timer = 0;
 	
-	//Í£»úÇ°3¸ö½×¶Î
-	// ¢Ù ËÙ¶È´óÓÚ 80% Ê± Ö±½Ó¿³°ë
-	// ¢Ú ËÙ¶ÈĞ¡ÓÚ 80% ´óÓÚ 20%  Ö±½Ó½µµ½ 20%
-	// ¢Û ×îÖÕ²ÅÍ£»ú
-	if((Temperature_Mos_Now > MOS_TEMP_ALARM_VALUE) || (Temperature_Box_Now > AMBIENT_TEMP_ALARM_VALUE))
+	//åœæœºå‰3ä¸ªé˜¶æ®µ
+	// â‘  é€Ÿåº¦å¤§äº 80% æ—¶ ç›´æ¥ç åŠ
+	// â‘¡ é€Ÿåº¦å°äº 80% å¤§äº 20%  ç›´æ¥é™åˆ° 20%
+	// â‘¢ æœ€ç»ˆæ‰åœæœº
+	if((Temperature_Mos_Now >= MOS_TEMP_ALARM_VALUE) || (Temperature_Box_Now >= AMBIENT_TEMP_ALARM_VALUE))
 	{
-		Temperature_Fault_To_Stop_Timer ++;
-		if(Temperature_Fault_To_Stop_Timer >= DOWN_CONVERSION_RATE_LOW)	//2·ÖÖÓ
+		if((Temperature_Fault_To_Stop_Timer >= DOWN_CONVERSION_RATE_LOW)||(Temperature_Fault_To_Stop_Timer == 0))	//2åˆ†é’Ÿ
 		{
 			Temp_Slow_Down_Speed_Now = Motor_Speed_Target_Get();
 			if(Temp_Slow_Down_Speed_Now >= 80)
 			{
 				Down_Conversion_Set_Speed(Temp_Slow_Down_Speed_Now/2);
-				Temperature_Fault_To_Stop_Timer = 0;
+				Temperature_Fault_To_Stop_Timer = 1;
 			}
 			else if(Temp_Slow_Down_Speed_Now > 20)
 			{
 				Down_Conversion_Set_Speed(TIME_SLOW_DOWN_SPEED_MIX);
-				Temperature_Fault_To_Stop_Timer = 0;
+				Temperature_Fault_To_Stop_Timer = 1;
 			}
 			else
 			{
-				if(Temperature_Mos_Now > MOS_TEMP_ALARM_VALUE)
-					Set_Motor_Fault_State(E101_TEMPERATURE_MOS);
-				else if(Temperature_Box_Now > AMBIENT_TEMP_ALARM_VALUE)
-					Set_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
+				if(Temperature_Fault_To_Stop_Timer > MOS_TEMP_ALARM_VALUE)
+				{
+					if(Temperature_Mos_Now >= MOS_TEMP_ALARM_VALUE)
+						Set_Motor_Fault_State(E101_TEMPERATURE_MOS);
+					else if(Temperature_Box_Now >= AMBIENT_TEMP_ALARM_VALUE)
+						Set_Motor_Fault_State(E102_TEMPERATURE_AMBIENT);
+				}
 			}
 		}
+		Temperature_Fault_To_Stop_Timer ++;
 	}
 }
 
-//  »ØÉı ²Ù×÷
+//  å›å‡ æ“ä½œ
 void Do_Down_Conversion_Rebound(uint8_t time)
 {
 	static uint16_t Rebound_timer_cnt=0;
 	
-	if((Rebound_timer_cnt % time) == 0)	//2·ÖÖÓ or µÚÒ»´Î
+	if((Rebound_timer_cnt % time) == 0)	//2åˆ†é’Ÿ or ç¬¬ä¸€æ¬¡
 	{
 		Temp_Slow_Down_Speed_Now = Motor_Speed_Target_Get();
 		
@@ -385,38 +391,38 @@ void Do_Down_Conversion_Rebound(uint8_t time)
 		}
 		else
 		{
-			Clean_All_Down_Conversion_Status();		//ÍË³ö½µÆµ
+			Clean_All_Down_Conversion_Status();		//é€€å‡ºé™é¢‘
 		}
 	}
 	Rebound_timer_cnt ++;
 }
 
-// ¹ıµÍÊ± »ØÉı
+// è¿‡ä½æ—¶ å›å‡
 void Check_Down_Conversion_Rebound(void)
 {
 	switch(Down_Conversion_Type)
 	{
-		case Down_Conversion_Off:							//	ÎŞ
+		case Down_Conversion_Off:							//	æ— 
 			break;
-		case Down_Conversion_Mos_Temper:			//	mos ¸ßÎÂ
+		case Down_Conversion_Mos_Temper:			//	mos é«˜æ¸©
 			if(Temperature_Mos_Now < (MOS_TEMP_RESTORE_SPEED-10))
 				Do_Down_Conversion_Rebound(REBOUND_FREQUENCHY_TIME_HIGH);
 			else if(Temperature_Mos_Now < MOS_TEMP_RESTORE_SPEED)
 				Do_Down_Conversion_Rebound(REBOUND_FREQUENCHY_TIME_LOW);
 			break;
-		case Down_Conversion_Box_Temper:			//	»úÏä ¸ßÎÂ
+		case Down_Conversion_Box_Temper:			//	æœºç®± é«˜æ¸©
 			if(Temperature_Box_Now < (AMBIENT_TEMP_RESTORE_SPEED-10))
 				Do_Down_Conversion_Rebound(REBOUND_FREQUENCHY_TIME_HIGH);
 			else if(Temperature_Box_Now < AMBIENT_TEMP_RESTORE_SPEED)
 				Do_Down_Conversion_Rebound(REBOUND_FREQUENCHY_TIME_LOW);
 			break;
-		case Down_Conversion_Out_Current:			//	Êä³ö µçÁ÷
+		case Down_Conversion_Out_Current:			//	è¾“å‡º ç”µæµ
 			if(Temperature_Box_Now < (MOTOR_CURRENT_RESTORE_SPEED-10))
 				Do_Down_Conversion_Rebound(REBOUND_FREQUENCHY_TIME_HIGH);
 			else if(Temperature_Box_Now < MOTOR_CURRENT_RESTORE_SPEED)
 				Do_Down_Conversion_Rebound(REBOUND_FREQUENCHY_TIME_LOW);
 			break;
-		case Down_Conversion_Out_Power:				//	Êä³ö ¹¦ÂÊ
+		case Down_Conversion_Out_Power:				//	è¾“å‡º åŠŸç‡
 			break;
 	}
 }
@@ -426,7 +432,7 @@ void update_buffer(uint8_t num, uint8_t *buffer, uint8_t *count) {
         buffer[*count] = num;
         (*count)++;
     } else {
-        // ÒÆ³ı×î¾ÉÔªËØ²¢Ç°ÒÆ
+        // ç§»é™¤æœ€æ—§å…ƒç´ å¹¶å‰ç§»
         for (int i = 0; i < DOWN_CONVERSION_BUFFER_SIZE-1; i++) {
             buffer[i] = buffer[i+1];
         }
@@ -444,13 +450,13 @@ int get_median(uint8_t *buffer) {
         temp[i] = buffer[i];
     }
     qsort(temp, DOWN_CONVERSION_BUFFER_SIZE, sizeof(int), compare);
-    return temp[DOWN_CONVERSION_BUFFER_SIZE/2]; // Ö±½Ó·µ»ØÖĞ¼äÔªËØ
+    return temp[DOWN_CONVERSION_BUFFER_SIZE/2]; // ç›´æ¥è¿”å›ä¸­é—´å…ƒç´ 
 }
-//-------------------- ¸ßÎÂ½µÆµ  mos ----------------------------
-// Temperature ¿ÉÎª¸ºÊı
+//-------------------- é«˜æ¸©é™é¢‘  mos ----------------------------
+// Temperature å¯ä¸ºè´Ÿæ•°
 void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 {
-	// 200ms ½øÒ»´Î
+	// 200ms è¿›ä¸€æ¬¡
 	uint8_t temp=0;
 	
 	if(Temperature < 0)
@@ -464,11 +470,11 @@ void Check_Down_Conversion_MOS_Temperature(short int Temperature)
 	
 }
 
-//-------------------- ¸ßÎÂ½µÆµ  »úÏä ----------------------------
-// Temperature ¿ÉÎª¸ºÊı
+//-------------------- é«˜æ¸©é™é¢‘  æœºç®± ----------------------------
+// Temperature å¯ä¸ºè´Ÿæ•°
 void Check_Down_Conversion_BOX_Temperature(short int Temperature)
 {
-	// 200ms ½øÒ»´Î
+	// 200ms è¿›ä¸€æ¬¡
 	uint8_t temp=0;
 	
 	if(Temperature < 0)
@@ -481,16 +487,16 @@ void Check_Down_Conversion_BOX_Temperature(short int Temperature)
 	Temperature_Box_Now = get_median(Box_Temperature_Array);
 }
 
-//-------------------- ¹¦ÂÊ½µÆµ   ----------------------------
+//-------------------- åŠŸç‡é™é¢‘   ----------------------------
 void Check_Down_Conversion_Motor_Power(uint16_t power)
 {
 
 }
 
-//-------------------- µçÁ÷½µÆµ   ----------------------------
+//-------------------- ç”µæµé™é¢‘   ----------------------------
 void Check_Down_Conversion_Motor_Current(uint32_t Current)
 {
-	// 200ms ½øÒ»´Î
+	// 200ms è¿›ä¸€æ¬¡
 	uint8_t temp=0;
 	
 //	if(Current < 0)
@@ -503,77 +509,77 @@ void Check_Down_Conversion_Motor_Current(uint32_t Current)
 	Current_Motor_Now = get_median(Out_Current_Array);
 }
 
-//-------------------- »ñÈ¡½µÆµ´ÎÊı ----------------------------
+//-------------------- è·å–é™é¢‘æ¬¡æ•° ----------------------------
 uint8_t Get_Down_Conversion_Time(void)
 {
 	return Down_Conversion_Time;
 }
 
-//-------------------- »ñÈ¡½µÆµÇ°ËÙ¶È ----------------------------
+//-------------------- è·å–é™é¢‘å‰é€Ÿåº¦ ----------------------------
 uint8_t Get_Down_Conversion_Speed_Old(void)
 {
 	return Temp_Slow_Down_Speed_Old;
 }
-//-------------------- »ñÈ¡½µÆµÇ°ËÙ¶È ----------------------------
+//-------------------- è·å–é™é¢‘å‰é€Ÿåº¦ ----------------------------
 void Set_Down_Conversion_Speed_Old(uint8_t vaule)
 {
 	Temp_Slow_Down_Speed_Old = vaule;
 }
-//-------------------- »ñÈ¡½µÆµÏÖÔÚËÙ¶È ----------------------------
+//-------------------- è·å–é™é¢‘ç°åœ¨é€Ÿåº¦ ----------------------------
 uint8_t Get_Down_Conversion_Speed_Now(void)
 {
 	return Temp_Slow_Down_Speed_Now;
 }
 
-//-------------------- ÉèÖÃ½µÆµÄ£Ê½ ----------------------------
+//-------------------- è®¾ç½®é™é¢‘æ¨¡å¼ ----------------------------
 //void Set_Temp_Slow_Down_State(uint8_t vaule)
 //{
 //	Down_Conversion_Type = vaule;
 //}
 
-//-------------------- »ñÈ¡¸ßÎÂ½µËÙÄ£Ê½ ----------------------------
+//-------------------- è·å–é«˜æ¸©é™é€Ÿæ¨¡å¼ ----------------------------
 uint8_t Get_Temp_Slow_Down_State(void)
 {
 	return Down_Conversion_Type;
 }
 
-//-------------------- ÉèÖÃ½µÆµ MOS ÎÂ¶È ----------------------------
+//-------------------- è®¾ç½®é™é¢‘ MOS æ¸©åº¦ ----------------------------
 //void Down_Conversion_Set_Temperature_Mos(uint8_t vaule)
 //{
 //	Temperature_Mos_Now = vaule;
 //}
 
-//-------------------- »ñÈ¡½µÆµ MOS ÎÂ¶È ----------------------------
+//-------------------- è·å–é™é¢‘ MOS æ¸©åº¦ ----------------------------
 uint8_t Down_Conversion_Get_Temperature_Mos(void)
 {
 	return Temperature_Mos_Now;
 }
 
-//-------------------- ÉèÖÃ½µÆµ Box ÎÂ¶È ----------------------------
+//-------------------- è®¾ç½®é™é¢‘ Box æ¸©åº¦ ----------------------------
 //void Down_Conversion_Set_Temperature_Box(uint8_t vaule)
 //{
 //	Temperature_Box_Now = vaule;
 //}
 
-//-------------------- »ñÈ¡½µÆµ Box ÎÂ¶È ----------------------------
+//-------------------- è·å–é™é¢‘ Box æ¸©åº¦ ----------------------------
 uint8_t Down_Conversion_Get_Temperature_Box(void)
 {
 	return Temperature_Box_Now;
 }
 
-//-------------------- ÉèÖÃ½µÆµ Current µçÁ÷ ----------------------------
+//-------------------- è®¾ç½®é™é¢‘ Current ç”µæµ ----------------------------
 //void Down_Conversion_Set_Current_Motor(uint8_t vaule)
 //{
 //	Current_Motor_Now = vaule;
 //}
 
-//-------------------- »ñÈ¡½µÆµ Current µçÁ÷ ----------------------------
+//-------------------- è·å–é™é¢‘ Current ç”µæµ ----------------------------
 uint8_t Down_Conversion_Get_Current_Motor(void)
 {
 	return Current_Motor_Now;
 }
 
-//-------------------- Ä£ÄâÊı¾İ²âÊÔ ----------------------------
+//-------------------- æ¨¡æ‹Ÿæ•°æ®æµ‹è¯• ----------------------------
 void Down_Conversion_Analog_Data_Test(void)
 {
 	static uint8_t direction=0;
@@ -611,20 +617,20 @@ void Down_Conversion_Analog_Data_Test(void)
 }
 
 
-// ½µÆµÈÎÎñÖ÷Ïß³Ì 	Ã¿Ãë½øÒ»´Î
+// é™é¢‘ä»»åŠ¡ä¸»çº¿ç¨‹ 	æ¯ç§’è¿›ä¸€æ¬¡
 void Down_Conversion_Handler(void)
 {
 	//Down_Conversion_Analog_Data_Test();
 	
 	Down_Conversion_Handler_Timing_Cnt ++;
-	// ÅĞ¶Ïµ±Ç°½µÆµÄ£Ê½
+	// åˆ¤æ–­å½“å‰é™é¢‘æ¨¡å¼
 	Check_Down_Conversion_State();
-	// ÅĞ¶Ïµ±Ç°½µÆµËÙÂÊ
+	// åˆ¤æ–­å½“å‰é™é¢‘é€Ÿç‡
 	Check_Down_Conversion_Rate();
-	// ¸ù¾İËÙÂÊ½µÆµ
+	// æ ¹æ®é€Ÿç‡é™é¢‘
 	Update_Down_Conversion_Speed();
-	// Í£»ú ÅĞ¶Ï
+	// åœæœº åˆ¤æ–­
 	Check_Fault_to_Stop();
-	// ¹ıµÍÊ±»ØÉı
+	// è¿‡ä½æ—¶å›å‡
 	Check_Down_Conversion_Rebound();
 }

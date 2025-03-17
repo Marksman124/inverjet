@@ -24,7 +24,7 @@
 #include <string.h>
 #include "subsystem.h"
 
-//****************  Ó³Éä ²ÎÊý
+//****************  æ˜ å°„ å‚æ•°
 uint16_t* p_Modbus_BaudRate=NULL;
 uint32_t Usart_BaudRate_Table[] = {0,2400,4800,9600,57600,115200};
 
@@ -32,44 +32,44 @@ uint32_t Usart_BaudRate_Table[] = {0,2400,4800,9600,57600,115200};
 #define BAUDRATE_TABLE_LEN 			(sizeof(Usart_BaudRate_Table)/sizeof(Usart_BaudRate_Table[0]))
 #define BAUDRATE_DEFAULT					3
 
-//´®¿Ú1ÖÐ¶Ï·þÎñ³ÌÐò
-//×¢Òâ,¶ÁÈ¡USARTx->SRÄÜ±ÜÃâÄªÃûÆäÃîµÄ´íÎó
-uint8_t USART1_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.
-//½ÓÊÕ×´Ì¬
-//bit15£¬	½ÓÊÕÍê³É±êÖ¾
-//bit14£¬	½ÓÊÕµ½0x0d
-//bit13~0£¬	½ÓÊÕµ½µÄÓÐÐ§×Ö½ÚÊýÄ¿
-uint16_t USART1_RX_STA = 0;		 //½ÓÊÕ×´Ì¬±ê¼Ç
-uint8_t aRxBuffer1[RXBUFFERSIZE]; //HAL¿âÊ¹ÓÃµÄ´®¿Ú½ÓÊÕ»º³å
-UART_HandleTypeDef huart1;	 //UART¾ä±ú
+//ä¸²å£1ä¸­æ–­æœåŠ¡ç¨‹åº
+//æ³¨æ„,è¯»å–USARTx->SRèƒ½é¿å…èŽ«åå…¶å¦™çš„é”™è¯¯
+uint8_t USART1_RX_BUF[USART_REC_LEN]; //æŽ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.
+//æŽ¥æ”¶çŠ¶æ€
+//bit15ï¼Œ	æŽ¥æ”¶å®Œæˆæ ‡å¿—
+//bit14ï¼Œ	æŽ¥æ”¶åˆ°0x0d
+//bit13~0ï¼Œ	æŽ¥æ”¶åˆ°çš„æœ‰æ•ˆå­—èŠ‚æ•°ç›®
+uint16_t USART1_RX_STA = 0;		 //æŽ¥æ”¶çŠ¶æ€æ ‡è®°
+uint8_t aRxBuffer1[RXBUFFERSIZE]; //HALåº“ä½¿ç”¨çš„ä¸²å£æŽ¥æ”¶ç¼“å†²
+UART_HandleTypeDef huart1;	 //UARTå¥æŸ„
 
 char R_speed[30];
 char config_para[30];
-uint8_t para_change = 0; //ÔÚÏßµ÷ÊÔPIDÓÃ
+uint8_t para_change = 0; //åœ¨çº¿è°ƒè¯•PIDç”¨
 
-//´®¿Ú2ÖÐ¶Ï·þÎñ³ÌÐò
-uint8_t USART2_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.
-uint16_t USART2_RX_STA = 0;			 //½ÓÊÕ×´Ì¬±ê¼Ç
-uint8_t aRxBuffer2[RXBUFFERSIZE];	 //HAL¿âÊ¹ÓÃµÄ´®¿Ú½ÓÊÕ»º³å
-UART_HandleTypeDef huart2;		 //UART¾ä±ú
+//ä¸²å£2ä¸­æ–­æœåŠ¡ç¨‹åº
+uint8_t USART2_RX_BUF[USART_REC_LEN]; //æŽ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.
+uint16_t USART2_RX_STA = 0;			 //æŽ¥æ”¶çŠ¶æ€æ ‡è®°
+uint8_t aRxBuffer2[RXBUFFERSIZE];	 //HALåº“ä½¿ç”¨çš„ä¸²å£æŽ¥æ”¶ç¼“å†²
+UART_HandleTypeDef huart2;		 //UARTå¥æŸ„
 
-//´®¿Ú3
-uint8_t USART3_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ÐÐ·û
-uint16_t USART3_RX_STA;				 //½ÓÊÕ×´Ì¬±ê¼Ç
-UART_HandleTypeDef huart3;		 //UART¾ä±ú
-uint8_t aRxBuffer3[RXBUFFERSIZE];	 //HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£3
+uint8_t USART3_RX_BUF[USART_REC_LEN]; //æŽ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦
+uint16_t USART3_RX_STA;				 //æŽ¥æ”¶çŠ¶æ€æ ‡è®°
+UART_HandleTypeDef huart3;		 //UARTå¥æŸ„
+uint8_t aRxBuffer3[RXBUFFERSIZE];	 //HALåº“USARTæŽ¥æ”¶Buffer
 
-//´®¿Ú4
-uint8_t USART4_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ÐÐ·û
-uint16_t USART4_RX_STA;				 //½ÓÊÕ×´Ì¬±ê¼Ç
-UART_HandleTypeDef huart4;		 //UART¾ä±ú
-uint8_t aRxBuffer4[RXBUFFERSIZE];	 //HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£4
+uint8_t USART4_RX_BUF[USART_REC_LEN]; //æŽ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦
+uint16_t USART4_RX_STA;				 //æŽ¥æ”¶çŠ¶æ€æ ‡è®°
+UART_HandleTypeDef huart4;		 //UARTå¥æŸ„
+uint8_t aRxBuffer4[RXBUFFERSIZE];	 //HALåº“USARTæŽ¥æ”¶Buffer
 
-//´®¿Ú5
-uint8_t USART5_RX_BUF[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ÐÐ·û
-uint16_t USART5_RX_STA;				 //½ÓÊÕ×´Ì¬±ê¼Ç
-UART_HandleTypeDef huart5;		 //UART¾ä±ú
-uint8_t aRxBuffer5[RXBUFFERSIZE];	 //HAL¿âUSART½ÓÊÕBuffer
+//ä¸²å£5
+uint8_t USART5_RX_BUF[USART_REC_LEN]; //æŽ¥æ”¶ç¼“å†²,æœ€å¤§USART_REC_LENä¸ªå­—èŠ‚.æœ«å­—èŠ‚ä¸ºæ¢è¡Œç¬¦
+uint16_t USART5_RX_STA;				 //æŽ¥æ”¶çŠ¶æ€æ ‡è®°
+UART_HandleTypeDef huart5;		 //UARTå¥æŸ„
+uint8_t aRxBuffer5[RXBUFFERSIZE];	 //HALåº“USARTæŽ¥æ”¶Buffer
 
 uint8_t data[200];
 uint8_t flag = 0;
@@ -514,11 +514,11 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 /* USER CODE BEGIN 1 */
 void HAL_UART_BaudRate_Init(void)
 {
-	// Á´½Ó·½Ê½
+	// é“¾æŽ¥æ–¹å¼
 	p_Modbus_BaudRate = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_DATA_ADDR_CONNECTION_MODE);
 	if(*p_Modbus_BaudRate > BAUDRATE_TABLE_LEN)
 	{
-		*p_Modbus_BaudRate = BAUDRATE_DEFAULT;// Ä¬ÈÏÖµ
+		*p_Modbus_BaudRate = BAUDRATE_DEFAULT;// é»˜è®¤å€¼
 		Set_DataAddr_Value( MB_FUNC_READ_HOLDING_REGISTER,  MB_DATA_ADDR_CONNECTION_MODE,  NO_MODE);
 	}
 }
@@ -527,22 +527,22 @@ void HAL_UART_BaudRate_Init(void)
 	
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if (huart->Instance == USART1) //Èç¹ûÊÇ´®¿Ú1
+	if (huart->Instance == USART1) //å¦‚æžœæ˜¯ä¸²å£1
 	{
 		
 	}
-	if (huart->Instance == USART2) //Èç¹ûÊÇ´®¿Ú2
+	if (huart->Instance == USART2) //å¦‚æžœæ˜¯ä¸²å£2
 	{
-		if ((USART2_RX_STA & 0x8000) == 0) //½ÓÊÕÎ´Íê³É
+		if ((USART2_RX_STA & 0x8000) == 0) //æŽ¥æ”¶æœªå®Œæˆ
 		{
-			if (USART2_RX_STA & 0x4000) //½ÓÊÕµ½ÁË0x0d
+			if (USART2_RX_STA & 0x4000) //æŽ¥æ”¶åˆ°äº†0x0d
 			{
 				if (aRxBuffer2[0] != 0x0a)
-					USART2_RX_STA = 0; //½ÓÊÕ´íÎó,ÖØÐÂ¿ªÊ¼
+					USART2_RX_STA = 0; //æŽ¥æ”¶é”™è¯¯,é‡æ–°å¼€å§‹
 				else
-					USART2_RX_STA |= 0x8000; //½ÓÊÕÍê³ÉÁË
+					USART2_RX_STA |= 0x8000; //æŽ¥æ”¶å®Œæˆäº†
 			}
-			else //»¹Ã»ÊÕµ½0X0D
+			else //è¿˜æ²¡æ”¶åˆ°0X0D
 			{
 				if (aRxBuffer2[0] == 0x0d)
 					USART2_RX_STA |= 0x4000;
@@ -551,7 +551,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 					USART2_RX_BUF[USART2_RX_STA & 0X3FFF] = aRxBuffer2[0];
 					USART2_RX_STA++;
 					if (USART2_RX_STA > (USART_REC_LEN - 1))
-						USART2_RX_STA = 0; //½ÓÊÕÊý¾Ý´íÎó,ÖØÐÂ¿ªÊ¼½ÓÊÕ
+						USART2_RX_STA = 0; //æŽ¥æ”¶æ•°æ®é”™è¯¯,é‡æ–°å¼€å§‹æŽ¥æ”¶
 				}
 			}
 		}
@@ -564,18 +564,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}
 	}
 
-	if (huart->Instance == USART3) //Èç¹ûÊÇ´®¿Ú3
+	if (huart->Instance == USART3) //å¦‚æžœæ˜¯ä¸²å£3
 	{
-		if ((USART3_RX_STA & 0x8000) == 0) //½ÓÊÕÎ´Íê³É
+		if ((USART3_RX_STA & 0x8000) == 0) //æŽ¥æ”¶æœªå®Œæˆ
 		{
-			if (USART3_RX_STA & 0x4000) //½ÓÊÕµ½ÁË0x0d
+			if (USART3_RX_STA & 0x4000) //æŽ¥æ”¶åˆ°äº†0x0d
 			{
 				if (aRxBuffer3[0] != 0x0a)
-					USART3_RX_STA = 0; //½ÓÊÕ´íÎó,ÖØÐÂ¿ªÊ¼
+					USART3_RX_STA = 0; //æŽ¥æ”¶é”™è¯¯,é‡æ–°å¼€å§‹
 				else
-					USART3_RX_STA |= 0x8000; //½ÓÊÕÍê³ÉÁË
+					USART3_RX_STA |= 0x8000; //æŽ¥æ”¶å®Œæˆäº†
 			}
-			else //»¹Ã»ÊÕµ½0X0D
+			else //è¿˜æ²¡æ”¶åˆ°0X0D
 			{
 				if (aRxBuffer3[0] == 0x0d)
 					USART3_RX_STA |= 0x4000;
@@ -584,7 +584,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 					USART3_RX_BUF[USART3_RX_STA & 0X3FFF] = aRxBuffer3[0];
 					USART3_RX_STA++;
 					if (USART3_RX_STA > (USART_REC_LEN - 1))
-						USART3_RX_STA = 0; //½ÓÊÕÊý¾Ý´íÎó,ÖØÐÂ¿ªÊ¼½ÓÊÕ
+						USART3_RX_STA = 0; //æŽ¥æ”¶æ•°æ®é”™è¯¯,é‡æ–°å¼€å§‹æŽ¥æ”¶
 				}
 			}
 		}
@@ -596,18 +596,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}
 	}
 
-	if (huart->Instance == UART4) //Èç¹ûÊÇ´®¿Ú4
+	if (huart->Instance == UART4) //å¦‚æžœæ˜¯ä¸²å£4
 	{
-		if ((USART4_RX_STA & 0x8000) == 0) //½ÓÊÕÎ´Íê³É
+		if ((USART4_RX_STA & 0x8000) == 0) //æŽ¥æ”¶æœªå®Œæˆ
 		{
-			if (USART4_RX_STA & 0x4000) //½ÓÊÕµ½ÁË0x0d
+			if (USART4_RX_STA & 0x4000) //æŽ¥æ”¶åˆ°äº†0x0d
 			{
 				if (aRxBuffer4[0] != 0x0a)
-					USART4_RX_STA = 0; //½ÓÊÕ´íÎó,ÖØÐÂ¿ªÊ¼
+					USART4_RX_STA = 0; //æŽ¥æ”¶é”™è¯¯,é‡æ–°å¼€å§‹
 				else
-					USART4_RX_STA |= 0x8000; //½ÓÊÕÍê³ÉÁË
+					USART4_RX_STA |= 0x8000; //æŽ¥æ”¶å®Œæˆäº†
 			}
-			else //»¹Ã»ÊÕµ½0X0D
+			else //è¿˜æ²¡æ”¶åˆ°0X0D
 			{
 				if (aRxBuffer4[0] == 0x0d)
 					USART4_RX_STA |= 0x4000;
@@ -616,7 +616,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 					USART4_RX_BUF[USART4_RX_STA & 0X3FFF] = aRxBuffer4[0];
 					USART4_RX_STA++;
 					if (USART4_RX_STA > (USART_REC_LEN - 1))
-						USART4_RX_STA = 0; //½ÓÊÕÊý¾Ý´íÎó,ÖØÐÂ¿ªÊ¼½ÓÊÕ
+						USART4_RX_STA = 0; //æŽ¥æ”¶æ•°æ®é”™è¯¯,é‡æ–°å¼€å§‹æŽ¥æ”¶
 				}
 			}
 		}
@@ -629,18 +629,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}
 	}
 
-	if (huart->Instance == UART5) //Èç¹ûÊÇ´®¿Ú5
+	if (huart->Instance == UART5) //å¦‚æžœæ˜¯ä¸²å£5
 	{
-		if ((USART5_RX_STA & 0x8000) == 0) //½ÓÊÕÎ´Íê³É
+		if ((USART5_RX_STA & 0x8000) == 0) //æŽ¥æ”¶æœªå®Œæˆ
 		{
-			if (USART5_RX_STA & 0x4000) //½ÓÊÕµ½ÁË0x0d
+			if (USART5_RX_STA & 0x4000) //æŽ¥æ”¶åˆ°äº†0x0d
 			{
 				if (aRxBuffer5[0] != 0x0a)
-					USART5_RX_STA = 0; //½ÓÊÕ´íÎó,ÖØÐÂ¿ªÊ¼
+					USART5_RX_STA = 0; //æŽ¥æ”¶é”™è¯¯,é‡æ–°å¼€å§‹
 				else
-					USART5_RX_STA |= 0x8000; //½ÓÊÕÍê³ÉÁË
+					USART5_RX_STA |= 0x8000; //æŽ¥æ”¶å®Œæˆäº†
 			}
-			else //»¹Ã»ÊÕµ½0X0D
+			else //è¿˜æ²¡æ”¶åˆ°0X0D
 			{
 				if (aRxBuffer5[0] == 0x0d)
 					USART5_RX_STA |= 0x4000;
@@ -649,7 +649,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 					USART5_RX_BUF[USART5_RX_STA & 0X3FFF] = aRxBuffer5[0];
 					USART5_RX_STA++;
 					if (USART5_RX_STA > (USART_REC_LEN - 1))
-						USART5_RX_STA = 0; //½ÓÊÕÊý¾Ý´íÎó,ÖØÐÂ¿ªÊ¼½ÓÊÕ
+						USART5_RX_STA = 0; //æŽ¥æ”¶æ•°æ®é”™è¯¯,é‡æ–°å¼€å§‹æŽ¥æ”¶
 				}
 			}
 		}

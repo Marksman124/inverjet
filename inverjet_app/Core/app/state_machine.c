@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				state_machine.c
-* @brief			×´Ì¬»ú 
+* @brief			çŠ¶æ€æœº 
 *
 * @author			WQG
 * @versions		v1.0
@@ -27,7 +27,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-// ÌØ±ğ×´Ì¬ Î»
+// ç‰¹åˆ«çŠ¶æ€ ä½
 uint8_t Special_Status_Bit = 0;
 
 
@@ -35,42 +35,42 @@ uint8_t Special_Status_Bit = 0;
 
 
 /* Private user code ---------------------------------------------------------*/
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
-// ³õÊ¼»¯
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
+// åˆå§‹åŒ–
 void App_State_Machine_Init(void)
 {
-	*p_System_State_Machine = POWER_OFF_STATUS;  //×´Ì¬»ú
+	*p_System_State_Machine = POWER_OFF_STATUS;  //çŠ¶æ€æœº
 	
 	Special_Status_Bit = 0;
 }
 
 //-----------------------------------------------------------------------------------------------
 //******************************************************************************************
-//------------- Ä£Ê½·¢ÉúÇĞ»» ------------------------------------
-// machine: ĞÂ×´Ì¬»ú
+//------------- æ¨¡å¼å‘ç”Ÿåˆ‡æ¢ ------------------------------------
+// machine: æ–°çŠ¶æ€æœº
 void Check_Mode_Change(uint16_t machine)
 {
 	if(Get_System_State_Machine() != machine)
 	{
-		Clean_Automatic_Shutdown_Timer();	// Çå³ı ×Ô¶¯¹Ø»ú¼ÆÊ±Æ÷
-		Clean_Timing_Timer_Cnt();					// Çå³ıÔËĞĞ(timing) ¼ÆÊ±Æ÷
+		Clean_Automatic_Shutdown_Timer();	// æ¸…é™¤ è‡ªåŠ¨å…³æœºè®¡æ—¶å™¨
+		Clean_Timing_Timer_Cnt();					// æ¸…é™¤è¿è¡Œ(timing) è®¡æ—¶å™¨
 		//Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 		
-		//	ÇĞ»»Ä£Ê½Ê±
+		//	åˆ‡æ¢æ¨¡å¼æ—¶
 		if(Is_Change_System_Mode(machine))
 		{
-			Finish_Statistics_Upload();			// ÉÏ´«<Í³¼ÆÊı¾İ>
+			Finish_Statistics_Upload();			// ä¸Šä¼ <ç»Ÿè®¡æ•°æ®>
 		}
 	}
 }
 
-//------------------- ÉèÖÃ×´Ì¬»ú  ----------------------------
+//------------------- è®¾ç½®çŠ¶æ€æœº  ----------------------------
 
 uint8_t Set_System_State_Machine(uint8_t val)
 {
-	if(val >= SYSTEM_STATE_END) //Òç³ö
+	if(val >= SYSTEM_STATE_END) //æº¢å‡º
 		return 0;
-//-----------------  Õ¹Ê¾Ñù»ú -------------------------
+//-----------------  å±•ç¤ºæ ·æœº -------------------------
 #ifdef SYSTEM_SHOW_MODEL_MACHINE
 	if(val == ERROR_DISPLAY_STATUS)
 		return 0;
@@ -80,7 +80,7 @@ uint8_t Set_System_State_Machine(uint8_t val)
 	
 	*p_System_State_Machine = val;
 	
-	// Ä£Ê½
+	// æ¨¡å¼
 	if(System_Mode_Train())
 	{
 		if(Get_System_State_Mode() == 0)
@@ -94,7 +94,7 @@ uint8_t Set_System_State_Machine(uint8_t val)
 }
 
 
-//------------------- »ñÈ¡×´Ì¬»ú  ----------------------------
+//------------------- è·å–çŠ¶æ€æœº  ----------------------------
 
 uint8_t Get_System_State_Machine(void)
 {
@@ -106,19 +106,19 @@ uint8_t Get_System_State_Machine(void)
 
 //-----------------------------------------------------------------------------------------------
 //******************************************************************************************
-//------------------- ÉèÖÃ Ä£Ê½(Pn)  ----------------------------
+//------------------- è®¾ç½® æ¨¡å¼(Pn)  ----------------------------
 
 uint8_t Set_System_State_Mode(uint8_t val)
 {
-	if(val > TRAINING_MODE_NUMBER_MAX) //Òç³ö
+	if(val > TRAINING_MODE_NUMBER_MAX) //æº¢å‡º
 		return 0;
 		
-	//	ÇĞ»»Ä£Ê½Ê±
+	//	åˆ‡æ¢æ¨¡å¼æ—¶
 	if(val != *p_PMode_Now)
 	{
 		Set_Pmode_Period_Now(0);
-		Finish_Statistics_Upload();			// ÉÏ´«<Í³¼ÆÊı¾İ>
-		Clean_Timing_Timer_Cnt();				// Çå³ıÔËĞĞ(timing) ¼ÆÊ±Æ÷
+		Finish_Statistics_Upload();			// ä¸Šä¼ <ç»Ÿè®¡æ•°æ®>
+		Clean_Timing_Timer_Cnt();				// æ¸…é™¤è¿è¡Œ(timing) è®¡æ—¶å™¨
 	}
 	
 	*p_PMode_Now = val;
@@ -127,7 +127,7 @@ uint8_t Set_System_State_Mode(uint8_t val)
 }
 
 
-//------------------- »ñÈ¡ Ä£Ê½  ----------------------------
+//------------------- è·å– æ¨¡å¼  ----------------------------
 
 uint8_t Get_System_State_Mode(void)
 {
@@ -138,9 +138,9 @@ uint8_t Get_System_State_Mode(void)
 //-----------------------------------------------------------------------------------------------
 
 
-//------------------- ¿ìËÙ»ñÈ¡×´Ì¬  ----------------------------
+//------------------- å¿«é€Ÿè·å–çŠ¶æ€  ----------------------------
 
-// µç»úÆô¶¯×´Ì¬
+// ç”µæœºå¯åŠ¨çŠ¶æ€
 uint8_t Motor_is_Start(void)
 {
 	if((*p_System_State_Machine == FREE_MODE_STARTING) || (*p_System_State_Machine == FREE_MODE_RUNNING) 
@@ -151,7 +151,7 @@ uint8_t Motor_is_Start(void)
 		return 0;
 }
 
-// Õı³£¹¤×÷×´Ì¬
+// æ­£å¸¸å·¥ä½œçŠ¶æ€
 uint8_t System_is_Normal_Operation(void)
 {
 	if((*p_System_State_Machine >= FREE_MODE_INITIAL) && (*p_System_State_Machine <= TRAINING_MODE_STOP))
@@ -160,7 +160,7 @@ uint8_t System_is_Normal_Operation(void)
 		return 0;
 }
 
-// ³õÊ¼×´Ì¬
+// åˆå§‹çŠ¶æ€
 uint8_t System_is_Initial(void)
 {
 	if((*p_System_State_Machine == FREE_MODE_INITIAL) || (*p_System_State_Machine == TIMING_MODE_INITIAL) || (*p_System_State_Machine == TRAINING_MODE_INITIAL))
@@ -169,7 +169,7 @@ uint8_t System_is_Initial(void)
 		return 0;
 }
 
-// Æô¶¯×´Ì¬
+// å¯åŠ¨çŠ¶æ€
 uint8_t System_is_Starting(void)
 {
 	if((*p_System_State_Machine == FREE_MODE_STARTING) || (*p_System_State_Machine == TIMING_MODE_STARTING) || (*p_System_State_Machine == TRAINING_MODE_STARTING))
@@ -178,7 +178,7 @@ uint8_t System_is_Starting(void)
 		return 0;
 }
 
-// ÔËĞĞ×´Ì¬
+// è¿è¡ŒçŠ¶æ€
 uint8_t System_is_Running(void)
 {
 	if((*p_System_State_Machine == FREE_MODE_RUNNING) || (*p_System_State_Machine == TIMING_MODE_RUNNING) || (*p_System_State_Machine == TRAINING_MODE_RUNNING))
@@ -187,7 +187,7 @@ uint8_t System_is_Running(void)
 		return 0;
 }
 
-// ÔİÍ£×´Ì¬
+// æš‚åœçŠ¶æ€
 uint8_t System_is_Pause(void)
 {
 	if((*p_System_State_Machine == FREE_MODE_SUSPEND) || (*p_System_State_Machine == TIMING_MODE_SUSPEND) || (*p_System_State_Machine == TRAINING_MODE_SUSPEND))
@@ -196,7 +196,7 @@ uint8_t System_is_Pause(void)
 		return 0;
 }
 
-// ½áÊø×´Ì¬
+// ç»“æŸçŠ¶æ€
 uint8_t System_is_Stop(void)
 {
 	if((*p_System_State_Machine == FREE_MODE_STOP) || (*p_System_State_Machine == TIMING_MODE_STOP) || (*p_System_State_Machine == TRAINING_MODE_STOP))
@@ -205,7 +205,7 @@ uint8_t System_is_Stop(void)
 		return 0;
 }
 
-// ²Ù×÷²Ëµ¥
+// æ“ä½œèœå•
 uint8_t System_is_Operation(void)
 {
 	if(*p_System_State_Machine == OPERATION_MENU_STATUS)
@@ -214,7 +214,7 @@ uint8_t System_is_Operation(void)
 		return 0;
 }
 
-// ¹ÊÕÏ½çÃæ
+// æ•…éšœç•Œé¢
 uint8_t System_is_Error(void)
 {
 	if(*p_System_State_Machine == ERROR_DISPLAY_STATUS)
@@ -223,7 +223,7 @@ uint8_t System_is_Error(void)
 		return 0;
 }
 
-// ¹Ø»ú
+// å…³æœº
 uint8_t System_is_Power_Off(void)
 {
 	if(*p_System_State_Machine == POWER_OFF_STATUS)
@@ -242,7 +242,7 @@ uint8_t System_is_OTA(void)
 }
 
 
-// ×ÔÓÉ Ä£Ê½
+// è‡ªç”± æ¨¡å¼
 uint8_t System_Mode_Free(void)
 {
 	if( (*p_System_State_Machine >= FREE_MODE_INITIAL) && (*p_System_State_Machine <= FREE_MODE_STOP))
@@ -251,7 +251,7 @@ uint8_t System_Mode_Free(void)
 		return 0;
 }
 
-// ¶¨Ê± Ä£Ê½
+// å®šæ—¶ æ¨¡å¼
 uint8_t System_Mode_Time(void)
 {
 	if( (*p_System_State_Machine >= TIMING_MODE_INITIAL) && (*p_System_State_Machine <= TIMING_MODE_STOP))
@@ -260,7 +260,7 @@ uint8_t System_Mode_Time(void)
 		return 0;
 }
 
-// ÑµÁ· Ä£Ê½
+// è®­ç»ƒ æ¨¡å¼
 uint8_t System_Mode_Train(void)
 {
 	if( (*p_System_State_Machine >= TRAINING_MODE_INITIAL) && (*p_System_State_Machine <= TRAINING_MODE_STOP))
@@ -269,7 +269,7 @@ uint8_t System_Mode_Train(void)
 		return 0;
 }
 
-// ³åÀË Ä£Ê½
+// å†²æµª æ¨¡å¼
 uint8_t System_Mode_Surf(void)
 {
 	if( System_Mode_Train() && (Get_System_State_Mode() == SURFING_MODE_NUMBER_ID))
@@ -278,8 +278,8 @@ uint8_t System_Mode_Surf(void)
 		return 0;
 }
 
-//------------------- ¸ü¸Ä×´Ì¬ ²»¸Ä±äÄ£Ê½  ----------------------------
-// --> ³õÊ¼×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+//------------------- æ›´æ”¹çŠ¶æ€ ä¸æ”¹å˜æ¨¡å¼  ----------------------------
+// --> åˆå§‹çŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 void Arbitrarily_To_Initial(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
@@ -299,7 +299,7 @@ void Arbitrarily_To_Initial(void)
 	return;
 }
 	
-// --> Æô¶¯×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> å¯åŠ¨çŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 void Arbitrarily_To_Starting(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
@@ -319,7 +319,7 @@ void Arbitrarily_To_Starting(void)
 	return;
 }
 
-// --> ÔËĞĞ×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> è¿è¡ŒçŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 void Arbitrarily_To_Running(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
@@ -339,7 +339,7 @@ void Arbitrarily_To_Running(void)
 	return;
 }
 
-// --> ÔİÍ£×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> æš‚åœçŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 void Arbitrarily_To_Pause(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
@@ -360,7 +360,7 @@ void Arbitrarily_To_Pause(void)
 	return;
 }
 
-// --> ½áÊø×´Ì¬ £¨²»¸ü¸ÄÄ£Ê½£©
+// --> ç»“æŸçŠ¶æ€ ï¼ˆä¸æ›´æ”¹æ¨¡å¼ï¼‰
 void Arbitrarily_To_Stop(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
@@ -382,57 +382,57 @@ void Arbitrarily_To_Stop(void)
 	return;
 }
 
-//------------------- ÅĞ¶Ï ×´Ì¬ & Ä£Ê½  ----------------------------
-// 	Ä£Ê½ ÊÇ·ñ·¢Éú±ä»¯ 
-//	1:ÊÇ  0:·ñ
+//------------------- åˆ¤æ–­ çŠ¶æ€ & æ¨¡å¼  ----------------------------
+// 	æ¨¡å¼ æ˜¯å¦å‘ç”Ÿå˜åŒ– 
+//	1:æ˜¯  0:å¦
 uint8_t Is_Change_System_Mode(uint16_t machine)
 {
 	uint8_t result = 1;
 	
 	switch(machine)
 	{
-		case POWER_OFF_STATUS:			//	¹Ø»ú
+		case POWER_OFF_STATUS:			//	å…³æœº
 			if(System_is_Power_Off())
 				result = 0;
 		break;
-	//×ÔÓÉÄ£Ê½
-		case FREE_MODE_INITIAL:				//	1		³õÊ¼×´Ì¬	
-		case FREE_MODE_STARTING:			//			Æô¶¯ÖĞ
-		case FREE_MODE_RUNNING:				//			ÔËĞĞÖĞ
-		case FREE_MODE_SUSPEND:				//			ÔİÍ£
-		case FREE_MODE_STOP:					//	5		½áÊø
+	//è‡ªç”±æ¨¡å¼
+		case FREE_MODE_INITIAL:				//	1		åˆå§‹çŠ¶æ€	
+		case FREE_MODE_STARTING:			//			å¯åŠ¨ä¸­
+		case FREE_MODE_RUNNING:				//			è¿è¡Œä¸­
+		case FREE_MODE_SUSPEND:				//			æš‚åœ
+		case FREE_MODE_STOP:					//	5		ç»“æŸ
 			if(System_Mode_Free())
 				result = 0;
 		break;
-	//¶¨Ê±Ä£Ê½
-		case TIMING_MODE_INITIAL:			//	6		³õÊ¼×´Ì¬
-		case TIMING_MODE_STARTING:		//			Æô¶¯ÖĞ
-		case TIMING_MODE_RUNNING:			//			ÔËĞĞÖĞ
-		case TIMING_MODE_SUSPEND:			//			ÔİÍ£
-		case TIMING_MODE_STOP:				//	10	½áÊø
+	//å®šæ—¶æ¨¡å¼
+		case TIMING_MODE_INITIAL:			//	6		åˆå§‹çŠ¶æ€
+		case TIMING_MODE_STARTING:		//			å¯åŠ¨ä¸­
+		case TIMING_MODE_RUNNING:			//			è¿è¡Œä¸­
+		case TIMING_MODE_SUSPEND:			//			æš‚åœ
+		case TIMING_MODE_STOP:				//	10	ç»“æŸ
 			if(System_Mode_Time())
 				result = 0;
 		break;
-	//ÑµÁ·Ä£Ê½
-		case TRAINING_MODE_INITIAL:		//	11	³õÊ¼×´Ì¬
-		case TRAINING_MODE_STARTING:	//			Æô¶¯ÖĞ
-		case TRAINING_MODE_RUNNING:		//			ÔËĞĞÖĞ
-		case TRAINING_MODE_SUSPEND:		//			ÔİÍ£
-		case TRAINING_MODE_STOP:			//	15	½áÊø
+	//è®­ç»ƒæ¨¡å¼
+		case TRAINING_MODE_INITIAL:		//	11	åˆå§‹çŠ¶æ€
+		case TRAINING_MODE_STARTING:	//			å¯åŠ¨ä¸­
+		case TRAINING_MODE_RUNNING:		//			è¿è¡Œä¸­
+		case TRAINING_MODE_SUSPEND:		//			æš‚åœ
+		case TRAINING_MODE_STOP:			//	15	ç»“æŸ
 			if(System_Mode_Train())
 				result = 0;
 		break;
 	
-	// ÆäËü×´Ì¬
-		case OPERATION_MENU_STATUS:		//			²Ù×÷²Ëµ¥
+	// å…¶å®ƒçŠ¶æ€
+		case OPERATION_MENU_STATUS:		//			æ“ä½œèœå•
 			if(System_is_Operation())
 				result = 0;
 		break;
-		case ERROR_DISPLAY_STATUS:		//			¹ÊÕÏ½çÃæ
+		case ERROR_DISPLAY_STATUS:		//			æ•…éšœç•Œé¢
 			if(System_is_Error())
 				result = 0;
 		break;
-		case OTA_UPGRADE_STATUS:			//			OTA Éı¼¶
+		case OTA_UPGRADE_STATUS:			//			OTA å‡çº§
 			if(System_is_OTA())
 				result = 0;
 		break;
@@ -445,40 +445,40 @@ uint8_t Is_Change_System_Mode(uint16_t machine)
 }
 
 
-//------------------- ÌØ±ğ×´Ì¬ »ú  ----------------------------
+//------------------- ç‰¹åˆ«çŠ¶æ€ æœº  ----------------------------
 
-// Ìí¼Ó ÌØ±ğ×´Ì¬ ±êÖ¾
+// æ·»åŠ  ç‰¹åˆ«çŠ¶æ€ æ ‡å¿—
 void Special_Status_Add(uint8_t num)
 {
 	Special_Status_Bit |= num;
 }
 
 
-// É¾³ı ÌØ±ğ×´Ì¬ ±êÖ¾
+// åˆ é™¤ ç‰¹åˆ«çŠ¶æ€ æ ‡å¿—
 void Special_Status_Delete(uint8_t num)
 {
 	Special_Status_Bit &= ~num;
 }
 
-// »ñÈ¡ ÌØ±ğ×´Ì¬ ±êÖ¾
+// è·å– ç‰¹åˆ«çŠ¶æ€ æ ‡å¿—
 uint8_t Special_Status_Get(uint8_t num)
 {
 	return (Special_Status_Bit & num);
 }
 
-//------------------- ÔËĞĞ²ÎÊıÉèÖÃ½Ó¿Ú ----------------------------
-// ÊÇ·ñ½ÓÊÕ¿ØÖÆ
+//------------------- è¿è¡Œå‚æ•°è®¾ç½®æ¥å£ ----------------------------
+// æ˜¯å¦æ¥æ”¶æ§åˆ¶
 uint8_t System_Para_External_Control(System_Ctrl_Mode_Type_enum ctrler)
 {
 	switch(ctrler)
 	{
-		case CTRL_FROM_KEY:				//	°´¼ü
+		case CTRL_FROM_KEY:				//	æŒ‰é”®
 			return 1;
 		case CTRL_FROM_WIFI:						//	wifi
 			if(If_Accept_External_Control(BLOCK_WIFI_CONTROL) == 0)
 				return 0;
 			break;
-		case CTRL_FROM_BT:							//	À¶ÑÀ
+		case CTRL_FROM_BT:							//	è“ç‰™
 			if(If_Accept_External_Control(BLOCK_BLUETOOTH_CONTROL) == 0)
 				return 0;
 			break;
@@ -490,29 +490,29 @@ uint8_t System_Para_External_Control(System_Ctrl_Mode_Type_enum ctrler)
 	return 1;
 }
 
-// Ä£Ê½
+// æ¨¡å¼
 void System_Para_Set_PMode(uint16_t pmode, System_Ctrl_Mode_Type_enum ctrler)
 {
 	if(System_Para_External_Control(ctrler))
 	{
 		Set_System_State_Mode(pmode);
 		
-		Set_Ctrl_Mode_Type(ctrler);//±ê¼Ç¿ØÖÆÀ´Ô´
+		Set_Ctrl_Mode_Type(ctrler);//æ ‡è®°æ§åˆ¶æ¥æº
 	}
 }
 
-// ×´Ì¬»ú
+// çŠ¶æ€æœº
 void System_Para_Set_Status(uint16_t status, System_Ctrl_Mode_Type_enum ctrler)
 {
 	if(System_Para_External_Control(ctrler))
 	{
 		if(status <= TRAINING_MODE_STOP)
 		{
-			//	ÇĞ»»Ä£Ê½Ê±
+			//	åˆ‡æ¢æ¨¡å¼æ—¶
 			if(Is_Change_System_Mode(status))
 			{
 				Set_System_State_Machine(status);
-				Check_OP_All();		// È·±£²ÎÊıºÏ·¨
+				Check_OP_All();		// ç¡®ä¿å‚æ•°åˆæ³•
 			}
 			else
 			{
@@ -520,12 +520,12 @@ void System_Para_Set_Status(uint16_t status, System_Ctrl_Mode_Type_enum ctrler)
 				OP_Update_Mode();
 			}
 			
-			Set_Ctrl_Mode_Type(ctrler);//±ê¼Ç¿ØÖÆÀ´Ô´
+			Set_Ctrl_Mode_Type(ctrler);//æ ‡è®°æ§åˆ¶æ¥æº
 		}
 	}
 }
 
-// ËÙ¶È
+// é€Ÿåº¦
 void System_Para_Set_Speed(uint16_t speed, System_Ctrl_Mode_Type_enum ctrler)
 {
 	if(System_Para_External_Control(ctrler))
@@ -536,8 +536,8 @@ void System_Para_Set_Speed(uint16_t speed, System_Ctrl_Mode_Type_enum ctrler)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
 		else
 			*p_OP_ShowNow_Speed = speed;
-		Set_Ctrl_Mode_Type(ctrler);//±ê¼Ç¿ØÖÆÀ´Ô´
-		// ±£´æ
+		Set_Ctrl_Mode_Type(ctrler);//æ ‡è®°æ§åˆ¶æ¥æº
+		// ä¿å­˜
 		Update_OP_Speed();
 		
 		if(Motor_is_Start())
@@ -547,7 +547,7 @@ void System_Para_Set_Speed(uint16_t speed, System_Ctrl_Mode_Type_enum ctrler)
 	}
 }
 
-// Ê±¼ä
+// æ—¶é—´
 void System_Para_Set_Time(uint16_t time, System_Ctrl_Mode_Type_enum ctrler)
 {
 	if(System_Para_External_Control(ctrler))
@@ -556,9 +556,9 @@ void System_Para_Set_Time(uint16_t time, System_Ctrl_Mode_Type_enum ctrler)
 			time = MOTOR_TIME_SHOW_MAX - 1;
 		
 		*p_OP_ShowNow_Time = time;
-		Set_Ctrl_Mode_Type(ctrler);//±ê¼Ç¿ØÖÆÀ´Ô´
+		Set_Ctrl_Mode_Type(ctrler);//æ ‡è®°æ§åˆ¶æ¥æº
 		
-		// ±£´æ
+		// ä¿å­˜
 		Update_OP_Time();
 	}
 }

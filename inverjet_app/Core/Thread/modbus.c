@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		modbus.c
-* @brief   		Modbus Ω”ø⁄
+* @brief   		Modbus Êé•Âè£
 *
 *
 * @author			WQG
@@ -14,7 +14,7 @@
 #include "dev.h"
 #include "key.h"
 /* Private variables ---------------------------------------------------------*/
-ULONG OTA_Pack_Len=0;					// ◊‹≥§∂»
+ULONG OTA_Pack_Len=0;					// ÊÄªÈïøÂ∫¶
 
 uint32_t ModbusTimerCnt=0;
 
@@ -67,11 +67,11 @@ HoldingCallOut( USHORT usAddress )
 	
 	//iRegIndex = ( usAddress );
 	
-	if(usAddress == MB_SLAVE_NODE_ADDRESS) // ¥”ª˙µÿ÷∑
+	if(usAddress == MB_SLAVE_NODE_ADDRESS) // ‰ªéÊú∫Âú∞ÂùÄ
 	{
 		MB_Node_Address_Set(*p_Local_Address);
 	}
-	else if(usAddress == MB_SLAVE_BAUD_RATE) // …Ë÷√≤®Ãÿ¬ 
+	else if(usAddress == MB_SLAVE_BAUD_RATE) // ËÆæÁΩÆÊ≥¢ÁâπÁéá
 	{
 		__HAL_UART_DISABLE(p_huart_mb);
 #if MODBUS_USART == 1
@@ -85,11 +85,11 @@ HoldingCallOut( USHORT usAddress )
 #endif
 		__HAL_UART_ENABLE(p_huart_mb);
 	}
-	else if(usAddress == MB_SYSTEM_WORKING_MODE) //	œµÕ≥π§◊˜ƒ£ Ω  ∏ﬂŒª::0£∫P1\2\3  µÕŒª:0£∫◊‘”…:1£∫∂® ±:2£∫—µ¡∑
+	else if(usAddress == MB_SYSTEM_WORKING_MODE) //	Á≥ªÁªüÂ∑•‰ΩúÊ®°Âºè  È´ò‰Ωç::0ÔºöP1\2\3  ‰Ωé‰Ωç:0ÔºöËá™Áî±:1ÔºöÂÆöÊó∂:2ÔºöËÆ≠ÁªÉ
 	{
 		System_Para_Set_PMode(usRegHoldingBuf[MB_SYSTEM_WORKING_MODE], CTRL_FROM_RS485);
 	}
-	else if(usAddress == MB_SYSTEM_WORKING_STATUS) //	◊¥Ã¨ª˙
+	else if(usAddress == MB_SYSTEM_WORKING_STATUS) //	Áä∂ÊÄÅÊú∫
 	{
 		System_Para_Set_Status(usRegHoldingBuf[MB_SYSTEM_WORKING_STATUS], CTRL_FROM_RS485);
 	}
@@ -112,6 +112,17 @@ HoldingCallOut( USHORT usAddress )
 				//Write_MbBuffer_Now();
 			}
 		}
+		else if(usRegHoldingBuf[MB_SYSTEM_SELF_TEST_STATE] == 0xA070 )
+		{
+			static uint8_t auto_runing_cnt=0;
+				
+			if(auto_runing_cnt++ > 3)
+			{
+				IN_AUTO_RUNNING_MODE();
+				usRegHoldingBuf[MB_SYSTEM_SELF_TEST_STATE] = 0;
+			}
+		}
+			
 	}
 }
 
@@ -173,7 +184,7 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
 						{
 							while( usNRegs > 0 )
 							{
-								//◊¥Ã¨ª˙
+								//Áä∂ÊÄÅÊú∫
 								if((iRegIndex == MB_SYSTEM_WORKING_STATUS) && ( *(pucRegBuffer+1) > TRAINING_MODE_STOP ))
 								{
 									pucRegBuffer++;
@@ -197,7 +208,7 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
 //							{
 //								HoldingCallOut(usAddress);
 //							}
-							//±£¥Ê
+							//‰øùÂ≠ò
 							Write_MbBuffer_Later();
 						}
 						break;
@@ -215,7 +226,7 @@ eMBRegFileCB( UCHAR * pucRegBuffer, USHORT fileNumber, USHORT fileLength,
                  eMBRegisterMode eMode )
 {
   eMBErrorCode    eStatus = MB_ENOERR;
-	ULONG write_addr=0;						// flash –¥»Îµÿ÷∑
+	ULONG write_addr=0;						// flash ÂÜôÂÖ•Âú∞ÂùÄ
 	ULONG sign=0;
 	
 	Clean_ModbusTimerCnt();
@@ -227,7 +238,7 @@ eMBRegFileCB( UCHAR * pucRegBuffer, USHORT fileNumber, USHORT fileLength,
 		case MB_REG_READ:
 			break;
 		case MB_REG_WRITE:
-			if(fileNumber == REG_FILE_NUMBER_STAR) // ∆ º∞¸
+			if(fileNumber == REG_FILE_NUMBER_STAR) // Ëµ∑ÂßãÂåÖ
 			{OTA_Pack_Len = 0;}
 			
 			taskENTER_CRITICAL();
@@ -236,13 +247,13 @@ eMBRegFileCB( UCHAR * pucRegBuffer, USHORT fileNumber, USHORT fileLength,
 			OTA_Pack_Len += (fileLength*2);
 			taskEXIT_CRITICAL();
 			
-			if(fileNumber == REG_FILE_NUMBER_END)//◊Ó∫Û“ª÷°
+			if(fileNumber == REG_FILE_NUMBER_END)//ÊúÄÂêé‰∏ÄÂ∏ß
 			{
-				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&OTA_Pack_Len,2); // –¥∞¸≥§∂» (∫¨crc)
+				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PACK_LEN,(uint16_t*)&OTA_Pack_Len,2); // ÂÜôÂåÖÈïøÂ∫¶ (Âê´crc)
 				sign = PRODUCT_BOOT_PASSWORD;
-				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // Ω¯»ÎOTA 
+				STMFLASH_Write(BOOT_FLASH_ADDR_OTA_PASSWORD,(uint16_t*)&sign,2); // ËøõÂÖ•OTA 
 
-				SysSoftReset();// »Ìº˛∏¥Œª
+				SysSoftReset();// ËΩØ‰ª∂Â§ç‰Ωç
 			}
 			break;
 		}
@@ -259,22 +270,22 @@ eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNCoils,
                eMBRegisterMode eMode )
 {
 	Clean_ModbusTimerCnt();
-	//¥ÌŒÛ◊¥Ã¨
+	//ÈîôËØØÁä∂ÊÄÅ
 	eMBErrorCode eStatus = MB_ENOERR;
-//	//ºƒ¥Ê∆˜∏ˆ ˝
+//	//ÂØÑÂ≠òÂô®‰∏™Êï∞
 //	int16_t iNCoils = ( int16_t )usNCoils;
-//	//ºƒ¥Ê∆˜∆´“∆¡ø
+//	//ÂØÑÂ≠òÂô®ÂÅèÁßªÈáè
 //	int16_t usBitOffset;
 
-//	//ºÏ≤Èºƒ¥Ê∆˜ «∑Ò‘⁄÷∏∂®∑∂Œßƒ⁄
+//	//Ê£ÄÊü•ÂØÑÂ≠òÂô®ÊòØÂê¶Âú®ÊåáÂÆöËåÉÂõ¥ÂÜÖ
 //	if( ( (int16_t)usAddress >= REG_COILS_START ) &&
 //	( usAddress + usNCoils <= REG_COILS_START + REG_COILS_SIZE ) )
 //	{
-//	//º∆À„ºƒ¥Ê∆˜∆´“∆¡ø
+//	//ËÆ°ÁÆóÂØÑÂ≠òÂô®ÂÅèÁßªÈáè
 //	usBitOffset = ( int16_t )( usAddress - REG_COILS_START );
 //	switch ( eMode )
 //	{
-//	//∂¡≤Ÿ◊˜
+//	//ËØªÊìç‰Ωú
 //	case MB_REG_READ:
 //	while( iNCoils > 0 )
 //	{
@@ -285,7 +296,7 @@ eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNCoils,
 //	}
 //	break;
 
-//	//–¥≤Ÿ◊˜
+//	//ÂÜôÊìç‰Ωú
 //	case MB_REG_WRITE:
 //	while( iNCoils > 0 )
 //	{
@@ -309,18 +320,18 @@ eMBErrorCode
 eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
 {
 	Clean_ModbusTimerCnt();
-	//¥ÌŒÛ◊¥Ã¨
+	//ÈîôËØØÁä∂ÊÄÅ
 	eMBErrorCode eStatus = MB_ENOERR;
-//	//≤Ÿ◊˜ºƒ¥Ê∆˜∏ˆ ˝
+//	//Êìç‰ΩúÂØÑÂ≠òÂô®‰∏™Êï∞
 //	int16_t iNDiscrete = ( int16_t )usNDiscrete;
-//	//∆´“∆¡ø
+//	//ÂÅèÁßªÈáè
 //	uint16_t usBitOffset;
 
-//	//≈–∂œºƒ¥Ê∆˜ ±∫Ú‘Ÿ÷∆∂®∑∂Œßƒ⁄
+//	//Âà§Êñ≠ÂØÑÂ≠òÂô®Êó∂ÂÄôÂÜçÂà∂ÂÆöËåÉÂõ¥ÂÜÖ
 //	if( ( (int16_t)usAddress >= REG_DISCRETE_START ) &&
 //	( usAddress + usNDiscrete <= REG_DISCRETE_START + REG_DISCRETE_SIZE ) )
 //	{
-//	//ªÒµ√∆´“∆¡ø
+//	//Ëé∑ÂæóÂÅèÁßªÈáè
 //	usBitOffset = ( uint16_t )( usAddress - REG_DISCRETE_START );
 
 //	while( iNDiscrete > 0 )
@@ -344,13 +355,13 @@ eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
 
 void Modbus_Init(void)
 {
-	// œ»–¥À¿ 0xAA  wuqingguang
+	// ÂÖàÂÜôÊ≠ª 0xAA  wuqingguang
 	if( (*p_Local_Address >= 0xFF) || (*p_Local_Address == 0) )
 	{
-		*p_Local_Address = MODBUS_LOCAL_ADDRESS;	// ƒ¨»œ 0xAA
+		*p_Local_Address = MODBUS_LOCAL_ADDRESS;	// ÈªòËÆ§ 0xAA
 	}
-	eMBInit( MB_RTU, *p_Local_Address, 0, Dev_BaudRate_Get(MODBUS_USART), MB_PAR_ODD);//≥ı ºªØmodbus£¨◊ﬂmodbusRTU£¨¥”’æµÿ÷∑Œ™0xAA£¨¥Æø⁄Œ™2°£
-	eMBEnable(  );// πƒ‹modbus
+	eMBInit( MB_RTU, *p_Local_Address, 0, Dev_BaudRate_Get(MODBUS_USART), MB_PAR_ODD);//ÂàùÂßãÂåñmodbusÔºåËµ∞modbusRTUÔºå‰ªéÁ´ôÂú∞ÂùÄ‰∏∫0xAAÔºå‰∏≤Âè£‰∏∫2„ÄÇ
+	eMBEnable(  );//‰ΩøËÉΩmodbus
 	
 }
 
@@ -359,7 +370,7 @@ void Modbus_Handle_Task(void)
 	ModbusTimerCnt ++;
 	Thread_Activity_Sign_Set(THREAD_ACTIVITY_RS485_MODBUS);
 	
-	( void )eMBPoll(  );//∆Ù∂Ømodbus’ÏÃ˝
+	( void )eMBPoll(  );//ÂêØÂä®modbus‰æ¶Âê¨
 	
 	if(ModbusTimerCnt > MODBUS_RESTART_TIMEOUT)
 	{
@@ -370,7 +381,7 @@ void Modbus_Handle_Task(void)
 
 
 
-// *********  Buf œ‡πÿ ˝æ›Ω”ø⁄  *************************************
+// *********  Buf Áõ∏ÂÖ≥Êï∞ÊçÆÊé•Âè£  *************************************
 
 void Modbus_Buffer_Init(void)
 {
@@ -381,7 +392,7 @@ void Modbus_Buffer_Init(void)
 void MB_Flash_Buffer_Write(void)
 {
 	taskENTER_CRITICAL();
-	//…»«¯ «2048£¨ ’˚∏ˆ usRegHoldingBuf “ª∆–¥
+	//ÊâáÂå∫ÊòØ2048Ôºå Êï¥‰∏™ usRegHoldingBuf ‰∏ÄËµ∑ÂÜô
 	STMFLASH_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
 	taskEXIT_CRITICAL();
 	//Eeprom_I2C_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
@@ -389,7 +400,7 @@ void MB_Flash_Buffer_Write(void)
 
 void MB_Flash_Buffer_Read(void)
 {
-	//…»«¯ «2048£¨ ’˚∏ˆ usRegHoldingBuf “ª∆–¥
+	//ÊâáÂå∫ÊòØ2048Ôºå Êï¥‰∏™ usRegHoldingBuf ‰∏ÄËµ∑ÂÜô
 	STMFLASH_Read(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
 	
 	//Eeprom_I2C_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
@@ -473,16 +484,16 @@ void Set_DataValue_Len(UCHAR ucFunctionCode, USHORT addr, uint8_t* p_data, uint8
 }
 
 
-//================= ≥Â¿Àƒ£ Ω »´æ÷ ≤Œ ˝ ================================
+//================= ÂÜ≤Êµ™Ê®°Âºè ÂÖ®Â±Ä ÂèÇÊï∞ ================================
 void Surf_Mode_Info_Get_Mapping(void)
 {
 	// ----------------------------------------------------------------------------------------------
-	p_Surf_Mode_Info_Acceleration = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_ACCELERATION);		//	≥Â¿Àƒ£ Ω -- º”ÀŸ∂»
-	p_Surf_Mode_Info_Prepare_Time = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_PREPARE_TIME);		//	≥Â¿Àƒ£ Ω -- ◊º±∏ ±º‰
-	p_Surf_Mode_Info_Low_Speed		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_LOW_SPEED);				//	≥Â¿Àƒ£ Ω -- µÕÀŸµµ -- ÀŸ∂»
-	p_Surf_Mode_Info_Low_Time 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_LOW_TIME);				//	≥Â¿Àƒ£ Ω -- µÕÀŸµµ --  ±º‰
-	p_Surf_Mode_Info_High_Speed 	= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_HIGH_SPEED);			//	≥Â¿Àƒ£ Ω -- ∏ﬂÀŸµµ -- ÀŸ∂»
-	p_Surf_Mode_Info_High_Time 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_HIGH_TIME);				//	≥Â¿Àƒ£ Ω -- ∏ﬂÀŸµµ --  ±º‰
+	p_Surf_Mode_Info_Acceleration = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_ACCELERATION);		//	ÂÜ≤Êµ™Ê®°Âºè -- Âä†ÈÄüÂ∫¶
+	p_Surf_Mode_Info_Prepare_Time = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_PREPARE_TIME);		//	ÂÜ≤Êµ™Ê®°Âºè -- ÂáÜÂ§áÊó∂Èó¥
+	p_Surf_Mode_Info_Low_Speed		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_LOW_SPEED);				//	ÂÜ≤Êµ™Ê®°Âºè -- ‰ΩéÈÄüÊ°£ -- ÈÄüÂ∫¶
+	p_Surf_Mode_Info_Low_Time 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_LOW_TIME);				//	ÂÜ≤Êµ™Ê®°Âºè -- ‰ΩéÈÄüÊ°£ -- Êó∂Èó¥
+	p_Surf_Mode_Info_High_Speed 	= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_HIGH_SPEED);			//	ÂÜ≤Êµ™Ê®°Âºè -- È´òÈÄüÊ°£ -- ÈÄüÂ∫¶
+	p_Surf_Mode_Info_High_Time 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,		MB_SURF_MODE_INFO_HIGH_TIME);				//	ÂÜ≤Êµ™Ê®°Âºè -- È´òÈÄüÊ°£ -- Êó∂Èó¥
 	// ----------------------------------------------------------------------------------------------
 }
 
@@ -494,93 +505,95 @@ void MB_Get_Mapping_Register(void)
 	p_OP_Free_Mode = 		(Operating_Parameters*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_FREE_MODE_SPEED);
 	p_OP_Timing_Mode = 	(Operating_Parameters*)Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TIME_MODE_SPEED);
 	p_OP_PMode =				(Operating_Parameters(*)[TRAINING_MODE_PERIOD_MAX])Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_USER_TRAIN_MODE_SPEED_P1_1);
-	//π‚»¶¡¡∂»
+	//ÂÖâÂúà‰∫ÆÂ∫¶
 	p_Breath_Light_Max = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_BREATH_LIGHT_MAX);
 	if(*p_Breath_Light_Max > 500)
 		*p_Breath_Light_Max = 500;
 
 	p_Motor_Pole_Number = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_POLE_NUMBER);
 	
-	//œµÕ≥ π ’œ◊¥Ã¨
+	//Á≥ªÁªü ÊïÖÈöúÁä∂ÊÄÅ
 	p_System_Fault_Static = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER , MB_SYSTEM_FAULT_STATUS);
-	//µÁª˙ π ’œ◊¥Ã¨
+	//ÁîµÊú∫ ÊïÖÈöúÁä∂ÊÄÅ
 	p_Motor_Fault_Static = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_FAULT_STATUS);
-	//mos Œ¬∂»
+	//mos Ê∏©Â∫¶
 	p_Mos_Temperature = (int16_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOS_TEMPERATURE);
-	//µÁœ‰ Œ¬∂»
+	//ÁîµÁÆ± Ê∏©Â∫¶
 	p_Box_Temperature = (int16_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_BOX_TEMPERATURE);
-	//µÁª˙ µÁ¡˜
+	//ÁîµÊú∫ ÁîµÊµÅ
 	p_Motor_Current = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_CURRENT);
-	//µÁª˙  µº  ◊™ÀŸ
+	//ÁîµÊú∫ ÂÆûÈôÖ ËΩ¨ÈÄü
 	p_Motor_Reality_Speed = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_REALITY_SPEED);
-	//µÁª˙ œ¬∑¢  µº  ◊™ÀŸ
+	//ÁîµÊú∫ ‰∏ãÂèë ÂÆûÈôÖ ËΩ¨ÈÄü
 	p_Send_Reality_Speed = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SEND_REALITY_SPEED);
 	
-	//µÁª˙  µº  π¶¬ 
+	//ÁîµÊú∫ ÂÆûÈôÖ ÂäüÁéá
 	p_Motor_Reality_Power = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_REALITY_POWER);
 	
-	//ƒ∏œﬂ µÁ—π
+	//ÊØçÁ∫ø ÁîµÂéã
 	p_Motor_Bus_Voltage = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_VOLTAGE);
-	//ƒ∏œﬂ µÁ¡˜
+	//ÊØçÁ∫ø ÁîµÊµÅ
 	p_Motor_Bus_Current = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_BUS_CURRENT);
 
-	//--------------------------- œµÕ≥ Ù–‘
-	// ◊¥Ã¨ª˙
+	//--------------------------- Á≥ªÁªüÂ±ûÊÄß
+	// Áä∂ÊÄÅÊú∫
 	p_System_State_Machine = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_WORKING_STATUS);
-	// µ±«∞ƒ£ Ω
+	// ÂΩìÂâçÊ®°Âºè
 	p_PMode_Now = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_SYSTEM_WORKING_MODE);
-	// µ±«∞ÀŸ∂»
+	// ÂΩìÂâçÈÄüÂ∫¶
 	p_OP_ShowNow_Speed = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_CURRENT_SPEED);
-	// µ±«∞ ±º‰
+	// ÂΩìÂâçÊó∂Èó¥
 	p_OP_ShowNow_Time = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_MOTOR_CURRENT_TIME);
 
 	//****************************************************************************************************************************************
-	//--------------------------- ¡Ÿ ± ”√”⁄π ’œµ»ΩÁ√Êº«¬º∑µªÿ÷µ
-	// ◊¥Ã¨ª˙
+	//--------------------------- ‰∏¥Êó∂ Áî®‰∫éÊïÖÈöúÁ≠âÁïåÈù¢ËÆ∞ÂΩïËøîÂõûÂÄº
+	// Áä∂ÊÄÅÊú∫
 	p_System_State_Machine_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SYSTEM_WORKING_STATUS_MEMORY);
-	// µ±«∞ƒ£ Ω
+	// ÂΩìÂâçÊ®°Âºè
 	p_PMode_Now_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_SYSTEM_WORKING_MODE_MEMORY);
-	// µ±«∞ÀŸ∂»
+	// ÂΩìÂâçÈÄüÂ∫¶
 	p_OP_ShowNow_Speed_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_CURRENT_SPEED_MEMORY);
-	// µ±«∞ ±º‰
+	// ÂΩìÂâçÊó∂Èó¥
 	p_OP_ShowNow_Time_Memory = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_MOTOR_CURRENT_TIME_MEMORY);
 	//****************************************************************************************************************************************
 
-	//--------------------------- µ˜ ‘  π”√
-	// œµÕ≥ ±º‰
-	p_System_Runing_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_RUNNING_TIME);		// œµÕ≥ ±º‰
-	// Œﬁ»À≤Ÿ◊˜ ±º‰
-	p_No_Operation_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_NO_OPERATION_TIME);		// Œﬁ»À≤Ÿ◊˜
-	// ∆Ù∂Ø ±º‰
-	p_System_Startup_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_SLEEP_TIME);		// –›√ﬂ ±º‰
+	//--------------------------- Ë∞ÉËØï ‰ΩøÁî®
+	// Á≥ªÁªüÊó∂Èó¥
+	p_System_Runing_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_RUNNING_TIME);		// Á≥ªÁªüÊó∂Èó¥
+	// Êó†‰∫∫Êìç‰ΩúÊó∂Èó¥
+	p_No_Operation_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_NO_OPERATION_TIME);		// Êó†‰∫∫Êìç‰Ωú
+	// ÂêØÂä®Êó∂Èó¥
+	p_System_Startup_Second_Cnt = (uint32_t *)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER, MB_SYSTEM_SLEEP_TIME);		// ‰ºëÁú†Êó∂Èó¥
 	
 	//--------------------------- 
 	p_Analog_key_Value = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_ANALOG_KEY_VALUE);
 	
-	//--------------------------- ÕÍ≥…Õ≥º∆ (APP“™)
-	p_Finish_Statistics_Time 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_TIME);			//	ÕÍ≥…Õ≥º∆ -->  ±≥§
-	p_Finish_Statistics_Speed = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_SPEED);			//	ÕÍ≥…Õ≥º∆ --> «ø∂»
-	p_Finish_Statistics_Distance = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_DISTANCE);	//	ÕÍ≥…Õ≥º∆ --> ”Œ”ææ‡¿Î
-	p_Preparation_Time_BIT 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_PREPARATION_TIME_BIT);			//	◊º±∏ ±º‰ Bit: ∂® ±ƒ£ Ω P1-P6
+	//--------------------------- ÂÆåÊàêÁªüËÆ° (APPË¶Å)
+	p_Finish_Statistics_Time 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_TIME);			//	ÂÆåÊàêÁªüËÆ° --> Êó∂Èïø
+	p_Finish_Statistics_Speed = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_SPEED);			//	ÂÆåÊàêÁªüËÆ° --> Âº∫Â∫¶
+	p_Finish_Statistics_Distance = (uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_FINISH_STATISTICS_DISTANCE);	//	ÂÆåÊàêÁªüËÆ° --> Ê∏∏Ê≥≥Ë∑ùÁ¶ª
+	p_Preparation_Time_BIT 		= Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER,MB_PREPARATION_TIME_BIT);			//	ÂáÜÂ§áÊó∂Èó¥ Bit: ÂÆöÊó∂Ê®°Âºè P1-P6
 	
-	p_Thread_Activity_Sign 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_THREAD_ACTIVITY_SGIN);			//	œﬂ≥Ã ªÓ∂Ø ±Í÷æŒª
+	p_Thread_Activity_Sign 	= Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_THREAD_ACTIVITY_SGIN);			//	Á∫øÁ®ã Ê¥ªÂä® Ê†áÂøó‰Ωç
 
-	p_Wifi_Timing_Value = 			(uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_WIFI_TIMING_VALUE);						//	wifi œµÕ≥ ±º‰
-	p_Wifi_Timing_Value_Old = 	(uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_WIFI_TIMING_VALUE_OLD);				//	wifi œµÕ≥ ±º‰
+	p_Wifi_Timing_Value = 			(uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_WIFI_TIMING_VALUE);						//	wifi Á≥ªÁªüÊó∂Èó¥
+	p_Wifi_Timing_Value_Old = 	(uint32_t*)Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_WIFI_TIMING_VALUE_OLD);				//	wifi Á≥ªÁªüÊó∂Èó¥
 	p_Check_Timing_Add_More = 	Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_CHECK_TIMING_ADD_MORE);
 	p_Check_Timing_Minus_More = Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_CHECK_TIMING_MINUS_MORE);				//
 	p_Check_Timing_Error_Cnt = 	Get_DataAddr_Pointer(MB_FUNC_READ_INPUT_REGISTER,MB_CHECK_TIMING_ERROR_CNT);				//
-	//================= ≥Â¿Àƒ£ Ω »´æ÷ ≤Œ ˝ ================================
+	//================= ÂÜ≤Êµ™Ê®°Âºè ÂÖ®Â±Ä ÂèÇÊï∞ ================================
 	Surf_Mode_Info_Get_Mapping();
 	
-	//================= –≈∫≈÷µ  ================================
+	
+	p_BLE_Pair_Finish = 	Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_BT_CONNECT_DONE);
+	//================= ‰ø°Âè∑ÂÄº  ================================
 	p_BLE_Rssi = 	Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_BLUETOOTH);
 	p_WIFI_Rssi = Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_WIFI);
 	
-	//================= ota ¥Û–°  ================================
+	//================= ota Â§ßÂ∞è  ================================
 	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE,*(uint16_t *)BOOT_FLASH_ADDR_OTA_PACK_LEN);
 	//Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER,MB_DEBUG_OTA_PAGE_SIZE,*(uint16_t *)BOOT_FLASH_ADDR_DOWNLOAD_PACK_SIZE);
-	//================= –≈∫≈÷µ  ================================
+	//================= ‰ø°Âè∑ÂÄº  ================================
 	p_Wifi_DP_Upload_Level = 	Get_DataAddr_Pointer(MB_FUNC_READ_HOLDING_REGISTER, MB_WIFI_DP_UPLOAD_LEVEL);
 	
 }

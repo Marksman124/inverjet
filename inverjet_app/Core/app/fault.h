@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		fault.h
-* @brief   		¹ÊÕÏÄ£¿és
+* @brief   		æ•…éšœæ¨¡å—s
 *
 *
 * @author			WQG
@@ -25,150 +25,108 @@ extern "C" {
 #include "data.h"
 #include "dev.h"
 #include "modbus.h"
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 /* Private includes ----------------------------------------------------------*/
 
 
 /* Exported types ------------------------------------------------------------*/
-#ifdef SYSTEM_DRIVER_BOARD_TOOL
+
 typedef enum 
 {
-	FAULT_BIT_01_VOLTAGE_ABNORMAL = 0,					// µçÑ¹ Òì³£									E001
-	FAULT_BIT_02_CURRENT_ABNORMAL,							// µçÁ÷ Òì³£									E002
-	FAULT_BIT_03_CURRENT_BIAS,									// µçÁ÷´«¸ÐÆ÷Æ«ÖÃ¹ÊÕÏ				E003
-	FAULT_BIT_04_SHORT_CIRCUIT,									// ¶ÌÂ·											E004
-	FAULT_BIT_05_LACK_PHASE,										// È±Ïà											E005
-	FAULT_BIT_06_LOCK_ROTOR,										// ¶Â×ª											E006
+	FAULT_BIT_01_VOLTAGE_ABNORMAL = 0,					// ç”µåŽ‹ å¼‚å¸¸									E001
+	FAULT_BIT_02_CURRENT_ABNORMAL,							// ç”µæµ å¼‚å¸¸									E002
+	FAULT_BIT_03_CURRENT_BIAS,									// ç”µæµä¼ æ„Ÿå™¨åç½®æ•…éšœ					E003
+	FAULT_BIT_04_SHORT_CIRCUIT,									// çŸ­è·¯												E004
+	FAULT_BIT_05_LACK_PHASE,										// ç¼ºç›¸												E005
+	FAULT_BIT_06_LOCK_ROTOR,										// å µè½¬												E006
 	
-	FAULT_BIT_07_TEMPERATURE_MOS,								// ÎÂ¶È MOS									E101
-	FAULT_BIT_08_TEMPERATURE_AMBIENT,						// ÎÂ¶È »·¾³									E102
+	FAULT_BIT_07_TEMPERATURE_MOS,								// æ¸©åº¦ MOS										E101
+	FAULT_BIT_08_TEMPERATURE_AMBIENT,						// æ¸©åº¦ çŽ¯å¢ƒ									E102
 		
-	FAULT_BIT_09_TEMPERATURE_HARDWARE,					// ÎÂ¶È (Ó²¼þ¹ÊÕÏ)						E201
-	FAULT_BIT_10_DRIVE_BOARD,										// Çý¶¯°å Òì³£								E202
-	FAULT_BIT_11_DRIVE_LOSS,										// Çý¶¯°å Í¨ÐÅ¹ÊÕÏ						E203
+	FAULT_BIT_09_TEMPERATURE_HARDWARE,					// æ¸©åº¦ (ç¡¬ä»¶æ•…éšœ)						E201
+	FAULT_BIT_10_DRIVE_BOARD,										// é©±åŠ¨æ¿ å¼‚å¸¸								E202
+	FAULT_BIT_11_DRIVE_LOSS,										// é©±åŠ¨æ¿ é€šä¿¡æ•…éšœ						E203
+	FAULT_BIT_12_IDLING_ERROR,									// ç©ºè½¬ æ•…éšœ									E204
 	
-	FAULT_BIT_12_WIFI_HARDWARE,									// WIFI Ä£×é (Ó²¼þ¹ÊÕÏ)			E301
-	FAULT_BIT_13_BT_HARDWARE,										// BT Ä£×é (Ó²¼þ¹ÊÕÏ)				E302
-	FAULT_BIT_14_RS485_HARDWARE,								// RS485 Ä£×é (Ó²¼þ¹ÊÕÏ)			E303
-	FAULT_BIT_15_MOTOR_MODEL_HARDWARE,					// Çý¶¯°å²åÕë¹ÊÕÏ						E401
-	
-} FAULT_STATE_BIT_E;
-#else
-typedef enum 
-{
-	FAULT_BIT_01_VOLTAGE_ABNORMAL = 0,					// µçÑ¹ Òì³£									E001
-	FAULT_BIT_02_CURRENT_ABNORMAL,							// µçÁ÷ Òì³£									E002
-	FAULT_BIT_03_CURRENT_BIAS,									// µçÁ÷´«¸ÐÆ÷Æ«ÖÃ¹ÊÕÏ				E003
-	FAULT_BIT_04_SHORT_CIRCUIT,									// ¶ÌÂ·											E004
-	FAULT_BIT_05_LACK_PHASE,										// È±Ïà											E005
-	FAULT_BIT_06_LOCK_ROTOR,										// ¶Â×ª											E006
-	
-	FAULT_BIT_07_TEMPERATURE_MOS,								// ÎÂ¶È MOS									E101
-	FAULT_BIT_08_TEMPERATURE_AMBIENT,						// ÎÂ¶È »·¾³									E102
-		
-	FAULT_BIT_09_TEMPERATURE_HARDWARE,					// ÎÂ¶È (Ó²¼þ¹ÊÕÏ)						E201
-	FAULT_BIT_10_DRIVE_BOARD,										// Çý¶¯°å Òì³£								E202
-	FAULT_BIT_11_DRIVE_LOSS,										// Çý¶¯°å Í¨ÐÅ¹ÊÕÏ						E203
-	
-	FAULT_BIT_12_WIFI_HARDWARE,									// WIFI Ä£×é (Ó²¼þ¹ÊÕÏ)			E301
-	FAULT_BIT_13_BT_HARDWARE,										// BT Ä£×é (Ó²¼þ¹ÊÕÏ)				E302
-	FAULT_BIT_14_RS485_HARDWARE,								// RS485 Ä£×é (Ó²¼þ¹ÊÕÏ)			E303
-	//FAULT_BIT_15_TTL_SEND_HARDWARE,									// °´¼ü	(Ó²¼þ¹ÊÕÏ)						E304
+	FAULT_BIT_13_WIFI_HARDWARE,									// WIFI æ¨¡ç»„ (ç¡¬ä»¶æ•…éšœ)				E301
+	FAULT_BIT_14_BT_HARDWARE,										// BT æ¨¡ç»„ (ç¡¬ä»¶æ•…éšœ)					E302
+	FAULT_BIT_15_RS485_HARDWARE,								// RS485 æ¨¡ç»„ (ç¡¬ä»¶æ•…éšœ)			E303
 	
 } FAULT_STATE_BIT_E;
 
-#endif
 
 /* Exported constants --------------------------------------------------------*/
 
 
 
 /* Exported macro ------------------------------------------------------------*/
-#ifdef SYSTEM_DRIVER_BOARD_TOOL
-#define FAULT_STATE_MAX										(1<<(FAULT_BIT_15_MOTOR_MODEL_HARDWARE+1))
 
-#define E001_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_01_VOLTAGE_ABNORMAL)
-#define E002_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_02_CURRENT_ABNORMAL)
-#define E003_BUS_CURRENT_BIAS							(1 << FAULT_BIT_03_CURRENT_BIAS)
-#define E004_ABNORMAL_SHORT_CIRCUIT				(1 << FAULT_BIT_04_SHORT_CIRCUIT)
-#define E005_LACK_PHASE										(1 << FAULT_BIT_05_LACK_PHASE)
-#define E006_LOCK_ROTOR										(1 << FAULT_BIT_06_LOCK_ROTOR)
-#define E101_TEMPERATURE_MOS							(1 << FAULT_BIT_07_TEMPERATURE_MOS)
-#define E102_TEMPERATURE_AMBIENT					(1 << FAULT_BIT_08_TEMPERATURE_AMBIENT)
-#define E201_TEMPERATURE_HARDWARE					(1 << FAULT_BIT_09_TEMPERATURE_HARDWARE)
-#define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)
-#define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)
-#define E301_WIFI_HARDWARE								(1 << FAULT_BIT_12_WIFI_HARDWARE)
-#define E302_BT_HARDWARE									(1 << FAULT_BIT_13_BT_HARDWARE)
-#define E303_RS485_HARDWARE								(1 << FAULT_BIT_14_RS485_HARDWARE)
-#define E401_MOTOR_MODEL_HARDWARE					(1 << FAULT_BIT_15_MOTOR_MODEL_HARDWARE)
+#define FAULT_STATE_MAX										(1<<(FAULT_BIT_15_RS485_HARDWARE+1))
 
-#else
-#define FAULT_STATE_MAX										(1<<(FAULT_BIT_14_RS485_HARDWARE+1))
+#define E001_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_01_VOLTAGE_ABNORMAL)			// æ¯çº¿ç”µåŽ‹å¼‚å¸¸
+#define E002_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_02_CURRENT_ABNORMAL)			// è¿‡æµæ•…éšœ
+#define E003_BUS_CURRENT_BIAS							(1 << FAULT_BIT_03_CURRENT_BIAS)					// ç”µæµä¸å¹³è¡¡
+#define E004_ABNORMAL_SHORT_CIRCUIT				(1 << FAULT_BIT_04_SHORT_CIRCUIT)					// è¾“å‡ºçŸ­è·¯
+#define E005_LACK_PHASE										(1 << FAULT_BIT_05_LACK_PHASE)						// ç¼ºç›¸
+#define E006_LOCK_ROTOR										(1 << FAULT_BIT_06_LOCK_ROTOR)						// å µè½¬
+#define E101_TEMPERATURE_MOS							(1 << FAULT_BIT_07_TEMPERATURE_MOS)				// MOSæ¸©åº¦è¿‡é«˜
+#define E102_TEMPERATURE_AMBIENT					(1 << FAULT_BIT_08_TEMPERATURE_AMBIENT)		// æœºç®±æ¸©åº¦è¿‡é«˜
+#define E201_TEMPERATURE_HARDWARE					(1 << FAULT_BIT_09_TEMPERATURE_HARDWARE)	// æ¸©åº¦ä¼ æ„Ÿå™¨æ•…éšœ
+#define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)						// ç”µæœºé©±åŠ¨æ•…éšœ (å…¶å®ƒæ•…éšœ)
+#define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)						// é©±åŠ¨æ¿é€šè®¯æ•…éšœ
+#define E204_IDLING_ERROR									(1 << FAULT_BIT_12_IDLING_ERROR)					// ç©ºè½¬ æ•…éšœ
+#define E301_WIFI_HARDWARE								(1 << FAULT_BIT_13_WIFI_HARDWARE)
+#define E302_BT_HARDWARE									(1 << FAULT_BIT_14_BT_HARDWARE)
+#define E303_RS485_HARDWARE								(1 << FAULT_BIT_15_RS485_HARDWARE)
 
-#define E001_BUS_VOLTAGE_ABNORMAL					(1 << FAULT_BIT_01_VOLTAGE_ABNORMAL)		// Ä¸ÏßµçÑ¹Òì³£
-#define E002_BUS_CURRENT_ABNORMAL					(1 << FAULT_BIT_02_CURRENT_ABNORMAL)		// ¹ýÁ÷¹ÊÕÏ
-#define E003_BUS_CURRENT_BIAS							(1 << FAULT_BIT_03_CURRENT_BIAS)				// µçÁ÷²»Æ½ºâ
-#define E004_ABNORMAL_SHORT_CIRCUIT				(1 << FAULT_BIT_04_SHORT_CIRCUIT)				// Êä³ö¶ÌÂ·
-#define E005_LACK_PHASE										(1 << FAULT_BIT_05_LACK_PHASE)					// È±Ïà
-#define E006_LOCK_ROTOR										(1 << FAULT_BIT_06_LOCK_ROTOR)					// ¶Â×ª
-#define E101_TEMPERATURE_MOS							(1 << FAULT_BIT_07_TEMPERATURE_MOS)			// MOSÎÂ¶È¹ý¸ß
-#define E102_TEMPERATURE_AMBIENT					(1 << FAULT_BIT_08_TEMPERATURE_AMBIENT)	// »úÏäÎÂ¶È¹ý¸ß
-#define E201_TEMPERATURE_HARDWARE					(1 << FAULT_BIT_09_TEMPERATURE_HARDWARE)// ÎÂ¶È´«¸ÐÆ÷¹ÊÕÏ
-#define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)					// µç»úÇý¶¯¹ÊÕÏ (ÆäËü¹ÊÕÏ)
-#define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)					// Çý¶¯°åÍ¨Ñ¶¹ÊÕÏ
-#define E301_WIFI_HARDWARE								(1 << FAULT_BIT_12_WIFI_HARDWARE)
-#define E302_BT_HARDWARE									(1 << FAULT_BIT_13_BT_HARDWARE)
-#define E303_RS485_HARDWARE								(1 << FAULT_BIT_14_RS485_HARDWARE)
-//#define E304_TTL_SEND_HARDWARE						(1 << FAULT_BIT_15_TTL_SEND_HARDWARE)
 
-#endif
-
-//-------------- °´¼ü×éºÏÏìÓ¦ ×ÜÊý -------------------
+//-------------- æŒ‰é”®ç»„åˆå“åº” æ€»æ•° -------------------
 #define CALL_OUT_NUMBER_MAX						8
 
 
-// »Ö¸´¹ÊÕÏºóµÈ´ýÊ±¼ä
+// æ¢å¤æ•…éšœåŽç­‰å¾…æ—¶é—´
 #define RECOVERY_ATTEMPT_TIME							30
 
 
 #define ORDINARY_FAULT_BIT  				(E001_BUS_VOLTAGE_ABNORMAL | E201_TEMPERATURE_HARDWARE | E203_MOTOR_LOSS)
+
+#define TEMP001_RESTAR_FAULT_BIT  	(TEMP001_MOTOR_FAULT_BUS_VOLTAGE_ERROR | TEMP001_MOTOR_FAULT_BUS_CIRCUIT_BIAS | TEMP001_MOTOR_FAULT_COMM_FAULT| TEMP001_MOTOR_FAULT_IDLING_ERROR| TEMP001_MOTOR_FAULT_MOSFET_TEMP_HARDWARE| TEMP001_MOTOR_FAULT_BRIDGE_HARDWARE)
 //extern uint8_t Fault_Recovery_Attempt_cnt;				//
 
 /* Exported functions prototypes ---------------------------------------------*/
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 extern void App_Fault_Init(void);
-// ¼ì²é ¹ÊÕÏ×´Ì¬ ÊÇ·ñºÏ·¨
+// æ£€æŸ¥ æ•…éšœçŠ¶æ€ æ˜¯å¦åˆæ³•
 extern uint8_t Fault_Check_Status_Legal(uint16_t parameter);
-// ¼ì²â¹ÊÕÏ
+// æ£€æµ‹æ•…éšœ
 extern uint8_t If_System_Is_Error(void);
-// ÉèÖÃ¹ÊÕÏÖµ
+// è®¾ç½®æ•…éšœå€¼
 void Set_Fault_Data(uint16_t type);
 
-// ½Ó¿Ú¼ì²â
+// æŽ¥å£æ£€æµ‹
 void Clean_Comm_Test(void);
 void Self_Testing_Check_Comm(void);
 //-------------------   ----------------------------
 
-// »ñÈ¡×ÜÊý
+// èŽ·å–æ€»æ•°
 extern uint8_t Get_Fault_Number_Sum(uint16_t para);
-// »ñÈ¡¹ÊÕÏºÅ
+// èŽ·å–æ•…éšœå·
 extern uint8_t Get_Fault_Number_Now(uint16_t para, uint8_t num);
-// ½øÈë²Ù×÷²Ëµ¥
+// è¿›å…¥æ“ä½œèœå•
 extern void To_Fault_Menu(void);
-// ¹ÊÕÏ½çÃæ ¸üÐÂ
+// æ•…éšœç•Œé¢ æ›´æ–°
 void Update_Fault_Menu(void);
-// Çå³ý¹ÊÕÏ×´Ì¬
+// æ¸…é™¤æ•…éšœçŠ¶æ€
 extern void Clean_Fault_State(void);
-// ¹ÊÕÏ ÏÔÊ¾
+// æ•…éšœ æ˜¾ç¤º
 extern void Lcd_Fault_Display(uint8_t sum, uint8_t now, uint16_t type);
 
 /* Private defines -----------------------------------------------------------*/
 
-// ¶Ì°´ ²Ûº¯Êý
+// çŸ­æŒ‰ æ§½å‡½æ•°
 extern void (*p_Fault_Button[CALL_OUT_NUMBER_MAX])(void);
 
-// ³¤°´ ²Ûº¯Êý
+// é•¿æŒ‰ æ§½å‡½æ•°
 extern void (*p_Fault_Long_Press[CALL_OUT_NUMBER_MAX])(void);
 
 

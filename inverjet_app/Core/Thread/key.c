@@ -32,7 +32,7 @@
 
 #define KEY_IO_NUMBER_MAX			7		//wuqingguang
 
-//------------------- led & Òı½Å ----------------------------
+//------------------- led & å¼•è„š ----------------------------
 #define LED_SPEED_IO_PORT			GPIOC
 #define LED_SPEED_IO_PIN			GPIO_PIN_3
 
@@ -47,7 +47,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-// °´¼ü¶ÔÓ¦ Òı½Å    //wuqingguang
+// æŒ‰é”®å¯¹åº” å¼•è„š    //wuqingguang
 IO_Hardware_Pin Key_Gpio_Pin_Array[KEY_IO_NUMBER_MAX] = {
 	{ Key_Speed_GPIO_Port, 	Key_Speed_Pin }, 
 	{ Key_Time_GPIO_Port, 	Key_Time_Pin }, 
@@ -58,7 +58,7 @@ IO_Hardware_Pin Key_Gpio_Pin_Array[KEY_IO_NUMBER_MAX] = {
 	{ DI_Key_Down_GPIO_Port, 	DI_Key_Down_Pin }
 };
 
-// °´¼üµÆ¶ÔÓ¦ Òı½Å
+// æŒ‰é”®ç¯å¯¹åº” å¼•è„š
 uint8_t Key_IO_Ordering_Value[KEY_CALL_OUT_NUMBER_MAX]={
 	KEY_VALUE_BIT_BUTTON_1,
 	KEY_VALUE_BIT_BUTTON_2,
@@ -73,7 +73,7 @@ uint8_t Key_IO_Ordering_Value[KEY_CALL_OUT_NUMBER_MAX]={
 	KEY_VALUE_BIT_BUTTON_7,
 };
 
-// ¶Ì°´ ²Ûº¯Êı
+// çŸ­æŒ‰ æ§½å‡½æ•°
 void (*p_Funtion_Button[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_pushButton_clicked,  on_pushButton_2_clicked,  on_pushButton_3_clicked,  on_pushButton_4_Short_Press,
 	on_pushButton_1_2_Short_Press, on_pushButton_1_3_Short_Press, 
@@ -83,7 +83,7 @@ void (*p_Funtion_Button[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_DiButton_Minus_clicked,
 };
 
-// ³¤°´ ²Ûº¯Êı
+// é•¿æŒ‰ æ§½å‡½æ•°
 void (*p_Funtion_Long_Press[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_pushButton_1_Long_Press,  on_pushButton_2_Long_Press,  on_pushButton_3_Long_Press,  on_pushButton_4_Long_Press,
 	on_pushButton_1_2_Long_Press, on_pushButton_1_3_Long_Press,
@@ -93,7 +93,7 @@ void (*p_Funtion_Long_Press[KEY_CALL_OUT_NUMBER_MAX])(void) = {
 	on_pushButton_NULL_Press,
 };
 
-// ¸÷²Û ³¤°´ÅĞ¶Ï Ê±³¤
+// å„æ§½ é•¿æŒ‰åˆ¤æ–­ æ—¶é•¿
 uint32_t Key_Long_Press_Confirm_Value[KEY_CALL_OUT_NUMBER_MAX]={
 	KEY_LONG_PRESS_TIME_1S, KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S,
 	KEY_LONG_PRESS_TIME_2S, KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,KEY_LONG_PRESS_TIME_2S,
@@ -102,19 +102,19 @@ uint32_t Key_Long_Press_Confirm_Value[KEY_CALL_OUT_NUMBER_MAX]={
 
 
 
-//------------------- ±äÁ¿ ÉùÃ÷ ----------------------------
-uint8_t Key_IO_Hardware = 0;		// ¶ÁÈ¡key Öµ
-uint8_t Key_IO_Old = 0;					// ÉÏÒ»´Î key Öµ
+//------------------- å˜é‡ å£°æ˜ ----------------------------
+uint8_t Key_IO_Hardware = 0;		// è¯»å–key å€¼
+uint8_t Key_IO_Old = 0;					// ä¸Šä¸€æ¬¡ key å€¼
 
 
-uint8_t Key_Multiple_Clicks_cnt = 0;				//8 ´ÎÁ¬»÷¼ÆÊı
-uint8_t Key_Multiple_Clicks_Old = 0;		// ÉÏÒ»´Î key Öµ
-uint32_t Key_Multiple_Clicks_time = 0;		// µÚÒ»´Î key Ê±¼ä
+uint8_t Key_Multiple_Clicks_cnt = 0;				//8 æ¬¡è¿å‡»è®¡æ•°
+uint8_t Key_Multiple_Clicks_Old = 0;		// ä¸Šä¸€æ¬¡ key å€¼
+uint32_t Key_Multiple_Clicks_time = 0;		// ç¬¬ä¸€æ¬¡ key æ—¶é—´
 uint32_t Key_Handler_Timer=0;
 
-uint32_t Key_For_Sleep_time = 0;		// Ë¯ÃßÊ±¼ä
+uint32_t Key_For_Sleep_time = 0;		// ç¡çœ æ—¶é—´
 
-uint32_t Key_Long_Press_cnt[KEY_CALL_OUT_NUMBER_MAX]={0};	// ³¤°´ ¼ÆÊıÆ÷
+uint32_t Key_Long_Press_cnt[KEY_CALL_OUT_NUMBER_MAX]={0};	// é•¿æŒ‰ è®¡æ•°å™¨
 
 uint8_t System_Self_Testing_State;
 
@@ -124,10 +124,10 @@ uint8_t System_Self_Testing_State;
 /* Private user code ---------------------------------------------------------*/
 /**********************************************************************************************
 *
-*						°´¼ü»Øµ÷    ¶Ì°´
+*						æŒ‰é”®å›è°ƒ    çŸ­æŒ‰
 *
 **********************************************************************************************/
-//================================== ¢Ù µµÎ»¼ü
+//================================== â‘  æ¡£ä½é”®
 void on_pushButton_clicked(void)
 {
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
@@ -194,12 +194,12 @@ void on_pushButton_clicked(void)
 	}
 }
 
-//================================== ¢Ú Ê±¼ä¼ü
+//================================== â‘¡ æ—¶é—´é”®
 void on_pushButton_2_clicked(void)
 {
 	if(System_is_Power_Off())
 		return;
-	//Clean_Swimming_Distance();//Çå³ı¼ÆËã¾àÀë
+	//Clean_Swimming_Distance();//æ¸…é™¤è®¡ç®—è·ç¦»
 	Clean_Timing_Timer_Cnt();
 	
 	if(Get_System_State_Machine() == TIMING_MODE_INITIAL)
@@ -223,18 +223,18 @@ void on_pushButton_2_clicked(void)
 	}
 	Arbitrarily_To_Initial();
 	
-//	if(Get_System_State_Machine() <= TIMING_MODE_STOP)	// ¶¨Ê±
+//	if(Get_System_State_Machine() <= TIMING_MODE_STOP)	// å®šæ—¶
 //	{
 //		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
 //	}
 }
 
-//================================== ¢Û Ä£Ê½¼ü
+//================================== â‘¢ æ¨¡å¼é”®
 void on_pushButton_3_clicked(void)
 {
 	if(System_is_Power_Off())
 		return;
-	//Clean_Swimming_Distance();//Çå³ı¼ÆËã¾àÀë
+	//Clean_Swimming_Distance();//æ¸…é™¤è®¡ç®—è·ç¦»
 		
 	if(System_Mode_Free())
 	{
@@ -257,39 +257,39 @@ void on_pushButton_3_clicked(void)
 	}
 }
 
-//================================== ¢Ü ¿ª»ú¼ü  ¶Ì°´
+//================================== â‘£ å¼€æœºé”®  çŸ­æŒ‰
 void on_pushButton_4_Short_Press(void)
 {
-	if(System_is_Power_Off())//¹Ø»úÖĞ Ö´ĞĞ¿ª»ú
+	if(System_is_Power_Off())//å…³æœºä¸­ æ‰§è¡Œå¼€æœº
 	{
 			return;
 	}
 
-	if(System_is_Initial() && (Special_Status_Get(SPECIAL_BIT_SKIP_INITIAL)))	// ³õÊ¼ --> Á¢¼´Æô¶¯
+	if(System_is_Initial() && (Special_Status_Get(SPECIAL_BIT_SKIP_INITIAL)))	// åˆå§‹ --> ç«‹å³å¯åŠ¨
 	{
 			Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
 			Arbitrarily_To_Running();
-			Data_Set_Current_Speed(p_OP_ShowLater->speed);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"Æô¶¯"
+			Data_Set_Current_Speed(p_OP_ShowLater->speed);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"å¯åŠ¨"
 	}
-	else if(System_is_Pause())	// ÔİÍ£ --> Æô¶¯
+	else if(System_is_Pause())	// æš‚åœ --> å¯åŠ¨
 	{
 		if(p_OP_ShowLater->speed == 0)
-			DEBUG_PRINT("\n\n\np_OP_ShowLater->speed ´íÎó *p_OP_ShowNow_Speed = %d\n",*p_OP_ShowNow_Speed);
+			DEBUG_PRINT("\n\n\np_OP_ShowLater->speed é”™è¯¯ *p_OP_ShowNow_Speed = %d\n",*p_OP_ShowNow_Speed);
 		
 		Arbitrarily_To_Running();
-		Data_Set_Current_Speed(p_OP_ShowLater->speed);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"Æô¶¯"
+		Data_Set_Current_Speed(p_OP_ShowLater->speed);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"å¯åŠ¨"
 	}
-	else	// ÆäËü --> ÔİÍ£
+	else	// å…¶å®ƒ --> æš‚åœ
 	{
 		if((*p_OP_ShowNow_Speed == 0)&&(p_OP_ShowLater->speed > 0))
 		{
-			DEBUG_PRINT("\n\n\np_OP_ShowNow_Speed ´íÎó p_OP_ShowLater->speed = %d\n",p_OP_ShowLater->speed);
+			DEBUG_PRINT("\n\n\np_OP_ShowNow_Speed é”™è¯¯ p_OP_ShowLater->speed = %d\n",p_OP_ShowLater->speed);
 		}
 		else
 		{
 			p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
 			*p_OP_ShowNow_Speed = 0;
-			Data_Set_Current_Speed(0);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"Æô¶¯"
+			Data_Set_Current_Speed(0);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"å¯åŠ¨"
 		}
 		Arbitrarily_To_Pause();
 	}
@@ -298,13 +298,13 @@ void on_pushButton_4_Short_Press(void)
 	//Lcd_Show();
 }
 
-//================================== ¢Ù + ¢Ú  ×éºÏ¼ü  ²âÊÔ ÉèÖÃ¹ÊÕÏ
+//================================== â‘  + â‘¡  ç»„åˆé”®  æµ‹è¯• è®¾ç½®æ•…éšœ
 void on_pushButton_1_2_Short_Press(void)
 {
 	//Set_Fault_Data(0xAC);
 }
 
-//================================== ¢Ù + ¢Û  ×éºÏ¼ü  ¶Ì°´   ÇĞ»»µµÎ» 100¼¶ or 5¼¶
+//================================== â‘  + â‘¢  ç»„åˆé”®  çŸ­æŒ‰   åˆ‡æ¢æ¡£ä½ 100çº§ or 5çº§
 void on_pushButton_1_3_Short_Press(void)
 {
 //	if(System_is_Power_Off())
@@ -316,13 +316,13 @@ void on_pushButton_1_3_Short_Press(void)
 //		Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 }
 
-//================================== ¢Ú + ¢Û  ×éºÏ¼ü  »Ö¸´³ö³§ÉèÖÃ
+//================================== â‘¡ + â‘¢  ç»„åˆé”®  æ¢å¤å‡ºå‚è®¾ç½®
 void on_pushButton_2_3_Short_Press(void)
 {
 	//Restore_Factory_Settings();
 }
 
-//================================== ¢Ú + ¢Ü  ×éºÏ¼ü  ½øÈë²Ù×÷²Ëµ¥
+//================================== â‘¡ + â‘£  ç»„åˆé”®  è¿›å…¥æ“ä½œèœå•
 void on_pushButton_2_4_Short_Press(void)
 {
 	//To_Operation_Menu();
@@ -330,10 +330,10 @@ void on_pushButton_2_4_Short_Press(void)
 
 /**********************************************************************************************
 *
-*						°´¼ü»Øµ÷    ¶Ì°´  ÍØÕ¹¼ü
+*						æŒ‰é”®å›è°ƒ    çŸ­æŒ‰  æ‹“å±•é”®
 *
 **********************************************************************************************/
-//==================================  +  ¼ü
+//==================================  +  é”®
 void on_DiButton_Add_clicked(void)
 {
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
@@ -359,7 +359,7 @@ void on_DiButton_Add_clicked(void)
 	
 	Update_OP_Speed();
 }
-//==================================   - ¼ü
+//==================================   - é”®
 void on_DiButton_Minus_clicked(void)
 {
 	if((System_is_Power_Off()) || System_is_Pause() || System_is_Stop() ||  System_Mode_Surf())
@@ -387,14 +387,14 @@ void on_DiButton_Minus_clicked(void)
 }
 /**********************************************************************************************
 *
-*						°´¼ü»Øµ÷    ³¤°´
+*						æŒ‰é”®å›è°ƒ    é•¿æŒ‰
 *
 **********************************************************************************************/
-//================================== ¢Ù µµÎ»¼ü
+//================================== â‘  æ¡£ä½é”®
 void on_pushButton_1_Long_Press(void)
 {
 	static uint8_t pushButton_1_delay_cnt = 0;
-	//Ë¢Ì«¿ìÁË  20ms
+	//åˆ·å¤ªå¿«äº†  20ms
 	if(pushButton_1_delay_cnt++ < KEY_LONG_PRESS_STEP)
 		return;
 	pushButton_1_delay_cnt = 0;
@@ -403,7 +403,7 @@ void on_pushButton_1_Long_Press(void)
 			return;
 //	if(Key_Long_Press_cnt[0] == KEY_LONG_PRESS_TIME_2S)
 //	{
-//		//³¤°´¿ÉÉè ¸ß¾«¶È×ªËÙ
+//		//é•¿æŒ‰å¯è®¾ é«˜ç²¾åº¦è½¬é€Ÿ
 //		if(Special_Status_Get(SPECIAL_BIT_SPEED_100_GEAR) == 0)
 //			Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 //	}
@@ -420,21 +420,21 @@ void on_pushButton_1_Long_Press(void)
 	}
 
 }
-//================================== ¢Ú Ê±¼ä¼ü
+//================================== â‘¡ æ—¶é—´é”®
 void on_pushButton_2_Long_Press(void)
 {
 	//Set_Fault_Data(0);
 }
-//================================== ¢Û Ä£Ê½¼ü
+//================================== â‘¢ æ¨¡å¼é”®
 void on_pushButton_3_Long_Press(void)
 {
 }
-//================================== ¢Ü ¿ª»ú¼ü  ¶Ì°´
+//================================== â‘£ å¼€æœºé”®  çŸ­æŒ‰
 void on_pushButton_4_Long_Press(void)
 {
 	Buzzer_Click_Long_On(1);
 	
-	if(System_is_Power_Off())//¹Ø»úÖĞ Ö´ĞĞ¿ª»ú
+	if(System_is_Power_Off())//å…³æœºä¸­ æ‰§è¡Œå¼€æœº
 	{
 			System_Power_On();
 	}
@@ -446,12 +446,12 @@ void on_pushButton_4_Long_Press(void)
 	//Key_Long_Press_cnt[3] = 0;
 	
 }
-//================================== ¿Õ¼ü
+//================================== ç©ºé”®
 void on_pushButton_NULL_Press(void)
 {
 }
-//================================== ¢Ù + ¢Ú  ×éºÏ¼ü
-//   wifiÅä¶Ô
+//================================== â‘  + â‘¡  ç»„åˆé”®
+//   wifié…å¯¹
 void on_pushButton_1_2_Long_Press(void)
 {
 	//if(Motor_is_Start() ==0)
@@ -461,7 +461,7 @@ void on_pushButton_1_2_Long_Press(void)
 	}
 }
 
-//================================== ¢Ù + ¢Û  ×éºÏ¼ü
+//================================== â‘  + â‘¢  ç»„åˆé”®
 void on_pushButton_1_3_Long_Press(void)
 {
 	if(System_is_Power_Off())
@@ -475,8 +475,8 @@ void on_pushButton_1_3_Long_Press(void)
 		Special_Status_Add(SPECIAL_BIT_SPEED_100_GEAR);
 	
 }
-//================================== ¢Ú + ¢Û  ×éºÏ¼ü
-//   À¶ÑÀÅä¶Ô
+//================================== â‘¡ + â‘¢  ç»„åˆé”®
+//   è“ç‰™é…å¯¹
 void on_pushButton_2_3_Long_Press(void)
 {
 //	if(System_is_Power_Off())
@@ -489,8 +489,8 @@ void on_pushButton_2_3_Long_Press(void)
 		BT_Get_In_Distribution();
 	}
 }
-//================================== ¢Ú + ¢Ü  ×éºÏ¼ü
-//  ¹Ø»úÏÂ   »Ö¸´³ö³§
+//================================== â‘¡ + â‘£  ç»„åˆé”®
+//  å…³æœºä¸‹   æ¢å¤å‡ºå‚
 void on_pushButton_2_4_Long_Press(void)
 {
 //	if(System_is_Power_Off())
@@ -502,19 +502,19 @@ void on_pushButton_2_4_Long_Press(void)
 //***************************************************************************************************
 
 
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
-// ³õÊ¼»¯
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
+// åˆå§‹åŒ–
 void App_Key_Init(void)
 {
-	Led_Button_On(0x0F);	// °´¼ü
+	Led_Button_On(0x0F);	// æŒ‰é”®
 	
 //	System_Boot_Screens();
 //	System_Power_Off();
 	
 }
 
-//------------------- °´¼üµÆ ----------------------------
-// °´¼üµÆ
+//------------------- æŒ‰é”®ç¯ ----------------------------
+// æŒ‰é”®ç¯
 void Led_Button_On(uint8_t para)
 {
 	
@@ -542,7 +542,7 @@ void Led_Button_On(uint8_t para)
 }
 /**********************************************************************************************
 *
-*						ÌØÊâ°´¼ü¹æÔò
+*						ç‰¹æ®ŠæŒ‰é”®è§„åˆ™
 *
 **********************************************************************************************/
 void Special_Button_Rules(uint8_t key_value)
@@ -550,7 +550,7 @@ void Special_Button_Rules(uint8_t key_value)
 	if(Get_Upgradation_Static() == UPDATE_START_CMD)
 		return;
 	
-	//¹Ø»úÏÂ ¼ÆÊı 8´Î
+	//å…³æœºä¸‹ è®¡æ•° 8æ¬¡
 	if( Key_Multiple_Clicks_Old != key_value)
 	{
 		Key_Multiple_Clicks_cnt = 1;
@@ -562,18 +562,18 @@ void Special_Button_Rules(uint8_t key_value)
 	{
 		if(Key_Multiple_Clicks_cnt >= KEY_MULTIPLE_CLICKS_MAX)
 		{
-			// ×Ô²â
+			// è‡ªæµ‹
 			if(key_value == KEY_VALUE_BIT_BUTTON_1)
 			{
 				IN_SELF_TEST_MODE();
 			}
-			// ²Ëµ¥
+			// èœå•
 			else if(key_value == KEY_VALUE_BIT_BUTTON_2)
 			{
 				Buzzer_Click_Long_On(1);
 				To_Operation_Menu();
 			}
-			// »Ö¸´³ö³§
+			// æ¢å¤å‡ºå‚
 			else if(key_value == KEY_VALUE_BIT_BUTTON_3)
 			{
 				//Buzzer_Click_Long_On(1);
@@ -591,7 +591,7 @@ void Special_Button_Rules(uint8_t key_value)
 }
 
 
-// °´¼üÖ÷Ñ­»·ÈÎÎñ
+// æŒ‰é”®ä¸»å¾ªç¯ä»»åŠ¡
 //  20 ms
 void App_Key_Task(void)
 {
@@ -603,7 +603,7 @@ void App_Key_Task(void)
 	if(System_PowerUp_Finish == 0)
 		return;
 	
-		//½øÈëË¯Ãß
+		//è¿›å…¥ç¡çœ 
 		if(Key_Handler_Timer > (Key_For_Sleep_time + KEY_FOR_SLEEP_TIME_SHORT))
 		{
 			TM1621_Set_light_Mode(1);
@@ -614,21 +614,18 @@ void App_Key_Task(void)
 			if(Key_IO_Hardware == Key_IO_Ordering_Value[i])
 			{
 				*p_No_Operation_Second_Cnt = 0;
-				Key_For_Sleep_time = Key_Handler_Timer;// Ë¯Ãß¼ÆÊ±
+				Key_For_Sleep_time = Key_Handler_Timer;// ç¡çœ è®¡æ—¶
 				TM1621_Set_light_Mode(0);
 				
 				Key_Long_Press_cnt[i]++;
 				
-				if(Key_Long_Press_cnt[i] == KEY_LONG_PRESS_TIME_2S)//³¤°´
+				if(Key_Long_Press_cnt[i] == KEY_LONG_PRESS_TIME_2S)//é•¿æŒ‰
 				{
 					Buzzer_Click_On();
 					
 					if((Key_IO_Hardware == KEY_VALUE_BIT_BUTTON_1)||(Key_IO_Hardware == KEY_VALUE_BIT_BUTTON_2))
 						Key_Long_Press_cnt[i] --;
 				
-					//²âÊÔ·¢ËÍ´®¿Ú
-					DEBUG_PRINT("[°´¼ü³¤°´]: %d\n",Key_IO_Ordering_Value[i]);
-					
 					if(System_is_Operation())
 						p_Operation_Long_Press[i]();
 					else if(System_is_Error())
@@ -640,18 +637,22 @@ void App_Key_Task(void)
 			else
 			{
 				key_value_now = (Key_IO_Old & ~Key_IO_Hardware);
-				if(key_value_now == Key_IO_Ordering_Value[i])//ÒÑ¾­°´ÏÂ
+				if(key_value_now == Key_IO_Ordering_Value[i])//å·²ç»æŒ‰ä¸‹
 				{
 					if(Key_Long_Press_cnt[i] >= KEY_LONG_PRESS_TIME_2S)//
 					{
-						//²âÊÔ·¢ËÍ´®¿Ú
-						DEBUG_PRINT("[°´¼ü¶Ì°´]: %d\n",Key_IO_Ordering_Value[i]);
+						/*if(System_is_Operation())
+							p_Operation_Long_Press[i]();
+						else if(System_is_Error())
+							p_Fault_Long_Press[i]();
+						else
+							p_Funtion_Long_Press[i]();*/
 					}
 					else
 					{
 						Buzzer_Click_On();
-						//²âÊÔ·¢ËÍ´®¿Ú
-						DEBUG_PRINT("[°´¼üµã»÷]: %d\n",i);
+						//æµ‹è¯•å‘é€ä¸²å£
+						DEBUG_PRINT("[æŒ‰é”®ç‚¹å‡»]: %d\n",i);
 						
 						if(System_is_Operation())
 							p_Operation_Button[i]();
@@ -660,10 +661,10 @@ void App_Key_Task(void)
 						else
 						{
 							p_Funtion_Button[i]();
-							Set_Ctrl_Mode_Type(CTRL_FROM_KEY);//±ê¼Ç¿ØÖÆÀ´Ô´
+							Set_Ctrl_Mode_Type(CTRL_FROM_KEY);//æ ‡è®°æ§åˆ¶æ¥æº
 						}
 						
-						//¹Ø»úÏÂ ¼ÆÊı 8´Î
+						//å…³æœºä¸‹ è®¡æ•° 8æ¬¡
 						if(System_is_Power_Off())
 						{
 							Special_Button_Rules(Key_IO_Ordering_Value[i]);
@@ -681,7 +682,7 @@ void App_Key_Task(void)
 		Key_IO_Old = Key_IO_Hardware;
 }
 
-// °´¼üÖ÷Ñ­»·ÈÎÎñ
+// æŒ‰é”®ä¸»å¾ªç¯ä»»åŠ¡
 //  20 ms
 void App_Key_Handler(void)
 {
@@ -695,7 +696,7 @@ void App_Key_Handler(void)
 	{
 		if((*p_Analog_key_Value>>8) >= 2)
 		{
-			//³¤°´
+			//é•¿æŒ‰
 			Key_IO_Hardware = (*p_Analog_key_Value & 0xFF);
 			for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
 			{
@@ -720,7 +721,7 @@ void App_Key_Handler(void)
 		{
 			if(++io_shake_cnt >= KEY_VALUE_SHAKE_TIME)
 			{
-				//×Ô²âÄ£Ê½
+				//è‡ªæµ‹æ¨¡å¼
 				if(IS_SELF_TEST_MODE())
 				{
 					if(Key_IO_Hardware > 0)
@@ -728,11 +729,11 @@ void App_Key_Handler(void)
 						Buzzer_Click_Long_On(1);
 						
 						Key_IO_Old |= Key_IO_Hardware;
-						Led_Button_On(Key_IO_Old);	// °´¼ü
+						Led_Button_On(Key_IO_Old);	// æŒ‰é”®
 						Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_KEY, Key_IO_Old);
 					}
 				}
-				else//Õı³£Ê¹ÓÃ
+				else//æ­£å¸¸ä½¿ç”¨
 				{
 					App_Key_Task();
 				}
@@ -748,7 +749,7 @@ void App_Key_Handler(void)
 }
 
 
-// »ñÈ¡°´¼ü
+// è·å–æŒ‰é”®
 uint8_t Key_Get_IO_Input(void)
 {
 	uint8_t result=0;
@@ -763,111 +764,116 @@ uint8_t Key_Get_IO_Input(void)
 			result |= (1<<i);
 	}
 	
+	result &= 0x0F;
+	
 	return result;
 }
 
 
-//------------------- ¹¦ÄÜ½Ó¿Ú ----------------------------
+//------------------- åŠŸèƒ½æ¥å£ ----------------------------
 
-//	¿ª»ú ½øÈë×ÔÓÉÄ£Ê½
+//	å¼€æœº è¿›å…¥è‡ªç”±æ¨¡å¼
 void System_Power_On(void)
 {
 	Out_Of_Upgradation();
 	Freertos_TaskResume_All();
-	// ¼ì²é¸÷Ä£Ê½ ÊôĞÔ
+	// æ£€æŸ¥å„æ¨¡å¼ å±æ€§
 	if(Check_Data_Init())
 	{
 		Write_MbBuffer_Now();
 	}
-	//	×´Ì¬
+	//	çŠ¶æ€
 	if(If_Fault_Recovery_Max())
 		To_Fault_Menu();
 	else
 		To_Free_Mode(FREE_MODE_AUTO_START);			// ui
 	
-	Led_Button_On(0x0F);	// °´¼ü
+	Led_Button_On(0x0F);	// æŒ‰é”®
 	
 	//System_Check_Timer_Update();
-	// ºóÌ¨¶¨Ê±Æ÷
+	// åå°å®šæ—¶å™¨
 	//BlackGround_Task_On();
 }
 
-//	¹Ø»ú
+//	å…³æœº
 void System_Power_Off(void)
 {
 	char show_mapping[9] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 	
-	//Clean_Swimming_Distance();//Çå³ı¼ÆËã¾àÀë
-	//Çå³ı¹ÊÕÏ×´Ì¬
+	//Clean_Swimming_Distance();//æ¸…é™¤è®¡ç®—è·ç¦»
+	//æ¸…é™¤æ•…éšœçŠ¶æ€
 	Timing_Clean_Fault_State();
-	//Çå³ı½µÆµ×´Ì¬
+	//æ¸…é™¤é™é¢‘çŠ¶æ€
 	Clean_All_Down_Conversion_Status();
-	//Çå³ı¼ÆÊıÆ÷
+	//æ¸…é™¤è®¡æ•°å™¨
 	//Clean_Fault_Recovery_Cnt();
-	//to ¹Ø»úÄ£Ê½
+	//to å…³æœºæ¨¡å¼
 	To_Power_Off();
-	//ÉèÖÃµç»ú×ªËÙ
-	Data_Set_Current_Speed(0);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"ÔİÍ£"
+	//è®¾ç½®ç”µæœºè½¬é€Ÿ
+	Data_Set_Current_Speed(0);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"æš‚åœ"
 
-	Led_Button_On(0x0F);	// °´¼ü
+	Led_Button_On(0x0F);	// æŒ‰é”®
 	
-	// ºóÌ¨¶¨Ê±Æ÷
+	// åå°å®šæ—¶å™¨
 	//BlackGround_Task_Off();
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER, MB_LCD_MAPPING_SYMBOL, 0);
 	Set_DataValue_Len(MB_FUNC_READ_INPUT_REGISTER,MB_LCD_MAPPING_MODE,(uint8_t *)show_mapping,8);
 	
-	//ÍË³ö100µµÎ»Ä£Ê½
+	//é€€å‡º100æ¡£ä½æ¨¡å¼
 	Special_Status_Delete(SPECIAL_BIT_SPEED_100_GEAR);
 	
-	// ´æ´¢flash
+	// å­˜å‚¨flash
 	Write_MbBuffer_Now();
 }
 
-//	¿ª»ú»­Ãæ
+//	å¼€æœºç”»é¢
 void System_Boot_Screens(void)
 {
 	
-////******************  µ÷ÊÔÄ£Ê½ **************************
+////******************  è°ƒè¯•æ¨¡å¼ **************************
 //#ifdef SYSTEM_DEBUG_MODE
 //	return;
 //#endif
 ////*******************************************************
 	
 	osDelay(200);
-	//È«ÁÁ 2s
-	//Buzzer_Click_Long_On(1);// ¿ª»ú³¤Ïì
+	//å…¨äº® 2s
+	//Buzzer_Click_Long_On(1);// å¼€æœºé•¿å“
 	Breath_light_Max();
 	TM1621_Buzzer_On();
 	TM1621_Show_All();
 	osDelay(500);
 	TM1621_Buzzer_Off();
 	osDelay(1600);
-	//»úĞÍÂë & ²¦Âë×´Ì¬ 2s
+	//æœºå‹ç  & æ‹¨ç çŠ¶æ€ 2s
 	Lcd_System_Information();
 	osDelay(2000);
 	//Breath_light_Off();
 }
 
-//	»Ö¸´³ö³§ÉèÖÃ
+//	æ¢å¤å‡ºå‚è®¾ç½®
 void Restore_Factory_Settings(void)
 {
-/*	TM1621_Buzzer_Click();
+	TM1621_Buzzer_Click();
 	Breath_light_Max();
 	TM1621_BLACK_ON();
-	TM1621_Show_All();//È«ÁÁ 3s*/
-	
-	// data »Ö¸´
+	TM1621_Show_All();//å…¨äº® 3s*/
+	BT_Module_AT_Factory();
+	// data æ¢å¤
 	App_Data_ReInit();
+
+	TM1621_Buzzer_Off();
 	
-	// wifi »Ö¸´
+	//BT_Module_AT_ReInit();
+	// wifi æ¢å¤
 	
 	//TM1621_Show_All();
 	//osDelay(500);
 	//TM1621_Buzzer_Off();
 	//osDelay(1500);
 	//System_Power_Off();
-	SysSoftReset();// Èí¼ş¸´Î»
-	// ·µ»Ø ×ÔÓÉÄ£Ê½ ³õÊ¼×´Ì¬
+	SysSoftReset();// è½¯ä»¶å¤ä½
+	// è¿”å› è‡ªç”±æ¨¡å¼ åˆå§‹çŠ¶æ€
 	
 }
 

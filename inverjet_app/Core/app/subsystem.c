@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		subsystem.c
-* @brief   		×ÓÏµÍ³²éÑ¯
+* @brief   		å­ç³»ç»ŸæŸ¥è¯¢
 *
 *
 * @author			WQG
@@ -39,7 +39,7 @@ void Subsystem_RxData(uint8_t len)
 
 void Subsystem_Handler_Task(void)
 {
-	//Ğ­Òé½âÎö DMX512
+	//åè®®è§£æ DMX512
 #ifdef SYSTEM_HARDWARE_DEBUG
 	if( Subsystem_Task_Counter > (THREAD_PERIOD_METERING_MODULE_HUART/THREAD_PERIOD_DMX512_HUART))
 	{
@@ -52,15 +52,15 @@ void Subsystem_Handler_Task(void)
 	if(( Subsystem_Task_Counter % (THREAD_PERIOD_METERING_MODULE_HUART/THREAD_PERIOD_DMX512_HUART))==0)
 	{
 		//Subsystem_Task_Counter = 0;
-		//Ğ­Òé½âÎö ¼ÆÁ¿Ä£¿é
+		//åè®®è§£æ è®¡é‡æ¨¡å—
 		Metering_Protocol_Analysis();
 		
-		//Set_Dmx512_Data_Change(1);	//	×Ô¶¯·¢ËÍ
+		//Set_Dmx512_Data_Change(1);	//	è‡ªåŠ¨å‘é€
 	}
 	if( Subsystem_Task_Counter > (THREAD_PERIOD_DMX512_AUTO_SEND/THREAD_PERIOD_DMX512_HUART))
 	{
 		Subsystem_Task_Counter = 0;
-		Set_Dmx512_Data_Change(1);	//	×Ô¶¯·¢ËÍ
+		Set_Dmx512_Data_Change(1);	//	è‡ªåŠ¨å‘é€
 	}
 	
 	Subsystem_Task_Counter ++;

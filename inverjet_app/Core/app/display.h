@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		display.h
-* @brief   		ÏÔÊ¾Ä£¿é  ÏÔÊ¾Ä£¿é±¾Éí²»Õ¼ÓÃÏß³Ì,ÓÉÆäËüÏß³ÌÈÎÎñµ÷ÓÃ
+* @brief   		æ˜¾ç¤ºæ¨¡å—  æ˜¾ç¤ºæ¨¡å—æœ¬èº«ä¸å ç”¨çº¿ç¨‹,ç”±å…¶å®ƒçº¿ç¨‹ä»»åŠ¡è°ƒç”¨
 *
 *
 * @author			WQG
@@ -36,7 +36,7 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 
-//-------------- Í¼±êÏÔÊ¾±ê×¼Î» -------------------
+//-------------- å›¾æ ‡æ˜¾ç¤ºæ ‡å‡†ä½ -------------------
 #define STATUS_BIT_BLUETOOTH			1
 #define STATUS_BIT_PERCENTAGE			2
 #define STATUS_BIT_WIFI						4
@@ -50,21 +50,21 @@ extern "C" {
 #define LCD_SYMBOL_FOT_FAULT								(STATUS_BIT_BLUETOOTH + STATUS_BIT_WIFI)
 
 
-// ×ÔÓÉÄ£Ê½ ÌØ±ğ×´Ì¬
+// è‡ªç”±æ¨¡å¼ ç‰¹åˆ«çŠ¶æ€
 #define FREE_MODE_AUTO_START					0
 #define FREE_MODE_NOT_AUTO_START			1
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
-// ³õÊ¼»¯
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
+// åˆå§‹åŒ–
 extern void App_Display_Init(void);
-//------------------- ÏÔÊ¾ÆÁ & ½Ó¿Ú ----------------------------
+//------------------- æ˜¾ç¤ºå± & æ¥å£ ----------------------------
 /*
 ******************************************************************************
 Display_Show_Speed	
 
-ÏÔÊ¾ËÙ¶È£¬ 0-100
+æ˜¾ç¤ºé€Ÿåº¦ï¼Œ 0-100
 ******************************************************************************
 */  
 extern void Display_Show_Speed(uint8_t speed);
@@ -72,7 +72,7 @@ extern void Display_Show_Speed(uint8_t speed);
 ******************************************************************************
 Display_Show_Min	
 
-ÏÔÊ¾·ÖÖÓ£¬ 0-99
+æ˜¾ç¤ºåˆ†é’Ÿï¼Œ 0-99
 ******************************************************************************
 */  
 extern void Display_Show_Min(uint8_t min);
@@ -80,7 +80,7 @@ extern void Display_Show_Min(uint8_t min);
 ******************************************************************************
 Display_Show_Speed	
 
-ÏÔÊ¾ËÙ¶È£¬ 0-100
+æ˜¾ç¤ºé€Ÿåº¦ï¼Œ 0-100
 ******************************************************************************
 */  
 extern void Display_Show_Sec(uint8_t sec);
@@ -88,7 +88,7 @@ extern void Display_Show_Sec(uint8_t sec);
 ******************************************************************************
 Display_Show_Mode	
 
-ÏÔÊ¾Ä£Ê½£¬ P1~P3
+æ˜¾ç¤ºæ¨¡å¼ï¼Œ P1~P3
 ******************************************************************************
 */  
 extern void Display_Show_Mode(uint8_t mode);
@@ -98,36 +98,36 @@ void Display_Hide_Min(uint8_t para);
 void Display_Hide_Sec(uint8_t para);
 void Display_Hide_Mode(uint8_t para);
 	
-//------------------- ÏÔÊ¾ & ½çÃæ ----------------------------
+//------------------- æ˜¾ç¤º & ç•Œé¢ ----------------------------
 
 extern void Lcd_Display_Symbol(uint8_t status_para);
 extern void Lcd_Test(uint8_t num);
 extern void Lcd_Display(uint16_t speed, uint16_t time, uint8_t status_para, uint8_t mode);
-// Ï¢ÆÁ
+// æ¯å±
 extern void Lcd_Off(void);
-// ËÙ¶È Ï¨Ãğ
+// é€Ÿåº¦ ç†„ç­
 extern void Lcd_No_Speed(uint16_t time, uint8_t status_para, uint8_t mode);
-//------------------- Íâ²¿½Ó¿Ú  ----------------------------
-//ÏÔÊ¾
+//------------------- å¤–éƒ¨æ¥å£  ----------------------------
+//æ˜¾ç¤º
 extern void Lcd_Show(void);
 
 extern void Lcd_Show_Upgradation(uint8_t sum, uint8_t num);
 
-// »úĞÍÂë & ²¦Âë
+// æœºå‹ç  & æ‹¨ç 
 extern void Lcd_System_Information(void);
 extern void Lcd_Speed_Off(void);
-// ½µËÙ ½çÃæ 2Ãë1Ë¢
+// é™é€Ÿ ç•Œé¢ 2ç§’1åˆ·
 void Lcd_Show_Slow_Down(uint8_t value);
 
-// ¹Ø»ú
+// å…³æœº
 extern void To_Power_Off(void);
-// ×ÔÓÉÄ£Ê½
+// è‡ªç”±æ¨¡å¼
 extern void To_Free_Mode(uint8_t mode);
-// ¶¨Ê±Ä£Ê½
+// å®šæ—¶æ¨¡å¼
 extern void To_Timing_Mode(void);
-//	ÑµÁ·Ä£Ê½  num:0-2
+//	è®­ç»ƒæ¨¡å¼  num:0-2
 extern void To_Train_Mode(uint8_t num);
-//	×Ô²â
+//	è‡ªæµ‹
 extern void System_Self_Testing_Porgram(void);
 
 extern void System_Self_Checking_Porgram(void);

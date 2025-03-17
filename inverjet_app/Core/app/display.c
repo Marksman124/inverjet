@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				display.c
-* @brief			ÏÔÊ¾Ä£¿é  ÏÔÊ¾Ä£¿é±¾Éí²»Õ¼ÓÃÏß³Ì,ÓÉÆäËüÏß³ÌÈÎÎñµ÷ÓÃ
+* @brief			æ˜¾ç¤ºæ¨¡å—  æ˜¾ç¤ºæ¨¡å—æœ¬èº«ä¸å ç”¨çº¿ç¨‹,ç”±å…¶å®ƒçº¿ç¨‹ä»»åŠ¡è°ƒç”¨
 *
 * @author			WQG
 * @versions		v1.0
@@ -24,25 +24,25 @@
 
 
 /* Private define ------------------------------------------------------------*/
-UART_HandleTypeDef* p_huart_display = &huart3;		 //µ÷ÊÔ´®¿Ú UART¾ä±ú
+UART_HandleTypeDef* p_huart_display = &huart3;		 //è°ƒè¯•ä¸²å£ UARTå¥æŸ„
 
 /* Private macro -------------------------------------------------------------*/
 
 
 /* Private variables ---------------------------------------------------------*/
 
-// ÏÔÊ¾Í¼±ê
+// æ˜¾ç¤ºå›¾æ ‡
 uint8_t LCD_Show_Bit;
 
-// ·¢ËÍ»º³åÇø
+// å‘é€ç¼“å†²åŒº
 uint8_t send_buffer[24] = {0};
 
 /* Private function prototypes -----------------------------------------------*/
 
 
 /* Private user code ---------------------------------------------------------*/
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
-// ³õÊ¼»¯
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
+// åˆå§‹åŒ–
 void App_Display_Init(void)
 {
 	
@@ -50,14 +50,14 @@ void App_Display_Init(void)
 	
 	LCD_Show_Bit = 0;
 	
-	Led_Button_On(0x0F);	// °´¼ü
+	Led_Button_On(0x0F);	// æŒ‰é”®
 }
-//------------------- ÏÔÊ¾ÆÁ & ½Ó¿Ú ----------------------------
+//------------------- æ˜¾ç¤ºå± & æ¥å£ ----------------------------
 /*
 ******************************************************************************
 Display_Show_Speed	
 
-ÏÔÊ¾ËÙ¶È£¬ 0-100
+æ˜¾ç¤ºé€Ÿåº¦ï¼Œ 0-100
 ******************************************************************************
 */  
 void Display_Show_Speed(uint8_t speed)
@@ -79,7 +79,7 @@ void Display_Show_Speed(uint8_t speed)
 ******************************************************************************
 Display_Show_Min	
 
-ÏÔÊ¾·ÖÖÓ£¬ 0-99
+æ˜¾ç¤ºåˆ†é’Ÿï¼Œ 0-99
 ******************************************************************************
 */  
 void Display_Show_Min(uint8_t min)
@@ -93,7 +93,7 @@ void Display_Show_Min(uint8_t min)
 ******************************************************************************
 Display_Show_Sec	
 
-ÏÔÊ¾ Ãë£¬ 0-60
+æ˜¾ç¤º ç§’ï¼Œ 0-60
 ******************************************************************************
 */  
 void Display_Show_Sec(uint8_t sec)
@@ -108,24 +108,24 @@ void Display_Show_Sec(uint8_t sec)
 ******************************************************************************
 Display_Show_Mode	
 
-ÏÔÊ¾Ä£Ê½£¬ P1~P3
+æ˜¾ç¤ºæ¨¡å¼ï¼Œ P1~P3
 ******************************************************************************
 */  
 void Display_Show_Mode(uint8_t mode)
 {
-	//×ÖÄ¸ p
+	//å­—æ¯ p
 	TM1621_display_Letter(TM1621_COORDINATE_MODE_HIGH,  'P');
 	
 	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  GET_NUMBER_ONE_DIGIT(mode));
 	
 	//TM1621_LCD_Redraw();
 }
-//------------------- ÏÔÊ¾ÆÁ Ï¨Ãğ & ½Ó¿Ú ----------------------------
+//------------------- æ˜¾ç¤ºå± ç†„ç­ & æ¥å£ ----------------------------
 /*
 ******************************************************************************
 Display_Show_Speed	
 
-Òş²Ø ËÙ¶È£¬ 0-100
+éšè— é€Ÿåº¦ï¼Œ 0-100
 ******************************************************************************
 */  
 void Display_Hide_Speed(uint8_t para)
@@ -144,7 +144,7 @@ void Display_Hide_Speed(uint8_t para)
 ******************************************************************************
 Display_Hide_Min	
 
-Òş²Ø ·ÖÖÓ  0-99
+éšè— åˆ†é’Ÿ  0-99
 ******************************************************************************
 */  
 void Display_Hide_Min(uint8_t para)
@@ -158,7 +158,7 @@ void Display_Hide_Min(uint8_t para)
 ******************************************************************************
 Display_Hide_Sec	
 
-Òş²Ø Ãë 0-60
+éšè— ç§’ 0-60
 ******************************************************************************
 */  
 void Display_Hide_Sec(uint8_t para)
@@ -173,7 +173,7 @@ void Display_Hide_Sec(uint8_t para)
 ******************************************************************************
 Display_Hide_Mode	
 
-Òş²Ø Ä£Ê½£¬ P1~P3
+éšè— æ¨¡å¼ï¼Œ P1~P3
 ******************************************************************************
 */  
 void Display_Hide_Mode(uint8_t para)
@@ -184,7 +184,7 @@ void Display_Hide_Mode(uint8_t para)
 		TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  0xFF);
 }
 
-//------------------- ÏÔÊ¾ & ½çÃæ ----------------------------
+//------------------- æ˜¾ç¤º & ç•Œé¢ ----------------------------
 
 void Lcd_Display_Symbol(uint8_t status_para)
 {
@@ -247,10 +247,10 @@ void Lcd_Display(uint16_t speed, uint16_t time, uint8_t status_para, uint8_t mod
 
 
 
-// Ï¢ÆÁ
+// æ¯å±
 void Lcd_Off(void)
 {
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_OFF();
 	TM1621_Show_Off();
 	
@@ -260,7 +260,7 @@ void Lcd_Off(void)
 }
 
 
-// ËÙ¶È Ï¨Ãğ
+// é€Ÿåº¦ ç†„ç­
 void Lcd_No_Speed(uint16_t time, uint8_t status_para, uint8_t mode)
 {
 	//speed
@@ -280,9 +280,9 @@ void Lcd_No_Speed(uint16_t time, uint8_t status_para, uint8_t mode)
 	Lcd_Display_Symbol(status_para);
 }
 
-//------------------- Íâ²¿½Ó¿Ú  ----------------------------
+//------------------- å¤–éƒ¨æ¥å£  ----------------------------
 /***********************************************************************
-*		ÏÔÊ¾ º¯Êı×ÜÈë¿Ú
+*		æ˜¾ç¤º å‡½æ•°æ€»å…¥å£
 *
 *
 ***********************************************************************/
@@ -300,10 +300,10 @@ void Lcd_Show(void)
 			return ;
 	}
 	
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_ON();
 	
-	LCD_Refresh_Restore();//»Ö¸´Ë¢ĞÂ
+	LCD_Refresh_Restore();//æ¢å¤åˆ·æ–°
 	//
 	Lcd_Display(*p_OP_ShowNow_Speed, *p_OP_ShowNow_Time, LCD_Show_Bit,Get_System_State_Mode());
 	
@@ -311,7 +311,7 @@ void Lcd_Show(void)
 }
 
 /***********************************************************************
-*		ÏÔÊ¾ Éı¼¶
+*		æ˜¾ç¤º å‡çº§
 *
 *
 ***********************************************************************/
@@ -319,11 +319,11 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 {
 	//uint8_t schedule=0;
 	
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_ON();
 	
 
-	//µ±Ç°°ü
+	//å½“å‰åŒ…
 	//schedule = (num*100)/sum;
 	
 	Display_Show_Speed(num);
@@ -335,11 +335,11 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 	//TM1621_Show_Symbol(TM1621_COORDINATE_WIFI, 					0);
 	
 	
-	//×Ü°üÊı
+	//æ€»åŒ…æ•°
 	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH, (sum/10)%10);
 	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  	sum%10);
 	
-	//½çÃæ
+	//ç•Œé¢
 	TM1621_display_Letter(TM1621_COORDINATE_MIN_HIGH, 	'U');
 	TM1621_display_Letter(TM1621_COORDINATE_MIN_LOW, 		'P');
 	TM1621_display_Letter(TM1621_COORDINATE_SEC_HIGH,  	'd');
@@ -348,15 +348,15 @@ void Lcd_Show_Upgradation(uint8_t sum, uint8_t num)
 	TM1621_LCD_Redraw();
 }
 
-// »úĞÍÂë & ²¦Âë
+// æœºå‹ç  & æ‹¨ç 
 void Lcd_System_Information(void)
 {
 	uint16_t Dial_Switch_Test = 0;
 	
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_ON();
 	
-	//	²¦Âë¿ª¹Ø
+	//	æ‹¨ç å¼€å…³
 	System_Dial_Switch = Gpio_Get_Dial_Switch();
 	Dial_Switch_Test = Get_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER, MB_COMM_TEST_DIAL_SWITCH);
 	if(System_Dial_Switch == 0)
@@ -373,7 +373,7 @@ void Lcd_System_Information(void)
 	TM1621_display_number(TM1621_COORDINATE_MODE_HIGH,  GET_NUMBER_TEN_DIGIT(System_Dial_Switch));
 	TM1621_display_number(TM1621_COORDINATE_MODE_LOW,  GET_NUMBER_ONE_DIGIT(System_Dial_Switch));
 	
-	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE, System_Dial_Switch);	//	»úĞÍÂë
+	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MACHINE_MODEL_CODE, System_Dial_Switch);	//	æœºå‹ç 
 	Set_DataAddr_Value(MB_FUNC_READ_INPUT_REGISTER , MB_MODBUS_RS485_VERSION, 1);
 	
 	//speed
@@ -397,17 +397,17 @@ void Lcd_System_Information(void)
 	TM1621_LCD_Redraw();
 }
 
-// ËÙ¶È Ï¨Ãğ
+// é€Ÿåº¦ ç†„ç­
 void Lcd_Speed_Off(void)
 {
-	//±³¹â ¹Ø
+	//èƒŒå…‰ å…³
 	//TM1621_BLACK_OFF()
 	//
 	Lcd_No_Speed(*p_OP_ShowNow_Time, LCD_Show_Bit,Get_System_State_Mode());
 	TM1621_LCD_Redraw();
 }
 
-// ½µËÙ ½çÃæ 2Ãë1Ë¢
+// é™é€Ÿ ç•Œé¢ 2ç§’1åˆ·
 void Lcd_Show_Slow_Down(uint8_t value)
 {
 	
@@ -424,25 +424,25 @@ void Lcd_Show_Slow_Down(uint8_t value)
 
 /*
 ******************************************************************************
-*	Ä£Ê½ÇĞ»»
+*	æ¨¡å¼åˆ‡æ¢
 ******************************************************************************
 */
 
-//-------------  To-->¹Ø»ú ------------------------------------
+//-------------  To-->å…³æœº ------------------------------------
 void To_Power_Off(void)
 {
 	OUT_SELF_TEST_MODE();
 	
-	Set_System_State_Machine(POWER_OFF_STATUS);		// ×´Ì¬»ú
-	*p_OP_ShowNow_Speed = 0;											// µ±Ç°ËÙ¶È
-	*p_OP_ShowNow_Time = 0;												// µ±Ç°Ê±¼ä
+	Set_System_State_Machine(POWER_OFF_STATUS);		// çŠ¶æ€æœº
+	*p_OP_ShowNow_Speed = 0;											// å½“å‰é€Ÿåº¦
+	*p_OP_ShowNow_Time = 0;												// å½“å‰æ—¶é—´
 	
 	Special_Status_Bit = 0;
 
 	Lcd_Off();
 }
 
-//-------------  To-->×ÔÓÉÄ£Ê½ ------------------------------------
+//-------------  To-->è‡ªç”±æ¨¡å¼ ------------------------------------
 void To_Free_Mode(uint8_t mode)
 {
 	//OUT_SELF_TEST_MODE();
@@ -466,7 +466,7 @@ void To_Free_Mode(uint8_t mode)
 	Lcd_Show();
 }
 
-//-------------  To-->¶¨Ê±Ä£Ê½ ------------------------------------
+//-------------  To-->å®šæ—¶æ¨¡å¼ ------------------------------------
 void To_Timing_Mode(void)
 {
 	Special_Status_Delete(SPECIAL_BIT_SKIP_INITIAL);
@@ -483,7 +483,7 @@ void To_Timing_Mode(void)
 	Lcd_Show();
 }
 
-//-------------  To-->ÑµÁ·Ä£Ê½  num:1-4 ------------------------------------
+//-------------  To-->è®­ç»ƒæ¨¡å¼  num:1-4 ------------------------------------
 void To_Train_Mode(uint8_t num)
 {
 	uint8_t plan=1;
@@ -509,7 +509,7 @@ void To_Train_Mode(uint8_t num)
 }
 
 
-//-------------  To-->×Ô²â ------------------------------------
+//-------------  To-->è‡ªæµ‹ ------------------------------------
 void System_Self_Testing_Porgram(void)
 {
 	Buzzer_Click_Long_On(1);
@@ -518,14 +518,14 @@ void System_Self_Testing_Porgram(void)
 	Clean_Comm_Test();//
 	mcu_start_wifitest();
 	
-	Led_Button_On(0);	// °´¼ü
-	// ÆÁÄ»
+	Led_Button_On(0);	// æŒ‰é”®
+	// å±å¹•
 	TM1621_BLACK_ON();
-	TM1621_Show_All();//È«ÁÁ 3s
+	TM1621_Show_All();//å…¨äº® 3s
 	osDelay(2000);
-	TM1621_Show_Repeat_All();//È«²¿Ñ­»·
+	TM1621_Show_Repeat_All();//å…¨éƒ¨å¾ªç¯
 	
-	Lcd_System_Information();//»úĞÍÂë & ²¦Âë×´Ì¬ 6s
+	Lcd_System_Information();//æœºå‹ç  & æ‹¨ç çŠ¶æ€ 6s
 	osDelay(2000);
 }
 
@@ -537,14 +537,14 @@ void System_Self_Checking_Porgram(void)
 	Clean_Comm_Test();//
 	mcu_start_wifitest();
 	
-	Led_Button_On(0);	// °´¼ü
-	// ÆÁÄ»
+	Led_Button_On(0);	// æŒ‰é”®
+	// å±å¹•
 	TM1621_BLACK_ON();
-	TM1621_Show_All();//È«ÁÁ 3s
+	TM1621_Show_All();//å…¨äº® 3s
 	osDelay(3000);
-	TM1621_Show_Repeat_All();//È«²¿Ñ­»·
+	TM1621_Show_Repeat_All();//å…¨éƒ¨å¾ªç¯
 	
-	Lcd_System_Information();//»úĞÍÂë & ²¦Âë×´Ì¬ 6s
+	Lcd_System_Information();//æœºå‹ç  & æ‹¨ç çŠ¶æ€ 6s
 	osDelay(6000);
 }
 
@@ -558,7 +558,7 @@ extern TaskHandle_t BT_TaskHandle;
 
 void Freertos_TaskSuspend_Wifi(void)
 {
-	// ÔİÍ£ÈÎÎñ
+	// æš‚åœä»»åŠ¡
 	osThreadSuspend(Key_Button_TaskHandle);
 	osThreadSuspend(Breath_Light_TaHandle);
 	osThreadSuspend(Rs485_Modbus_TaHandle);
@@ -572,7 +572,7 @@ void Freertos_TaskSuspend_Wifi(void)
 
 void Freertos_TaskSuspend_BT(void)
 {
-	// ÔİÍ£ÈÎÎñ
+	// æš‚åœä»»åŠ¡
 	osThreadSuspend(Key_Button_TaskHandle);
 	osThreadSuspend(Breath_Light_TaHandle);
 	osThreadSuspend(Rs485_Modbus_TaHandle);
@@ -584,7 +584,7 @@ void Freertos_TaskSuspend_BT(void)
 
 void Freertos_TaskSuspend_RS485(void)
 {
-	// ÔİÍ£ÈÎÎñ
+	// æš‚åœä»»åŠ¡
 	osThreadSuspend(Key_Button_TaskHandle);
 	osThreadSuspend(Breath_Light_TaHandle);
 	//osThreadSuspend(Rs485_Modbus_TaHandle);
@@ -597,7 +597,7 @@ void Freertos_TaskSuspend_RS485(void)
 
 void Freertos_TaskResume_All(void)
 {
-	// »Ö¸´ÈÎÎñ
+	// æ¢å¤ä»»åŠ¡
 	osThreadResume(Key_Button_TaskHandle);
 	osThreadResume(Breath_Light_TaHandle);
 	osThreadResume(Rs485_Modbus_TaHandle);

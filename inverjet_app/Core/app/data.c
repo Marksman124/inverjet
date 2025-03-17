@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file				data.c
-* @brief			Êı¾İ¹ÜÀíÄ£¿é
+* @brief			æ•°æ®ç®¡ç†æ¨¡å—
 *
 * @author			WQG
 * @versions		v1.0
@@ -33,12 +33,12 @@ Operating_Parameters OP_ShowNow;
 
 Operating_Parameters* p_OP_ShowLater;
 
-// ÑµÁ·Ä£Ê½ µ±Ç°×´Ì¬
+// è®­ç»ƒæ¨¡å¼ å½“å‰çŠ¶æ€
 uint8_t PMode_Now = 0;
 
 uint8_t Period_Now = 0;
 
-// ¸÷Ä£Ê½ ÊôĞÔ ³õÊ¼Öµ
+// å„æ¨¡å¼ å±æ€§ åˆå§‹å€¼
 Operating_Parameters OP_Init_Free = { 40 , 0};
 
 Operating_Parameters OP_Init_Timing = { 40 , 1800};
@@ -51,21 +51,21 @@ Operating_Parameters OP_Init_PMode[TRAINING_MODE_NUMBER_MAX][TRAINING_MODE_PERIO
 {{30,00}},
 };
 
-//--------------------------- ÏµÍ³ÊôĞÔ
-uint16_t* p_System_State_Machine;			// ×´Ì¬»ú
-uint16_t* p_PMode_Now;								// µ±Ç°Ä£Ê½
-uint16_t* p_OP_ShowNow_Speed;					// µ±Ç°ËÙ¶È
-uint16_t* p_OP_ShowNow_Time;					// µ±Ç°Ê±¼ä
+//--------------------------- ç³»ç»Ÿå±æ€§
+uint16_t* p_System_State_Machine;			// çŠ¶æ€æœº
+uint16_t* p_PMode_Now;								// å½“å‰æ¨¡å¼
+uint16_t* p_OP_ShowNow_Speed;					// å½“å‰é€Ÿåº¦
+uint16_t* p_OP_ShowNow_Time;					// å½“å‰æ—¶é—´
 
-//--------------------------- ÁÙÊ± ÓÃÓÚ¹ÊÕÏµÈ½çÃæ¼ÇÂ¼·µ»ØÖµ
-uint16_t* p_System_State_Machine_Memory;			// ×´Ì¬»ú
-uint16_t* p_PMode_Now_Memory;									// µ±Ç°Ä£Ê½
-uint16_t* p_OP_ShowNow_Speed_Memory;					// µ±Ç°ËÙ¶È
-uint16_t* p_OP_ShowNow_Time_Memory;						// µ±Ç°Ê±¼ä
+//--------------------------- ä¸´æ—¶ ç”¨äºæ•…éšœç­‰ç•Œé¢è®°å½•è¿”å›å€¼
+uint16_t* p_System_State_Machine_Memory;			// çŠ¶æ€æœº
+uint16_t* p_PMode_Now_Memory;									// å½“å‰æ¨¡å¼
+uint16_t* p_OP_ShowNow_Speed_Memory;					// å½“å‰é€Ÿåº¦
+uint16_t* p_OP_ShowNow_Time_Memory;						// å½“å‰æ—¶é—´
 
-System_Ctrl_Mode_Type_enum Ctrl_Mode_Type = CTRL_FROM_KEY;				// ¿ØÖÆ·½Ê½
+System_Ctrl_Mode_Type_enum Ctrl_Mode_Type = CTRL_FROM_KEY;				// æ§åˆ¶æ–¹å¼
 
-// ¸÷Ä£Ê½ ÊôĞÔ
+// å„æ¨¡å¼ å±æ€§
 Operating_Parameters* p_OP_Free_Mode;
 
 Operating_Parameters* p_OP_Timing_Mode;
@@ -73,103 +73,105 @@ Operating_Parameters* p_OP_Timing_Mode;
 Operating_Parameters (*p_OP_PMode)[TRAINING_MODE_PERIOD_MAX] = OP_Init_PMode;
 
 //==========================================================
-//--------------------------- Çı¶¯°å¶ÁÈ¡ĞÅÏ¢
+//--------------------------- é©±åŠ¨æ¿è¯»å–ä¿¡æ¯
 //==========================================================
 
-uint16_t Driver_Software_Version_Read;		// Çı¶¯°åÈí¼ş°æ±¾	 ¶ÁÉÏÀ´µÄÔ­Ê¼Öµ
+uint16_t Driver_Software_Version_Read;		// é©±åŠ¨æ¿è½¯ä»¶ç‰ˆæœ¬	 è¯»ä¸Šæ¥çš„åŸå§‹å€¼
 
-uint16_t* p_Motor_Fault_Static;						// ¹ÊÕÏ×´Ì¬		Çı¶¯°å
+uint16_t* p_Motor_Fault_Static;						// æ•…éšœçŠ¶æ€		é©±åŠ¨æ¿
 
-uint32_t* p_Motor_Reality_Speed;					// µç»ú Êµ¼Ê ×ªËÙ
-uint32_t* p_Motor_Reality_Power;					// µç»ú Êµ¼Ê ¹¦ÂÊ
+uint32_t* p_Motor_Reality_Speed;					// ç”µæœº å®é™… è½¬é€Ÿ
+uint32_t* p_Motor_Reality_Power;					// ç”µæœº å®é™… åŠŸç‡
 
-int16_t* p_Mos_Temperature;							// mos ÎÂ¶È
-uint32_t* p_Motor_Current;								// µç»ú µçÁ÷		Êä³ö
-uint16_t* p_Motor_Bus_Voltage;						// Ä¸Ïß µçÑ¹		ÊäÈë
-uint16_t* p_Motor_Bus_Current;						// Ä¸Ïß µçÁ÷  	ÊäÈë
+int16_t* p_Mos_Temperature;							// mos æ¸©åº¦
+uint32_t* p_Motor_Current;								// ç”µæœº ç”µæµ		è¾“å‡º
+uint16_t* p_Motor_Bus_Voltage;						// æ¯çº¿ ç”µå‹		è¾“å…¥
+uint16_t* p_Motor_Bus_Current;						// æ¯çº¿ ç”µæµ  	è¾“å…¥
 
 //==========================================================
-//--------------------------- Õû»úĞÅÏ¢
+//--------------------------- æ•´æœºä¿¡æ¯
 //==========================================================
-uint16_t* p_System_Fault_Static;					// ¹ÊÕÏ×´Ì¬		Õû»ú
-int16_t* p_Box_Temperature;							// µçÏä ÎÂ¶È
-uint32_t* p_Send_Reality_Speed;						// ÏÂ·¢ Êµ¼Ê ×ªËÙ
+uint16_t* p_System_Fault_Static;					// æ•…éšœçŠ¶æ€		æ•´æœº
+int16_t* p_Box_Temperature;							// ç”µç®± æ¸©åº¦
+uint32_t* p_Send_Reality_Speed;						// ä¸‹å‘ å®é™… è½¬é€Ÿ
 
 
-uint16_t* p_Support_Control_Methods;	//ÆÁ±Î¿ØÖÆ·½Ê½
-uint16_t* p_Motor_Pole_Number;				//µç»ú¼«Êı
-uint16_t* p_Breath_Light_Max;					//¹âÈ¦ÁÁ¶È  
+uint16_t* p_Support_Control_Methods;	//å±è”½æ§åˆ¶æ–¹å¼
+uint16_t* p_Motor_Pole_Number;				//ç”µæœºææ•°
+uint16_t* p_Breath_Light_Max;					//å…‰åœˆäº®åº¦  
 	
-uint8_t Motor_State_Storage[MOTOR_PROTOCOL_ADDR_MAX]={0};//µç»ú×´Ì¬
+uint8_t Motor_State_Storage[MOTOR_PROTOCOL_ADDR_MAX]={0};//ç”µæœºçŠ¶æ€
 
-//================= ³åÀËÄ£Ê½ È«¾Ö ²ÎÊı ================================
+//================= å†²æµªæ¨¡å¼ å…¨å±€ å‚æ•° ================================
 // ----------------------------------------------------------------------------------------------
-uint16_t* p_Surf_Mode_Info_Acceleration;  		//	³åÀËÄ£Ê½ -- ¼ÓËÙ¶È
-uint16_t* p_Surf_Mode_Info_Prepare_Time;  		//	³åÀËÄ£Ê½ -- ×¼±¸Ê±¼ä
-uint16_t* p_Surf_Mode_Info_Low_Speed;  				//	³åÀËÄ£Ê½ -- µÍËÙµµ -- ËÙ¶È
-uint16_t* p_Surf_Mode_Info_Low_Time;					//	³åÀËÄ£Ê½ -- µÍËÙµµ -- Ê±¼ä
-uint16_t* p_Surf_Mode_Info_High_Speed;  			//	³åÀËÄ£Ê½ -- ¸ßËÙµµ -- ËÙ¶È
-uint16_t* p_Surf_Mode_Info_High_Time;  				//	³åÀËÄ£Ê½ -- ¸ßËÙµµ -- Ê±¼ä
+uint16_t* p_Surf_Mode_Info_Acceleration;  		//	å†²æµªæ¨¡å¼ -- åŠ é€Ÿåº¦
+uint16_t* p_Surf_Mode_Info_Prepare_Time;  		//	å†²æµªæ¨¡å¼ -- å‡†å¤‡æ—¶é—´
+uint16_t* p_Surf_Mode_Info_Low_Speed;  				//	å†²æµªæ¨¡å¼ -- ä½é€Ÿæ¡£ -- é€Ÿåº¦
+uint16_t* p_Surf_Mode_Info_Low_Time;					//	å†²æµªæ¨¡å¼ -- ä½é€Ÿæ¡£ -- æ—¶é—´
+uint16_t* p_Surf_Mode_Info_High_Speed;  			//	å†²æµªæ¨¡å¼ -- é«˜é€Ÿæ¡£ -- é€Ÿåº¦
+uint16_t* p_Surf_Mode_Info_High_Time;  				//	å†²æµªæ¨¡å¼ -- é«˜é€Ÿæ¡£ -- æ—¶é—´
 // ----------------------------------------------------------------------------------------------
+uint16_t *p_BLE_Pair_Finish;
+uint16_t BLE_Pair_Finish_Now = 0;
 
 uint16_t *p_WIFI_Rssi;
 uint16_t *p_BLE_Rssi;
 
-uint16_t* p_Analog_key_Value;					// ĞéÄâ°´¼ü
+uint16_t* p_Analog_key_Value;					// è™šæ‹ŸæŒ‰é”®
 
 uint8_t System_PowerUp_Finish = 0;
 
 uint16_t MB_Buffer_Write_Timer = 0;
 
-//================= µ÷ÊÔÊ¹ÓÃ  Ê±¼ä ================================
+//================= è°ƒè¯•ä½¿ç”¨  æ—¶é—´ ================================
 
-uint32_t* p_System_Runing_Second_Cnt;			// ÏµÍ³Ê±¼ä
-uint32_t* p_No_Operation_Second_Cnt;			// ÎŞÈË²Ù×÷Ê±¼ä
-uint32_t* p_System_Startup_Second_Cnt;		// Æô¶¯ Ê±¼ä
+uint32_t* p_System_Runing_Second_Cnt;			// ç³»ç»Ÿæ—¶é—´
+uint32_t* p_No_Operation_Second_Cnt;			// æ— äººæ“ä½œæ—¶é—´
+uint32_t* p_System_Startup_Second_Cnt;		// å¯åŠ¨ æ—¶é—´
 
 
 //==========================================================
-//--------------------------- Íê³ÉÍ³¼Æ (APPÒª)
+//--------------------------- å®Œæˆç»Ÿè®¡ (APPè¦)
 //==========================================================
-uint16_t* p_Finish_Statistics_Time;					//	Íê³ÉÍ³¼Æ --> Ê±³¤
-uint16_t* p_Finish_Statistics_Speed;				//	Íê³ÉÍ³¼Æ --> Ç¿¶È
-uint32_t* p_Finish_Statistics_Distance;			//	Íê³ÉÍ³¼Æ --> ÓÎÓ¾¾àÀë
-uint16_t* p_Preparation_Time_BIT;						//	×¼±¸Ê±¼ä Bit: ¶¨Ê±Ä£Ê½ P1-P6
+uint16_t* p_Finish_Statistics_Time;					//	å®Œæˆç»Ÿè®¡ --> æ—¶é•¿
+uint16_t* p_Finish_Statistics_Speed;				//	å®Œæˆç»Ÿè®¡ --> å¼ºåº¦
+uint32_t* p_Finish_Statistics_Distance;			//	å®Œæˆç»Ÿè®¡ --> æ¸¸æ³³è·ç¦»
+uint16_t* p_Preparation_Time_BIT;						//	å‡†å¤‡æ—¶é—´ Bit: å®šæ—¶æ¨¡å¼ P1-P6
 
 
-uint16_t* p_Thread_Activity_Sign;					//	Ïß³Ì »î¶¯ ±êÖ¾Î»
+uint16_t* p_Thread_Activity_Sign;					//	çº¿ç¨‹ æ´»åŠ¨ æ ‡å¿—ä½
 
-uint32_t* p_Wifi_Timing_Value;						// wifi ÏµÍ³Ê±¼ä	
-uint32_t* p_Wifi_Timing_Value_Old;				// ÉÏÒ»´ÎÊ±¼ä
+uint32_t* p_Wifi_Timing_Value;						// wifi ç³»ç»Ÿæ—¶é—´	
+uint32_t* p_Wifi_Timing_Value_Old;				// ä¸Šä¸€æ¬¡æ—¶é—´
 
-uint16_t* p_Check_Timing_Add_More;				// ×ßÂıÁË,²¹Ê±
+uint16_t* p_Check_Timing_Add_More;				// èµ°æ…¢äº†,è¡¥æ—¶
 
-uint16_t* p_Check_Timing_Minus_More;			// ×ß¿éÁË, ¼õÊ±
+uint16_t* p_Check_Timing_Minus_More;			// èµ°å—äº†, å‡æ—¶
 
-uint16_t* p_Check_Timing_Error_Cnt;				// wifiÄ£¿é Ğ£Ê±´íÎó¼ÆÊıÆ÷
+uint16_t* p_Check_Timing_Error_Cnt;				// wifiæ¨¡å— æ ¡æ—¶é”™è¯¯è®¡æ•°å™¨
 
-uint16_t* p_Wifi_DP_Upload_Level;					// wifiÄ£¿é dpµãÉÏ±¨µÈ¼¶
+uint16_t* p_Wifi_DP_Upload_Level;					// wifiæ¨¡å— dpç‚¹ä¸ŠæŠ¥ç­‰çº§
 /* Private function prototypes -----------------------------------------------*/
 
 
 /* Private user code ---------------------------------------------------------*/
-//------------------- Ó²¼ş & Çı¶¯ ----------------------------
+//------------------- ç¡¬ä»¶ & é©±åŠ¨ ----------------------------
 
-// ³õÊ¼»¯ ³åÀËÄ£Ê½ ²ÎÊı
+// åˆå§‹åŒ– å†²æµªæ¨¡å¼ å‚æ•°
 void Surf_Mode_Info_Data_Init(void)
 {
-	//================= ³åÀËÄ£Ê½ È«¾Ö ²ÎÊı ================================
+	//================= å†²æµªæ¨¡å¼ å…¨å±€ å‚æ•° ================================
 	// ----------------------------------------------------------------------------------------------
-	*p_Surf_Mode_Info_Acceleration	=	2;  			//	³åÀËÄ£Ê½ -- ¼ÓËÙ¶È
-	*p_Surf_Mode_Info_Prepare_Time	=	10;  			//	³åÀËÄ£Ê½ -- ×¼±¸Ê±¼ä
-	*p_Surf_Mode_Info_Low_Speed			=	30;  			//	³åÀËÄ£Ê½ -- µÍËÙµµ -- ËÙ¶È
-	*p_Surf_Mode_Info_Low_Time			=	15;				//	³åÀËÄ£Ê½ -- µÍËÙµµ -- Ê±¼ä
-	*p_Surf_Mode_Info_High_Speed		=	100;  		//	³åÀËÄ£Ê½ -- ¸ßËÙµµ -- ËÙ¶È
-	*p_Surf_Mode_Info_High_Time			=	15;  			//	³åÀËÄ£Ê½ -- ¸ßËÙµµ -- Ê±¼ä
+	*p_Surf_Mode_Info_Acceleration	=	2;  			//	å†²æµªæ¨¡å¼ -- åŠ é€Ÿåº¦
+	*p_Surf_Mode_Info_Prepare_Time	=	10;  			//	å†²æµªæ¨¡å¼ -- å‡†å¤‡æ—¶é—´
+	*p_Surf_Mode_Info_Low_Speed			=	30;  			//	å†²æµªæ¨¡å¼ -- ä½é€Ÿæ¡£ -- é€Ÿåº¦
+	*p_Surf_Mode_Info_Low_Time			=	15;				//	å†²æµªæ¨¡å¼ -- ä½é€Ÿæ¡£ -- æ—¶é—´
+	*p_Surf_Mode_Info_High_Speed		=	100;  		//	å†²æµªæ¨¡å¼ -- é«˜é€Ÿæ¡£ -- é€Ÿåº¦
+	*p_Surf_Mode_Info_High_Time			=	15;  			//	å†²æµªæ¨¡å¼ -- é«˜é€Ÿæ¡£ -- æ—¶é—´
 	// ----------------------------------------------------------------------------------------------
 }
 
-// ³õÊ¼»¯ ¿ª»úÖ´ĞĞ
+// åˆå§‹åŒ– å¼€æœºæ‰§è¡Œ
 uint8_t Check_Data_Init(void)
 {
 	uint8_t x=0,y=0;
@@ -199,11 +201,11 @@ uint8_t Check_Data_Init(void)
 	{
 		*p_Local_Address 					= MODBUS_LOCAL_ADDRESS;
 		//*p_Baud_Rate 							= MODBUS_BAUDRATE_DEFAULT;
-		*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// µç»ú¼¶Êı		5
-		*p_Support_Control_Methods 	= 0;			//	¿ØÖÆ·½Ê½	
+		*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// ç”µæœºçº§æ•°		5
+		*p_Support_Control_Methods 	= 0;			//	æ§åˆ¶æ–¹å¼	
 	}
 	
-	//================= ³åÀËÄ£Ê½ È«¾Ö ²ÎÊı ================================
+	//================= å†²æµªæ¨¡å¼ å…¨å±€ å‚æ•° ================================
 	Surf_Mode_Info_Data_Init();
 	
 	for(x=0; x<TRAINING_MODE_NUMBER_MAX; x++)
@@ -232,56 +234,56 @@ uint8_t Check_Data_Init(void)
 }
 
 
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 void App_Data_Init(void)
 {
 	Read_OPMode();
-	// »ñÈ¡Ó³Éä  flashÒÑ¶Á
+	// è·å–æ˜ å°„  flashå·²è¯»
 	MB_Get_Mapping_Register();
 	//
 	MB_InputBuffer_Init();
-	// ¼ì²é¸÷Ä£Ê½ ÊôĞÔ
+	// æ£€æŸ¥å„æ¨¡å¼ å±æ€§
 	if(Check_Data_Init())
 	{
 		//App_Data_ReInit();
 		Write_MbBuffer_Now();
 	}
-	// ÆÁÄ»³õÊ¼»¯
+	// å±å¹•åˆå§‹åŒ–
 	TM1621_LCD_Init();
 	
 	TM1621_Buzzer_Init();
 	
-	//test ²âÊÔ¹ØÆÁÄ»±³¹âpwm ¼ÇµÃÉ¾  wuqingguang 2024-09-09
+	//test æµ‹è¯•å…³å±å¹•èƒŒå…‰pwm è®°å¾—åˆ   wuqingguang 2024-09-09
 	TM1621_light_Off();
 }
 
 
-// »Ö¸´ ³õÊ¼»¯
+// æ¢å¤ åˆå§‹åŒ–
 void App_Data_ReInit(void)
 {
 	memset(p_Local_Address,0,REG_HOLDING_NREGS*2);
 	
 	*p_Local_Address 					= MODBUS_LOCAL_ADDRESS;
 	*p_Baud_Rate 							= MODBUS_BAUDRATE_DEFAULT;
-	*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// µç»ú¼¶Êı		5
-	//*p_Preparation_Time_BIT 	= 0;				// Ô¤±¸Ê±¼ä
+	*p_Motor_Pole_Number 			= MOTOR_RPM_NUMBER_OF_POLES;				// ç”µæœºçº§æ•°		5
+	//*p_Preparation_Time_BIT 	= 0;				// é¢„å¤‡æ—¶é—´
 	
-	// ÑµÁ·Ä£Ê½ µ±Ç°×´Ì¬
-//	*p_System_State_Machine 	= 0;			// ×´Ì¬»ú
-//	*p_PMode_Now 							= 0;			// µ±Ç°Ä£Ê½
-//	*p_OP_ShowNow_Speed 			= 0;			// µ±Ç°ËÙ¶È
-//	*p_OP_ShowNow_Time 				= 0;			// µ±Ç°Ê±¼ä
+	// è®­ç»ƒæ¨¡å¼ å½“å‰çŠ¶æ€
+//	*p_System_State_Machine 	= 0;			// çŠ¶æ€æœº
+//	*p_PMode_Now 							= 0;			// å½“å‰æ¨¡å¼
+//	*p_OP_ShowNow_Speed 			= 0;			// å½“å‰é€Ÿåº¦
+//	*p_OP_ShowNow_Time 				= 0;			// å½“å‰æ—¶é—´
 	Set_Pmode_Period_Now(0);
 	
-	// ¸÷Ä£Ê½ ÊôĞÔ
+	// å„æ¨¡å¼ å±æ€§
 	*p_OP_Free_Mode = OP_Init_Free;
 	*p_OP_Timing_Mode = OP_Init_Timing;
 
-	//================= ³åÀËÄ£Ê½ È«¾Ö ²ÎÊı ================================
+	//================= å†²æµªæ¨¡å¼ å…¨å±€ å‚æ•° ================================
 	Surf_Mode_Info_Data_Init();
-	//================= µç»ú ²ÎÊı ================================
-	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_DRIVE_MODE, MOTOR_DRIVE_MODE_POLES);	// ³§ÄÚÄ£Ê½
-	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_MODEL_CODE, MOTOR_MODEL_CODE_POLES);	// µç»úĞÍºÅ
+	//================= ç”µæœº å‚æ•° ================================
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_DRIVE_MODE, MOTOR_DRIVE_MODE_POLES);	// å‚å†…æ¨¡å¼
+	Set_DataAddr_Value(MB_FUNC_READ_HOLDING_REGISTER , MB_MOTOR_MODEL_CODE, MOTOR_MODEL_CODE_POLES);	// ç”µæœºå‹å·
 	
 	memcpy(&p_OP_PMode[0][0], &OP_Init_PMode[0][0], sizeof(OP_Init_PMode[0]));
 	memcpy(&p_OP_PMode[1][0], &OP_Init_PMode[1][0], sizeof(OP_Init_PMode[1]));
@@ -289,11 +291,11 @@ void App_Data_ReInit(void)
 	memcpy(&p_OP_PMode[3][0], &OP_Init_PMode[3][0], sizeof(OP_Init_PMode[3]));
 	memcpy(&p_OP_PMode[4][0], &OP_Init_PMode[4][0], sizeof(OP_Init_PMode[4]));
 	
-	//´æ´¢  ´æÒ»¸ö »¹ÊÇ ÉÈÇø´æ
+	//å­˜å‚¨  å­˜ä¸€ä¸ª è¿˜æ˜¯ æ‰‡åŒºå­˜
 	Write_MbBuffer_Now();
 }
 
-// ¶Á flash
+// è¯» flash
 uint8_t Read_OPMode(void)
 {
 	MB_Flash_Buffer_Read();
@@ -314,7 +316,7 @@ void MB_Write_Timer_CallOut(void)
 }
 
 
-// ´æ flash
+// å­˜ flash
 uint8_t Write_MbBuffer_Later(void)
 {
 	MB_Buffer_Write_Timer = 1;
@@ -322,7 +324,7 @@ uint8_t Write_MbBuffer_Later(void)
 }
 
 
-// Á¢¼´´æ flash
+// ç«‹å³å­˜ flash
 uint8_t Write_MbBuffer_Now(void)
 {
 	MB_Flash_Buffer_Write();
@@ -331,13 +333,13 @@ uint8_t Write_MbBuffer_Now(void)
 	return 1;
 }
 
-//´æ´¢ ĞÂ ËÙ¶È
+//å­˜å‚¨ æ–° é€Ÿåº¦
 void Update_OP_Speed(void)
 {
-	if(System_is_Pause())	// ÔİÍ£
+	if(System_is_Pause())	// æš‚åœ
 		return;
 	
-	if(System_Mode_Free())	// ×ÔÓÉ
+	if(System_Mode_Free())	// è‡ªç”±
 	{
 		if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MIX)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
@@ -346,9 +348,9 @@ void Update_OP_Speed(void)
 			
 		p_OP_Free_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Free_Mode->time = 0;
-		Write_MbBuffer_Later();//´æflash
+		Write_MbBuffer_Later();//å­˜flash
 	}
-	else if(System_Mode_Time())	// ¶¨Ê±
+	else if(System_Mode_Time())	// å®šæ—¶
 	{
 		if(*p_OP_ShowNow_Speed < MOTOR_PERCENT_SPEED_MIX)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MIX;
@@ -356,34 +358,34 @@ void Update_OP_Speed(void)
 			*p_OP_ShowNow_Speed = MOTOR_PERCENT_SPEED_MAX;
 		
 		p_OP_Timing_Mode->speed = *p_OP_ShowNow_Speed;
-		Write_MbBuffer_Later();//´æflash
+		Write_MbBuffer_Later();//å­˜flash
 	}
 }
 
-//´æ´¢ ĞÂ Ê±¼ä
+//å­˜å‚¨ æ–° æ—¶é—´
 void Update_OP_Time(void)
 {
-	if(System_Mode_Time())	// ¶¨Ê±
+	if(System_Mode_Time())	// å®šæ—¶
 	{
 		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
-		Write_MbBuffer_Later();//´æflash
+		Write_MbBuffer_Later();//å­˜flash
 	}
 }
 
-//´æ´¢ ĞÂ ËÙ¶È & Ê±¼ä
+//å­˜å‚¨ æ–° é€Ÿåº¦ & æ—¶é—´
 void Update_OP_All(void)
 {
-	if(System_Mode_Free())	// ×ÔÓÉ
+	if(System_Mode_Free())	// è‡ªç”±
 	{
 		p_OP_Free_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Free_Mode->time = 0;
-		Write_MbBuffer_Later();//´æflash
+		Write_MbBuffer_Later();//å­˜flash
 	}
-	else if(System_Mode_Time())	// ¶¨Ê±
+	else if(System_Mode_Time())	// å®šæ—¶
 	{
 		p_OP_Timing_Mode->speed = *p_OP_ShowNow_Speed;
 		p_OP_Timing_Mode->time = *p_OP_ShowNow_Time;
-		Write_MbBuffer_Later();//´æflash
+		Write_MbBuffer_Later();//å­˜flash
 	}
 }
 
@@ -410,11 +412,11 @@ void OP_Update_Mode(void)
 	{
 		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
 		*p_OP_ShowNow_Speed = 0;
-		Data_Set_Current_Speed(0);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"Æô¶¯"
+		Data_Set_Current_Speed(0);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"å¯åŠ¨"
 	}
 	else
 	{
-		// ËÙ¶È
+		// é€Ÿåº¦
 		if(System_Mode_Free())
 		{
 			*p_OP_ShowNow_Speed = p_OP_Free_Mode->speed;
@@ -434,14 +436,14 @@ void OP_Update_Mode(void)
 	
 	if(Motor_is_Start())
 	{
-		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//¹âÈ¦×Ô¶¯ÅĞ¶Ï
+		Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//å…‰åœˆè‡ªåŠ¨åˆ¤æ–­
 		Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 	}
 	else
 		Motor_Speed_Target_Set(0);
 }
 
-//¼ì²é ĞÂ ËÙ¶È & Ê±¼ä  ·ÀÖ¹Òç³ö
+//æ£€æŸ¥ æ–° é€Ÿåº¦ & æ—¶é—´  é˜²æ­¢æº¢å‡º
 void Check_OP_All(void)
 {
 	if(System_is_Power_Off())
@@ -451,11 +453,11 @@ void Check_OP_All(void)
 	else if(System_is_Pause())
 	{
 		p_OP_ShowLater->speed = *p_OP_ShowNow_Speed;
-		Data_Set_Current_Speed(0);//×¢Òâ,ĞèÒªÔÚÇĞÍêÔËĞĞ×´Ì¬ºóÔÙÉèÖÃËÙ¶È,Èç"Æô¶¯"
+		Data_Set_Current_Speed(0);//æ³¨æ„,éœ€è¦åœ¨åˆ‡å®Œè¿è¡ŒçŠ¶æ€åå†è®¾ç½®é€Ÿåº¦,å¦‚"å¯åŠ¨"
 	}
 	else
 	{
-		// ËÙ¶È
+		// é€Ÿåº¦
 		if(System_Mode_Free())
 		{
 			*p_OP_ShowNow_Speed = p_OP_Free_Mode->speed;
@@ -479,7 +481,7 @@ void Check_OP_All(void)
 		
 		if(Motor_is_Start())
 		{
-			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//¹âÈ¦×Ô¶¯ÅĞ¶Ï
+			Special_Status_Add(SPECIAL_BIT_SKIP_STARTING);//å…‰åœˆè‡ªåŠ¨åˆ¤æ–­
 			Motor_Speed_Target_Set(*p_OP_ShowNow_Speed);
 		}
 		else
@@ -487,7 +489,7 @@ void Check_OP_All(void)
 	}
 }
 
-//------------------- ÅĞ¶Ï Ä£Ê½ ºÏ·¨ ----------------------------
+//------------------- åˆ¤æ–­ æ¨¡å¼ åˆæ³• ----------------------------
 uint8_t Is_Mode_Legal(uint8_t mode)
 {
 	if((mode > 0) && (mode <= TRAINING_MODE_NUMBER_MAX) )
@@ -497,7 +499,7 @@ uint8_t Is_Mode_Legal(uint8_t mode)
 	else
 		return 0;
 }
-//------------------- ÅĞ¶ÏËÙ¶È ºÏ·¨ ----------------------------
+//------------------- åˆ¤æ–­é€Ÿåº¦ åˆæ³• ----------------------------
 uint8_t Is_Speed_Legal(uint16_t speed)
 {
 	if((speed >= SPEED_LEGAL_MIN) && (speed <= SPEED_LEGAL_MAX))
@@ -508,7 +510,7 @@ uint8_t Is_Speed_Legal(uint16_t speed)
 		return 0;
 }
 
-//------------------- ÅĞ¶ÏÊ±¼ä ºÏ·¨ ----------------------------
+//------------------- åˆ¤æ–­æ—¶é—´ åˆæ³• ----------------------------
 uint8_t Is_Time_Legal(uint16_t time)
 {
 	if((time >= TIME_LEGAL_MIN) && (time <= TIME_LEGAL_MAX))
@@ -519,12 +521,12 @@ uint8_t Is_Time_Legal(uint16_t time)
 		return 0;
 }
 
-//------------------- ÉèÖÃ µ±Ç° ËÙ¶È ----------------------------
+//------------------- è®¾ç½® å½“å‰ é€Ÿåº¦ ----------------------------
 void Data_Set_Current_Speed(uint8_t speed)
 {
 	//if(System_is_Starting())
 		//return;
-	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// Ìø¹ı ×Ô¶¯Æô¶¯
+	if(Special_Status_Get( SPECIAL_BIT_SKIP_INITIAL))// è·³è¿‡ è‡ªåŠ¨å¯åŠ¨
 		return;
 	
 	*p_OP_ShowNow_Speed = speed;	
@@ -540,7 +542,7 @@ void Data_Set_Current_Speed(uint8_t speed)
 	Motor_Speed_Target_Set(speed);
 }
 
-//------------------- ÉèÖÃ µ±Ç° Ê±¼ä ----------------------------
+//------------------- è®¾ç½® å½“å‰ æ—¶é—´ ----------------------------
 void Data_Set_Current_Time(uint16_t time)
 {
 	//if(System_is_Starting())
@@ -549,14 +551,14 @@ void Data_Set_Current_Time(uint16_t time)
 	*p_OP_ShowNow_Time = time;
 }
 
-//------------------- ÉèÖÃ ÑµÁ·Ê±¶Î ----------------------------
+//------------------- è®¾ç½® è®­ç»ƒæ—¶æ®µ ----------------------------
 void Set_Pmode_Period_Now(uint16_t value)
 {
 	Period_Now = value;
 }
 
 
-//------------------- ÊÇ·ñ½ÓÊÕÍâ²¿¿ØÖÆ ----------------------------
+//------------------- æ˜¯å¦æ¥æ”¶å¤–éƒ¨æ§åˆ¶ ----------------------------
 uint8_t If_Accept_External_Control(uint8_t mode)
 {
 	if(ERROR_DISPLAY_STATUS == Get_System_State_Machine())
@@ -569,7 +571,7 @@ uint8_t If_Accept_External_Control(uint8_t mode)
 	return 1;
 }
 
-//------------------- »ñÈ¡Èí¼ş°æ±¾ºÅ  ×Ö·û´®×ª uint32 ----------------------------
+//------------------- è·å–è½¯ä»¶ç‰ˆæœ¬å·  å­—ç¬¦ä¸²è½¬ uint32 ----------------------------
 void get_uint3_version(char * buffer)
 {
 	char str[32];
@@ -581,7 +583,7 @@ void get_uint3_version(char * buffer)
 	if (tmp != NULL) {
 			*p_Software_Version_high = (uint8_t)atoi(tmp);
 
-			// Èí¼ş×Ó°æ±¾ºÅ³õÊ¼»¯
+			// è½¯ä»¶å­ç‰ˆæœ¬å·åˆå§‹åŒ–
 			tmp = strtok(NULL, ".");
 			if (tmp != NULL) {
 				*p_Software_Version_low = (uint8_t)atoi(tmp)<<8;
@@ -593,32 +595,32 @@ void get_uint3_version(char * buffer)
 	}
 }
 
-//------------------- Çå³ıwifi±êÖ¾ ----------------------------
+//------------------- æ¸…é™¤wifiæ ‡å¿— ----------------------------
 void System_Wifi_State_Clean(void)
 {
 	*p_WIFI_Rssi = 0xFF;
 }
-//------------------- Çå³ıÀ¶ÑÀ±êÖ¾ ----------------------------
+//------------------- æ¸…é™¤è“ç‰™æ ‡å¿— ----------------------------
 void System_BT_State_Clean(void)
 {
 	*p_BLE_Rssi = 0;
 }
 extern void LCD_Refresh_Restore(void);
 
-//------------------- ÉèÖÃ¿ØÖÆ·½Ê½ ----------------------------
+//------------------- è®¾ç½®æ§åˆ¶æ–¹å¼ ----------------------------
 void Set_Ctrl_Mode_Type(System_Ctrl_Mode_Type_enum type)
 {
-	LCD_Refresh_Restore();//»Ö¸´Ë¢ĞÂ
+	LCD_Refresh_Restore();//æ¢å¤åˆ·æ–°
 	Ctrl_Mode_Type = type;
 }
 	
-//------------------- »ñÈ¡¿ØÖÆ·½Ê½ ----------------------------
+//------------------- è·å–æ§åˆ¶æ–¹å¼ ----------------------------
 System_Ctrl_Mode_Type_enum Get_Ctrl_Mode_Type(void)
 {
 	return Ctrl_Mode_Type;
 }
 
-//------------------- OTA ×Ô¶¯ÍË³ö 1Ãë½øÒ»´Î ----------------------------
+//------------------- OTA è‡ªåŠ¨é€€å‡º 1ç§’è¿›ä¸€æ¬¡ ----------------------------
 void OTA_Time_Out(void)
 {
 	static uint32_t time_out_cnt=0;
@@ -626,53 +628,53 @@ void OTA_Time_Out(void)
 	time_out_cnt ++;
 	if(time_out_cnt > OTA_SHUTDOWN_TIME_OUT)
 	{
-		SysSoftReset();// Èí¼ş¸´Î»
+		SysSoftReset();// è½¯ä»¶å¤ä½
 	}
 }
 
-//------------------- ÏÔÊ¾ÄÚÈİÓ³Éä ----------------------------
+//------------------- æ˜¾ç¤ºå†…å®¹æ˜ å°„ ----------------------------
 void LCD_TO_Mapping(void)
 {
 	
 }
 
-// Íê³ÉÊı¾İÍ³¼Æ
+// å®Œæˆæ•°æ®ç»Ÿè®¡
 //*********************************************************************************************
-//-------------- ¼ÆËã Íê³ÉÍ³¼Æ  -------------------
-//	count Ãë
+//-------------- è®¡ç®— å®Œæˆç»Ÿè®¡  -------------------
+//	count ç§’
 void Finish_Statistics_Count(uint8_t count)
 {
 
-	* p_Finish_Statistics_Time += count;								//	Íê³ÉÍ³¼Æ --> Ê±³¤
+	* p_Finish_Statistics_Time += count;								//	å®Œæˆç»Ÿè®¡ --> æ—¶é•¿
 	if(*p_OP_ShowNow_Speed >= MOTOR_PERCENT_SPEED_MIX)
-		* p_Finish_Statistics_Speed = *p_OP_ShowNow_Speed;	//	Íê³ÉÍ³¼Æ --> Ç¿¶È
-	* p_Finish_Statistics_Distance += (Motor_Speed_Now * EVERY_1PERCENT_DISTANCE_PER_SECOND / 100);			//	Íê³ÉÍ³¼Æ --> ÓÎÓ¾¾àÀë
+		* p_Finish_Statistics_Speed = *p_OP_ShowNow_Speed;	//	å®Œæˆç»Ÿè®¡ --> å¼ºåº¦
+	* p_Finish_Statistics_Distance += (Motor_Speed_Now * EVERY_1PERCENT_DISTANCE_PER_SECOND / 100);			//	å®Œæˆç»Ÿè®¡ --> æ¸¸æ³³è·ç¦»
 }
 
 
-//-------------- Çå³ı Íê³ÉÍ³¼Æ  -------------------
+//-------------- æ¸…é™¤ å®Œæˆç»Ÿè®¡  -------------------
 void Finish_Statistics_Clean( void )
 {
-	* p_Finish_Statistics_Time = 0;				//	Íê³ÉÍ³¼Æ --> Ê±³¤
-	* p_Finish_Statistics_Speed = 0;			//	Íê³ÉÍ³¼Æ --> Ç¿¶È
-	* p_Finish_Statistics_Distance = 0;		//	Íê³ÉÍ³¼Æ --> ÓÎÓ¾¾àÀë
+	* p_Finish_Statistics_Time = 0;				//	å®Œæˆç»Ÿè®¡ --> æ—¶é•¿
+	* p_Finish_Statistics_Speed = 0;			//	å®Œæˆç»Ÿè®¡ --> å¼ºåº¦
+	* p_Finish_Statistics_Distance = 0;		//	å®Œæˆç»Ÿè®¡ --> æ¸¸æ³³è·ç¦»
 }
 
 
-//-------------- ÉÏ´« Íê³ÉÍ³¼Æ  -------------------
+//-------------- ä¸Šä¼  å®Œæˆç»Ÿè®¡  -------------------
 void Finish_Statistics_Upload( void )
 {
 	WIFI_Finish_Statistics_Upload();
 }
 
 
-//-------------- Ïß³Ì »î¶¯ ±êÖ¾ÇåÁã  -------------------
+//-------------- çº¿ç¨‹ æ´»åŠ¨ æ ‡å¿—æ¸…é›¶  -------------------
 void Thread_Activity_Sign_Clean( void )
 {
 	*p_Thread_Activity_Sign = 0;
 }
 
-//-------------- Ïß³Ì »î¶¯ ÉèÖÃ  -------------------
+//-------------- çº¿ç¨‹ æ´»åŠ¨ è®¾ç½®  -------------------
 void Thread_Activity_Sign_Set( uint16_t val )
 {
 	*p_Thread_Activity_Sign |= val;

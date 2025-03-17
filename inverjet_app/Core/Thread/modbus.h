@@ -94,6 +94,7 @@ extern UART_HandleTypeDef* p_huart_mb;		 //UART句柄
 // ----------------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------------
+#define MB_BT_CONNECT_DONE        					( 0x5F )	//	蓝牙配网完成
 #define MB_SYSTEM_SELF_TEST_STATE        		( 0x60 )	//	
 #define MB_COMM_TEST_BLUETOOTH        			( 0x61 )	//	BT 		写入测试 (测试使用)
 #define MB_COMM_TEST_RS485        					( 0x62 )	//	RS485 写入测试 (测试使用)

@@ -46,8 +46,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-//extern uint8_t aRxBuffer3[RXBUFFERSIZE];	 //HAL��USART����Buffer
-//extern uint8_t aRxBuffer5[RXBUFFERSIZE];	 //HAL��USART����Buffer
+//extern uint8_t aRxBuffer3[RXBUFFERSIZE];	 //HAL库USART接收Buffer
+//extern uint8_t aRxBuffer5[RXBUFFERSIZE];	 //HAL库USART接收Buffer
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -228,12 +228,12 @@ void USART1_IRQHandler(void)
   //HAL_UART_IRQHandler(&huart1);
 	if(__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE)!= RESET) 
 		{
-				prvvUARTRxISR();//�����ж�
+				prvvUARTRxISR();//接收中断
 		}
 
 	if(__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_TXE)!= RESET) 
 		{
-			prvvUARTTxReadyISR();//�����ж�
+			prvvUARTTxReadyISR();//发送中断
 		}
   HAL_NVIC_ClearPendingIRQ(USART1_IRQn);
   /* USER CODE END USART1_IRQn 0 */
@@ -271,27 +271,27 @@ void USART3_IRQHandler(void)
 #if (MOTOR_MODULE_HUART == 3)
 	DEBUG_LED2_ON();
 	uint8_t temp=0;
-	if((__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE) != RESET))//����ǽ�������жϣ�idle��־����λ
+	if((__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE) != RESET))//如果是接收完成中断，idle标志被置位
 	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart3);//�����־λ
-		HAL_UART_DMAStop(&huart3); //  ֹͣDMA���䣬��ֹ
-		temp  =  __HAL_DMA_GET_COUNTER(huart3.hdmarx);// ��ȡDMA��δ��������ݸ���   
+		__HAL_UART_CLEAR_IDLEFLAG(&huart3);//清除标志位
+		HAL_UART_DMAStop(&huart3); //  停止DMA传输，防止
+		temp  =  __HAL_DMA_GET_COUNTER(huart3.hdmarx);// 获取DMA中未传输的数据个数   
 		Motor_RxData(MOTOR_RS485_RX_BUFF_SIZE-temp);
 		
-		memset(Motor_DMABuff,0,MOTOR_RS485_RX_BUFF_SIZE);    				//��ջ�����
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart3, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // ������Ϻ�����
-		__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);		   // �ֶ��ر�DMA_IT_HT�ж�
+		memset(Motor_DMABuff,0,MOTOR_RS485_RX_BUFF_SIZE);    				//清空缓存区
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart3, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // 接收完毕后重启
+		__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
 	 }
 	DEBUG_LED2_OFF();
 #elif MODBUS_USART == 3
 	if(__HAL_UART_GET_IT_SOURCE(&huart3, UART_IT_RXNE)!= RESET) 
 		{
-			prvvUARTRxISR();//�����ж�
+			prvvUARTRxISR();//接收中断
 		}
 
 	if(__HAL_UART_GET_IT_SOURCE(&huart3, UART_IT_TXE)!= RESET) 
 		{
-			prvvUARTTxReadyISR();//�����ж�
+			prvvUARTTxReadyISR();//发送中断
 		}
 	
   HAL_NVIC_ClearPendingIRQ(USART3_IRQn);
@@ -311,10 +311,10 @@ void USART3_IRQHandler(void)
 void TIM5_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM5_IRQn 0 */
-	if(__HAL_TIM_GET_FLAG(&htim5, TIM_FLAG_UPDATE))			// �����жϱ�Ǳ���λ
+	if(__HAL_TIM_GET_FLAG(&htim5, TIM_FLAG_UPDATE))			// 更新中断标记被置位
 	{
-			__HAL_TIM_CLEAR_FLAG(&htim5, TIM_FLAG_UPDATE);		// ����жϱ��
-			prvvTIMERExpiredISR();								// ֪ͨmodbus3.5���ַ��ȴ�ʱ�䵽
+			__HAL_TIM_CLEAR_FLAG(&htim5, TIM_FLAG_UPDATE);		// 清除中断标记
+			prvvTIMERExpiredISR();								// 通知modbus3.5个字符等待时间到
 	}
   /* USER CODE END TIM5_IRQn 0 */
   HAL_TIM_IRQHandler(&htim5);
@@ -330,16 +330,16 @@ void UART4_IRQHandler(void)
 {
   /* USER CODE BEGIN UART4_IRQn 0 */
 /*	uint8_t temp=0;
-	if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_IDLE) != RESET))//����ǽ�������жϣ�idle��־����λ
+	if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_IDLE) != RESET))//如果是接收完成中断，idle标志被置位
 	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart4);//�����־λ
-		HAL_UART_DMAStop(&huart4); //  ֹͣDMA���䣬��ֹ
-		temp  =  __HAL_DMA_GET_COUNTER(huart4.hdmarx);// ��ȡDMA��δ��������ݸ���   
+		__HAL_UART_CLEAR_IDLEFLAG(&huart4);//清除标志位
+		HAL_UART_DMAStop(&huart4); //  停止DMA传输，防止
+		temp  =  __HAL_DMA_GET_COUNTER(huart4.hdmarx);// 获取DMA中未传输的数据个数   
 		//To_Debug_Protocol_Analysis(DEBUG_PROTOCOL_RX_MAX - temp);
 		
-		memset(Debug_Read_Buffer,0,DEBUG_PROTOCOL_RX_MAX);    				//��ջ�����
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart4, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // ������Ϻ�����
-		__HAL_DMA_DISABLE_IT(&hdma_uart4_rx, DMA_IT_HT);		   // �ֶ��ر�DMA_IT_HT�ж�
+		memset(Debug_Read_Buffer,0,DEBUG_PROTOCOL_RX_MAX);    				//清空缓存区
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart4, Debug_Read_Buffer, DEBUG_PROTOCOL_RX_MAX); // 接收完毕后重启
+		__HAL_DMA_DISABLE_IT(&hdma_uart4_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
 		
 	 }*/
   /* USER CODE END UART4_IRQn 0 */
@@ -396,7 +396,7 @@ void DMA2_Channel3_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
-//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	//��ʱ���жϻص���������������porttimer.c�ļ��ĺ���
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	//定时器中断回调函数，用于连接porttimer.c文件的函数
 //{
 //  /* NOTE : This function Should not be modified, when the callback is needed,
 //            the __HAL_TIM_PeriodElapsedCallback could be implemented in the user file

@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		debug_protocol.c
-* @brief			µ÷ÊÔĞ­Òé
+* @brief			è°ƒè¯•åè®®
 *
 *
 * @author			WQG
@@ -10,7 +10,7 @@
 ******************************************************************************
 */
 /* Includes ------------------------------------------------------------------*/
-#include "debug_protocol.h"	///////////////////////	´®¿Úµ÷ÊÔ
+#include "debug_protocol.h"	///////////////////////	ä¸²å£è°ƒè¯•
 #include "motor.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -18,7 +18,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 #if DEBUG_USART == 4
-UART_HandleTypeDef* p_huart_debug = &huart4;		 //µ÷ÊÔ´®¿Ú UART¾ä±ú
+UART_HandleTypeDef* p_huart_debug = &huart4;		 //è°ƒè¯•ä¸²å£ UARTå¥æŸ„
 #elif DEBUG_USART == 5
 UART_HandleTypeDef* p_huart_debug = &huart5;
 #endif
@@ -66,9 +66,9 @@ extern DMA_HandleTypeDef hdma_uart4_rx;
 ******************************************************************************
 Add_Ctrl_Log	
 
-Ìí¼Ó¿ØÖÆ ÈÕÖ¾
+æ·»åŠ æ§åˆ¶ æ—¥å¿—
 
-0£º°´¼ü   1£ºwifi  2£ºbt
+0ï¼šæŒ‰é”®   1ï¼šwifi  2ï¼šbt
 ******************************************************************************
 */
 void Add_Ctrl_Log(void)
@@ -76,17 +76,17 @@ void Add_Ctrl_Log(void)
 	static uint8_t Log_Cnt = 0;
 	uint16_t value=0;
 	
-	System_Ctrl_Mode_Type_enum mode = Get_Ctrl_Mode_Type();//¿ØÖÆÀ´Ô´
+	System_Ctrl_Mode_Type_enum mode = Get_Ctrl_Mode_Type();//æ§åˆ¶æ¥æº
 
 	uint8_t addr = MB_SYSTEM_LAST_KEY_VALUE + (Log_Cnt * 5);
 	
 	value = (uint8_t)mode | (Log_Cnt<<8) ;
 	
 	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr,  	value);
-	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+1,  * p_System_State_Machine);		// ×´Ì¬»ú
-	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+2,  * p_PMode_Now);							// µ±Ç°Ä£Ê½
-	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+3,  * p_OP_ShowNow_Speed);				// µ±Ç°ËÙ¶È
-	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+4,  * p_OP_ShowNow_Time);				// µ±Ç°Ê±¼ä
+	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+1,  * p_System_State_Machine);		// çŠ¶æ€æœº
+	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+2,  * p_PMode_Now);							// å½“å‰æ¨¡å¼
+	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+3,  * p_OP_ShowNow_Speed);				// å½“å‰é€Ÿåº¦
+	Set_DataAddr_Value( MB_FUNC_READ_INPUT_REGISTER,  addr+4,  * p_OP_ShowNow_Time);				// å½“å‰æ—¶é—´
 	
 	if(Log_Cnt < 10)
 		Log_Cnt ++;
@@ -110,8 +110,8 @@ void Set_Debug_Protocol_Mode(uint8_t mode)
 	Debug_Send_Buffer[4] = Debug_Protocol_Mode;
 	
 #ifdef DEBUG_USART
-	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, 5,50); //½«ÊÕµ½µÄĞÅÏ¢·¢ËÍ³öÈ¥
-	//HAL_UART_Transmit_IT(p_huart_debug, Debug_Send_Buffer, 5); //½«ÊÕµ½µÄĞÅÏ¢·¢ËÍ³öÈ¥
+	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, 5,50); //å°†æ”¶åˆ°çš„ä¿¡æ¯å‘é€å‡ºå»
+	//HAL_UART_Transmit_IT(p_huart_debug, Debug_Send_Buffer, 5); //å°†æ”¶åˆ°çš„ä¿¡æ¯å‘é€å‡ºå»
 #endif
 }
 
@@ -125,29 +125,47 @@ void UART_Send_Debug(uint8_t * p_buff, uint8_t len)
 	memset(Debug_Send_Buffer, 0, DEBUG_PROTOCOL_TX_MAX);
 	//Debug_Send_Buffer[0] = cmd;
 	memcpy(Debug_Send_Buffer, p_buff, len);
-	// ×ª·¢ÖÁ´®¿Ú  ÓÃÓÚµ÷ÊÔ
-	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, len,50); //½«ÊÕµ½µÄĞÅÏ¢·¢ËÍ³öÈ¥
-	//HAL_UART_Transmit_IT(p_huart_debug, (uint8_t *)Debug_Send_Buffer, len+1);//Ê¹ÓÃDMA·¢ËÍÊı¾İ
+	// è½¬å‘è‡³ä¸²å£  ç”¨äºè°ƒè¯•
+	HAL_UART_Transmit(p_huart_debug, Debug_Send_Buffer, len,50); //å°†æ”¶åˆ°çš„ä¿¡æ¯å‘é€å‡ºå»
+	//HAL_UART_Transmit_IT(p_huart_debug, (uint8_t *)Debug_Send_Buffer, len+1);//ä½¿ç”¨DMAå‘é€æ•°æ®
 
 #else
 	return;
 #endif
 }
 
+void Main_Modbus_Send(uint8_t * p_buff, uint8_t len)
+{
+	HAL_GPIO_WritePin(Main_RS485_EN_GPIO_Port, Main_RS485_EN_Pin, GPIO_PIN_SET);
+	HAL_UART_Transmit(p_huart_debug, p_buff, len,50); //å°†æ”¶åˆ°çš„ä¿¡æ¯å‘é€å‡ºå»
+	HAL_GPIO_WritePin(Main_RS485_EN_GPIO_Port, Main_RS485_EN_Pin, GPIO_PIN_RESET);
+	
+	//HAL_UART_Transmit_IT(p_huart_debug, (uint8_t *)Debug_Send_Buffer, len+1);//ä½¿ç”¨DMAå‘é€æ•°æ®
+}
 
+void Main_Modbus_Send_Auto_Run(void)
+{
+	uint8_t Buffer[8] = {0x15, 0x06, 0x00, 0x60, 0xA0, 0x70, 0xF3, 0x24};
+	
+	HAL_GPIO_WritePin(Main_RS485_EN_GPIO_Port, Main_RS485_EN_Pin, GPIO_PIN_SET);
+	HAL_UART_Transmit(p_huart_debug, Buffer, 8,200); //å°†æ”¶åˆ°çš„ä¿¡æ¯å‘é€å‡ºå»
+	HAL_GPIO_WritePin(Main_RS485_EN_GPIO_Port, Main_RS485_EN_Pin, GPIO_PIN_RESET);
+	
+	//HAL_UART_Transmit_IT(p_huart_debug, (uint8_t *)Debug_Send_Buffer, len+1);//ä½¿ç”¨DMAå‘é€æ•°æ®
+}
 
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 void Debug_Protocol_Init(void)
 {
-	__HAL_UART_ENABLE_IT(p_huart_debug, UART_IT_IDLE);//Ê¹ÄÜidleÖĞ¶Ï
+	__HAL_UART_ENABLE_IT(p_huart_debug, UART_IT_IDLE);//ä½¿èƒ½idleä¸­æ–­
 	__HAL_UART_ENABLE_IT(p_huart_debug, UART_IT_ERR);//
 	
-  HAL_UARTEx_ReceiveToIdle_DMA(p_huart_debug,Debug_Read_Buffer,DEBUG_PROTOCOL_RX_MAX);//´ò¿ª´®¿ÚDMA½ÓÊÕ
-	__HAL_DMA_DISABLE_IT(&hdma_uart4_rx, DMA_IT_HT);		   // ÊÖ¶¯¹Ø±ÕDMA_IT_HTÖĞ¶Ï
+  HAL_UARTEx_ReceiveToIdle_DMA(p_huart_debug,Debug_Read_Buffer,DEBUG_PROTOCOL_RX_MAX);//æ‰“å¼€ä¸²å£DMAæ¥æ”¶
+	__HAL_DMA_DISABLE_IT(&hdma_uart4_rx, DMA_IT_HT);		   // æ‰‹åŠ¨å…³é—­DMA_IT_HTä¸­æ–­
 
 }
 
-// ÖØÆô
+// é‡å¯
 void Debug_Usart_Restar(void)
 {
 	if(HAL_UART_DeInit(p_huart_debug) != HAL_OK)
@@ -155,7 +173,7 @@ void Debug_Usart_Restar(void)
     Error_Handler();
   }
   
-  // ÖØĞÂ´ò¿ª´®¿Ú
+  // é‡æ–°æ‰“å¼€ä¸²å£
   MX_UART4_Init();
 	Debug_Protocol_Init();
 }

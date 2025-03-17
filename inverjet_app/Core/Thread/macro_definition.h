@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 * @file    		macro_definition.h
-* @brief   		ÏµÍ³²ÎÊýºê¶¨Òå
+* @brief   		ç³»ç»Ÿå‚æ•°å®å®šä¹‰
 *
 *
 * @author			WQG
@@ -36,38 +36,38 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 
-// Èí¼þ°æ±¾
-#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.7"
+// è½¯ä»¶ç‰ˆæœ¬
+#define	MACRO_SOFTWARE_VERSION_UINT32									"1.3.9"
 
 /**
 ******************************************************************************
-* ÏµÍ³ºê¶¨Òå
+* ç³»ç»Ÿå®å®šä¹‰
 ******************************************************************************
 */
-//#define SYSTEM_DEBUG_MODE								1	// µ÷ÊÔÄ£Ê½
-//#define UART_PRINTF_LOG									1	// ´òÓ¡ÈÕÖ¾
-//#define SYSTEM_LONG_RUNNING_MODE				1	// ÀÏ»¯Ä£Ê½
-//#define SYSTEM_SHOW_MODEL_MACHINE				1	// Õ¹Ê¾Ñù»ú  (²»±¨¹ÊÕÏ)
-//#define SYSTEM_DRIVER_BOARD_TOOL				1	// Çý¶¯°å¹¤×° ||  ³§ÄÚÄ£Ê½
+//#define SYSTEM_DEBUG_MODE								1	// è°ƒè¯•æ¨¡å¼
+//#define UART_PRINTF_LOG									1	// æ‰“å°æ—¥å¿—
+//#define SYSTEM_LONG_RUNNING_MODE				1	// è€åŒ–æ¨¡å¼
+//#define SYSTEM_SHOW_MODEL_MACHINE				1	// å±•ç¤ºæ ·æœº  (ä¸æŠ¥æ•…éšœ)
+//#define SYSTEM_DRIVER_BOARD_TOOL				1	// é©±åŠ¨æ¿å·¥è£… ||  åŽ‚å†…æ¨¡å¼
 //***************************************************************************
 
-//******************  Çý¶¯°å ÐÍºÅÑ¡Ôñ ****************************************
-#define MOTOR_DEVICE_HARDWARE_AQPED002					(0)			//	¹ù¹¤ °æ
-#define MOTOR_DEVICE_HARDWARE_TEMP001						(1)			//	À¶¹¤ °æ
+//******************  é©±åŠ¨æ¿ åž‹å·é€‰æ‹© ****************************************
+#define MOTOR_DEVICE_HARDWARE_AQPED002					(0)			//	éƒ­å·¥ ç‰ˆ
+#define MOTOR_DEVICE_HARDWARE_TEMP001						(1)			//	è“å·¥ ç‰ˆ
 
 //***************************************************************************
 
-#define MOTOR_DEVICE_PROTOCOL_VERSION						Get_Motor_Device_Protocol_Version()				// Çý¶¯Ð­Òé°æ±¾
+#define MOTOR_DEVICE_PROTOCOL_VERSION						Get_Motor_Device_Protocol_Version()				// é©±åŠ¨åè®®ç‰ˆæœ¬
 
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
 /*==============================================================================================================*/
-// ´®¿Ú1 --> ÖÐ¿ØModbus 	(485)
-// ´®¿Ú2 --> wifi 			(ttl)
-// ´®¿Ú3 --> Çý¶¯°å 			(ttl)
-// ´®¿Ú4 --> µ÷ÊÔ debug 	(ttl)
-// ´®¿Ú5 --> À¶ÑÀ				(ttl)
+// ä¸²å£1 --> ä¸­æŽ§Modbus 	(485)
+// ä¸²å£2 --> wifi 			(ttl)
+// ä¸²å£3 --> é©±åŠ¨æ¿ 			(ttl)
+// ä¸²å£4 --> è°ƒè¯• debug 	(ttl)
+// ä¸²å£5 --> è“ç‰™				(ttl)
 
 #define MACRO_MODBUS_USART								1
 #define	MACRO_WIFI_USART									2
@@ -75,11 +75,11 @@ extern "C" {
 #define	MACRO_DEBUG_USART									4
 #define	MACRO_BLUETOOTH_USART							5
 
-//´®¿Ú×ÜÊý
+//ä¸²å£æ€»æ•°
 #define	MACRO_SYSTEM_USER_USART_MAX										(5)
 
 
-#define MACRO_POWER_ON_WAITE_TIME_TASK								(5000)			//ÉÏµçµÈ´ýÊ±¼ä £¨µÈÏÔÊ¾¿ª»ú½çÃæ »úÐÍÂë£©
+#define MACRO_POWER_ON_WAITE_TIME_TASK								(5000)			//ä¸Šç”µç­‰å¾…æ—¶é—´ ï¼ˆç­‰æ˜¾ç¤ºå¼€æœºç•Œé¢ æœºåž‹ç ï¼‰
 
 /*==============================================================================================================*/
 /*==============================================================================================================*/
@@ -89,38 +89,38 @@ extern "C" {
 #define BREATH_LIGHT_THREAD_TURN_ON					1
 
 #if(BREATH_LIGHT_THREAD_TURN_ON)
-//Ïß³ÌÖÜÆÚ
+//çº¿ç¨‹å‘¨æœŸ
 #define BREATH_LIGHT_THREAD_LIFECYCLE				(20)				// ms
-//¹âÈ¦ pwm Í¨µÀºÅ
+//å…‰åœˆ pwm é€šé“å·
 #define BREATH_LIGHT_PWM_CHANNEL						(TIM_CHANNEL_1)
 
-//******************  µ÷ÊÔÄ£Ê½ **************************
+//******************  è°ƒè¯•æ¨¡å¼ **************************
 #ifdef SYSTEM_DEBUG_MODE
-#define LIGHT_BRIGHTNESS_MIX					(0)			// ×îµÍÁÁ¶È  
-#define LIGHT_BRIGHTNESS_MAX					(50)		// ×î´óÁÁ¶È  0~500
+#define LIGHT_BRIGHTNESS_MIX					(0)			// æœ€ä½Žäº®åº¦  
+#define LIGHT_BRIGHTNESS_MAX					(50)		// æœ€å¤§äº®åº¦  0~500
 #else
-#define LIGHT_BRIGHTNESS_MIX					(0)			// ×îµÍÁÁ¶È  
-#define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// ×î´óÁÁ¶È  0~500
+#define LIGHT_BRIGHTNESS_MIX					(0)			// æœ€ä½Žäº®åº¦  
+#define LIGHT_BRIGHTNESS_MAX					(500)		//(*p_Breath_Light_Max)			// æœ€å¤§äº®åº¦  0~500
 #endif
 //*******************************************************
-#define AD_SAMPLE_MAX   		    4000                        // AD²ÉÑù×î´óÖµ
-//µµÎ»
-#define BREATH_LIGHT_GEAR_POSITION						(AD_SAMPLE_MAX/(1000/BREATH_LIGHT_THREAD_LIFECYCLE))				// µµÎ» 50
-//²½½ø
+#define AD_SAMPLE_MAX   		    4000                        // ADé‡‡æ ·æœ€å¤§å€¼
+//æ¡£ä½
+#define BREATH_LIGHT_GEAR_POSITION						(AD_SAMPLE_MAX/(1000/BREATH_LIGHT_THREAD_LIFECYCLE))				// æ¡£ä½ 50
+//æ­¥è¿›
 #define LIGHT_BRIGHTNESS_STEP									((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION)
 
-//---------- ÔÝÍ£ÏÂ 5ÃëÖÜÆÚ
-//µµÎ»
-#define BREATH_LIGHT_GEAR_POSITION_LOW				(AD_SAMPLE_MAX/(2500/BREATH_LIGHT_THREAD_LIFECYCLE))				// µµÎ» 125
-//²½½ø
+//---------- æš‚åœä¸‹ 5ç§’å‘¨æœŸ
+//æ¡£ä½
+#define BREATH_LIGHT_GEAR_POSITION_LOW				(AD_SAMPLE_MAX/(2500/BREATH_LIGHT_THREAD_LIFECYCLE))				// æ¡£ä½ 125
+//æ­¥è¿›
 #define LIGHT_BRIGHTNESS_STEP_LOW							((LIGHT_BRIGHTNESS_MAX-LIGHT_BRIGHTNESS_MIX)/BREATH_LIGHT_GEAR_POSITION_LOW)
 
-//-------------- ·äÃùÆ÷ ³¤¶È -------------------
-#define KEY_BUZZER_TIME								(200/BREATH_LIGHT_THREAD_LIFECYCLE)					//ÖÜÆÚ  KEY_THREAD_LIFECYCLE ±¶Êý
-#define KEY_BUZZER_TIME_LONG					(400/BREATH_LIGHT_THREAD_LIFECYCLE)					//ÖÜÆÚ  KEY_THREAD_LIFECYCLE ±¶Êý
-#define KEY_BUZZER_TIME_LONG_32				(800/BREATH_LIGHT_THREAD_LIFECYCLE)					//ÖÜÆÚ  KEY_THREAD_LIFECYCLE ±¶Êý
-/* ·äÃùÆ÷ ÒôÁ¿  50×î´ó  ------------------------------------------------------------*/
-//******************  µ÷ÊÔÄ£Ê½ **************************
+//-------------- èœ‚é¸£å™¨ é•¿åº¦ -------------------
+#define KEY_BUZZER_TIME								(200/BREATH_LIGHT_THREAD_LIFECYCLE)					//å‘¨æœŸ  KEY_THREAD_LIFECYCLE å€æ•°
+#define KEY_BUZZER_TIME_LONG					(400/BREATH_LIGHT_THREAD_LIFECYCLE)					//å‘¨æœŸ  KEY_THREAD_LIFECYCLE å€æ•°
+#define KEY_BUZZER_TIME_LONG_32				(800/BREATH_LIGHT_THREAD_LIFECYCLE)					//å‘¨æœŸ  KEY_THREAD_LIFECYCLE å€æ•°
+/* èœ‚é¸£å™¨ éŸ³é‡  50æœ€å¤§  ------------------------------------------------------------*/
+//******************  è°ƒè¯•æ¨¡å¼ **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_FREQUENCY					3
 #else
@@ -137,35 +137,35 @@ extern "C" {
 #define KEY_THREAD_TURN_ON					1
 
 #if(KEY_THREAD_TURN_ON)
-//Ïß³ÌÖÜÆÚ
-#define KEY_THREAD_LIFECYCLE								(20)	// ÈÎÎñÉúÃüÖÜÆÚ 200ms
+//çº¿ç¨‹å‘¨æœŸ
+#define KEY_THREAD_LIFECYCLE								(20)	// ä»»åŠ¡ç”Ÿå‘½å‘¨æœŸ 200ms
 
-#define KEY_LONG_PRESS_TIME_3S									(3000/KEY_THREAD_LIFECYCLE)			//³¤°´Ê±¼ä 3s
-#define KEY_LONG_PRESS_TIME_2S									(2000/KEY_THREAD_LIFECYCLE)			//³¤°´Ê±¼ä 2s
-#define KEY_LONG_PRESS_TIME_1S									(1000/KEY_THREAD_LIFECYCLE)			//¶ÌÒ»µãµÄ ³¤°´Ê±¼ä  1s
-//-------------- ÌØÊâ°´¼ü  -------------------
-#define KEY_MULTIPLE_CLICKS_MAX				8						// 8´Î
-#define KEY_MULTIPLE_CLICKS_TIME			5000				// 5ÃëÄÚ
+#define KEY_LONG_PRESS_TIME_3S									(3000/KEY_THREAD_LIFECYCLE)			//é•¿æŒ‰æ—¶é—´ 3s
+#define KEY_LONG_PRESS_TIME_2S									(2000/KEY_THREAD_LIFECYCLE)			//é•¿æŒ‰æ—¶é—´ 2s
+#define KEY_LONG_PRESS_TIME_1S									(1000/KEY_THREAD_LIFECYCLE)			//çŸ­ä¸€ç‚¹çš„ é•¿æŒ‰æ—¶é—´  1s
+//-------------- ç‰¹æ®ŠæŒ‰é”®  -------------------
+#define KEY_MULTIPLE_CLICKS_MAX				8						// 8æ¬¡
+#define KEY_MULTIPLE_CLICKS_TIME			5000				// 5ç§’å†…
 
 //*******************************************************
 
-#define KEY_VALUE_SHAKE_TIME					(1)		//È¥¶¶¶¯ ´ÎÊý
+#define KEY_VALUE_SHAKE_TIME					(1)		//åŽ»æŠ–åŠ¨ æ¬¡æ•°
 
-#define KEY_LONG_PRESS_STEP						(5)		// ³¤°´ ²½½ø
+#define KEY_LONG_PRESS_STEP						(5)		// é•¿æŒ‰ æ­¥è¿›
 
-//ÆÁÄ»±³¹â pwm ¿ØÖÆ 
+//å±å¹•èƒŒå…‰ pwm æŽ§åˆ¶ 
 //#define LCD_BACK_LIGHT_PWM_CTRL							1
 
-//ÆÁÄ»±³¹â pwm Í¨µÀºÅ
+//å±å¹•èƒŒå…‰ pwm é€šé“å·
 #define LCD_BACK_LIGHT_PWM_CHANNEL						(TIM_CHANNEL_2)
-//ÆÁÄ»±³¹â ×î´óÁÁ¶È
-#define BACK_LIGHT_BRIGHTNESS_MAX						(500)			// ×î´óÁÁ¶È  0~500
-//ÐÝÃßÊ±¼ä(Ä¿Ç°ÎÞÐ§)
+//å±å¹•èƒŒå…‰ æœ€å¤§äº®åº¦
+#define BACK_LIGHT_BRIGHTNESS_MAX						(500)			// æœ€å¤§äº®åº¦  0~500
+//ä¼‘çœ æ—¶é—´(ç›®å‰æ— æ•ˆ)
 #define KEY_FOR_SLEEP_TIME_SHORT						(3000/KEY_THREAD_LIFECYCLE)			//5 min  300 000
 
-// µç»úËÙ¶ÈÃ¿µµÔö¼ÓÁ¿ 5µµ
+// ç”µæœºé€Ÿåº¦æ¯æ¡£å¢žåŠ é‡ 5æ¡£
 #define	KEY_SPEED_INCREASE_20_GEAR										(20)
-// µç»úËÙ¶ÈÃ¿µµÔö¼ÓÁ¿	100µµ
+// ç”µæœºé€Ÿåº¦æ¯æ¡£å¢žåŠ é‡	100æ¡£
 #define	KEY_SPEED_INCREASE_100_GEAR										(1)
 
 
@@ -181,49 +181,49 @@ extern "C" {
 #if(TIMING_THREAD_TURN_ON)
 #define TIMING_THREAD_LIFECYCLE				(24)				// ms    41  492
 
-//-------------- °ëÃëÖÜÆÚÊý -------------------
+//-------------- åŠç§’å‘¨æœŸæ•° -------------------
 #define TIMING_THREAD_HALF_SECOND			(480/TIMING_THREAD_LIFECYCLE)				 // wuqingguang   480
-//-------------- 1ÃëÖÜÆÚÊý -------------------
+//-------------- 1ç§’å‘¨æœŸæ•° -------------------
 #define TIMING_THREAD_ONE_SECOND			(2)				// 1 s
-//******************  µ÷ÊÔÄ£Ê½ **************************
+//******************  è°ƒè¯•æ¨¡å¼ **************************
 #ifdef SYSTEM_DEBUG_MODE
-//-------------- ÅäÍøÊ±³¤ -------------------
+//-------------- é…ç½‘æ—¶é•¿ -------------------
 #define WIFI_DISTRIBUTION_TIME_CALLOUT				(60*TIMING_THREAD_ONE_SECOND)				// 6 s
 #define BT_DISTRIBUTION_TIME_CALLOUT					(60*TIMING_THREAD_ONE_SECOND)				// 6 s
-//-------------- ¹ÊÕÏ È¥¶¶Ê±¼ä -------------------
+//-------------- æ•…éšœ åŽ»æŠ–æ—¶é—´ -------------------
 #define MOTOR_CHECK_FAULT_TIMER								(1)
-//-------------- ¹ÊÕÏ×Ô»Ö¸´ -------------------
+//-------------- æ•…éšœè‡ªæ¢å¤ -------------------
 #define SYSTEM_FAULT_TIME_CALLOUT							(6*TIMING_THREAD_ONE_SECOND)				// 6 s
-#define SYSTEM_FAULT_RECOVERY_MAX							(200)				// 3 ´Î¹ÊÕÏ
-#define SYSTEM_FAULT_RECOVERY_TIME						(60*TIMING_THREAD_ONE_SECOND)				// 1 ·ÖÖÓ  60 s
-//-------------- ×Ô¶¯¹Ø»ú -------------------
+#define SYSTEM_FAULT_RECOVERY_MAX							(200)				// 3 æ¬¡æ•…éšœ
+#define SYSTEM_FAULT_RECOVERY_TIME						(60*TIMING_THREAD_ONE_SECOND)				// 1 åˆ†é’Ÿ  60 s
+//-------------- è‡ªåŠ¨å…³æœº -------------------
 #define AUTOMATIC_SHUTDOWN_TIME								(600*TIMING_THREAD_ONE_SECOND)				// 10 min
 
 #else
-//-------------- ÅäÍøÊ±³¤ -------------------
+//-------------- é…ç½‘æ—¶é•¿ -------------------
 #define WIFI_DISTRIBUTION_TIME_CALLOUT				(60*TIMING_THREAD_ONE_SECOND)				// 60 s
 #define BT_DISTRIBUTION_TIME_CALLOUT					(60*TIMING_THREAD_ONE_SECOND)				// 60 s
-//-------------- ¹ÊÕÏ È¥¶¶Ê±¼ä -------------------
+//-------------- æ•…éšœ åŽ»æŠ–æ—¶é—´ -------------------
 #define MOTOR_CHECK_FAULT_TIMER								(2-1)
-//-------------- ¹ÊÕÏ×Ô»Ö¸´ -------------------
+//-------------- æ•…éšœè‡ªæ¢å¤ -------------------
 #define SYSTEM_FAULT_TIME_CALLOUT							(30*TIMING_THREAD_ONE_SECOND)				// 30 s    wuqingguang 
-#define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 ´Î¹ÊÕÏ
-#define SYSTEM_FAULT_RECOVERY_TIME						(3600*TIMING_THREAD_ONE_SECOND)				// 1 Ð¡Ê±ÄÚ  3600 s
-//-------------- ×Ô¶¯¹Ø»ú -------------------
-#define AUTOMATIC_SHUTDOWN_TIME								(1800*TIMING_THREAD_ONE_SECOND)				// 0.5 Ð¡Ê±ÄÚ  1800 s
+#define SYSTEM_FAULT_RECOVERY_MAX							(3)				// 3 æ¬¡æ•…éšœ
+#define SYSTEM_FAULT_RECOVERY_TIME						(3600*TIMING_THREAD_ONE_SECOND)				// 1 å°æ—¶å†…  3600 s
+//-------------- è‡ªåŠ¨å…³æœº -------------------
+#define AUTOMATIC_SHUTDOWN_TIME								(1800*TIMING_THREAD_ONE_SECOND)				// 0.5 å°æ—¶å†…  1800 s
 
 #endif
 
-//-------------- ½µÆµ È¥¶¶Ê±¼ä -------------------
+//-------------- é™é¢‘ åŽ»æŠ–æ—¶é—´ -------------------
 #define MOTOR_DOWN_CONVERSION_TIMER									(10-1)
-//-------------- ½µËÙ¼ì²éÊ±¼ä -------------------
-#define TIME_SLOW_DOWN_TIME													(120)		//2 min  120*2 ¸öÖÜÆÚ,ÓëÏß³ÌÖÜÆÚÏà¹Ø
-//-------------- ½µËÙ µµÎ» -------------------
-#define TIME_SLOW_DOWN_SPEED_01											(10)		//µÚÒ»µµ ½µËÙ
-#define TIME_SLOW_DOWN_SPEED_02											(1)			//µÚ¶þµµ ½µËÙ
-//-------------- ½µËÙ ×îµÍËÙ¶È -------------------
-#define TIME_SLOW_DOWN_SPEED_MIX										(20)		//×îµÍ½µµ½ 20%
-#define TIME_SLOW_DOWN_SPEED_MAX										(100)		//»Ö¸´ËÙ¶È×î¸ß»Ö¸´µ½ 100%
+//-------------- é™é€Ÿæ£€æŸ¥æ—¶é—´ -------------------
+#define TIME_SLOW_DOWN_TIME													(120)		//2 min  120*2 ä¸ªå‘¨æœŸ,ä¸Žçº¿ç¨‹å‘¨æœŸç›¸å…³
+//-------------- é™é€Ÿ æ¡£ä½ -------------------
+#define TIME_SLOW_DOWN_SPEED_01											(10)		//ç¬¬ä¸€æ¡£ é™é€Ÿ
+#define TIME_SLOW_DOWN_SPEED_02											(1)			//ç¬¬äºŒæ¡£ é™é€Ÿ
+//-------------- é™é€Ÿ æœ€ä½Žé€Ÿåº¦ -------------------
+#define TIME_SLOW_DOWN_SPEED_MIX										(20)		//æœ€ä½Žé™åˆ° 20%
+#define TIME_SLOW_DOWN_SPEED_MAX										(100)		//æ¢å¤é€Ÿåº¦æœ€é«˜æ¢å¤åˆ° 100%
 
 #endif
 /*==============================================================================================================*/
@@ -235,13 +235,13 @@ extern "C" {
 #define MODBUS_THREAD_TURN_ON					1
 
 #if(MODBUS_THREAD_TURN_ON)
-#define MODBUS_THREAD_LIFECYCLE							(40)				// ms ÔÝÊ±²»ÓÃ
+#define MODBUS_THREAD_LIFECYCLE							(40)				// ms æš‚æ—¶ä¸ç”¨
 
-//1ÃëÖÜÆÚÊý
+//1ç§’å‘¨æœŸæ•°
 #define MODBUS_THREAD_ONE_SECOND						(1000/MODBUS_THREAD_LIFECYCLE)				// 1 s
 
-//Í¨Ñ¶¹ÊÕÏ ±¨¾¯Ê±¼ä
-//#define FAULT_MODBUS_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 Ãë  wuqingguang
+//é€šè®¯æ•…éšœ æŠ¥è­¦æ—¶é—´
+//#define FAULT_MODBUS_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 ç§’  wuqingguang
 
 #endif
 /*==============================================================================================================*/
@@ -255,61 +255,61 @@ extern "C" {
 
 #if(MOTOR_THREAD_TURN_ON)
 
-#define MOTOR_THREAD_LIFECYCLE						(20)				// ÈÎÎñÉúÃüÖÜÆÚ 50ms
+#define MOTOR_THREAD_LIFECYCLE						(20)				// ä»»åŠ¡ç”Ÿå‘½å‘¨æœŸ 50ms
 
-//-------------- 1ÃëÖÜÆÚÊý -------------------
+//-------------- 1ç§’å‘¨æœŸæ•° -------------------
 #define MOTOR_THREAD_ONE_SECOND			(1000/MOTOR_THREAD_LIFECYCLE)
 
-// ÃüÁî ÖÜÆÚ 200ms 
+// å‘½ä»¤ å‘¨æœŸ 200ms 
 #define MOTOR_POLLING_PERIOD							(200/MOTOR_THREAD_LIFECYCLE)
 
-// ÐÄÌø ÖÜÆÚ 200ms 
+// å¿ƒè·³ å‘¨æœŸ 200ms 
 #define MOTOR_HEARTBEAT_CYCLE							(MOTOR_POLLING_PERIOD/3)
-// ÃüÁî ÖÜÆÚ 200ms
+// å‘½ä»¤ å‘¨æœŸ 200ms
 #define MOTOR_COMMAND_CYCLE								((MOTOR_POLLING_PERIOD/3)*2)
-// ¶Á×´Ì¬ ÖÜÆÚ 200ms 
+// è¯»çŠ¶æ€ å‘¨æœŸ 200ms 
 #define MOTOR_READ_STATIC_CYCLE						(0)
 
 
-// Çý¶¯×´Ì¬¼ìÑé   µç»úµçÁ÷ ±¨¾¯Ê±¼ä  ------------------
+// é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºç”µæµ æŠ¥è­¦æ—¶é—´  ------------------
 //#define MOTOR_CANNOT_START_TIME						(5000 / MOTOR_POLLING_PERIOD / MOTOR_THREAD_LIFECYCLE)		// wuqingguang
-// Çý¶¯×´Ì¬¼ìÑé   µç»ú×ªËÙ ±¨¾¯Ê±¼ä  ------------------
+// é©±åŠ¨çŠ¶æ€æ£€éªŒ   ç”µæœºè½¬é€Ÿ æŠ¥è­¦æ—¶é—´  ------------------
 //#define MOTOR_SPEED_ERROR_TIME						(10000 / MOTOR_POLLING_PERIOD/ MOTOR_THREAD_LIFECYCLE)			// wuqingguang
 
 //*****************************************************************************
-//µç»ú¼«Êý
+//ç”µæœºæžæ•°
 
 #define	MOTOR_POLE_NUMBER									(5)
 //*****************************************************************************
 
 //-------------------------------------------------------------------------------------------------
 //*********************************************************************************************
-// ======================= ËÙ¶È ============================
+// ======================= é€Ÿåº¦ ============================
 // 700  1012   1324  1637   1950
-//Ã¿ 1% ×ªËÙ
+//æ¯ 1% è½¬é€Ÿ
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /80)			//15.6			78
 
-//Ã¿ 20% ×ªËÙ
+//æ¯ 20% è½¬é€Ÿ
 #define	MOTOR_RPM_CONVERSION_COEFFICIENT_20				((MOTOR_RPM_SPEED_MAX - MOTOR_RPM_SPEED_MIX) /4)			//312.5     1562
 
-//µç»ú×î¸ßËÙ¶È  °Ù·Ö±È  100%
+//ç”µæœºæœ€é«˜é€Ÿåº¦  ç™¾åˆ†æ¯”  100%
 #define	MOTOR_PERCENT_SPEED_MAX										(100)
-//µç»ú×îµÍËÙ¶È  °Ù·Ö±È  20%
+//ç”µæœºæœ€ä½Žé€Ÿåº¦  ç™¾åˆ†æ¯”  20%
 #define	MOTOR_PERCENT_SPEED_MIX										(20)
 
 #ifdef MOTOR_CANNOT_START_TIME
-//µç»ú×îµÍµçÁ÷
+//ç”µæœºæœ€ä½Žç”µæµ
 #define	MOTOR_CURRENT_MIX									(1000)				//10A
 #endif
 #ifdef MOTOR_SPEED_ERROR_TIME
-//µç»ú×ªËÙÎó²î·¶Î§
-#define	MOTOR_SPEED_VIBRATION_RANGE					(10)				//°Ù·Ö±È
+//ç”µæœºè½¬é€Ÿè¯¯å·®èŒƒå›´
+#define	MOTOR_SPEED_VIBRATION_RANGE					(10)				//ç™¾åˆ†æ¯”
 #endif
 
-//µç»ú¼ÓËÙ¶È
+//ç”µæœºåŠ é€Ÿåº¦
 #define	MOTOR_ACCELERATION										(1)
 
-//µç»ú ×îµÍÊµ¼ÊÆô¶¯ËÙ¶È (°Ù·Ö±È)
+//ç”µæœº æœ€ä½Žå®žé™…å¯åŠ¨é€Ÿåº¦ (ç™¾åˆ†æ¯”)
 #define	MOTOR_ACTUAL_SPEED_MIN										(20)
 
 //*********************************************************************************************
@@ -317,14 +317,14 @@ extern "C" {
 
 //-------------------------------------------------------------------------------------------------
 //*********************************************************************************************
-// ======================= Ê±¼ä ============================
-// ÏÔÊ¾×î´óÖµ
+// ======================= æ—¶é—´ ============================
+// æ˜¾ç¤ºæœ€å¤§å€¼
 #define	MOTOR_TIME_SHOW_MAX												(6000)		//	99:59
-// ×î´óµµÎ»
+// æœ€å¤§æ¡£ä½
 #define	MOTOR_TIME_GEAR_MAX												(5400)			//	95 min
-// ×îÐ¡µµÎ»
+// æœ€å°æ¡£ä½
 #define	MOTOR_TIME_GEAR_MIX												(900)				//	15 min
-// Ã¿µµÎ»Æ«ÒÆÖµ
+// æ¯æ¡£ä½åç§»å€¼
 #define	MOTOR_TIME_GEAR_OFFSET										(900)				//	15 min
 
 //*********************************************************************************************
@@ -338,18 +338,18 @@ extern "C" {
 //-------------------------------------------------------------------------------------------------
 #ifdef SYSTEM_DRIVER_BOARD_TOOL
 
-//Í¨Ñ¶¹ÊÕÏ ±¨¾¯Ê±¼ä
-#define FAULT_MOTOR_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 Ãë
+//é€šè®¯æ•…éšœ æŠ¥è­¦æ—¶é—´
+#define FAULT_MOTOR_LOSS_TIME							(3000/(MOTOR_THREAD_LIFECYCLE))				// 3 ç§’
 
 #else
 
-//Í¨Ñ¶¹ÊÕÏ ±¨¾¯Ê±¼ä
-#define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 Ãë  wuqingguang   30000
+//é€šè®¯æ•…éšœ æŠ¥è­¦æ—¶é—´
+#define FAULT_MOTOR_LOSS_TIME							(30000/(MOTOR_THREAD_LIFECYCLE))				// 30 ç§’  wuqingguang   30000
 
 #endif
 
-//Í¨Ñ¶¹ÊÕÏ ³¢ÊÔÖØÆô Ê±¼ä
-#define FAULT_MOTOR_TRY_RESTAR_TIME				(6000/(MOTOR_THREAD_LIFECYCLE))				// 6Ãë
+//é€šè®¯æ•…éšœ å°è¯•é‡å¯ æ—¶é—´
+#define FAULT_MOTOR_TRY_RESTAR_TIME				(6000/(MOTOR_THREAD_LIFECYCLE))				// 6ç§’
 /*------------------- IO define ----------------------------------------------*/
 #define	MOTOR_MODULE_HUART				DRIVER_USART		//
 
@@ -372,34 +372,34 @@ extern "C" {
 #define WIFI_THREAD_TURN_ON					1
 
 #if(WIFI_THREAD_TURN_ON)
-#define WIFI_THREAD_LIFECYCLE											(40)				// ms ÔÝÊ±²»ÓÃ
+#define WIFI_THREAD_LIFECYCLE											(40)				// ms æš‚æ—¶ä¸ç”¨
 
-//1ÃëÖÜÆÚÊý
+//1ç§’å‘¨æœŸæ•°
 #define WIFI_THREAD_ONE_SECOND									(1000/WIFI_THREAD_LIFECYCLE)				// 1 s
 
 #define OTA_SHUTDOWN_TIME_OUT										(1800)				//  s
 
-#define WIFI_DATE_UPLOAD_TIME_NORMAL							(1 * WIFI_THREAD_ONE_SECOND)				// ÆÕÍ¨Êý¾Ý Ê±¼ä 1s
+#define WIFI_DATE_UPLOAD_TIME_NORMAL							(1 * WIFI_THREAD_ONE_SECOND)				// æ™®é€šæ•°æ® æ—¶é—´ 1s
 
 #ifdef SYSTEM_LONG_RUNNING_MODE
-//********* ÀÏ»¯¹¤×° ***********************************************
-// ÀÏ»¯¹¤×° ¿ìËÙÉÏ±¨ ·½±ã²é¿´ÔËÐÐ×´Ì¬
+//********* è€åŒ–å·¥è£… ***********************************************
+// è€åŒ–å·¥è£… å¿«é€Ÿä¸ŠæŠ¥ æ–¹ä¾¿æŸ¥çœ‹è¿è¡ŒçŠ¶æ€
 #define WIFI_DATE_UPLOAD_TIME											(1 * WIFI_THREAD_ONE_SECOND)				// 1s
 #else
-#define WIFI_DATE_UPLOAD_TIME											(10 * WIFI_THREAD_ONE_SECOND)				// ²»³£ÓÃÊý¾Ý Ê±¼ä 10s
+#define WIFI_DATE_UPLOAD_TIME											(10 * WIFI_THREAD_ONE_SECOND)				// ä¸å¸¸ç”¨æ•°æ® æ—¶é—´ 10s
 //******************************************************************
 #endif
 
-// wifi ¹ÊÕÏ ÐÅºÅÅÐ¶ÏÖµ
+// wifi æ•…éšœ ä¿¡å·åˆ¤æ–­å€¼
 #define WIFI_RSSI_ERROR_VAULE										(50)
 
-//Í¨Ñ¶¹ÊÕÏ ±¨¾¯Ê±¼ä
-#define FAULT_WIFI_LOST_TIME							(3000/(WIFI_THREAD_LIFECYCLE))				// 3 Ãë  wuqingguang
+//é€šè®¯æ•…éšœ æŠ¥è­¦æ—¶é—´
+#define FAULT_WIFI_LOST_TIME							(3000/(WIFI_THREAD_LIFECYCLE))				// 3 ç§’  wuqingguang
 
-// ½áÊøÍ³¼Æ ÉÏ´« ×îµÍÊ±¼ä -- µÍÓÚ 1min ²»¼ÆÈëÍ³¼Æ  µ¥Î»(Ãë)
+// ç»“æŸç»Ÿè®¡ ä¸Šä¼  æœ€ä½Žæ—¶é—´ -- ä½ŽäºŽ 1min ä¸è®¡å…¥ç»Ÿè®¡  å•ä½(ç§’)
 #define WIFI_STATISTICE_UPLOAD_MINIMUM_TIME										(60)
 
-// appÈ·ÈÏ ·½Ê½
+// appç¡®è®¤ æ–¹å¼
 #define OTA_WAY_APP_CONFIRM									(2)
 
 #endif
@@ -413,12 +413,12 @@ extern "C" {
 #define BT_THREAD_TURN_ON					1
 
 #if(BT_THREAD_TURN_ON)
-#define BT_THREAD_LIFECYCLE											(40)				// ms ÔÝÊ±²»ÓÃ
+#define BT_THREAD_LIFECYCLE											(20)				// ms æš‚æ—¶ä¸ç”¨
 
-//1ÃëÖÜÆÚÊý
+//1ç§’å‘¨æœŸæ•°
 #define BT_THREAD_ONE_SECOND									(1000/BT_THREAD_LIFECYCLE)				// 1 s
 
-// À¶ÑÀ ¹ÊÕÏ ÐÅºÅÅÐ¶ÏÖµ
+// è“ç‰™ æ•…éšœ ä¿¡å·åˆ¤æ–­å€¼
 #define BT_RSSI_ERROR_VAULE										(80)
 
 

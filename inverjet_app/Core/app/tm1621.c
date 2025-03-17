@@ -29,7 +29,7 @@
 
 #define NOP __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
 
-/********************** TM1261 Ä£¿éÃüÁî ********************************/
+/********************** TM1261 æ¨¡å—å‘½ä»¤ ********************************/
 
 #define SYSDIS 		0x00
 #define SYSEN			0x02
@@ -48,7 +48,7 @@
 #define WDTEN			0x0E
 
 
-//******************  µ÷ÊÔÄ£Ê½ **************************
+//******************  è°ƒè¯•æ¨¡å¼ **************************
 #ifdef SYSTEM_DEBUG_MODE
 #define BUZZER_VOLUME_MAX					1						//20
 #define BUZZER_TONE_CONFIG				TONE_2K
@@ -65,7 +65,7 @@ uint8_t Lcd_ram[SCREEN_NUMBER_MAX]={0};
 
 static uint8_t Back_Light_Mode = 0;
 
-// Êı×ÖÏÔÊ¾0-9£¬ÈÎºÎÏÔÊ¾Êı×ÖµÄÇøÓò£¬¶¼ÊÇµ÷ÓÃÕâÀïµÄÊı¾İ
+// æ•°å­—æ˜¾ç¤º0-9ï¼Œä»»ä½•æ˜¾ç¤ºæ•°å­—çš„åŒºåŸŸï¼Œéƒ½æ˜¯è°ƒç”¨è¿™é‡Œçš„æ•°æ®
 
 //uint8_t Lcd_Number_table_1[10]={
 //0x3f,0x06,
@@ -77,10 +77,10 @@ static uint8_t Back_Light_Mode = 0;
 // 1-4
 uint8_t Lcd_Number_table_1[10]={0x5F,0x06,0x6B,0x2F,0x36,0x3D,0x7D,0x07,0x7F,0x3F};
 
-// Êı×Ö 5 -8
+// æ•°å­— 5 -8
 uint8_t Lcd_Number_table_2[10]={0xF5,0x60,0xD3,0xF2,0x66,0xB6,0xB7,0xE0,0xF7,0xF6};
 
-// ×ÖÄ¸ÏÔÊ¾ 1-4
+// å­—æ¯æ˜¾ç¤º 1-4
 uint8_t Lcd_Letter_table_1[TM1621_LETTER_MAX][2] = {
 	{0x77,'A'}, // A
 	{0x59,'C'}, // C
@@ -104,7 +104,7 @@ uint8_t Lcd_Letter_table_1[TM1621_LETTER_MAX][2] = {
 	{0x4C,'u'}, // u
 };
 
-// ×ÖÄ¸ÏÔÊ¾ 5-8
+// å­—æ¯æ˜¾ç¤º 5-8
 uint8_t Lcd_Letter_table_2[TM1621_LETTER_MAX][2] = {
 	{0xE7,'A'},
 	{0x95,'C'}, // C
@@ -148,7 +148,7 @@ static void Tm1621_Delay(uint32_t mdelay)
 
 /**************************************************************************************
 * FunctionName   : TM1621_SendBitMsb()
-* Description    : ·¢ËÍ·¢ËÍ¶àÎ»[¸ßÎ»ÔÚÇ°]
+* Description    : å‘é€å‘é€å¤šä½[é«˜ä½åœ¨å‰]
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
@@ -167,7 +167,7 @@ void TM1621_SendBitMsb(uint8_t dat, uint8_t cnt)
 
 /**************************************************************************************
 * FunctionName   : TM1621_SendBitLsb()
-* Description    : ·¢ËÍ¶àÎ»[µÍÎ»ÔÚÇ°]
+* Description    : å‘é€å¤šä½[ä½ä½åœ¨å‰]
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
@@ -185,33 +185,33 @@ void TM1621_SendBitLsb(uint8_t dat, uint8_t cnt)
 
 ///**************************************************************************************
 //* FunctionName   : TM1621_SendCmd()
-//* Description    : ·¢ËÍÃüÁî
+//* Description    : å‘é€å‘½ä»¤
 //* EntryParameter : None
 //* ReturnValue    : None
 //**************************************************************************************/
 void TM1621_SendCmd(uint8_t cmd)
 {
     TM1621_CS_LOW();
-    TM1621_SendBitMsb(0x80, 3);                                                     // Ç°Ãæ3Î»ÃüÁî´úÂë
-    TM1621_SendBitMsb(cmd, 9);                                                      // ºóÃæ10Î»: a5~a0[RAMµØÖ·]+d3~d0[RAMÊı¾İ]
+    TM1621_SendBitMsb(0x80, 3);                                                     // å‰é¢3ä½å‘½ä»¤ä»£ç 
+    TM1621_SendBitMsb(cmd, 9);                                                      // åé¢10ä½: a5~a0[RAMåœ°å€]+d3~d0[RAMæ•°æ®]
     TM1621_CS_HIG();
 }
 
 /**************************************************************************************
 * FunctionName   : HTBSendNDat()
-* Description    : ·¢ËÍNÊı¾İ
+* Description    : å‘é€Næ•°æ®
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
 void TM1621_SendNDat(uint8_t addr, uint8_t *pDat, uint8_t cnt, uint8_t bitNum)
 {
     TM1621_CS_LOW();
-    TM1621_SendBitMsb(0xA0, 3);                                                    // Ç°Ãæ3Î»ÃüÁî´úÂë
-    TM1621_SendBitMsb(addr<<2, 6);                                                 // a5~a0[RAMµØÖ·]
+    TM1621_SendBitMsb(0xA0, 3);                                                    // å‰é¢3ä½å‘½ä»¤ä»£ç 
+    TM1621_SendBitMsb(addr<<2, 6);                                                 // a5~a0[RAMåœ°å€]
 
     for (uint8_t i=0; i<cnt; i++)
     {        
-			TM1621_SendBitLsb(*pDat++, bitNum);   // RAMÊıTM1621_SendBitLsb¾İ
+			TM1621_SendBitLsb(*pDat++, bitNum);   // RAMæ•°TM1621_SendBitLsbæ®
     }
     TM1621_CS_HIG();
 }
@@ -219,14 +219,14 @@ void TM1621_SendNDat(uint8_t addr, uint8_t *pDat, uint8_t cnt, uint8_t bitNum)
 
 /**
   * @brief  TM1621 Write CMD.
-  * @param  cmd Ö¸ÏòĞ´ÈëµÄÃüÁî.
+  * @param  cmd æŒ‡å‘å†™å…¥çš„å‘½ä»¤.
   * @return void
   */
 void TM1621_Write_CMD(uint8_t cmd)
 {
 	TM1621_CS_LOW();
-  TM1621_SendBitMsb(0x80, 4);                                                    // Ç°Ãæ3Î»ÃüÁî´úÂë
-  TM1621_SendBitMsb(cmd, 8);                                                 // a5~a0[RAMµØÖ·]
+  TM1621_SendBitMsb(0x80, 4);                                                    // å‰é¢3ä½å‘½ä»¤ä»£ç 
+  TM1621_SendBitMsb(cmd, 8);                                                 // a5~a0[RAMåœ°å€]
   TM1621_CS_HIG();
 }
 
@@ -234,7 +234,7 @@ void TM1621_Write_CMD(uint8_t cmd)
 ******************************************************************************
 TM1621_display_number	
 
-ÏÔÊ¾»º´æ
+æ˜¾ç¤ºç¼“å­˜
 ******************************************************************************
 */  
 void TM1621_display_number(uint8_t coordinate, uint8_t value)
@@ -253,7 +253,7 @@ void TM1621_display_number(uint8_t coordinate, uint8_t value)
 		symbol = Lcd_ram[coordinate] & 0x80;
 	}
 	
-	if(value == 0xFF)// ²»ÏÔÊ¾
+	if(value == 0xFF)// ä¸æ˜¾ç¤º
 		Lcd_ram[coordinate] = 0;
 	else
 		Lcd_ram[coordinate] = p_number_table[value];
@@ -266,7 +266,7 @@ void TM1621_display_number(uint8_t coordinate, uint8_t value)
 ******************************************************************************
 TM1621_display_Letter	
 
-ÏÔÊ¾ ×ÖÄ¸ value:×ÖÄ¸µÄasciiÂë
+æ˜¾ç¤º å­—æ¯ value:å­—æ¯çš„asciiç 
 ******************************************************************************
 */  
 void TM1621_display_Letter(uint8_t coordinate, uint8_t value)
@@ -287,7 +287,7 @@ void TM1621_display_Letter(uint8_t coordinate, uint8_t value)
 		symbol = Lcd_ram[coordinate] & 0x80;
 	}
 	
-	if(value == 0xFF)// ²»ÏÔÊ¾
+	if(value == 0xFF)// ä¸æ˜¾ç¤º
 		Lcd_ram[coordinate] = 0;
 	else
 	{
@@ -304,7 +304,7 @@ void TM1621_display_Letter(uint8_t coordinate, uint8_t value)
 ******************************************************************************
 TM1621_Show_Colon	
 
-ÏÔÊ¾·ûºÅ
+æ˜¾ç¤ºç¬¦å·
 ******************************************************************************
 */  
 void TM1621_Show_Symbol(uint8_t coordinate, uint8_t value)
@@ -330,7 +330,7 @@ void TM1621_Show_Symbol(uint8_t coordinate, uint8_t value)
 ******************************************************************************
 TM1621_LCD_Redraw	
 
-ÆÁÄ»Ë¢ĞÂ
+å±å¹•åˆ·æ–°
 ******************************************************************************
 */ 
 void TM1621_LCD_Redraw(void)
@@ -343,7 +343,7 @@ void TM1621_LCD_Redraw(void)
 ******************************************************************************
 TM1621_Show_LCD_Test	
 
-²âÊÔÏÔÊ¾, È«²¿ÏÔÊ¾Ò»¸ö·ûºÅ
+æµ‹è¯•æ˜¾ç¤º, å…¨éƒ¨æ˜¾ç¤ºä¸€ä¸ªç¬¦å·
 ******************************************************************************
 */ 
 void TM1621_Show_LCD_Test(uint8_t value)
@@ -362,7 +362,7 @@ void TM1621_Show_LCD_Test(uint8_t value)
 ******************************************************************************
 TM1621_Show_Repeat_All	
 
-ÆÁÄ»Ñ­»·ÏÔÊ¾
+å±å¹•å¾ªç¯æ˜¾ç¤º
 ******************************************************************************
 */ 
 void TM1621_Show_Repeat_All(void)
@@ -389,13 +389,13 @@ void TM1621_Show_Repeat_All(void)
 ******************************************************************************
 TM1621_Show_All	
 
-È«ÏÔÊ¾
+å…¨æ˜¾ç¤º
 ******************************************************************************
 */ 
 void TM1621_Show_All(void)
 {
 	uint8_t show_all[SCREEN_NUMBER_MAX] = { 0xF7,0xFF,0xFF,0xFF,0xFF,0xFF,0x7F,0xFF};
-	//±³¹â
+	//èƒŒå…‰
 	TM1621_BLACK_ON();
 	
 	memcpy(Lcd_ram, show_all, SCREEN_NUMBER_MAX);
@@ -406,7 +406,7 @@ void TM1621_Show_All(void)
 ******************************************************************************
 TM1621_Show_Off	
 
-Ï¢ÆÁ
+æ¯å±
 ******************************************************************************
 */ 
 void TM1621_Show_Off(void)
@@ -416,8 +416,8 @@ void TM1621_Show_Off(void)
  	TM1621_LCD_Redraw();
 }
 
-//------------------- pwm¿ØÖÆ ----------------------------
-// µ÷½Ú·¶Î§ : 1 - 100
+//------------------- pwmæ§åˆ¶ ----------------------------
+// è°ƒèŠ‚èŒƒå›´ : 1 - 100
 void Buzzer_IO_PwmOut(uint16_t pul)
 {
 	if(TM1621_Buzzer_value == pul)
@@ -434,7 +434,7 @@ void Buzzer_IO_PwmOut(uint16_t pul)
 ******************************************************************************
 TM1621_Show_Off	
 
-Ï¢ÆÁ
+æ¯å±
 ******************************************************************************
 */ 
 void TM1621_Buzzer_Off(void)
@@ -447,7 +447,7 @@ void TM1621_Buzzer_Off(void)
 ******************************************************************************
 TM1621_Show_Off	
 
-Ï¢ÆÁ
+æ¯å±
 ******************************************************************************
 */ 
 void TM1621_Buzzer_On(void)
@@ -459,7 +459,7 @@ void TM1621_Buzzer_On(void)
 
 void TM1621_Buzzer_Delay(uint16_t ms)
 {
-/* Æô¶¯¶¨Ê±Æ÷ */
+/* å¯åŠ¨å®šæ—¶å™¨ */
 	__HAL_TIM_CLEAR_IT(&htim6,TIM_IT_UPDATE);
 	__HAL_TIM_ENABLE_IT(&htim6,TIM_IT_UPDATE);
 	__HAL_TIM_SET_COUNTER(&htim6,0);
@@ -468,7 +468,7 @@ void TM1621_Buzzer_Delay(uint16_t ms)
 	HAL_TIM_Base_Start_IT(&htim6);
 }
 
-// ÃùµÑ  ²»¿É´ò¶Ï,¾¡Á¿²»ÒªÓÃÕâ¸ö
+// é¸£ç¬›  ä¸å¯æ‰“æ–­,å°½é‡ä¸è¦ç”¨è¿™ä¸ª
 void TM1621_Buzzer_Whistle(uint16_t ms) 
 {
 	TM1621_Buzzer_On();
@@ -476,14 +476,14 @@ void TM1621_Buzzer_Whistle(uint16_t ms)
 	TM1621_Buzzer_Off();
 }
 
-// àÖÒ»ÏÂ
+// å˜€ä¸€ä¸‹
 void TM1621_Buzzer_Click(void) 
 {
 	TM1621_Buzzer_Off();
-	//-------------- ·äÃùÆ÷ ³¤¶È -------------------
+	//-------------- èœ‚é¸£å™¨ é•¿åº¦ -------------------
 
 	TM1621_Buzzer_On();
-	//ÓÃ¶¨Ê±Æ÷²»ÎÈ¶¨, ÔÚÏß³ÌÑ­»·Àï¼ÆÊ±
+	//ç”¨å®šæ—¶å™¨ä¸ç¨³å®š, åœ¨çº¿ç¨‹å¾ªç¯é‡Œè®¡æ—¶
 	//TM1621_Buzzer_Delay(BUZZER_VOLUME_MAX);
 	//TM1621_Buzzer_Off();
 
@@ -493,14 +493,14 @@ void TM1621_Buzzer_Click(void)
 void TM1621_Buzzer_Init(void) 
 {
 	Tm1621_Delay(10);
-	//·äÃùÆ÷
+	//èœ‚é¸£å™¨
 	TM1621_Write_CMD(BUZZER_TONE_CONFIG);
 	TM1621_Write_CMD(TONEOFF);
 }
 /*
 ******************************************************************************
 LCD_Init	
-³õÊ¼»¯ÃüÁîµ½HT1621 
+åˆå§‹åŒ–å‘½ä»¤åˆ°HT1621 
 ******************************************************************************
 */  
  
@@ -510,7 +510,7 @@ void TM1621_LCD_Init(void)
 	TM1621_DATA_HIG();
 	TM1621_WR_HIG();
 	
-	Tm1621_Delay(2000); //ÑÓÊ±Ê¹LCD¹¤×÷µçÑ¹ÎÈ¶¨
+	Tm1621_Delay(2000); //å»¶æ—¶ä½¿LCDå·¥ä½œç”µå‹ç¨³å®š
 	
 	TM1621_Write_CMD(BIAS);
 	TM1621_Write_CMD(RC);
@@ -523,7 +523,7 @@ void TM1621_LCD_Init(void)
 
 
 
-//------------------- pwm¿ØÖÆ ----------------------------
+//------------------- pwmæ§åˆ¶ ----------------------------
 
 void TM1621_light_Max(void)
 {

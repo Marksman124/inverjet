@@ -21,7 +21,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #include "tim.h"
-#include "macro_definition.h"				// Í³Ò»ºê¶¨Òå
+#include "macro_definition.h"				// ç»Ÿä¸€å®å®šä¹‰
 /* Private includes ----------------------------------------------------------*/
 
 
@@ -37,11 +37,11 @@ extern "C" {
 
 
 #ifdef LCD_BACK_LIGHT_PWM_CTRL
-//PWM ¿ØÖÆ
+//PWM æ§åˆ¶
 #define TM1621_BLACK_ON()			TM1621_light_On();
 #define TM1621_BLACK_OFF()		TM1621_light_Off();
 #else
-//IO¿ØÖÆ
+//IOæ§åˆ¶
 #define TM1621_BLACK_ON()			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 #define TM1621_BLACK_OFF()		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
 #endif
@@ -58,7 +58,7 @@ extern "C" {
 #define TM1621_WR_LOW()			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET)
 
 
-// ¿ìËÙ¼ÆËã
+// å¿«é€Ÿè®¡ç®—
 #define GET_NUMBER_HUNDRED_DIGIT(n)						((n>=100)?1:0)
 #define GET_NUMBER_TEN_DIGIT(n)								((n/10)%10)
 #define GET_NUMBER_ONE_DIGIT(n)								(n%10)
@@ -69,11 +69,11 @@ extern "C" {
 #define GET_LETTER_HIGH_DIGIT(n)							((n&0xF0)>>4)
 #define GET_LETTER_LOW_DIGIT(n)								(n&0x0F)
 
-/* ÆÁÄ» ²ÎÊı  ------------------------------------------------------------*/
+/* å±å¹• å‚æ•°  ------------------------------------------------------------*/
 
-#define SCREEN_NUMBER_MAX			8		// ÆÁÄ»Êı×Öµ¥ÔªÊıÁ¿
+#define SCREEN_NUMBER_MAX			8		// å±å¹•æ•°å­—å•å…ƒæ•°é‡
 
-#define TM1621_LETTER_MAX			20	//×ÖÄ¸±í³¤¶È
+#define TM1621_LETTER_MAX			20	//å­—æ¯è¡¨é•¿åº¦
 
 #define TM1621_DIGITAL_NUMBER_1			7
 #define TM1621_DIGITAL_NUMBER_2			6
@@ -113,39 +113,39 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-//------------------- ¹¦ÄÜ½Ó¿Ú ----------------------------
+//------------------- åŠŸèƒ½æ¥å£ ----------------------------
 void Delay_us(uint16_t us);
 /**************************************************************************************
 * FunctionName   : TM1621_SendBitMsb()
-* Description    : ·¢ËÍ·¢ËÍ¶àÎ»[¸ßÎ»ÔÚÇ°]
+* Description    : å‘é€å‘é€å¤šä½[é«˜ä½åœ¨å‰]
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
 void TM1621_SendBitMsb(uint8_t dat, uint8_t cnt);
 /**************************************************************************************
 * FunctionName   : TM1621_SendBitLsb()
-* Description    : ·¢ËÍ¶àÎ»[µÍÎ»ÔÚÇ°]
+* Description    : å‘é€å¤šä½[ä½ä½åœ¨å‰]
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
 void TM1621_SendBitLsb(uint8_t dat, uint8_t cnt);
 ///**************************************************************************************
 //* FunctionName   : TM1621_SendCmd()
-//* Description    : ·¢ËÍÃüÁî
+//* Description    : å‘é€å‘½ä»¤
 //* EntryParameter : None
 //* ReturnValue    : None
 //**************************************************************************************/
 void TM1621_SendCmd(uint8_t cmd);
 /**************************************************************************************
 * FunctionName   : HTBSendNDat()
-* Description    : ·¢ËÍNÊı¾İ
+* Description    : å‘é€Næ•°æ®
 * EntryParameter : None
 * ReturnValue    : None
 **************************************************************************************/
 void TM1621_SendNDat(uint8_t addr, uint8_t *pDat, uint8_t cnt, uint8_t bitNum);
 /**
   * @brief  TM1621 Write CMD.
-  * @param  cmd Ö¸ÏòĞ´ÈëµÄÃüÁî.
+  * @param  cmd æŒ‡å‘å†™å…¥çš„å‘½ä»¤.
   * @return void
   */
 void TM1621_Write_CMD(uint8_t cmd);
@@ -153,7 +153,7 @@ void TM1621_Write_CMD(uint8_t cmd);
 ******************************************************************************
 TM1621_display_number	
 
-ÏÔÊ¾»º´æ
+æ˜¾ç¤ºç¼“å­˜
 ******************************************************************************
 */  
 void TM1621_display_number(uint8_t coordinate, uint8_t value);
@@ -161,7 +161,7 @@ void TM1621_display_number(uint8_t coordinate, uint8_t value);
 ******************************************************************************
 TM1621_display_Letter	
 
-ÏÔÊ¾ ×ÖÄ¸
+æ˜¾ç¤º å­—æ¯
 ******************************************************************************
 */  
 void TM1621_display_Letter(uint8_t coordinate, uint8_t value);
@@ -169,7 +169,7 @@ void TM1621_display_Letter(uint8_t coordinate, uint8_t value);
 ******************************************************************************
 TM1621_Show_Colon	
 
-ÏÔÊ¾·ûºÅ
+æ˜¾ç¤ºç¬¦å·
 ******************************************************************************
 */  
 void TM1621_Show_Symbol(uint8_t coordinate, uint8_t value);
@@ -177,7 +177,7 @@ void TM1621_Show_Symbol(uint8_t coordinate, uint8_t value);
 ******************************************************************************
 TM1621_LCD_Redraw	
 
-ÆÁÄ»Ë¢ĞÂ
+å±å¹•åˆ·æ–°
 ******************************************************************************
 */ 
 void TM1621_LCD_Redraw(void);
@@ -185,7 +185,7 @@ void TM1621_LCD_Redraw(void);
 ******************************************************************************
 TM1621_Show_Repeat_All	
 
-ÆÁÄ»Ñ­»·ÏÔÊ¾
+å±å¹•å¾ªç¯æ˜¾ç¤º
 ******************************************************************************
 */ 
 void TM1621_Show_Repeat_All(void);
@@ -193,7 +193,7 @@ void TM1621_Show_Repeat_All(void);
 ******************************************************************************
 TM1621_Show_All	
 
-È«ÏÔÊ¾
+å…¨æ˜¾ç¤º
 ******************************************************************************
 */ 
 void TM1621_Show_All(void);
@@ -201,29 +201,29 @@ void TM1621_Show_All(void);
 ******************************************************************************
 TM1621_Show_Off	
 
-Ï¢ÆÁ
+æ¯å±
 ******************************************************************************
 */ 
 void TM1621_Show_Off(void);
 
 /*******************************************************************************
-·äÃùÆ÷
+èœ‚é¸£å™¨
 *******************************************************************************/ 
 void TM1621_Buzzer_Off(void);
 void TM1621_Buzzer_On(void);
-// ÃùµÑ  ²»¿É´ò¶Ï,¾¡Á¿²»ÒªÓÃÕâ¸ö
+// é¸£ç¬›  ä¸å¯æ‰“æ–­,å°½é‡ä¸è¦ç”¨è¿™ä¸ª
 void TM1621_Buzzer_Whistle(uint16_t us);
-// àÖÒ»ÏÂ
+// å˜€ä¸€ä¸‹
 void TM1621_Buzzer_Click(void);
 /*
 ******************************************************************************
-³õÊ¼»¯ÃüÁîµ½HT1621 
+åˆå§‹åŒ–å‘½ä»¤åˆ°HT1621 
 ******************************************************************************
 */  
 void TM1621_Buzzer_Init(void);
 void TM1621_LCD_Init(void);
 
-//------------------- pwm¿ØÖÆ ----------------------------
+//------------------- pwmæ§åˆ¶ ----------------------------
 extern void TM1621_light_Max(void);
 extern void TM1621_light_Half(void);
 extern void TM1621_light_Off(void);
