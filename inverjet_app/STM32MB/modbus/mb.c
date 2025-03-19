@@ -366,13 +366,13 @@ eMBPoll(void)
             eStatus = peMBFrameReceiveCur(&ucRcvAddress, &ucMBFrame, &usLength);
             if (eStatus == MB_ENOERR)
             {
+							DEBUG_LED1_ON();
                 /* Check if the frame is for us. If not ignore the frame. */
                 if ((ucRcvAddress == ucMBAddress) || (ucRcvAddress == MB_ADDRESS_BROADCAST))
                 {
                     (void)xMBPortEventPost(EV_EXECUTE);
                 }
             }
-						DEBUG_LED1_OFF();
             break;
 
         case EV_EXECUTE:
@@ -409,6 +409,7 @@ eMBPoll(void)
                 }
                 eStatus = peMBFrameSendCur(ucMBAddress, ucMBFrame, usLength);
             }
+						DEBUG_LED1_OFF();
             break;
 
         case EV_FRAME_SENT:

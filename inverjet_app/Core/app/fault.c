@@ -65,7 +65,7 @@ void on_Fault_Button_2_4_Long_Press(void);
 
 uint16_t Fault_Label[16] = {0x001,0x002,0x003,0x004,0x005,0x006,
 														0x101,0x102,
-														0x201,0x202,0x203,0x204,
+														0x201,0x202,0x203,0x007,
 														0x301,0x302,0x303,0x304};
 
 uint8_t Fault_Number_Sum = 0;	// 故障总数
@@ -156,6 +156,9 @@ uint8_t If_System_Is_Error(void)
 	{
 		if(system_fault >0)
 		{
+#ifdef SYSTEM_DRIVER_BOARD_TOOL
+		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
+#endif
 			if(Motor_Is_Software_Fault(system_fault))
 			{
 				if((Motor_Is_Software_Fault(*p_System_Fault_Static)==0) || (*p_System_Fault_Static == 0))
@@ -266,8 +269,8 @@ void Fault_Number_Update(void)
 {
 	Fault_Number_Sum = Get_Fault_Number_Sum(*p_System_Fault_Static);
 	
-	if(Fault_Number_Cnt > Fault_Number_Sum)
-		Fault_Number_Cnt = 1;
+	//if(Fault_Number_Cnt > Fault_Number_Sum)
+		Fault_Number_Cnt = Fault_Number_Sum;
 }
 
 // 进入故障界面
@@ -302,6 +305,9 @@ void To_Fault_Menu(void)
 // 故障界面 更新
 void Update_Fault_Menu(void)
 {	
+	if(Fault_Number_Sum == 0)
+		return;
+	
 	if(++Automatic_Polling_Timer_Cnt > 4)//5
 	{
 		Automatic_Polling_Timer_Cnt = 0;

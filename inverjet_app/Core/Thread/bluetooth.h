@@ -79,6 +79,8 @@ extern void BT_Set_TRANSENTER(uint8_t data);
 extern void BT_Module_AT_Factory(void);
 //
 extern void BT_Module_AT_Init(void);
+// 连接后断开
+extern void BT_Module_AT_Disconnect(void);
 //重新初始化
 extern void BT_Module_AT_ReInit(void);
 

@@ -82,7 +82,6 @@ static uint32_t Motor_Mode_Register = 0;
 #define GET_OUT_WAIT_RESTART_STAGE()			Motor_ReStart_Flag = 0
 #define	IS_IN_WAIT_RESTART_STAGE()				(Motor_ReStart_Flag ==1)
 	
-
 /* Private user code ---------------------------------------------------------*/
 
 // 初始化
@@ -509,7 +508,7 @@ uint16_t Change_Faule_To_Upper(uint16_t type)
 			
 			else if(type == MOTOR_FAULT_IDLING_ERROR)			//----------- 空转 39
 			{
-				change_fault = E204_IDLING_ERROR;
+				change_fault = E007_IDLING_ERROR;
 				Fault_Restar_Set(1);
 			}
 			//----------- 其它 故障
@@ -556,7 +555,7 @@ uint16_t Change_Faule_To_Upper(uint16_t type)
 		// 空转
 		if(type & TEMP001_MOTOR_FAULT_IDLING_ERROR)
 		{
-			change_fault |= E204_IDLING_ERROR;
+			change_fault |= E007_IDLING_ERROR;
 			Fault_Restar_Set(1);
 		}
 		
@@ -1012,10 +1011,6 @@ void Set_Motor_Fault_State(uint16_t fault_bit)
 #else
 	 Motor_Fault_State |= fault_bit;
 #endif
-	
-#ifdef SYSTEM_DRIVER_BOARD_TOOL
-		Add_Fault_Recovery_Cnt(SYSTEM_FAULT_RECOVERY_MAX);//直接锁机
-#endif
 }
 
 //-------------------- 清除电机故障状态 ----------------------------
@@ -1068,7 +1063,7 @@ uint8_t Motor_Is_Specified_Fault(uint16_t fault_bit, uint16_t specified_bit)
 void Motor_UART_Send(uint8_t* p_buff, uint8_t len)
 {
 #ifdef MOTOR_MODULE_HUART
-	HAL_UART_Transmit(p_huart_motor, p_buff, len, 100);
+	HAL_UART_Transmit(p_huart_motor, p_buff, len, len*10);
 	
 #endif
 }
@@ -1201,10 +1196,11 @@ void Motor_Read_Register(void)
 	Motor_UART_Send(buffer, 6);
 }
 
+#define	MOTOR_TESTMODE_MSG_SIZEOF						( 54 )
+
 //-------------------- 下发测试参数 ( 测试 )----------------------------
 void Motor_GetIn_TestMode(void)
 {
-#define	MOTOR_TESTMODE_MSG_SIZEOF						( 54 )
 	//uint8_t buffer_temp[MOTOR_TESTMODE_MSG_SIZEOF]={0x02,0x29,0x90,0x00,0x00,0x93,0x44,0x00,0x00,0x00,0x86,0x00,0x00,0x25,0xF6,0x00,0x00,0x16,0x4E,0x00,0x00,
 		//0x05,0x44,0x00,0x00,0x0E,0xBE,0x01,0xD3,0xFC,0xB0,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x64,0x00,0x00,0x00,0xC8,0x14,0x53,0x03};
 		

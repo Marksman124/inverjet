@@ -590,6 +590,45 @@ void Special_Button_Rules(uint8_t key_value)
 	Key_Multiple_Clicks_cnt ++;
 }
 
+// 命令控制 按键
+void Key_Task_For_Cmd(uint16_t vault)
+{
+	uint8_t i;
+	uint8_t key_vault=0;
+	uint8_t key_time=0;
+	
+	key_vault = (vault & 0xFF);
+	key_time = (vault>>8);
+	
+	if(key_vault == 0)
+		return;
+	
+	for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
+	{
+		if(key_vault == Key_IO_Ordering_Value[i])
+		{
+			Buzzer_Click_On();
+			if(key_time >= 2)
+			{
+				if(System_is_Operation())
+					p_Operation_Long_Press[i]();
+				else if(System_is_Error())
+					p_Fault_Long_Press[i]();
+				else
+					p_Funtion_Long_Press[i]();
+			}
+			else
+			{
+				if(System_is_Operation())
+					p_Operation_Button[i]();
+				else if(System_is_Error())
+					p_Fault_Button[i]();
+				else
+					p_Funtion_Button[i]();
+			}
+		}
+	}
+}
 
 // 按键主循环任务
 //  20 ms
@@ -611,13 +650,15 @@ void App_Key_Task(void)
 		
 		for(i=0; i<KEY_CALL_OUT_NUMBER_MAX; i++)
 		{
-			if(Key_IO_Hardware == Key_IO_Ordering_Value[i])
+			//if(Key_IO_Hardware == Key_IO_Ordering_Value[i])
+			if((Key_IO_Hardware & Key_IO_Ordering_Value[i])== Key_IO_Ordering_Value[i])
 			{
 				*p_No_Operation_Second_Cnt = 0;
 				Key_For_Sleep_time = Key_Handler_Timer;// 睡眠计时
 				TM1621_Set_light_Mode(0);
 				
-				Key_Long_Press_cnt[i]++;
+				if(Key_Long_Press_cnt[i] < 0xFFFF)
+					Key_Long_Press_cnt[i]++;
 				
 				if(Key_Long_Press_cnt[i] == KEY_LONG_PRESS_TIME_2S)//长按
 				{
@@ -714,6 +755,11 @@ void App_Key_Handler(void)
 		App_Key_Task();
 		*p_Analog_key_Value = 0;
 	}
+	/*{
+		// 命令控制 按键
+		Key_Task_For_Cmd(*p_Analog_key_Value);
+		*p_Analog_key_Value = 0;
+	}*/
 	else
 	{
 		io_shake = Key_Get_IO_Input();
@@ -764,7 +810,7 @@ uint8_t Key_Get_IO_Input(void)
 			result |= (1<<i);
 	}
 	
-	result &= 0x0F;
+	//result &= 0x0F; //屏蔽外接按键
 	
 	return result;
 }

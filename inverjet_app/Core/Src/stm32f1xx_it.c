@@ -251,10 +251,8 @@ void USART2_IRQHandler(void)
 	
 	if((USART2->SR&UART_FLAG_RXNE) != 0)
 	{
-		DEBUG_LED1_ON();
 		//Res=USART2->DR;
 			uart_receive_input(USART2->DR);
-		DEBUG_LED1_OFF();
 	}
   /* USER CODE END USART2_IRQn 0 */
   //HAL_UART_IRQHandler(&huart2);
@@ -269,7 +267,6 @@ void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
 #if (MOTOR_MODULE_HUART == 3)
-	DEBUG_LED2_ON();
 	uint8_t temp=0;
 	if((__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE) != RESET))//如果是接收完成中断，idle标志被置位
 	{
@@ -282,7 +279,6 @@ void USART3_IRQHandler(void)
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart3, Motor_DMABuff, MOTOR_RS485_RX_BUFF_SIZE); // 接收完毕后重启
 		__HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);		   // 手动关闭DMA_IT_HT中断
 	 }
-	DEBUG_LED2_OFF();
 #elif MODBUS_USART == 3
 	if(__HAL_UART_GET_IT_SOURCE(&huart3, UART_IT_RXNE)!= RESET) 
 		{

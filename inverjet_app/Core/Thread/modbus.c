@@ -391,11 +391,13 @@ void Modbus_Buffer_Init(void)
 
 void MB_Flash_Buffer_Write(void)
 {
+	DEBUG_LED2_ON();
 	taskENTER_CRITICAL();
 	//扇区是2048， 整个 usRegHoldingBuf 一起写
 	STMFLASH_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
 	taskEXIT_CRITICAL();
 	//Eeprom_I2C_Write(FLASH_APP_PARAM_ADDR, usRegHoldingBuf, REG_HOLDING_NREGS );
+	DEBUG_LED2_OFF();
 }
 
 void MB_Flash_Buffer_Read(void)

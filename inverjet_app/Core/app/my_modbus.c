@@ -77,6 +77,14 @@ void MsTimeout(ModbusSlaveObj_t * pObj)
 {
     if(pObj->rxTimerEnable)
     {
+			if((BLE_Pair_Finish_Now == 1)&&(pObj->rxWriteIdx >= 8))
+			{
+				pObj->rxWriteLock = 1;
+				pObj->rxTimerEnable = 0;
+				pObj->rxTimerCnt = 0;
+			}
+			else
+			{
         if(pObj->rxTimerCnt < pObj->timeout)
         {
             pObj->rxTimerCnt++;
@@ -87,6 +95,7 @@ void MsTimeout(ModbusSlaveObj_t * pObj)
             pObj->rxTimerEnable = 0;
             pObj->rxTimerCnt = 0;
         }
+			}
     }
 }
 /*******************************************************************************

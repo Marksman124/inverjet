@@ -46,7 +46,7 @@ typedef enum
 	FAULT_BIT_09_TEMPERATURE_HARDWARE,					// 温度 (硬件故障)						E201
 	FAULT_BIT_10_DRIVE_BOARD,										// 驱动板 异常								E202
 	FAULT_BIT_11_DRIVE_LOSS,										// 驱动板 通信故障						E203
-	FAULT_BIT_12_IDLING_ERROR,									// 空转 故障									E204
+	FAULT_BIT_12_IDLING_ERROR,									// 空转 故障									E007
 	
 	FAULT_BIT_13_WIFI_HARDWARE,									// WIFI 模组 (硬件故障)				E301
 	FAULT_BIT_14_BT_HARDWARE,										// BT 模组 (硬件故障)					E302
@@ -74,7 +74,7 @@ typedef enum
 #define E201_TEMPERATURE_HARDWARE					(1 << FAULT_BIT_09_TEMPERATURE_HARDWARE)	// 温度传感器故障
 #define E202_MOTOR_DRIVER									(1 << FAULT_BIT_10_DRIVE_BOARD)						// 电机驱动故障 (其它故障)
 #define E203_MOTOR_LOSS										(1 << FAULT_BIT_11_DRIVE_LOSS)						// 驱动板通讯故障
-#define E204_IDLING_ERROR									(1 << FAULT_BIT_12_IDLING_ERROR)					// 空转 故障
+#define E007_IDLING_ERROR									(1 << FAULT_BIT_12_IDLING_ERROR)					// 空转 故障
 #define E301_WIFI_HARDWARE								(1 << FAULT_BIT_13_WIFI_HARDWARE)
 #define E302_BT_HARDWARE									(1 << FAULT_BIT_14_BT_HARDWARE)
 #define E303_RS485_HARDWARE								(1 << FAULT_BIT_15_RS485_HARDWARE)

@@ -2,6 +2,7 @@
 #ifndef _MODBUSSLAVE_H
 #define _MODBUSSLAVE_H
 
+
 #define MODBUS_SLAVE_TX_RX_MAX_LEN  256
 
 typedef struct
@@ -58,4 +59,5 @@ typedef enum
 	MS_Slave_device_busy 	= 0x06,
 	MS_CRC_check_failure 	= 0x0C,
 }MsState;
+
 #endif

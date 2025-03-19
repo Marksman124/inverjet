@@ -307,7 +307,7 @@ void MB_Write_Timer_CallOut(void)
 	if(MB_Buffer_Write_Timer > 0)
 	{
 		MB_Buffer_Write_Timer ++;
-		if(MB_Buffer_Write_Timer > 20) // 20:5s   60000:25min
+		if(MB_Buffer_Write_Timer > 200) // 200:5s    25ms
 		{
 			MB_Flash_Buffer_Write();
 			MB_Buffer_Write_Timer = 0;

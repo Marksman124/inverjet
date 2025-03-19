@@ -73,7 +73,7 @@ static uint32_t Old_Chemical_Equipment_Cnt =0;
 void App_Timing_Init(void)
 {
 	LCD_Show_Bit = STATUS_BIT_PERCENTAGE;
-	
+
 	System_Boot_Screens();			// 5s
 	Dev_Check_Control_Methods();
 	//开机完成
@@ -284,6 +284,8 @@ void WIFI_State_Handler(void)
 // 蓝牙 状态基  TIMING_THREAD_LIFECYCLE
 void BT_State_Handler(void)
 {
+	static uint8_t bt_handler_cnt=0;
+	
 	if(BT_Get_Machine_State() == BT_ERROR)
 	{
 		BT_Distribution_Timing_Cnt = 0;
@@ -301,7 +303,8 @@ void BT_State_Handler(void)
 		{
 			if(BT_Get_Machine_State() == BT_DISTRIBUTION)
 			{
-				BT_Distribution_Halder();
+				bt_handler_cnt = 1;
+				//BT_Distribution_Halder();
 				
 				if(( BT_Distribution_Timing_Cnt == 0)||(BT_Distribution_Timing_Cnt > Timing_Half_Second_Cnt))
 				{
@@ -326,9 +329,10 @@ void BT_State_Handler(void)
 			}
 			else if(BT_Get_Machine_State() == BT_WORKING)
 			{
-				if(*p_BLE_Pair_Finish != BLE_Pair_Finish_Now)
+				if(bt_handler_cnt == 1)
 				{
-					*p_BLE_Pair_Finish = BLE_Pair_Finish_Now;
+					bt_handler_cnt = 2;
+					*p_BLE_Pair_Finish = 0xA5;
 					//存储  存一个 还是 扇区存
 					Write_MbBuffer_Now();
 				}
@@ -337,6 +341,11 @@ void BT_State_Handler(void)
 			}
 			else
 			{
+				if((bt_handler_cnt == 1)||(bt_handler_cnt == 2))
+				{
+					bt_handler_cnt = 0;
+					BT_Module_AT_Disconnect();
+				}
 				BT_Distribution_Timing_Cnt = 0;
 				LCD_Show_Bit &= ~STATUS_BIT_BLUETOOTH;
 			}
@@ -739,7 +748,7 @@ void App_Timing_Task(void)
 #endif
 #ifdef SYSTEM_DRIVER_BOARD_TOOL
 //********* 场内老化 ***********************************************
-	 //Main_Modbus_Send_Auto_Run();
+	 Main_Modbus_Send_Auto_Run();
 #endif
 			// 时间 : 闪烁  半秒
 			if(System_is_Normal_Operation())
@@ -904,11 +913,11 @@ void Add_Fault_Recovery_Cnt(uint8_t no)
 {
 	if(System_Fault_Recovery_Cnt == 0)
 		Fault_Recovery_Timing_Cnt = Timing_Half_Second_Cnt; // 重新计时
-	
-	System_Fault_Recovery_Cnt += no;
-	
+		
 	if(System_Fault_Recovery_Cnt >= SYSTEM_FAULT_RECOVERY_MAX)
 		Fault_Recovery_Timing_Cnt = 0;
+	else
+		System_Fault_Recovery_Cnt += no;
 }
 
 //-------------------- 超过最大次数 ----------------------------

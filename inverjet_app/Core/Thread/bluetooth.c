@@ -41,6 +41,8 @@ uint8_t BT_Read_Buffer_For_Test[64]={0};
 uint16_t BT_Read_Cnt_For_Test=0;
 
 static uint16_t BT_Halder_cnt = 0;
+
+
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -98,6 +100,9 @@ void BT_Read_Data_Bit(unsigned char vaule)
 //中断调用
 void Usart_IRQ_CallBack(uint8_t data)
 {
+	//static uint8_t buffer[8] = {0};
+	//static uint8_t buffer_cnt=0;
+	
 	if(IS_CHECK_ERROR_MODE())
 	{
 		if(data == '>')
@@ -107,8 +112,26 @@ void Usart_IRQ_CallBack(uint8_t data)
 	}
 	else
 	{
-		BT_Uart_Read_Buffer = data;
-		MsSerialRead(&Ms_BT_Modbus,&BT_Uart_Read_Buffer,1);
+		/*if(BLE_Pair_Finish_Now == 1)
+		{
+			if(buffer[0] != 0x15)
+			{
+				buffer_cnt = 0;
+			}
+			if(buffer_cnt < 8)
+				buffer[buffer_cnt++] = data;
+			
+			if(buffer_cnt >= 8)
+			{
+				MsSerialRead(&Ms_BT_Modbus,buffer,8);
+				buffer_cnt = 0;
+			}
+		}
+		else*/
+		{
+			BT_Uart_Read_Buffer = data;
+			MsSerialRead(&Ms_BT_Modbus,&BT_Uart_Read_Buffer,1);
+		}
 	}
 }
 
@@ -125,13 +148,13 @@ void BT_Set_MAC(void)
 	osDelay(1000);
 }
 
-// AT 指令 设置名称
+// AT 指令 设置名称  需重启
 void BT_Set_Name(void)
 {
 	char buff_1[32]={"AT+BLENAME=inverjet\r\n"};
 	char buff_0[32]={"AT+BLENAME=Anjie_Ble\r\n"};
 	
-	if(*p_BLE_Pair_Finish == 1)
+	if(*p_BLE_Pair_Finish == 0xA5)
 		SerialWrite((uint8_t*)buff_0,strlen(buff_0));
 	else
 		SerialWrite((uint8_t*)buff_1,strlen(buff_1));
@@ -320,7 +343,7 @@ void BT_Module_AT_Factory(void)
 	BT_Restore_Factory();
 }
 
-//
+// 上电初始化
 void BT_Module_AT_Init(void)
 {
 	BT_Set_TRANSENTER(0);
@@ -328,23 +351,39 @@ void BT_Module_AT_Init(void)
 
 	BT_Set_Name();
 	BT_Set_Mode(0);
-	//BT_Set_MTU(243);
 	BT_Set_Power(10);
 	
 	//重启
 	BT_Restar();
-	
 	BT_Set_Advintv(160);
-	
+	BT_Set_MTU(243);
 	//BT_Set_Auth();
 	
-	if(*p_BLE_Pair_Finish == 1)
+	if(*p_BLE_Pair_Finish == 0xA5)
 		BT_Set_Adven(1);
 	else
 		BT_Set_Adven(0);
 	//BT_Set_TRANSENTER(1);// 进入透传
 }
-//
+
+// 连接后断开
+void BT_Module_AT_Disconnect(void)
+{
+	BT_Set_Name();
+	
+	//重启
+	BT_Restar();
+	BT_Set_Advintv(160);
+	BT_Set_MTU(243);
+	
+	if(*p_BLE_Pair_Finish == 0xA5)
+		BT_Set_Adven(1);
+	else
+		BT_Set_Adven(0);
+	
+}
+
+// 配网
 void BT_Module_AT_ReInit(void)
 {
 	BT_Set_TRANSENTER(0);
@@ -358,20 +397,19 @@ void BT_Module_AT_ReInit(void)
 	Write_MbBuffer_Now();//
 	//BT_Set_MAC();
 	BT_Set_Mode(0);
-	//BT_Set_MTU(243);
 	BT_Set_Power(10);
 	//重启
 	BT_Restar();
-	
 	BT_Set_Advintv(160);
-	//BT_Set_Auth();
-	//BT_Set_Adven(1);
+	BT_Set_MTU(243);
+	//BT_Set_Auth();//配对码
+	//BT_Set_Adven(1);//开广播
 }
 
 void BT_Module_AT_NoConnect(void)
 {
-	BT_Set_TRANSENTER(0);
-	BT_Out_Connect();
+	//BT_Set_TRANSENTER(0);
+	//BT_Out_Connect();
 	
 	BT_Set_Adven(0);
 	//重启
@@ -406,7 +444,7 @@ void BT_Module_AT_DoTest(void)
 void BT_Modbus_Config_Init(void)
 {
 	//初始化
-	MsInit(&Ms_BT_Modbus,21,1,SerialWrite);
+	MsInit(&Ms_BT_Modbus,21,2,SerialWrite);
 	//设置01寄存器的参数,
 	//MsConfigureRegister(&Ms_BT_Modbus,0x01,buff01,sizeof(buff01));
 	//MsConfigureRegister(&Ms_BT_Modbus,0x0F,buff01,sizeof(buff01));
